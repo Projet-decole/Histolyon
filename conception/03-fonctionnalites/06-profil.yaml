@@ -1,0 +1,761 @@
+# =============================================================================
+# Palier 3 — Domaine D6 — Profil et données personnelles
+# =============================================================================
+# Le domaine D6 décrit la relation entre l'utilisateur et ses données dans
+# l'app : ses favoris, son historique de visite, ses paramètres, et — en
+# OPTION — son compte. Il pose la règle d'or : l'app fonctionne ENTIÈREMENT
+# sans compte, tout est local par défaut. Le compte n'est requis que pour
+# deux usages très ciblés : publier un parcours à la communauté et
+# synchroniser ses données entre plusieurs appareils.
+#
+# Ce domaine matérialise le refus essentiel "Le mur d'inscription"
+# (essence § ce_qu_on_refuse) : pas de Facebook/Google obligatoire au
+# démarrage, pas de page de création de compte avant d'avoir vu Lyon.
+#
+# Format strict respecté (cf. 00-index § 5). Anti-périmètre strict respecté
+# (cf. 00-index § 2) : aucune description d'écran, aucun composant nommé,
+# aucun chiffre technique, aucune microcopy exacte.
+# =============================================================================
+
+document:
+    type: palier_fonctionnalites_domaine
+    domaine_id: D6
+    numero: 3
+    audience:
+        - "Tout agent qui rédige un palier en aval (4 à 16)"
+        - "Devs Flutter (cahier des charges fonctionnel pour le profil et le stockage local)"
+        - "Lead historienne et équipe — référence pour les enjeux vie privée"
+    role: >-
+        Décrire fonctionnellement l'espace personnel de l'utilisateur : ses
+        données privées (favoris, historique), ses préférences (paramètres),
+        et la relation OPTIONNELLE au compte. Poser que le local est le défaut
+        et que toute remontée vers un cloud est un consentement explicite et
+        granulaire.
+    format: yaml
+    prerequis_de_lecture:
+        - "design/conception/intention.yaml — § 5.7 separation_des_responsabilites_entre_paliers"
+        - "design/conception/01-essence.yaml — en particulier § ce_qu_on_refuse (Le mur d'inscription)"
+        - "design/conception/02-personas.yaml"
+        - "design/conception/03-fonctionnalites/00-index.yaml — § 2 anti_perimetre_strict est OBLIGATOIRE"
+        - "design/conception/03-fonctionnalites/01-carte-exploration-temporelle.yaml — modèle pilote"
+
+# -----------------------------------------------------------------------------
+# Raison d'être du domaine
+# -----------------------------------------------------------------------------
+raison_d_etre_du_domaine: >-
+    HistoLyon promet de l'émerveillement sans contrepartie : pas de mur
+    d'inscription, pas de friction, pas de revente de données. Ce domaine
+    est le garant matériel de cette promesse. Il rassemble TOUT ce qui
+    appartient à l'utilisateur — ce qu'il a aimé, ce qu'il a vu, ce qu'il
+    préfère — et garantit que ces données restent SIENNES, sur SON appareil,
+    consultables, modifiables, effaçables sans avoir à demander.
+
+    Le domaine sert chaque persona à sa manière : Kenji conserve ses
+    découvertes pour les retrouver le soir à l'hôtel sans avoir donné son
+    email ; le père lyonnais retrouve l'anecdote du dimanche pour la raconter
+    le mardi soir ; Mme Dupont peut publier un parcours à la communauté en
+    créant un compte au moment où elle en a besoin (et pas avant) ; Mme
+    Martin règle les paramètres de l'app pour la projeter en classe sans que
+    l'institution ait à donner ses identifiants à quiconque.
+
+    Ce domaine est aussi le point de contact avec les enjeux de vie privée
+    les plus sensibles du produit (historique de présence en ville,
+    préférences personnelles). C'est pourquoi sa logique cardinale est
+    inversée par rapport aux apps standards : le LOCAL est le défaut, le
+    CLOUD est l'exception consentie.
+
+# -----------------------------------------------------------------------------
+# Sous-domaines
+# -----------------------------------------------------------------------------
+sous_domaines:
+    # ===========================================================================
+    - id: D6.1
+      nom: "Profil sans compte (mode local par défaut)"
+
+      raison_d_etre: >-
+          Garantir que l'app est utilisable INTÉGRALEMENT sans aucune
+          inscription. C'est l'application directe du refus essentiel
+          "Le mur d'inscription" (essence § ce_qu_on_refuse). Le profil
+          existe dès la première ouverture de l'app, peuplé au fil de
+          l'usage, sans qu'aucune identité ne soit demandée. C'est la
+          surface qui rend visibles à l'utilisateur SES propres données.
+
+      comportement: >-
+          Dès la première ouverture, un espace personnel existe et est
+          accessible depuis la navigation principale. Cet espace réunit
+          les pins favoris, l'historique de visite, les paramètres de
+          l'app, et un point d'entrée OPTIONNEL pour la création ou la
+          connexion à un compte. Aucune information identifiante n'est
+          demandée pour utiliser cet espace. L'utilisateur peut consulter,
+          enrichir et nettoyer ses données librement. Tant qu'il ne crée
+          pas de compte, ses données sont strictement présentes sur son
+          appareil et nulle part ailleurs.
+
+      regles_fonctionnelles:
+          - "L'espace personnel existe dès la première ouverture, sans inscription"
+          - "Aucune donnée identifiante n'est requise pour le faire vivre"
+          - "Toutes les données du profil sont stockées localement par défaut"
+          - "L'utilisateur peut consulter et modifier librement ses propres données"
+          - "Aucune télémétrie identifiante ni tracking caché n'est associé au profil"
+          - "Le compte (D6.5) est un point d'entrée OPTIONNEL, jamais un préalable"
+          - "Désinstaller l'app revient à supprimer ces données, sauf compte cloud activé (D6.5)"
+
+      capabilites:
+          - "Donner accès à l'utilisateur à ses propres données (favoris, historique, paramètres)"
+          - "Conserver localement les données du profil entre les sessions"
+          - "Faire vivre le profil sans aucune information identifiante"
+          - "Distinguer l'état 'sans compte' (par défaut) de l'état 'compte associé' (D6.5)"
+          - "Servir de point d'accès aux sous-domaines de profil (favoris, historique, paramètres, compte)"
+
+      ce_qu_on_ne_fait_pas:
+          - "Pas de demande d'inscription au lancement"
+          - "Pas de connexion par tiers (Facebook, Google) imposée"
+          - "Pas de fonctionnalité réservée au seul fait d'avoir un compte, en dehors de la publication communautaire (D6.5) et de la synchronisation (D6.5)"
+          - "Pas de remontée silencieuse de données personnelles vers un serveur sans compte ET activation explicite"
+          - "Pas de profil 'public' visible par d'autres utilisateurs (pas de pseudonyme exposé sans action explicite côté communauté D9)"
+
+      criteres_de_reussite:
+          - "Kenji utilise l'app pendant tout son séjour sans avoir donné un email — ses favoris et son historique sont là"
+          - "Le père lyonnais ouvre l'espace personnel et n'y rencontre aucun champ à remplir"
+          - "L'utilisateur ressent que ses données lui appartiennent, sans avoir à le démontrer"
+
+      definition_of_done:
+          - "L'espace personnel est accessible dès la première ouverture sans aucune saisie"
+          - "Les sous-domaines (favoris, historique, paramètres, compte) sont atteignables depuis cet espace"
+          - "Aucune donnée du profil n'est transmise à un serveur sans compte ET activation explicite de la synchronisation"
+          - "L'utilisateur peut utiliser intégralement l'app sans jamais créer de compte"
+
+      enjeux_transversaux:
+          accessibilite: >-
+              L'espace personnel doit être navigable de la même manière que
+              le reste de l'app (lecteurs d'écran, navigation alternative).
+              Les contrôles d'effacement doivent être atteignables sans
+              prouesse motrice.
+          performance: >-
+              Modeste : l'espace personnel est consulté ponctuellement, pas
+              en continu. La lecture des données locales doit être perçue
+              comme immédiate.
+          vie_privee: >-
+              Critique et structurante. Le profil contient ce qu'il y a de
+              plus intime dans l'app : ce que l'utilisateur a aimé, où il
+              est passé, ses préférences. La règle est inversée par rapport
+              aux apps standards : le LOCAL est le défaut, le CLOUD une
+              exception consentie. À aucun moment l'utilisateur ne doit
+              avoir à prouver son droit de rester anonyme.
+
+      questions_ouvertes:
+          - "Étendue exacte des données qui survivent à un changement d'appareil hors compte (sauvegarde système iOS/Android ?) — à trancher avec les devs Flutter"
+          - "Comportement à la désinstallation : effacement total ou résidu de cache ? — à acter avec les devs"
+
+      priorite: "important"
+
+      personas_principaux:
+          - kenji
+          - pere_lyonnais
+          - mme_dupont
+          - mme_martin
+
+      dependances:
+          - "D5 (onboarding — l'absence de compte au lancement est la promesse posée par l'onboarding)"
+
+      comportements_transverses_referenced:
+          - "Permissions juste-à-temps (canonique D5.5) — appliqué ici à toute permission liée au compte ou à la synchronisation, demandée au moment de l'activation, jamais au lancement"
+
+    # ===========================================================================
+    - id: D6.2
+      nom: "Favoris et pins épinglés"
+
+      raison_d_etre: >-
+          Permettre à l'utilisateur de marquer un pin (ou un parcours) qui
+          l'a marqué pour le retrouver ensuite. Sert directement le moment
+          de vérité du père lyonnais ("découvrir un fait fou et le retrouver
+          le soir pour le raconter à un ami") et le préparatif de Kenji ("le
+          soir à l'hôtel, je veux refaire le tour des choses qui m'ont plu").
+          C'est aussi le geste de mémoire personnelle : ce qu'on a aimé
+          mérite d'être tenu à portée.
+
+      comportement: >-
+          Lors de la consultation d'un pin (D2) ou d'un parcours (D3),
+          l'utilisateur peut le marquer comme favori d'un geste simple.
+          Le retrait du favori est tout aussi simple. La collection des
+          favoris est consultable depuis l'espace personnel : l'utilisateur
+          retrouve la liste des éléments qu'il a marqués, dans un ordre
+          pertinent (par exemple le plus récemment ajouté en tête, à
+          affiner). Depuis cette consultation, il peut rouvrir le pin ou
+          le parcours, ou retirer le favori. La collection est strictement
+          locale par défaut.
+
+      regles_fonctionnelles:
+          - "Marquer/démarquer un favori est un geste simple disponible depuis le pin et depuis le parcours"
+          - "L'état favori d'un élément est cohérent partout où l'élément apparaît (carte, parcours, historique, consultation approfondie)"
+          - "La consultation des favoris est accessible depuis l'espace personnel"
+          - "Les favoris sont strictement locaux par défaut"
+          - "Les favoris peuvent être synchronisés vers le cloud uniquement si un compte est associé ET la synchronisation activée explicitement (D6.5)"
+          - "L'utilisateur peut retirer un favori à tout moment, sans confirmation lourde, sans perte du contenu sous-jacent"
+
+      capabilites:
+          - "Marquer un pin comme favori"
+          - "Marquer un parcours comme favori"
+          - "Retirer un élément des favoris"
+          - "Donner accès à la collection des favoris"
+          - "Refléter l'état favori partout où l'élément apparaît"
+          - "Permettre l'ouverture d'un favori pour le reconsulter"
+
+      ce_qu_on_ne_fait_pas:
+          - "Pas de favoris partagés publiquement — la collection est privée"
+          - "Pas de catégorisation imposée des favoris (pas de dossiers obligatoires)"
+          - "Pas de remontée des favoris vers le cloud sans compte ET activation"
+          - "Pas de quota arbitraire imposé sur le nombre de favoris"
+
+      criteres_de_reussite:
+          - "Le père lyonnais retrouve le pin marqué le dimanche pour le raconter à un ami le mardi soir, sans effort"
+          - "Kenji retrouve le soir à l'hôtel les lieux qu'il a aimés dans la journée"
+          - "Mme Dupont peut épingler quelques pins en préparation de sa sortie pour les vérifier avant le jour J"
+          - "Marquer/démarquer ne donne jamais l'impression de prendre un risque (toujours réversible immédiatement)"
+
+      definition_of_done:
+          - "L'utilisateur peut marquer et démarquer un pin et un parcours"
+          - "L'état favori d'un élément est visible et cohérent partout où l'élément apparaît"
+          - "La collection des favoris est consultable depuis l'espace personnel"
+          - "L'ouverture d'un favori ramène à la consultation pleine du pin ou du parcours"
+          - "Les favoris persistent entre les sessions"
+          - "Sans compte, les favoris ne quittent jamais l'appareil"
+
+      enjeux_transversaux:
+          accessibilite: >-
+              Le geste de mise en favori et de retrait doit être atteignable
+              avec une cible tactile généreuse et navigable au clavier ou
+              au lecteur d'écran. L'état favori doit être perceptible
+              autrement que par la seule couleur.
+          performance: >-
+              L'effet du marquage doit être perçu comme instantané. La
+              consultation de la collection doit s'ouvrir sans attente,
+              même avec une longue collection.
+          vie_privee: >-
+              Critique : la liste des favoris est une lecture intime des
+              intérêts de l'utilisateur. Strictement locale par défaut.
+              Toute synchronisation cloud passe par D6.5 (compte + activation
+              explicite et granulaire).
+
+      questions_ouvertes:
+          - "Ordre par défaut de la collection (récents en tête ? regroupé par parcours ? alphabétique ?) — à arbitrer en palier 7"
+          - "Possibilité de filtrer la collection (par catégorie, par époque) — recommandation : oui à terme, à confirmer"
+          - "Comportement quand un pin favori est retiré du contenu publié (suppression côté éditorial) — recommandation : conserver l'entrée comme 'archivée' avec mention, à acter"
+
+      priorite: "important"
+
+      personas_principaux:
+          - pere_lyonnais
+          - kenji
+          - mme_dupont
+
+      dependances:
+          - "D2 (consultation d'un pin — surface où le marquage est posé)"
+          - "D3 (parcours — peuvent aussi être marqués comme favoris)"
+
+      comportements_transverses_referenced: []
+
+    # ===========================================================================
+    - id: D6.3
+      nom: "Historique de visite"
+
+      raison_d_etre: >-
+          Permettre à l'utilisateur de retrouver ce qu'il a consulté ou
+          vécu sans avoir eu le réflexe de le marquer comme favori. Sert
+          la curiosité a posteriori ("j'avais lu un truc sur ce mur, c'était
+          où déjà ?") et les usages d'apprentissage où l'on accumule sans
+          tout fixer. Sert aussi la transparence sur ce que l'app a
+          enregistré : l'utilisateur voit ce qui est conservé, et peut
+          effacer.
+
+      comportement: >-
+          Au fil de l'usage, les pins consultés et les parcours terminés
+          sont automatiquement enregistrés dans un historique strictement
+          local. L'utilisateur peut consulter cet historique depuis
+          l'espace personnel et y retrouver les éléments par lesquels il
+          est passé, dans un ordre chronologique pertinent. Il peut
+          rouvrir un élément depuis l'historique, ou effacer une entrée
+          individuellement. Il peut également effacer la totalité de
+          l'historique d'un seul geste, sans suppression cachée par
+          étapes. Aucune position GPS précise n'est conservée — seule
+          la trace fonctionnelle de ce qui a été consulté l'est.
+
+      regles_fonctionnelles:
+          - "L'historique enregistre la consultation d'un pin, la complétion d'un parcours et les résultats de quiz post-narratifs (cf. D2.7)"
+          - "L'historique est strictement local — il n'est jamais transmis à un serveur, même par un compte avec synchronisation activée, sans consentement spécifique"
+          - "L'utilisateur peut effacer une entrée individuellement"
+          - "L'utilisateur peut effacer la totalité de l'historique"
+          - "L'historique ne stocke pas la position GPS continue de l'utilisateur — uniquement la trace fonctionnelle du contenu consulté"
+          - "L'utilisateur peut désactiver l'enregistrement de l'historique dans les paramètres (D6.4)"
+          - "Aucune analytique tierce n'est dérivée de l'historique"
+
+      capabilites:
+          - "Enregistrer la consultation d'un pin"
+          - "Enregistrer la complétion d'un parcours"
+          - "Enregistrer les résultats de quiz post-narratifs (cf. D2.7)"
+          - "Donner accès à l'historique consultable"
+          - "Permettre la réouverture d'un élément depuis l'historique"
+          - "Effacer une entrée individuelle de l'historique"
+          - "Effacer la totalité de l'historique"
+          - "Désactiver l'enregistrement de l'historique"
+
+      ce_qu_on_ne_fait_pas:
+          - "Pas d'historique remonté à un serveur, même par compte synchronisé, sans consentement spécifique au-delà de la synchronisation générale"
+          - "Pas de stockage de la trajectoire GPS continue de l'utilisateur"
+          - "Pas d'historique inférable depuis un autre appareil sans transfert explicite"
+          - "Pas de profil comportemental dérivé de l'historique pour des recommandations cachées ou des publicités"
+          - "Pas d'historique partagé publiquement"
+          - "Pas d'effacement caché par étapes — l'effacement global est un seul geste assumé"
+
+      criteres_de_reussite:
+          - "Le père lyonnais retrouve le pin du dimanche dans son historique le mardi soir sans avoir eu à le marquer"
+          - "L'utilisateur peut effacer son historique sans avoir l'impression de fâcher l'app"
+          - "Le test_litmus de Kenji 'l'app respecte ma vie privée' est tenu"
+          - "Aucun utilisateur ne se sent pisté"
+
+      definition_of_done:
+          - "Les pins consultés et parcours terminés apparaissent dans l'historique"
+          - "L'historique est consultable depuis l'espace personnel"
+          - "La réouverture d'un élément depuis l'historique fonctionne"
+          - "L'effacement individuel d'une entrée fonctionne"
+          - "L'effacement total de l'historique fonctionne en un seul geste"
+          - "L'historique est strictement local par défaut, jamais transmis sans consentement spécifique"
+          - "L'utilisateur peut désactiver l'enregistrement de l'historique"
+
+      enjeux_transversaux:
+          accessibilite: >-
+              L'historique doit être navigable au lecteur d'écran. Les
+              actions d'effacement doivent annoncer clairement leur portée
+              (entrée seule vs total) pour les utilisateurs en assistance
+              vocale. L'effacement global doit être atteignable sans avoir
+              à parcourir toutes les entrées.
+          performance: >-
+              La consultation de l'historique doit rester fluide même sur
+              une longue accumulation. L'enregistrement automatique ne doit
+              pas dégrader l'expérience principale (consultation pin,
+              parcours).
+          vie_privee: >-
+              Critique et déterminante. L'historique de visite est une
+              donnée extrêmement sensible : il dit où l'utilisateur a porté
+              son attention dans la ville, donc indirectement où il est
+              passé. C'est pourquoi : (a) strictement local par défaut,
+              (b) jamais cloud sans consentement spécifique au-delà de la
+              synchronisation générale, (c) effacement individuel ET global
+              toujours possibles, (d) désactivable dans les paramètres,
+              (e) aucune trajectoire GPS continue stockée.
+
+      questions_ouvertes:
+          - "Profondeur temporelle de l'historique conservé (illimité ? glissant à 6 mois / 1 an ?) — recommandation : illimité tant que l'utilisateur n'efface pas, à acter"
+          - "Distinction visuelle entre 'consulté brièvement' et 'consulté en profondeur' (ex. lu jusqu'au bout vs aperçu) — à arbitrer en palier 7"
+          - "Notion de 'reprise' depuis l'historique pour un parcours interrompu — articulation avec D3 à confirmer"
+
+      priorite: "important"
+
+      personas_principaux:
+          - pere_lyonnais
+          - kenji
+          - mme_dupont
+
+      dependances:
+          - "D2 (consultation d'un pin — déclencheur d'une entrée d'historique)"
+          - "D3 (parcours — la complétion alimente l'historique)"
+          - "D6.4 (paramètres — désactivation de l'enregistrement de l'historique)"
+
+      comportements_transverses_referenced: []
+
+    # ===========================================================================
+    - id: D6.4
+      nom: "Paramètres"
+
+      raison_d_etre: >-
+          Permettre à l'utilisateur d'ajuster l'app à ses préférences et à
+          son contexte : les notifications (le père lyonnais qui veut
+          couper aujourd'hui), le mode Surprenez-moi (qui doit rester
+          opt-in), l'accessibilité (pour tout utilisateur en situation de
+          besoin), et la gestion de ses propres données. Sans cet espace,
+          l'app impose des défauts à tout le monde — alors que l'essence
+          du produit est de respecter l'utilisateur.
+
+      comportement: >-
+          Depuis l'espace personnel, l'utilisateur accède à un ensemble de
+          réglages organisés par sujet. Il peut y activer ou désactiver le
+          mode Surprenez-moi (qui reste désactivé par défaut), gérer les
+          notifications de proximité (cf. D4), ajuster les options
+          d'accessibilité (taille du texte, contraste, alternatives
+          visuelles, comportements audio), et accéder aux options de
+          gestion de ses données (effacement de l'historique, déconnexion
+          d'un compte si applicable). Toute modification d'un paramètre
+          est appliquée immédiatement et persiste entre les sessions.
+
+      regles_fonctionnelles:
+          - "Les paramètres sont accessibles depuis l'espace personnel"
+          - "Le mode Surprenez-moi est DÉSACTIVÉ par défaut, et son activation est explicite (essence § ce_qu_on_refuse — notifications par défaut)"
+          - "Les notifications respectent les modes définis en D4 (balade libre, Surprenez-moi opt-in, en parcours)"
+          - "Une catégorie d'options d'accessibilité est offerte (taille de texte, contraste, alternatives visuelles, comportement audio)"
+          - "L'effacement global de l'historique est atteignable depuis les paramètres (cf. D6.3)"
+          - "Toute modification est appliquée immédiatement"
+          - "La désactivation du mode Surprenez-moi en cours d'usage est immédiate, jamais différée"
+          - "Les paramètres sont stockés localement, et synchronisés uniquement si compte ET synchronisation activés (D6.5)"
+
+      capabilites:
+          - "Permettre la sélection de la langue de l'interface"
+          - "Permettre l'activation/désactivation du mode Surprenez-moi"
+          - "Permettre la gestion fine des notifications de proximité"
+          - "Permettre l'ajustement des options d'accessibilité"
+          - "Permettre l'effacement de l'historique (cf. D6.3)"
+          - "Permettre la désactivation de l'enregistrement de l'historique"
+          - "Permettre la gestion du compte si associé (cf. D6.5)"
+          - "Donner accès aux mentions légales, crédits et politique de confidentialité"
+
+      ce_qu_on_ne_fait_pas:
+          - "Pas d'activation par défaut de fonctionnalités intrusives (notifications, Surprenez-moi)"
+          - "Pas de personnalisation cachée par persona — l'utilisateur règle, l'app n'infère pas"
+          - "Pas de réglage qui modifierait silencieusement la frontière vie privée (toute remontée cloud passe par D6.5)"
+          - "Pas de paramètres avancés cachés derrière des gestes obscurs"
+          - "Pas de paramètres redondants avec ceux du système (on ne re-demande pas la permission GPS dans nos paramètres si elle est gérée au niveau OS — on ouvre l'OS si nécessaire)"
+
+      criteres_de_reussite:
+          - "Kenji peut basculer l'app en japonais sans avoir à chercher"
+          - "Le père lyonnais peut couper les notifs du jour en quelques gestes simples depuis l'espace personnel (test_litmus persona père : 2 taps)"
+          - "Mme Martin trouve les options d'accessibilité utiles pour la projection en classe (taille de texte, contraste)"
+          - "Aucun utilisateur ne se sent surpris par un comportement de l'app qu'il n'avait pas activé"
+
+      definition_of_done:
+          - "L'utilisateur peut sélectionner la langue de l'interface dans la liste prévue"
+          - "L'utilisateur peut activer/désactiver le mode Surprenez-moi"
+          - "L'utilisateur peut configurer ses notifications de proximité"
+          - "L'utilisateur peut ajuster au moins les options d'accessibilité prévues (taille, contraste, alternatives, audio)"
+          - "L'utilisateur peut effacer son historique et désactiver son enregistrement"
+          - "Les modifications sont appliquées immédiatement et persistent entre les sessions"
+          - "Le mode Surprenez-moi est bien désactivé par défaut"
+          - "Les mentions légales, crédits et politique de confidentialité sont accessibles depuis cet espace"
+
+      enjeux_transversaux:
+          accessibilite: >-
+              Centrale : c'est ICI que se règlent les options d'accessibilité.
+              Les paramètres eux-mêmes doivent être exemplaires en termes de
+              navigabilité (lecteurs d'écran, taille de cible, libellés
+              explicites, alternative non gestuelle). Les modifications
+              doivent être annoncées clairement (état avant / état après).
+          performance: >-
+              Modeste — les paramètres sont consultés ponctuellement. La
+              prise en compte d'une modification doit être perçue comme
+              immédiate.
+          vie_privee: >-
+              Critique : c'est l'écran où l'utilisateur RÉCUPÈRE de l'agence
+              sur ses données. La présence visible et accessible des
+              commandes 'effacer historique', 'désactiver historique',
+              'gérer notifs', 'gérer compte' est un dû. Aucun paramètre ne
+              doit dégrader silencieusement la confidentialité — un changement
+              de paramètre qui élargit la portée des données (ex. activer la
+              synchronisation) doit être explicite et compris.
+
+      questions_ouvertes:
+          - "Liste exacte des langues supportées (fr / en / ja minimum pour les personas — à valider)"
+          - "Liste exacte des options d'accessibilité offertes (taille texte, contraste élevé, animations réduites, alternatives à l'audio, alternatives au geste continu) — à arbitrer en palier 12 / palier 16"
+          - "Mode présentation (utile à Mme Martin) : un réglage dans les paramètres ou un raccourci contextuel en D2.5 ? — à articuler avec le palier 7"
+          - "Stockage de l'historique : durée maximale conservée par défaut (cf. D6.3) — à acter"
+
+      priorite: "important"
+
+      personas_principaux:
+          - kenji
+          - pere_lyonnais
+          - mme_martin
+          - mme_dupont
+
+      dependances:
+          - "D4 (notifications de proximité — gérées depuis les paramètres)"
+          - "D6.3 (historique — effacement et désactivation depuis les paramètres)"
+          - "D6.5 (compte — gestion depuis les paramètres si associé)"
+
+      comportements_transverses_referenced:
+          - "Permissions juste-à-temps (canonique D5.5) — l'écran de paramètres peut renvoyer aux paramètres système si une permission doit être révoquée ou ré-autorisée"
+
+    # ===========================================================================
+    - id: D6.5
+      nom: "Compte (création/connexion optionnelle, synchronisation)"
+
+      raison_d_etre: >-
+          Offrir un compte UNIQUEMENT pour les usages qui en ont vraiment
+          besoin : (a) publier un parcours communautaire (un parcours
+          partagé publiquement doit être attribuable à un auteur, ne
+          serait-ce que pour la modération et l'attribution éditoriale),
+          (b) synchroniser ses données entre plusieurs appareils (Mme
+          Dupont prépare son parcours sur sa tablette le dimanche, le
+          retrouve sur son téléphone le jour J). En dehors de ces deux
+          usages, le compte n'apporte rien — et l'app le dit. Le compte
+          est une OPTION, pas un préalable. C'est l'application directe
+          du refus essentiel "Le mur d'inscription".
+
+      comportement: >-
+          Depuis l'espace personnel ou au moment où l'utilisateur tente
+          l'un des deux usages qui le requièrent (publier un parcours
+          communautaire, activer la synchronisation), l'app propose la
+          création d'un compte ou la connexion. La création se fait avec
+          le minimum de données nécessaires (l'app ne demande pas plus
+          que ce qu'elle a besoin). Une fois le compte créé, l'utilisateur
+          reste libre d'activer ou non la synchronisation. La
+          synchronisation est GRANULAIRE : l'utilisateur consent
+          explicitement à ce qui remonte (favoris, parcours créés,
+          historique — choix par catégorie, à confirmer en palier 7). À
+          tout moment, l'utilisateur peut se déconnecter, ce qui réintègre
+          l'app à son état sans compte sur cet appareil ; il peut aussi
+          demander la suppression de son compte côté serveur, qui efface
+          effectivement les données qui y étaient remontées.
+
+      regles_fonctionnelles:
+          - "Le compte n'est requis QUE pour : publier un parcours communautaire (D9), activer la synchronisation multi-appareils"
+          - "Aucune fonctionnalité de consommation (carte, pins, parcours, mode canapé, audio, AR) ne dépend du compte"
+          - "La création de compte est demandée AU MOMENT où elle sert (cas de Mme Dupont qui veut publier — pas avant), pas au lancement"
+          - "La création de compte demande le minimum de données nécessaires"
+          - "Le compte par tiers (Facebook, Google) reste optionnel s'il est offert — jamais obligatoire (essence § ce_qu_on_refuse)"
+          - "La synchronisation est désactivée par défaut, même avec compte associé"
+          - "L'activation de la synchronisation est explicite et granulaire (par catégorie de données, à affiner palier 7)"
+          - "L'historique de visite (D6.3) ne remonte JAMAIS sans consentement spécifique au-delà de l'activation générale de la synchronisation"
+          - "La déconnexion ramène l'app à son état sans compte sur l'appareil (les données locales sont conservées par défaut, l'utilisateur peut choisir de les effacer)"
+          - "La suppression du compte côté serveur efface les données remontées correspondantes"
+          - "Le compte ne crée pas de profil public visible par d'autres utilisateurs (un pseudonyme apparaît uniquement quand l'utilisateur publie quelque chose côté communauté D9, et c'est lui qui le choisit)"
+
+      capabilites:
+          - "Permettre la création d'un compte avec le minimum de données"
+          - "Permettre la connexion à un compte existant"
+          - "Permettre l'activation explicite de la synchronisation multi-appareils"
+          - "Permettre la sélection granulaire des catégories de données synchronisées"
+          - "Permettre la déconnexion du compte sur l'appareil"
+          - "Permettre la suppression du compte côté serveur et l'effacement des données associées"
+          - "Permettre la récupération des données synchronisées depuis un nouvel appareil après connexion"
+          - "Servir d'identité pour la publication de parcours communautaires (D9)"
+
+      ce_qu_on_ne_fait_pas:
+          - "Pas de mur d'inscription au lancement (essence)"
+          - "Pas de Facebook/Google obligatoire (essence)"
+          - "Pas de fonctionnalité de CONSOMMATION enfermée derrière le compte"
+          - "Pas de synchronisation activée par défaut, même après création de compte"
+          - "Pas de remontée de l'historique sans consentement spécifique"
+          - "Pas de suppression de compte différée par mécanique de rétention obscure"
+          - "Pas de profil public exposé sans action explicite de l'utilisateur côté communauté (D9)"
+          - "Pas de monétisation des données associées au compte"
+
+      criteres_de_reussite:
+          - "Kenji utilise l'app pendant tout son séjour sans jamais voir une demande de création de compte"
+          - "Mme Dupont peut publier son parcours communautaire avec une création de compte qui ne la fait pas regretter d'avoir voulu partager"
+          - "Mme Dupont peut basculer entre tablette (préparation) et téléphone (jour J) avec ses données à jour, sans confusion"
+          - "L'utilisateur qui se déconnecte ne perd pas ses données locales par accident"
+          - "L'utilisateur qui demande la suppression de son compte voit ses données effectivement effacées côté serveur"
+
+      definition_of_done:
+          - "L'utilisateur peut créer un compte au moment où l'usage le requiert (publication communautaire, synchronisation)"
+          - "L'utilisateur peut se connecter à un compte existant"
+          - "L'utilisateur peut activer la synchronisation explicitement, et choisir granulairement ce qui est synchronisé"
+          - "L'utilisateur peut se déconnecter sans perdre ses données locales par accident"
+          - "L'utilisateur peut supprimer son compte côté serveur et voir ses données associées effectivement effacées"
+          - "Aucune fonctionnalité de consommation n'est rendue impossible par l'absence de compte"
+          - "Aucune donnée du profil ne remonte vers le cloud sans compte ET activation explicite"
+
+      enjeux_transversaux:
+          accessibilite: >-
+              Le formulaire de création de compte et l'écran de connexion
+              doivent être exemplaires en accessibilité (libellés explicites,
+              navigation clavier, lecture par lecteur d'écran, gestion des
+              erreurs annoncée à voix haute, alternatives au tiers d'auth si
+              offerts).
+          performance: >-
+              La création et la connexion doivent être perçues comme rapides
+              ; les retours d'erreur ne doivent pas être perdus dans une
+              latence opaque.
+          vie_privee: >-
+              Critique et structurante. C'est ICI que se joue la frontière
+              local/cloud. Trois exigences cardinales : (1) consentement
+              explicite et granulaire à la synchronisation (jamais cocher
+              par défaut), (2) suppression de compte effective côté serveur
+              (pas une rétention masquée), (3) historique jamais remonté
+              sans consentement spécifique au-delà de la synchronisation
+              générale. La politique de confidentialité, accessible depuis
+              les paramètres (D6.4), doit être lisible par un humain et ne
+              pas mentir.
+
+      questions_ouvertes:
+          - "Méthode d'authentification (email + mot de passe / magic link / tiers optionnel) — à arbitrer avec les devs Flutter et l'équipe sécu"
+          - "Catégories exactes de données synchronisables (favoris seuls ? favoris + parcours créés ? + historique sur consentement spécifique ?) — à acter en palier 4 (données et contrats)"
+          - "Délai et procédure exacts de la suppression effective des données côté serveur — à formaliser dans le quality plan / palier 16"
+          - "Conservation locale ou non lors de la déconnexion : par défaut conservées, option d'effacement proposée — à confirmer"
+          - "Récupération des données après connexion sur un nouvel appareil : merge ou remplacement ? — à arbitrer (recommandation : merge avec préférence à la version cloud quand conflit)"
+
+      priorite: "important"
+
+      personas_principaux:
+          - mme_dupont
+          - kenji
+          - pere_lyonnais
+
+      dependances:
+          - "D6.1 (profil sans compte — état par défaut auquel ce sous-domaine ajoute une OPTION)"
+          - "D6.2 (favoris — peuvent être synchronisés via compte)"
+          - "D6.3 (historique — règles spécifiques de remontée)"
+          - "D6.4 (paramètres — gestion du compte et de la synchronisation depuis cet espace)"
+          - "D9 (communauté — la publication d'un parcours communautaire est l'un des deux usages requérant un compte)"
+          - "D3 (parcours — un parcours créé peut être l'objet d'une publication communautaire)"
+
+      comportements_transverses_referenced:
+          - "Permissions juste-à-temps (canonique D5.5) — la création de compte et l'activation de la synchronisation sont demandées au moment où elles servent, jamais avant"
+
+    # ===========================================================================
+    - id: D6.6
+      nom: "Sections engageantes (badges, statistiques)"
+
+      raison_d_etre: >-
+          Donner à l'utilisateur, s'il le souhaite, un retour sur ce qu'il
+          a fait avec l'app : pins visités, kilomètres parcourus, époques
+          explorées, badges symboliques pour des étapes marquantes. C'est
+          une dimension d'engagement DOUCE, qui valorise l'usage sans le
+          transformer en gamification agressive. Reste explicitement
+          'planifié si le temps le permet' (cf. brief § 12) — l'app est
+          complète sans, et ces sections viennent en couche additionnelle.
+          Le ton conteur impose ici une retenue : pas de confettis, pas
+          de feedback joyeux/peppy à la Duolingo (essence § ce_qu_on_refuse).
+
+      comportement: >-
+          Depuis l'espace personnel, une section optionnelle propose à
+          l'utilisateur une lecture de son usage : combien de pins
+          consultés, combien d'époques traversées, combien de parcours
+          terminés, et possiblement un kilométrage approximatif. Des
+          badges peuvent marquer des étapes symboliques (premier parcours
+          terminé, plusieurs époques explorées, etc.). L'utilisateur peut
+          consulter cette section, ou simplement l'ignorer — elle n'est
+          jamais imposée comme étape. Les statistiques sont calculées
+          localement à partir de l'historique (D6.3) et ne génèrent
+          aucune nouvelle donnée transmise.
+
+      regles_fonctionnelles:
+          - "Les badges et statistiques sont OPTIONNELS et n'apparaissent que dans cette section dédiée"
+          - "Les statistiques sont calculées localement à partir des données déjà présentes (favoris, historique)"
+          - "Aucune statistique ni badge n'est affiché en dehors de cette section sans consentement (pas de bandeau de progression imposé)"
+          - "Aucune notification ni célébration intrusive n'est déclenchée par l'obtention d'un badge — le ton reste sobre et conteur (essence § ce_qu_on_refuse — pas de joyeux/peppy)"
+          - "Les badges sont symboliques — pas de classement public, pas de comparaison entre utilisateurs"
+          - "L'utilisateur peut désactiver l'affichage de cette section dans les paramètres (D6.4)"
+          - "Aucune mécanique d'addiction (séries quotidiennes, rappels de relance, etc.) n'est introduite"
+
+      capabilites:
+          - "Calculer localement des statistiques d'usage (pins consultés, époques explorées, parcours terminés, distance approximative)"
+          - "Attribuer des badges symboliques pour des étapes marquantes"
+          - "Donner accès à la section depuis l'espace personnel"
+          - "Permettre la désactivation de l'affichage de cette section"
+
+      ce_qu_on_ne_fait_pas:
+          - "Pas de gamification intrusive (séries quotidiennes, rappels de relance, classements publics)"
+          - "Pas de comparaison entre utilisateurs"
+          - "Pas de notification déclenchée par un badge"
+          - "Pas de célébration joyeuse/peppy à la Duolingo (essence)"
+          - "Pas de récompenses qui débloqueraient du contenu (le contenu est libre)"
+          - "Pas de pression à 'compléter sa collection'"
+          - "Pas dans le cœur du produit — fonctionnalité 'si le temps le permet' (cf. brief § 12)"
+
+      criteres_de_reussite:
+          - "Le père lyonnais peut consulter ses statistiques pour le plaisir, sans jamais s'y sentir poussé"
+          - "Kenji repart avec un petit retour de son séjour qu'il peut regarder à l'aéroport"
+          - "Aucun utilisateur n'a l'impression de jouer à un jeu de rétention"
+          - "Le ton reste cohérent avec le conteur sobre du reste de l'app"
+
+      definition_of_done:
+          - "La section est accessible depuis l'espace personnel"
+          - "Les statistiques de base (pins consultés, époques explorées, parcours terminés) sont calculées et affichées"
+          - "Au moins quelques badges symboliques sont attribuables et visibles"
+          - "L'utilisateur peut désactiver l'affichage de la section depuis les paramètres"
+          - "Aucune notification ni célébration intrusive n'est déclenchée"
+
+      enjeux_transversaux:
+          accessibilite: >-
+              Les statistiques et badges doivent être lisibles autrement que
+              par la seule iconographie (descriptions textuelles annoncées
+              aux lecteurs d'écran, alternatives non graphiques pour les
+              chiffres clés).
+          performance: >-
+              Modeste — calcul local sur des données déjà présentes. La
+              section doit s'ouvrir sans attente.
+          vie_privee: >-
+              Pertinente : les statistiques sont une lecture agrégée des
+              usages, donc à conserver strictement locales tant que la
+              synchronisation n'est pas activée. Aucune analytique tierce
+              ne doit dériver de ces calculs.
+
+      questions_ouvertes:
+          - "Liste des badges retenus (registre symbolique restreint vs registre étendu) — à acter avec la lead/historienne (le ton importe)"
+          - "Calcul de la distance parcourue : sur la base des parcours terminés ou d'une estimation issue de la géolocalisation ? — recommandation : sur la base des parcours pour ne pas stocker de trajectoire GPS continue, à acter"
+          - "Visibilité initiale de la section : affichée par défaut ou masquée ? — recommandation : masquée par défaut, ouverte par opt-in pour rester sobre, à arbitrer"
+
+      priorite: "si_le_temps"
+
+      personas_principaux:
+          - pere_lyonnais
+          - kenji
+
+      dependances:
+          - "D6.1 (espace personnel — surface d'accueil)"
+          - "D6.3 (historique — source des statistiques)"
+          - "D6.4 (paramètres — désactivation de l'affichage)"
+
+      comportements_transverses_referenced: []
+
+# -----------------------------------------------------------------------------
+# Persona-check du domaine D6
+# -----------------------------------------------------------------------------
+persona_check:
+    kenji:
+        pertinence: "Élevée — utilise l'app sans compte tout son séjour, retrouve ses favoris le soir, peut basculer la langue"
+        scenarios_passes:
+            - scenario: "Utiliser l'app pendant tout son séjour sans avoir donné un email"
+              reponse: "Couvert par D6.1 (profil sans compte, tout local par défaut)"
+            - scenario: "Le soir à l'hôtel, retrouver les lieux qu'il a aimés dans la journée"
+              reponse: "Couvert par D6.2 (favoris) et D6.3 (historique)"
+            - scenario: "Repartir avec un petit retour de son séjour"
+              reponse: "Couvert par D6.6 (statistiques) — fonctionnalité si_le_temps, valorisable même non implémentée"
+
+    mme_dupont:
+        pertinence: "Très élevée — c'est le seul persona pour qui le compte sert vraiment"
+        scenarios_passes:
+            - scenario: "Préparer un parcours sur sa tablette le dimanche, le retrouver sur son téléphone le jour J"
+              reponse: "Couvert par D6.5 (compte + synchronisation activée explicitement) — c'est l'un des deux usages qui justifie le compte"
+            - scenario: "Publier son parcours à la communauté pour le partager au-delà de sa classe"
+              reponse: "Couvert par D6.5 (publication communautaire est le second usage qui requiert un compte)"
+            - scenario: "Épingler quelques pins pour les vérifier avant le jour J"
+              reponse: "Couvert par D6.2 (favoris)"
+            - scenario: "Ne pas devoir créer de compte pour utiliser le reste de l'app"
+              reponse: "Couvert par D6.1 — règle fondatrice du domaine"
+        questions_levees:
+            - "Si Mme Dupont passe d'un appareil à l'autre, le merge doit lui éviter toute perte (cf. question ouverte D6.5)"
+
+    mme_martin:
+        pertinence: "Moyenne — utilise l'app en classe, configure peu, n'a pas besoin de compte"
+        scenarios_passes:
+            - scenario: "Régler les options d'accessibilité pour la projection (taille de texte, contraste)"
+              reponse: "Couvert par D6.4 (options d'accessibilité)"
+            - scenario: "Activer un mode de présentation pour la classe"
+              reponse: "Pointé par D6.4 question ouverte (paramètre vs raccourci contextuel D2.5) — à arbitrer en palier 7"
+            - scenario: "Ne pas avoir à créer de compte pour préparer son cours"
+              reponse: "Couvert par D6.1 — l'usage en classe ne requiert pas de compte"
+        questions_levees:
+            - "Acter en palier 7 si le mode présentation est un paramètre persistant ou un raccourci ponctuel"
+
+    pere_lyonnais:
+        pertinence: "Très élevée — usage flâneur, sensibilité forte à la vie privée et à la sobriété"
+        scenarios_passes:
+            - scenario: "Couper les notifs aujourd'hui en moins de 2 taps depuis l'écran principal"
+              reponse: "Couvert par D6.4 (gestion des notifications) — la promesse '2 taps' est à confirmer en palier 7 (placement du contrôle)"
+            - scenario: "Retrouver un pin du dimanche le mardi soir sans l'avoir marqué"
+              reponse: "Couvert par D6.3 (historique)"
+            - scenario: "Marquer un pin pour le raconter à un ami ensuite"
+              reponse: "Couvert par D6.2 (favoris)"
+            - scenario: "Avoir l'assurance que son historique reste sur son téléphone"
+              reponse: "Couvert par D6.3 (strictement local par défaut, jamais cloud sans consentement spécifique)"
+            - scenario: "Ne pas se sentir poussé à 'compléter une collection'"
+              reponse: "Couvert par D6.6 (sobriété, pas de gamification intrusive)"
+        questions_levees:
+            - "Acter en palier 7 que la gestion des notifs est atteignable en peu de gestes depuis l'écran principal (test_litmus '2 taps')"
+
+    anais_back_office:
+        pertinence: "Faible — domaine côté grand public, Anaïs opère sur une autre surface (templates / CMS)"
+        scenarios_passes:
+            - scenario: "Production de contenu via templates"
+              reponse: "Hors périmètre D6 — couvert par D10 (production de contenu)"
+        questions_levees: []

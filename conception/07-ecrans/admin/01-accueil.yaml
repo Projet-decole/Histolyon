@@ -1,0 +1,86 @@
+# =============================================================================
+# E-ADMIN-ACCUEIL — Tableau de bord back-office
+# =============================================================================
+# Porte d'entrée du back-office HistoLyon. Vue synthétique des files de travail
+# (saisies en cours, validations en attente, modérations à traiter, soumissions,
+# signalements). C'est l'écran que voit Anaïs (et tout autre rôle back-office)
+# en arrivant — il oriente vers les écrans spécialisés H1 à H6.
+# =============================================================================
+
+document:
+  type: palier_ecrans_fiche
+  format: yaml
+
+ecran:
+  id: E-ADMIN-ACCUEIL
+  nom: "Tableau de bord back-office"
+
+  mode: "back-office"
+  surface_parente: "back-office"
+
+  raison_d_etre: >-
+    Donner à Anaïs et aux rôles back-office une vue d'ensemble des files de
+    travail en un coup d'œil, et orienter vers l'écran spécialisé adéquat
+    (catalogue, validation, modération, promotion, retrait). Sans cet écran,
+    le back-office serait un éparpillement de listes sans hiérarchisation.
+
+  composition:
+    - zone: "synthèse — Pins en saisie"
+      role: "indicateur du nombre de Pins éditoriaux en brouillon (lien vers E-ADMIN-CATALOGUE-PINS filtré sur brouillon)"
+      entites_affichees: [Pin]
+
+    - zone: "synthèse — Pins en validation"
+      role: "indicateur du nombre de Pins éditoriaux en en_revue (lien vers E-ADMIN-VALIDATION-SCIENTIFIQUE)"
+      entites_affichees: [Pin]
+
+    - zone: "synthèse — Commentaires et Retours en attente"
+      role: "indicateur de la file de modération communautaire (lien vers E-ADMIN-MODERATION-COMMUNAUTAIRE)"
+      entites_affichees: [Commentaire, "Retour de parcours"]
+
+    - zone: "synthèse — Soumissions en attente"
+      role: "indicateur des Pins et Parcours communautaires en en_revue (lien vers E-ADMIN-MODERATION-SOUMISSIONS)"
+      entites_affichees: [Pin, Parcours]
+
+    - zone: "synthèse — Signalements à traiter"
+      role: "indicateur des Signalements en état nouveau ou en_examen, priorité haute (lien vers la file appropriée selon le type de cible)"
+      entites_affichees: [Signalement]
+
+    - zone: "synthèse — Pins publiés à surveiller"
+      role: "indicateur des Pins publiés ayant fait l'objet d'un signalement honoré récent ou candidats à réouverture (lien vers E-ADMIN-RETRAIT-REOUVERTURE-PIN)"
+      entites_affichees: [Pin]
+
+    - zone: "point d'accès saisie d'un nouveau Pin"
+      role: "raccourci vers l'ouverture d'un nouveau brouillon (entrée du flow H1) → E-ADMIN-SAISIE-PIN-TEMPLATE"
+
+    - zone: "point d'accès catalogue complet"
+      role: "ouvre E-ADMIN-CATALOGUE-PINS sans filtre"
+
+  etats:
+    nominal_charge: "Files chiffrées et actualisées, points d'accès disponibles"
+    chargement: "Compteurs en cours de calcul ; les liens restent activables"
+    files_vides: "Aucun élément en attente dans aucune file — message gracieux invitant à créer un nouveau Pin (entrée H1)"
+    erreur_synthese: "Impossible de charger un ou plusieurs compteurs ; les liens restent activables (l'écran spécialisé prend le relais)"
+    permission_insuffisante: "L'utilisateur connecté ne dispose pas de tous les rôles (ex. modérateur sans rôle validateur) — les zones non autorisées sont absentes ou indiquent l'absence de droit"
+
+  elements_interactifs:
+    - "Tap sur un indicateur de file → ouverture de l'écran spécialisé filtré sur cette file"
+    - "Tap sur point d'accès saisie → ouverture E-ADMIN-SAISIE-PIN-TEMPLATE en mode nouveau brouillon"
+    - "Tap sur point d'accès catalogue → ouverture E-ADMIN-CATALOGUE-PINS sans filtre"
+    - "Rafraîchissement manuel des compteurs (au moins, comportement à arbitrer en palier 13)"
+
+  flows_actifs:
+    - "porte d'entrée vers H1, H2, H3, H4, H5, H6"
+
+  surfaces_imbriquees:
+    - E-ADMIN-CATALOGUE-PINS
+    - E-ADMIN-SAISIE-PIN-TEMPLATE
+    - E-ADMIN-VALIDATION-SCIENTIFIQUE
+    - E-ADMIN-MODERATION-COMMUNAUTAIRE
+    - E-ADMIN-MODERATION-SOUMISSIONS
+    - E-ADMIN-PROMOTION-COMMUNAUTAIRE
+    - E-ADMIN-RETRAIT-REOUVERTURE-PIN
+
+  questions_ouvertes:
+    - "Granularité des indicateurs : compteurs simples ou tendances (variation depuis hier) — palier 13"
+    - "Délai-cible de prise en charge par file affiché ici (ex. 'plus ancien Pin en revue : 3 jours') ? — palier 13 + 16"
+    - "Une seule zone d'accueil unifiée pour Anaïs cumulant les rôles, ou tableaux différenciés par rôle quand un modérateur dédié rejoindra l'équipe ? — palier 13"

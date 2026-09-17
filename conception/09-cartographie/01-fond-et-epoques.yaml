@@ -1,0 +1,288 @@
+# =============================================================================
+# Palier 9 — Fond de carte et Époques
+# =============================================================================
+# Le fond de carte ne change pas par PRÉSET d'Époque ; il transitionne par
+# INTERPOLATION CONTINUE de plusieurs axes paramétriques en fonction de la
+# position du slider. Chaque Époque est une ANCRE sur ces axes — les valeurs
+# intermédiaires sont calculées en continu.
+#
+# C'est ce qui distingue le slider d'HistoLyon d'un sélecteur banal :
+# l'utilisateur ne saute pas d'une apparence à l'autre, il VOYAGE.
+# =============================================================================
+
+document:
+  type: palier_cartographie_fond_epoques
+  numero: 9
+  fichier: "01-fond-et-epoques.yaml"
+  version: "0.1"
+  date: "2026-05-06"
+  format: yaml
+  prerequis_de_lecture:
+    - "design/conception/09-cartographie/00-index.yaml — anti-périmètre, vocabulaire, décisions D7/D8"
+    - "design/conception/03-fonctionnalites/01-carte-exploration-temporelle.yaml — D1.2 (slider), D1.3 (apparence par époque), D1.5 (couches d'archives)"
+
+raison_d_etre: >-
+  Le voyage temporel est le geste signature d'HistoLyon. Sans le filtre
+  carte qui transitionne au glissement du slider, le slider n'est qu'un
+  sélecteur de pins ; avec lui, la carte respire l'époque. Ce fichier
+  pose les RÈGLES du système paramétrique — pas les valeurs (palier 12),
+  pas les durées (palier 11), pas les seuils a11y (palier 16).
+
+# -----------------------------------------------------------------------------
+# 1. Principe paramétrique — fonction continue de la position du slider
+# -----------------------------------------------------------------------------
+principe_parametrique:
+
+  enonce: >-
+    L'apparence du fond carte est une fonction continue de la position
+    du slider d'Époque. Pendant le geste, plusieurs axes interpolent
+    simultanément. Au relâchement (snap, cf. D1.2), le slider cale sur
+    l'Époque la plus proche et chaque axe prend sa valeur ancrée à
+    cette Époque.
+
+  pourquoi: >-
+    Modéliser comme préset discrets ('Antiquité = sépia', 'Moyen Âge =
+    ambre', etc.) trahit l'expérience attendue : l'utilisateur doit
+    SENTIR le passage du temps en glissant. La fonction continue,
+    avec ancres aux marqueurs Époque, conserve à la fois la fluidité
+    perceptive et la possibilité d'un calage net pour le contenu.
+
+  consequence_sur_le_catalogue_ouvert: >-
+    Conforme à I7 (catalogue Époque ouvert). L'ajout d'une nouvelle
+    Époque insère un nouveau marqueur sur les axes paramétriques ;
+    les valeurs intermédiaires se reconfigurent par interpolation
+    sans qu'aucune valeur ne soit à recalculer manuellement entre
+    deux Époques préexistantes.
+
+# -----------------------------------------------------------------------------
+# 2. Axes de transformation
+# -----------------------------------------------------------------------------
+# Cinq axes paramétriques. Chacun a son propre comportement qualitatif sur la
+# durée du temps long de Lyon. Tous sont interpolés simultanément.
+axes_de_transformation:
+
+  - axe: temperature_chromatique
+    role: "Donne au fond carte une dominante chaude ou froide selon la période"
+    comportement_qualifie: >-
+      Très chaude aux extrémités anciennes (le passé lointain est ocre,
+      brun, doré), refroidit progressivement à mesure qu'on s'approche
+      du présent, avec un creux froid à l'époque classique et à la
+      Seconde Guerre, et un retour vers une chaleur rétro au XXe.
+      Au présent (Aujourd'hui), neutre.
+
+  - axe: desaturation
+    role: "Module l'intensité chromatique de la carte"
+    comportement_qualifie: >-
+      Forte aux extrémités anciennes (le passé est délavé comme une
+      photographie ancienne), réduit progressivement vers le présent.
+      Au présent, saturation pleine (la carte moderne).
+
+  - axe: grain_et_texture
+    role: "Donne au fond carte une matière sensible — papier, parchemin, film, aquarelle"
+    comportement_qualifie: >-
+      Texture aquarelle/parchemin pour les périodes anciennes, grain
+      film argentique pour les périodes photographiques (XIXe et après),
+      atténué au XXe puis absent au présent.
+
+  - axe: vignettage
+    role: "Assombrit progressivement les bords du champ visuel"
+    comportement_qualifie: >-
+      Marqué pour les périodes les plus anciennes (effet de vieille
+      photographie ou d'enluminure aux marges sombres), diminue
+      progressivement, absent au présent.
+
+  - axe: contraste
+    role: "Module l'écart tonal de la carte"
+    comportement_qualifie: >-
+      Accentué aux périodes de rupture (Révolution/Empire, Seconde
+      Guerre) pour soutenir la dramaturgie historique, neutre ailleurs,
+      pleinement standard au présent.
+
+note_sur_les_valeurs: >-
+  Les cinq axes sont qualifiés ici en relatif (très/peu, accentué/
+  neutre). Les valeurs précises aux ancres sont du palier 12. Les
+  courbes d'interpolation entre ancres (linéaire, ease, inflexion)
+  sont du palier 11.
+
+# -----------------------------------------------------------------------------
+# 3. Ancres aux marqueurs Époque
+# -----------------------------------------------------------------------------
+# Profils qualifiés par Époque — résumé synthétique de la combinaison des 5
+# axes à chaque ancre. Inspiré de la matière première DA archives, retraité
+# avec esprit critique. Bornes exactes en attente lead/historienne (cf. D1.2
+# question ouverte) — n'impacte pas la fonction paramétrique.
+ancres_aux_marqueurs:
+
+  - epoque: antiquite_romaine
+    profil_qualifie: "chaleur ocre antique, désaturation marquée, texture aquarelle, vignettage présent"
+
+  - epoque: haut_moyen_age
+    profil_qualifie: "sépia profond presque monochrome, vignettage fort, lecture austère"
+
+  - epoque: moyen_age
+    profil_qualifie: "ambre doré d'enluminure, texture parchemin, accents rouges et bleus préservés"
+
+  - epoque: renaissance
+    profil_qualifie: "couleurs vives légèrement adoucies, ombres chaleureuses, détails nets"
+
+  - epoque: epoque_classique
+    profil_qualifie: "dominante bleu froid noble, contraste accentué, géométrie nette"
+
+  - epoque: revolution_empire
+    profil_qualifie: "contraste brutal, désaturation partielle avec rouges accentués, grain papier"
+
+  - epoque: xixe_siecle
+    profil_qualifie: "sépia argentique du daguerréotype, grain film, teinte légèrement froide"
+
+  - epoque: seconde_guerre_mondiale
+    profil_qualifie: "monochrome quasi pur, grain fort, contraste brutal"
+
+  - epoque: xxe_siecle
+    profil_qualifie: "Kodachrome chaleureux, saturation pop, grain film 35mm"
+
+  - epoque: aujourd_hui
+    profil_qualifie: "neutre sans filtre — le présent ne se filtre pas"
+
+note: >-
+  Les profils sont qualifiés. Aucun hex, aucune valeur chiffrée.
+  Le palier 12 fixera les valeurs aux ancres ; le palier 11
+  décidera les courbes d'interpolation entre ancres ; le palier 16
+  validera la lisibilité aux ancres ET aux interpolations
+  (cf. § invariants_de_lisibilite).
+
+# -----------------------------------------------------------------------------
+# 4. Comportement pendant le geste vs au calage
+# -----------------------------------------------------------------------------
+comportement:
+
+  pendant_le_geste:
+    - "Les 5 axes sont interpolés en continu en fonction de la position du slider"
+    - "Aucun calage intermédiaire — la transition est perceptivement fluide"
+    - "Les Pins ne se rechargent PAS pendant le geste (cf. D1.2 — chargement à la fin)"
+    - "Un retour visuel sur la période en cours de sélection est lisible (forme exacte au palier 7/10)"
+
+  au_calage:
+    - "Au relâchement, le slider cale sur l'Époque ancrée la plus proche (cf. D1.2)"
+    - "Chaque axe paramétrique prend la valeur ancrée à cette Époque"
+    - "Les Pins se rechargent selon la nouvelle Époque sélectionnée"
+    - "La transition de calage est chorégraphiée — durée et courbe au palier 11"
+
+  pilotage_automatique_par_parcours:
+    - "Un Parcours en cours peut piloter automatiquement le slider (cf. D1.2)"
+    - "Le pilotage automatique respecte les mêmes axes paramétriques (interpolation puis calage à l'Époque cible de l'étape)"
+    - "L'utilisateur peut toujours déplacer manuellement le slider — l'interaction utilisateur prime sur le pilotage automatique (à confirmer en palier 11)"
+
+# -----------------------------------------------------------------------------
+# 5. Invariants de lisibilité
+# -----------------------------------------------------------------------------
+# Règles strictes qui priment sur l'effet stylistique. Toute valeur d'axe qui
+# violerait un de ces invariants doit être ajustée au palier 12.
+invariants_de_lisibilite:
+
+  - id: L1
+    enonce: >-
+      Les Pins restent visibles et identifiables à toute valeur d'axe.
+      Le contraste entre Pin et fond carte est garanti aux ancres ET
+      aux interpolations.
+
+  - id: L2
+    enonce: >-
+      Le tracé d'un Parcours actif reste visible à toute valeur d'axe
+      (cf. fichier 03-parcours-traces).
+
+  - id: L3
+    enonce: >-
+      Les libellés de rues et de quartiers restent lisibles à toute
+      valeur d'axe (le filtre n'efface pas la cartographie de base).
+
+  - id: L4
+    enonce: >-
+      La forme empilée signalant un Pin multi-époque reste perceptible
+      à toute valeur d'axe (cf. fichier 02-pins).
+
+  - id: L5
+    enonce: >-
+      Le contour signalant un Pin/Parcours communautaire en cours de
+      vérification (I3) reste perceptible à toute valeur d'axe.
+
+validation: >-
+  Chaque invariant est testé au palier 16 (validation), aux 10
+  ancres ET à des points d'interpolation entre chaque paire
+  d'ancres consécutives.
+
+# -----------------------------------------------------------------------------
+# 6. Couches cartographiques d'archives (D1.5)
+# -----------------------------------------------------------------------------
+# Le fond carte 'paramétrique par Époque' est la couche de base. D1.5 prévoit
+# des couches cartographiques d'archives optionnelles (ex. plan de Lyon de
+# 1750, carte de la Révolution) qui se SUPERPOSENT au fond paramétrique.
+couches_d_archives:
+
+  nature: >-
+    Couche de carte historique réelle (extraction d'archive, plan
+    ancien, carte topographique d'époque), distincte du filtre
+    paramétrique du fond. Modélisée au cluster 01 sous l'entité
+    Couche cartographique.
+
+  cohabitation_avec_le_fond_parametrique:
+    - "La couche d'archive se SUPERPOSE au fond paramétrique courant"
+    - "L'utilisateur ajuste la visibilité de la couche d'archive (cf. E-CARTE-FILTRES-COUCHES)"
+    - "Le fond paramétrique reste actif derrière — sa présence garantit la cohérence chromatique avec l'Époque sélectionnée"
+    - "Disponibilité d'une couche d'archive : dépendante de l'Époque sélectionnée (cf. D1.5)"
+
+  invariant_supplementaire: >-
+    À toute opacité de couche d'archive, les Pins restent visibles
+    et la forme empilée multi-époques reste perceptible (renvoi
+    L1, L4).
+
+  questions_ouvertes:
+    - "Catalogue des couches d'archives disponibles — à acter avec l'institution (archives départementales, mairie). Liste vide acceptable actuellement."
+    - "Si plusieurs couches d'archives sont disponibles pour une Époque, l'utilisateur peut-il en activer plusieurs simultanément, ou exclusivité par Époque ?"
+
+# -----------------------------------------------------------------------------
+# 7. Enjeux transversaux
+# -----------------------------------------------------------------------------
+enjeux_transversaux:
+
+  accessibilite: >-
+    Critique pour Mme Martin (projection en classe, lecture depuis
+    le fond). Le contraste Pin/fond doit rester suffisant aux 10
+    ancres ET aux interpolations. Test daltonisme aux ancres
+    chromatiquement chargées (Antiquité ocre, Moyen Âge ambre,
+    Révolution rouge, XXe Kodachrome). Critères chiffrés au
+    palier 16. Validation aussi en mode présentation (M4) sans
+    chrome.
+
+  performance: >-
+    Critique : la fluidité de l'interpolation pendant le geste fait
+    partie de l'expérience (le ressenti d'émerveillement est non
+    négociable). Toute saccade tue l'effet. Critères chiffrés au
+    palier 16. Politique d'implémentation de l'interpolation
+    (CPU vs GPU, shader, etc.) — relève de l'implémentation
+    technique.
+
+  vie_privee: "Pas d'enjeu spécifique."
+
+  i18n: >-
+    Aucun enjeu spécifique au paramétrique du fond. Les libellés
+    d'Époque (chips, slider) sont au palier 8 — éventuel impact
+    de longueur de libellé sur la lisibilité du slider à confirmer
+    au palier 7/10.
+
+# -----------------------------------------------------------------------------
+# 8. Questions ouvertes
+# -----------------------------------------------------------------------------
+questions_ouvertes:
+
+  - "Bornes exactes des 10 Époques (années / périodes nommées) — à acter avec lead/historienne. N'impacte pas la fonction paramétrique mais le mapping ancre ↔ contenu (Pins associés)."
+  - "Cas particulier 'Aujourd'hui' (vue cumulée, tous les Pins de toutes les Époques visibles) — sur le fond, on garde le profil 'neutre sans filtre'. Confirmé."
+  - "Comportement quand l'utilisateur manipule le slider PENDANT un Parcours en cours qui pilote automatiquement : priorité utilisateur, ou pilotage repris au relâchement ? — palier 11."
+  - "Catalogue des couches d'archives D1.5 — décision équipe + institution."
+
+# -----------------------------------------------------------------------------
+# 9. Dépendances internes au palier 9
+# -----------------------------------------------------------------------------
+dependances:
+  - "02-pins.yaml — invariants L1 (contraste Pin/fond), L4 (forme empilée perceptible), L5 (contour de vérification perceptible)"
+  - "03-parcours-traces.yaml — invariant L2 (tracé visible à toute valeur d'axe)"
+  - "04-densite-zoom.yaml — la lisibilité des clusters doit rester garantie aux 10 ancres et aux interpolations"

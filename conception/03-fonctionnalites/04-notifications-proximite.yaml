@@ -1,0 +1,577 @@
+# =============================================================================
+# Palier 3 — Domaine D4 — Notifications de proximité
+# =============================================================================
+# HistoLyon refuse les notifications de proximité par défaut (cf. essence
+# § ce_qu_on_refuse). C'est un parti pris fort : pousser des notifs sans
+# demande, c'est une déclaration de guerre à l'attention de l'utilisateur.
+# Mais l'app a besoin d'une mécanique de proximité — sinon la sérendipité
+# géographique ne peut pas se déclencher, et un parcours actif ne peut pas
+# annoncer l'arrivée à une étape.
+#
+# Ce domaine résout cette tension par TROIS modes mutuellement exclusifs,
+# au choix explicite de l'utilisateur :
+#   - Mode 1 — Balade libre : DÉFAUT, AUCUNE notification de proximité
+#   - Mode 2 — Surprenez-moi : opt-in volontaire, sérendipité poussée
+#   - Mode 3 — En parcours : actif quand un parcours est en cours, étapes seulement
+#
+# Le déclencheur transverse commun est la géolocalisation (canonique en D1.1).
+# La permission notification système suit le pattern juste-à-temps (canonique
+# en D5.5). Ce domaine ne redéfinit ni l'une ni l'autre — il les utilise.
+#
+# Priorité globale du domaine : "important" (cf. 00-index § 7).
+#
+# Refonte v1.1 : périmètre fonctionnel STRICT (cf. 00-index § 2). Pas de
+# rayon en mètres, pas de "vibration douce" (signal discret), pas de
+# "toggle" / "bottom sheet" / "plein écran" nommés. La calibration
+# technique (rayon, latences, intensité du signal) va au palier 16 ; la
+# microcopy de la notification va au palier 8 ; la forme du point
+# d'activation va au palier 7.
+# =============================================================================
+
+document:
+    type: palier_fonctionnalites_domaine
+    domaine_id: D4
+    numero: 3
+    audience:
+        - "Tout agent qui rédige un palier en aval (4 à 16)"
+        - "Devs Flutter (cahier des charges fonctionnel pour la mécanique de proximité)"
+        - "Lead historienne (pour cadrer le contenu poussé en modes 2 et 3)"
+    role: >-
+        Décrire fonctionnellement les trois modes de notification de proximité
+        proposés à l'utilisateur, leur articulation avec la géolocalisation et
+        la permission système, et l'anti-périmètre (pas de notif par défaut,
+        pas de relances marketing).
+    format: yaml
+    prerequis_de_lecture:
+        - "design/conception/intention.yaml — § 5.7 separation_des_responsabilites_entre_paliers"
+        - "design/conception/01-essence.yaml — en particulier § ce_qu_on_refuse"
+        - "design/conception/02-personas.yaml — en particulier père lyonnais, Kenji, Mme Dupont"
+        - "design/conception/03-fonctionnalites/00-index.yaml — § 2 anti_perimetre_strict est OBLIGATOIRE"
+        - "design/conception/03-fonctionnalites/01-carte-exploration-temporelle.yaml — D1.1 (géolocalisation canonique)"
+
+# -----------------------------------------------------------------------------
+# Raison d'être du domaine
+# -----------------------------------------------------------------------------
+raison_d_etre_du_domaine: >-
+    Les notifications de proximité sont le mécanisme par lequel HistoLyon
+    PEUT — quand l'utilisateur le demande — transformer un déplacement
+    physique en déclencheur narratif. C'est l'incarnation la plus directe
+    du principe de sérendipité (essence § principe 1) : "Découvrir sans
+    avoir cherché", déclenché par le lieu et non par la requête. Mais
+    c'est aussi le point où l'app peut basculer dans l'intrusif si on s'y
+    prend mal — d'où l'INTERDICTION ABSOLUE de l'opt-out (cf. essence
+    § ce_qu_on_refuse : "Les notifications de proximité par défaut").
+
+    Trois modes au choix de l'utilisateur, jamais activés silencieusement :
+    Balade libre (défaut, silence total), Surprenez-moi (opt-in volontaire,
+    sérendipité poussée hors parcours), En parcours (actif uniquement
+    pendant un parcours en cours, sur les étapes du parcours seulement).
+
+    Ce domaine sert à des intensités très différentes les personas grand
+    public : le père lyonnais est l'incarnation du mode 2 (anecdote au bon
+    moment, sans rien demander) ; Kenji et les parents accompagnateurs de
+    Mme Dupont sont les utilisateurs principaux du mode 3 (parcours préparé,
+    étapes annoncées) ; Mme Martin reste en mode 1 (jamais de notif en
+    classe). Anaïs (back-office) n'est pas concernée directement — elle
+    produit le contenu poussé.
+
+# -----------------------------------------------------------------------------
+# Sous-domaines
+# -----------------------------------------------------------------------------
+sous_domaines:
+    # ===========================================================================
+    - id: D4.1
+      nom: "Mode Balade libre (défaut)"
+
+      raison_d_etre: >-
+          Honorer le refus structurant de l'essence : pas de notification de
+          proximité par défaut. C'est l'option zéro, celle qui demande zéro
+          action de l'utilisateur, celle qui est silencieuse. Sert directement
+          "ne pas imposer une friction qu'on n'a pas à imposer" (essence
+          § ce_qu_on_refuse) et le respect de l'attention. Critique pour Mme
+          Martin (jamais de notif pendant qu'elle projette en classe) et pour
+          le père lyonnais qui veut pouvoir flâner sans rien recevoir tant
+          qu'il n'a pas activé Surprenez-moi.
+
+      comportement: >-
+          Au premier lancement, et tant que l'utilisateur n'a rien activé
+          d'autre, l'app est en mode Balade libre : aucune notification de
+          proximité, aucun signal déclenché par la géolocalisation. L'utilisateur
+          explore la carte et consulte les pins qu'il veut, à son rythme. Le
+          mode reste silencieux même si la permission notification système a
+          été accordée par ailleurs (par exemple lors d'un parcours précédent).
+          L'état Balade libre est consultable depuis les paramètres ; la bascule
+          vers Surprenez-moi (D4.2) est accessible directement depuis la carte
+          ainsi que depuis les paramètres, et le retour à Balade libre y est
+          tout aussi rapide. Quand un parcours est engagé, c'est le mode 3 qui
+          prend le relais (cf. D4.3) sans que l'utilisateur ait besoin de
+          changer son mode courant ; à la fin du parcours, l'app retrouve son
+          mode courant.
+
+      regles_fonctionnelles:
+          - "Mode actif au premier lancement, sans aucune action utilisateur"
+          - "Aucune notification de proximité émise dans ce mode"
+          - "Aucun signal sensoriel (vibration, son) déclenché par la géolocalisation"
+          - "Reste actif tant que l'utilisateur ne bascule pas explicitement vers Surprenez-moi (D4.2)"
+          - "Aucune permission notification système n'est demandée tant que l'utilisateur reste en Balade libre"
+          - "Le mode 3 (En parcours, D4.3) est indépendant : il s'active à l'engagement d'un parcours et se désactive à sa fin, sans modifier le mode courant (Balade libre ou Surprenez-moi)"
+          - "Le retour de Surprenez-moi vers Balade libre coupe immédiatement toute notif de proximité, sans révoquer la permission système déjà accordée"
+
+      capabilites:
+          - "Définir Balade libre comme mode actif au premier lancement"
+          - "Suspendre toute émission de notification de proximité"
+          - "S'abstenir de toute demande de permission système tant que l'utilisateur reste dans ce mode"
+          - "Permettre la bascule rapide vers Surprenez-moi depuis la carte ou les paramètres"
+          - "Reprendre le silence immédiatement quand l'utilisateur revient depuis Surprenez-moi"
+
+      ce_qu_on_ne_fait_pas:
+          - "Pas de notification de proximité, sous aucune forme"
+          - "Pas de relance après X jours pour proposer Surprenez-moi (anti-pattern : l'utilisateur a choisi le silence par défaut, on respecte)"
+          - "Pas de demande de permission notification système au lancement (couvert par D5.5 permissions juste-à-temps)"
+          - "Pas de message 'mode dégradé' ou équivalent — Balade libre est l'état NORMAL de l'app"
+          - "Pas de désactivation du mode 3 quand un parcours est engagé — Balade libre concerne uniquement la sérendipité hors parcours"
+
+      criteres_de_reussite:
+          - "Le père lyonnais ouvre l'app pour la première fois et marche dans son quartier : aucune notif, aucune interruption (atteint test_litmus 'pas de notifs activées sans son consentement')"
+          - "Mme Martin projette en classe pendant un cours entier : aucune notif ne surgit pendant la projection (cohérent avec son test_litmus sur la projection sans chrome)"
+          - "Au premier lancement, l'app ne demande JAMAIS la permission notification système (cohérence avec essence § ce_qu_on_refuse 'toute friction au lancement')"
+          - "L'utilisateur ressent l'app comme respectueuse de son attention dès la première ouverture"
+
+      definition_of_done:
+          - "Au premier lancement, le mode actif est Balade libre"
+          - "Aucune notification de proximité n'est émise tant que ce mode est actif"
+          - "La permission notification système n'est PAS demandée tant que l'utilisateur reste dans ce mode"
+          - "La bascule vers Surprenez-moi est accessible depuis la carte et depuis les paramètres (D6)"
+          - "Le retour à Balade libre depuis Surprenez-moi coupe immédiatement toute notif"
+          - "L'engagement d'un parcours active le mode 3 (D4.3) indépendamment du mode courant ; à la fin du parcours, l'app retrouve le mode courant"
+
+      enjeux_transversaux:
+          accessibilite: >-
+              L'état du mode courant doit être annoncé par les lecteurs d'écran
+              partout où il est exposé (carte, paramètres). La bascule vers
+              Surprenez-moi doit être atteignable au clavier et avec une cible
+              tactile généreuse. Critères chiffrés en palier 16.
+          performance: >-
+              Aucun coût batterie résiduel ne doit être lié à la mécanique de
+              proximité quand ce mode est actif (pas de surveillance géoloc
+              inutile en arrière-plan). Critères chiffrés en palier 16.
+          vie_privee: >-
+              C'est le mode qui matérialise le respect par défaut. Aucune
+              position n'est exploitée pour notifier ; aucune permission n'est
+              demandée tant que l'utilisateur n'a rien sollicité.
+
+      questions_ouvertes:
+          - "Faut-il rendre l'état du mode courant visible discrètement sur la carte, ou le réserver aux paramètres ? Recommandation : information dans les paramètres, signal sur la carte uniquement quand un mode différent du défaut est actif."
+          - "Si l'utilisateur a activé Surprenez-moi puis revient à Balade libre, conserve-t-on la permission notification système accordée pour réactivation rapide, ou la révoque-t-on côté logique applicative ? Recommandation : conserver (on ne révoque pas du logiciel ce que l'utilisateur a accordé au système)."
+
+      priorite: "important"
+
+      personas_principaux:
+          - pere_lyonnais
+          - mme_martin
+          - kenji
+          - mme_dupont
+
+      dependances:
+          - "D5 (onboarding — premier lancement → Balade libre actif sans intervention)"
+          - "D6 (paramètres — bascule consultable et activable depuis ici)"
+
+      comportements_transverses_referenced:
+          - "Géolocalisation (canonique D1.1) — non utilisée pour notifier dans ce mode"
+          - "Permissions juste-à-temps (canonique D5.5) — pas de demande de permission notification dans ce mode"
+
+    # ===========================================================================
+    - id: D4.2
+      nom: "Mode Surprenez-moi (opt-in)"
+
+      raison_d_etre: >-
+          Permettre à l'utilisateur qui le souhaite EXPLICITEMENT de transformer
+          sa balade en livre vivant qui s'ouvre tout seul. C'est l'incarnation
+          la plus pure du principe de sérendipité (essence § principe 1) :
+          l'app pousse, l'utilisateur reçoit, le déclencheur est le lieu.
+          Persona-cible numéro un : le père lyonnais qui marche dans son
+          quartier le dimanche — une anecdote arrive au bon moment, sans
+          qu'il ait rien demandé. Mais le mode est OPT-IN STRICT, jamais
+          activé silencieusement (cf. essence § ce_qu_on_refuse : "Les
+          notifications de proximité par défaut").
+
+      comportement: >-
+          L'utilisateur active explicitement Surprenez-moi depuis un point
+          d'activation accessible sur la carte, ou depuis les paramètres. À la
+          première activation, la permission notification système est demandée
+          juste-à-temps (cf. D5.5) ; un refus est accepté sans drame, sans
+          culpabilisation, et le mode reste utilisable au moins quand l'app est
+          au premier plan (cf. questions_ouvertes pour l'arbitrage exact).
+          Une fois actif, le mode fonctionne en arrière-plan : quand l'utilisateur
+          passe à proximité d'un pin, un signal discret accompagne l'arrivée
+          et l'aperçu rapide du pin (D2.4) s'ouvre — laissant la carte visible
+          derrière, l'utilisateur peut décider d'approfondir, partager ou
+          refermer (cohérent avec l'esprit sérendipité : recevoir sans être
+          embarqué). Le mode reste actif d'une session à l'autre jusqu'à
+          désactivation explicite, et la désactivation est accessible aussi
+          rapidement que l'activation. Quand un parcours est engagé, ce mode
+          est suspendu au profit du mode 3 (D4.3) ; il est restauré à la fin
+          du parcours.
+
+      regles_fonctionnelles:
+          - "Activation EXPLICITE par l'utilisateur, jamais par défaut, jamais suggérée silencieusement"
+          - "Première activation → demande de permission notification système juste-à-temps (cf. D5.5)"
+          - "Refus de la permission système → mode utilisable au moins quand l'app est au premier plan, sans blocage ni message culpabilisant"
+          - "Déclenchement = passage à proximité d'un pin (rayon précis arbitré au palier 16, cohérent avec celui des étapes de parcours)"
+          - "À l'approche, un aperçu rapide (D2.4) s'ouvre, laissant la carte visible derrière — l'utilisateur peut approfondir, partager ou refermer (cohérent avec l'esprit sérendipité)"
+          - "Un signal discret accompagne l'arrivée, paramétrable / suppressible"
+          - "Anti-spam : un même pin ne re-notifie pas dans la même session"
+          - "Désactivation aussi accessible et rapide que l'activation"
+          - "Désactivation = arrêt immédiat de la mécanique de proximité, conservation de la permission système accordée"
+          - "Quand un parcours est engagé, ce mode est suspendu et le mode 3 (D4.3) prend le relais — il est restauré à la fin du parcours"
+          - "Les paramètres système silencieux et Ne pas déranger sont respectés"
+          - "La détection de proximité est locale à l'appareil (pas d'envoi de la position à un serveur)"
+
+      capabilites:
+          - "Activer le mode Surprenez-moi à l'initiative explicite de l'utilisateur"
+          - "Demander la permission notification système juste-à-temps lors de la première activation"
+          - "Détecter le passage à proximité d'un pin en s'appuyant sur la géolocalisation (D1.1)"
+          - "Émettre un signal discret accompagnant l'arrivée à proximité d'un pin"
+          - "Ouvrir l'aperçu rapide du pin (D2.4) en laissant la carte visible derrière"
+          - "Empêcher un même pin de re-notifier dans la même session"
+          - "Permettre la désactivation rapide du mode"
+          - "Suspendre la mécanique pendant un parcours actif (relais D4.3) et la restaurer à la fin"
+          - "Respecter le mode silencieux et Ne pas déranger du système"
+          - "Effectuer la détection de proximité localement (pas de partage de position vers un serveur)"
+
+      ce_qu_on_ne_fait_pas:
+          - "Pas d'activation par défaut, sous aucune forme (essence § ce_qu_on_refuse)"
+          - "Pas de relance pour proposer le mode après un délai (anti-pattern, l'utilisateur a choisi)"
+          - "Pas d'ouverture en consultation approfondie : Surprenez-moi mène à un aperçu rapide ; c'est l'utilisateur qui décide ensuite d'approfondir ou non (cohérent avec l'esprit sérendipité — l'app pousse, l'utilisateur reçoit, l'utilisateur dispose)"
+          - "Pas de notification récapitulative agrégée ('Vous avez croisé X lieux historiques aujourd'hui')"
+          - "Pas de re-notification d'un pin déjà visité récemment"
+          - "Pas de notification de proximité quand un parcours est actif — laisser la main à D4.3 (anti-double-déclenchement)"
+          - "Pas de demande de permission notification au lancement de l'app — uniquement à la première activation du mode"
+          - "Pas d'envoi de la position vers un serveur"
+
+      criteres_de_reussite:
+          - "Atteint le test_litmus du père lyonnais : 'Quand le père marche dans son quartier en mode Surprenez-moi, reçoit-il une anecdote au bon moment et au bon format ?'"
+          - "Atteint le test_litmus du père lyonnais : 'Quand il veut couper les notifs aujourd'hui, peut-il le faire rapidement depuis l'écran principal ?'"
+          - "Le ton de la notif parle à un habitant (pas de 'Découvrez Lyon !' qui sonne tourisme) — relève du palier 8, ce sous-domaine doit le rendre possible (notification courte, contextuelle, déclenchée par le lieu)"
+          - "Le délai entre passage à proximité et ouverture de l'aperçu est ressenti comme 'au bon moment'"
+          - "Le mode n'est activé que par des utilisateurs qui l'ont voulu (zéro opt-in implicite vérifiable à l'audit)"
+
+      definition_of_done:
+          - "Le mode Surprenez-moi est activable depuis la carte et depuis les paramètres"
+          - "À la première activation, la permission notification système est demandée juste-à-temps"
+          - "Un refus de la permission n'empêche pas le mode d'être utilisable (au moins quand l'app est au premier plan)"
+          - "L'état du mode est persistant entre sessions"
+          - "Une notification est émise quand l'utilisateur passe à proximité d'un pin"
+          - "Le tap sur la notification ouvre l'aperçu rapide du pin (D2.4) avec la carte visible derrière"
+          - "Aucune notification n'est émise pour un pin déjà déclenché dans la même session"
+          - "La désactivation arrête la mécanique immédiatement"
+          - "Quand un parcours est engagé, ce mode est suspendu au profit de D4.3, et restauré à la fin du parcours"
+          - "Le mode silencieux et le Ne pas déranger système sont respectés"
+          - "La détection de proximité est effectuée localement"
+
+      enjeux_transversaux:
+          accessibilite: >-
+              Le point d'activation doit être atteignable au clavier et offrir
+              une cible tactile généreuse. La notification doit être lisible
+              par les lecteurs d'écran (texte court et clair). Le signal
+              sensoriel d'arrivée doit être paramétrable / suppressible pour
+              les utilisateurs sensibles ou pour les contextes silencieux.
+              Critères chiffrés en palier 16.
+          performance: >-
+              Le délai entre passage à proximité et émission de la notification
+              doit être ressenti comme 'au bon moment' (pas trop tôt, pas trop
+              tard). Le coût batterie de la surveillance en arrière-plan doit
+              être tenable sur la durée d'une balade. Critères chiffrés en
+              palier 16.
+          vie_privee: >-
+              Critique : la détection de proximité est locale à l'appareil. La
+              position de l'utilisateur n'est jamais transmise à un serveur, et
+              n'est pas stockée durablement en clair sans nécessité fonctionnelle.
+              Cohérent avec D1.1 (géoloc canonique) et D6 (historique strictement
+              local).
+
+      questions_ouvertes:
+          - "Refus de la permission notification système : mode utilisable seulement quand l'app est au premier plan, ou désactivation complète du mode ? Recommandation : utilisable au premier plan, à arbitrer en équipe."
+          - "Fenêtre de re-notification : un pin déjà notifié peut-il re-notifier le jour suivant ? Le surlendemain ? Recommandation initiale : pas dans la même session, re-notifiable au-delà d'une fenêtre à acter."
+          - "Faut-il un cooldown si l'utilisateur est manifestement immobile depuis longtemps (éviter le harcèlement passif sur un café-terrasse) ?"
+          - "Couplage avec mode silencieux système : si l'utilisateur est en silencieux total, on émet quand même la notification mais sans son ? À acter."
+          - "Quand un pin HORS rayon mais juste sur la trajectoire est dépassé sans être déclenché, faut-il un mécanisme de rattrapage discret a posteriori, ou on assume le silence ? Recommandation : on assume le silence, la sérendipité ne doit pas devenir exhaustive."
+
+      priorite: "important"
+
+      personas_principaux:
+          - pere_lyonnais
+          - kenji
+
+      dependances:
+          - "D1.1 (carte de base et géolocalisation — déclencheur principal)"
+          - "D2.5 (consultation approfondie — ouverte au tap sur la notification)"
+          - "D5.5 (permissions juste-à-temps — pour la permission notification système)"
+          - "D6 (paramètres — accès secondaire à l'activation/désactivation)"
+
+      comportements_transverses_referenced:
+          - "Géolocalisation (canonique D1.1) — déclencheur principal du mode, utilisée en arrière-plan"
+          - "Permissions juste-à-temps (canonique D5.5) — appliquée à la permission notification système, demandée à la première activation"
+
+    # ===========================================================================
+    - id: D4.3
+      nom: "Mode En parcours"
+
+      raison_d_etre: >-
+          Pendant qu'un parcours est en cours, l'utilisateur a fait un contrat
+          explicite : il VEUT être guidé d'étape en étape, l'histoire doit
+          venir à lui à chaque arrivée. Sans notification de proximité sur
+          les étapes, il devrait soit fixer son téléphone, soit avoir le
+          réflexe de le sortir à chaque pin — incompatible avec le test_litmus
+          de Kenji ('vivre 80% de l'expérience sans regarder son écran') et
+          avec celui des parents accompagnateurs de Mme Dupont ('savoir quoi
+          faire en 30 secondes sans formation'). Mais le mode est CIRCONSCRIT
+          au parcours en cours et à ses étapes uniquement : les pins HORS
+          parcours restent silencieux.
+
+      comportement: >-
+          Quand un parcours est engagé (cf. D3 lancement et déroulement), le
+          mode En parcours s'active automatiquement et prend le relais du mode
+          courant (Balade libre ou Surprenez-moi). À l'approche d'une ÉTAPE du
+          parcours, un signal discret accompagne l'arrivée et la consultation
+          approfondie du pin (D2.5) s'ouvre directement — sans étape d'aperçu
+          intermédiaire. Les pins HORS parcours qui se trouveraient à
+          proximité restent silencieux : l'utilisateur s'est engagé sur un
+          parcours, il veut l'histoire de l'étape, pas les distractions
+          voisines (cf. brief § 9.10). Un repli manuel ('arrivée signalée par
+          l'utilisateur') reste disponible quand la géolocalisation est imprécise
+          (rues étroites, intérieur), pour qu'aucune étape ne reste bloquée.
+          Le mode se désactive automatiquement à la fin du parcours, à sa mise
+          en pause ou à son abandon ; l'app revient au mode courant (Balade
+          libre par défaut, ou Surprenez-moi s'il était activé). En mode
+          canapé (consultation d'un parcours sans terrain), ce mode est
+          suspendu — la navigation est manuelle, pas géo-déclenchée.
+
+      regles_fonctionnelles:
+          - "Activation AUTOMATIQUE à l'engagement d'un parcours — pas de point d'activation utilisateur dédié à ce mode"
+          - "Désactivation AUTOMATIQUE à la fin, mise en pause ou abandon du parcours"
+          - "Demande de permission notification système juste-à-temps (cf. D5.5) si pas déjà accordée — au premier parcours qui en a besoin"
+          - "Refus de la permission système → repli manuel + retour à la consultation depuis la carte ; pas de blocage du parcours"
+          - "Déclenchement UNIQUEMENT sur les pins du parcours en cours"
+          - "Pins HORS parcours à proximité : SILENCIEUX (cf. brief § 9.10)"
+          - "À l'approche d'une étape : signal discret + ouverture directe de la consultation approfondie (D2.5), sans aperçu intermédiaire"
+          - "Repli manuel toujours accessible (arrivée signalée par l'utilisateur) pour rues étroites / intérieur / géoloc imprécise"
+          - "Suspend Surprenez-moi (D4.2) pendant la durée du parcours — exclusivité, pas de double déclenchement"
+          - "À la fin du parcours, retour automatique au mode courant (Balade libre ou Surprenez-moi)"
+          - "En mode canapé (D3, consultation d'un parcours sans terrain) : ce mode est SUSPENDU"
+          - "Une étape déjà déclenchée ne re-notifie pas dans la même session de parcours (saut, retour, test possibles sans spam)"
+          - "Les paramètres système silencieux et Ne pas déranger sont respectés"
+
+      capabilites:
+          - "Activer ce mode automatiquement à l'engagement d'un parcours (D3)"
+          - "Désactiver ce mode automatiquement à la fin / pause / abandon du parcours"
+          - "Détecter l'arrivée à proximité d'une étape du parcours en cours"
+          - "Émettre un signal discret et ouvrir directement la consultation approfondie de l'étape (D2.5)"
+          - "Maintenir le silence sur les pins hors parcours"
+          - "Proposer un repli manuel pour les cas de géoloc imprécise"
+          - "Suspendre Surprenez-moi pendant la durée du parcours et le restaurer à la fin"
+          - "Suspendre la mécanique en mode canapé (D3)"
+          - "Empêcher la re-notification d'une même étape déjà déclenchée"
+          - "Restaurer le mode courant (D4.1 ou D4.2) à la fin du parcours"
+
+      ce_qu_on_ne_fait_pas:
+          - "Pas de notification sur les pins hors parcours, même proches (cf. brief § 9.10)"
+          - "Pas d'aperçu intermédiaire — la consultation approfondie s'ouvre directement"
+          - "Pas de turn-by-turn GPS (cf. essence § ce_qu_on_refuse) — la direction et la distance simples vivent côté D3 (déroulement de parcours)"
+          - "Pas de désactivation manuelle de ce mode pendant un parcours (l'utilisateur peut mettre le parcours en pause s'il veut le silence)"
+          - "Pas de re-notification d'une étape déjà déclenchée dans la même session de parcours"
+          - "Pas de double déclenchement avec Surprenez-moi — l'un suspend l'autre"
+          - "Pas de notification en mode canapé — c'est l'utilisateur qui choisit l'étape suivante"
+          - "Pas de demande de permission notification au lancement de l'app — uniquement au premier parcours qui en a besoin"
+
+      criteres_de_reussite:
+          - "Kenji marche un parcours dans le Vieux Lyon avec son casque : il vit 80% de l'expérience sans regarder l'écran (atteint test_litmus n°2 de Kenji) — l'arrivée à chaque étape est annoncée et la consultation approfondie ouverte"
+          - "Un parent accompagnateur (cas Mme Dupont) suit le parcours sans formation : la mécanique d'arrivée fait le travail, il n'a rien à configurer (atteint test_litmus 'parent qui sait quoi faire en 30 secondes')"
+          - "Le passage devant un pin hors parcours pendant qu'on suit un parcours ne distrait pas — silence total"
+          - "Quand la géoloc est imprécise (Vieux Lyon, traboule), le repli manuel empêche le blocage — l'utilisateur ne reste jamais coincé sur une étape"
+          - "À la fin du parcours, le retour au mode courant est propre — pas de notif fantôme post-parcours"
+
+      definition_of_done:
+          - "L'engagement d'un parcours active automatiquement ce mode"
+          - "La fin / pause / abandon du parcours désactive automatiquement ce mode"
+          - "À l'arrivée à proximité d'une étape, un signal est émis et la consultation approfondie du pin de l'étape s'ouvre"
+          - "Les pins hors parcours dans la zone ne déclenchent JAMAIS de notification"
+          - "Le repli manuel est disponible et déclenche l'arrivée même en cas de géoloc imprécise"
+          - "Surprenez-moi est suspendu pendant le parcours et restauré à la fin"
+          - "En mode canapé, ce mode est suspendu (pas de notif géo-déclenchée)"
+          - "Une étape déjà déclenchée ne re-notifie pas dans la même session de parcours"
+          - "Au premier parcours qui en a besoin, la permission notification est demandée si pas déjà accordée"
+          - "Un refus de permission n'empêche pas le parcours de fonctionner (repli manuel disponible)"
+          - "Le mode silencieux et le Ne pas déranger système sont respectés"
+
+      enjeux_transversaux:
+          accessibilite: >-
+              Le repli manuel doit être atteignable au clavier et offrir une
+              cible tactile généreuse, parce qu'il est la garantie que personne
+              ne reste bloqué sur une étape. La notification d'arrivée à étape
+              doit être lisible par les lecteurs d'écran (numéro et nom de
+              l'étape audibles). Le signal sensoriel doit être paramétrable /
+              suppressible (cohérent avec D4.2). Critères chiffrés en palier 16.
+          performance: >-
+              Le délai entre arrivée à proximité d'une étape et ouverture de la
+              consultation approfondie doit être ressenti comme 'au bon moment'.
+              La mécanique de proximité doit cohabiter sans dégradation perceptible
+              avec la lecture audio (D7) et l'affichage carte (D1) qui tournent
+              en parallèle pendant un parcours. Coût batterie tenable sur la
+              durée typique d'un parcours (1-2 h). Critères chiffrés en palier 16.
+          vie_privee: >-
+              La détection de proximité est locale à l'appareil — cohérent avec
+              D4.2 et D1.1. La position pendant un parcours peut être conservée
+              localement pour la progression, mais n'est pas transmise à un
+              serveur (cohérent avec D6 historique strictement local).
+
+      questions_ouvertes:
+          - "Si l'utilisateur a refusé la permission notification système au premier parcours, faut-il la redemander à un parcours suivant (l'usage change), ou se contenter du repli ? Recommandation : redemander une fois quand un nouveau parcours est engagé, respecter un nouveau refus."
+          - "Si l'utilisateur saute une étape (cf. brief § 9.11), faut-il marquer l'étape sautée comme passée et ne plus la déclencher ? Recommandation : oui, marquer passée."
+          - "Si l'utilisateur sort du tracé (déviation, cf. brief § 9.11), la mécanique reste-t-elle active sur la prochaine étape ou est-elle mise en veille ? Recommandation : reste active — le toast 'éloignement du tracé' (palier 8) suffit."
+          - "Si l'utilisateur passe deux fois devant la même étape (aller-retour), faut-il la re-déclencher au retour ? Recommandation : non, déclenchée une fois par session de parcours."
+          - "Cohabitation avec la surface persistante du parcours en cours (cf. D3, D7) : à l'ouverture de la consultation approfondie depuis une étape, l'élément persistant du parcours reste-t-il visible, en pause, fermé ? Cohérence à régler avec D3 et D7, surfaces exactes à confirmer en palier 7."
+
+      priorite: "important"
+
+      personas_principaux:
+          - kenji
+          - mme_dupont
+          - pere_lyonnais
+
+      dependances:
+          - "D1.1 (carte de base et géolocalisation — déclencheur)"
+          - "D2.5 (consultation approfondie — ouverte à l'arrivée)"
+          - "D3 (parcours — engagement, déroulement, pause/abandon, mode canapé, edge cases)"
+          - "D4.2 (Surprenez-moi — suspendu pendant la durée du parcours)"
+          - "D5.5 (permissions juste-à-temps — pour la permission notification système)"
+
+      comportements_transverses_referenced:
+          - "Géolocalisation (canonique D1.1) — déclencheur principal du mode, utilisée pendant le parcours"
+          - "Permissions juste-à-temps (canonique D5.5) — appliquée à la permission notification système, demandée au premier parcours qui en a besoin"
+
+# -----------------------------------------------------------------------------
+# Persona-check du domaine D4
+# -----------------------------------------------------------------------------
+# Passe explicite des personas concernés via la grille du palier 2.
+# Pas un 'oui à tout' — une vraie passe, avec ligne de réponse documentée.
+persona_check:
+    kenji:
+        pertinence: "Élevée — mode 3 (En parcours) lui sert quand il marche un parcours dans le Vieux Lyon ; mode 1 par défaut, mode 2 envisageable hors parcours"
+        scenarios_passes:
+            - scenario: "Quand Kenji marche un parcours dans le Vieux Lyon avec son casque, peut-il vivre 80% de l'expérience sans regarder son écran ?"
+              reponse: >-
+                  Couvert par D4.3 : à l'arrivée à chaque étape, signal discret +
+                  ouverture directe de la consultation approfondie (qui déclenche
+                  l'audio narré de D7). Kenji sent l'arrivée par le signal,
+                  écoute, regarde la ville. Test_litmus n°2 atteint, à condition
+                  que D7 (audio) joue son rôle.
+            - scenario: "Quand Kenji ouvre l'app pour la première fois en japonais, comprend-il quoi faire en moins de 60 secondes sans tutoriel ?"
+              reponse: >-
+                  Couvert indirectement par D4.1 : aucune notif au premier
+                  lancement, aucune permission demandée — Kenji n'est pas confronté
+                  à un mur de pop-ups en japonais. Quand il activera Surprenez-moi
+                  (D4.2) ou lancera son premier parcours (D4.3), la permission
+                  sera demandée juste-à-temps (D5.5) avec un libellé localisé.
+            - scenario: "Quand Kenji n'a plus de data au milieu de Bellecour pendant un parcours, peut-il continuer son parcours préchargé hors-ligne ?"
+              reponse: >-
+                  Le mode 3 (D4.3) repose sur la géolocalisation (D1.1) qui
+                  fonctionne hors-ligne, et la détection de proximité est locale
+                  (cohérent avec D4.2 et D6 vie privée). Donc OUI, sous réserve
+                  que les contenus du parcours soient préchargés (couvert par D3).
+        questions_levees:
+            - "Confirmer que la mécanique de détection de proximité ne dépend d'aucun appel serveur — couplé à D1.1 mode hors-ligne et D6 historique strictement local"
+
+    mme_dupont:
+        pertinence: "Élevée — mode 3 (En parcours) est CRITIQUE pour les parents accompagnateurs"
+        scenarios_passes:
+            - scenario: "Quand un parent accompagnateur ouvre le lien d'un parcours le jour J sans formation, sait-il quoi faire en 30 secondes — sans créer de compte, sans tutoriel ?"
+              reponse: >-
+                  Couvert par D4.3 : une fois le parcours engagé, le mode En
+                  parcours s'active automatiquement. Le parent n'a rien à
+                  configurer. À chaque étape, signal + consultation approfondie
+                  ouverte d'office. C'est exactement le pattern visé par le
+                  test_litmus. Seule friction possible : la première demande de
+                  permission notification système (D5.5) — juste-à-temps, claire,
+                  sans drame en cas de refus.
+            - scenario: "Quand un parent sort du parcours parce qu'un enfant fatigue, l'app le ramène-t-elle proprement ou le perd-elle dans une nav cassée ?"
+              reponse: >-
+                  Couvert indirectement par D4.3 : la pause / abandon du parcours
+                  (D3) désactive proprement le mode 3 et restaure le mode courant.
+                  Pas de notif fantôme post-parcours. Question d'expérience
+                  exhaustive renvoyée à D3 et palier 6 flows.
+            - scenario: "Quand un parent a refusé la permission notification au premier lancement, le mode 3 plante-t-il pendant le parcours ?"
+              reponse: >-
+                  Couvert par D4.3 : refus de la permission système → repli manuel
+                  + retour à la consultation depuis la carte. Pas de blocage du
+                  parcours. Inscrit explicitement au DoD."
+        questions_levees:
+            - "Confirmer que la première demande de permission notification se fait à l'engagement du premier parcours (juste-à-temps réel) plutôt qu'avant, pour minimiser la friction"
+
+    mme_martin:
+        pertinence: "Faible directement, mais TRÈS élevée pour le mode 1 (Balade libre) qui doit garantir le silence en classe"
+        scenarios_passes:
+            - scenario: "Quand Mme Martin projette l'app au tableau pendant un cours entier, le silence est-il garanti (pas de notif qui surgit pendant la projection) ?"
+              reponse: >-
+                  Couvert par D4.1 : Balade libre est le mode par défaut, jamais
+                  activé sans son consentement, donc aucune notif de proximité.
+                  Si elle a un jour activé Surprenez-moi, elle peut le couper
+                  aussi rapidement qu'elle l'a activé (cf. D4.2). Si elle consulte
+                  un parcours en classe (mode canapé, D3), le mode 3 est SUSPENDU
+                  en mode canapé — donc toujours pas de notif. Triple filet de
+                  sécurité.
+            - scenario: "Quand Mme Martin utilise le mode canapé en classe, le ton de l'app est-il professionnel (pas de message intrusif) ?"
+              reponse: >-
+                  Couvert par D4.3 : en mode canapé, ce mode est SUSPENDU. La
+                  navigation entre étapes est manuelle, pas géo-déclenchée. Aucune
+                  notif de proximité ne perturbe la projection.
+        questions_levees: []
+
+    pere_lyonnais:
+        pertinence: "Très élevée — il est le PERSONA-INCARNATION du mode 2 (Surprenez-moi)"
+        scenarios_passes:
+            - scenario: "Quand le père marche dans son quartier en mode Surprenez-moi, reçoit-il une anecdote au bon moment et au bon format ?"
+              reponse: >-
+                  Couvert par D4.2 : à l'approche d'un pin, signal discret +
+                  consultation approfondie ouverte directement. C'est le scénario
+                  canonique du mode 2. La notion de 'bon moment' dépend de la
+                  calibration du rayon (palier 16) et du contenu (court / lisible
+                  en quelques secondes, palier 8). Côté D4, le mécanisme est conçu
+                  pour s'aligner sur ce scénario.
+            - scenario: "Quand le père ne veut PAS de notifs ce dimanche, peut-il les couper rapidement depuis l'écran principal ?"
+              reponse: >-
+                  Couvert par D4.1 et D4.2 : la bascule Surprenez-moi est
+                  accessible depuis la carte, pas seulement depuis les paramètres.
+                  Désactivation = retour à Balade libre, arrêt immédiat de la
+                  mécanique. Test_litmus du père lyonnais explicitement adressé."
+            - scenario: "Quand le père reçoit une anecdote, le ton lui parle-t-il en tant qu'habitant ?"
+              reponse: >-
+                  Hors périmètre de D4 — relève du palier 8 (microcopy). Mais D4
+                  rend le ton possible : la notification est courte, contextuelle,
+                  déclenchée par le LIEU. Pas de 'Découvrez Lyon !'. À cadrer côté
+                  palier 8 explicitement.
+            - scenario: "Quand le père découvre un fait fou et veut le retrouver le soir, le retrouve-t-il facilement dans son historique ?"
+              reponse: >-
+                  Hors périmètre de D4 — relève de D6 (historique). D4 alimente
+                  l'historique en émettant un événement 'pin consulté' à chaque
+                  ouverture déclenchée par notif. À acter avec D6.
+        questions_levees:
+            - "Calibration du rayon de proximité : à valider en test terrain dans le quartier de la Croix-Rousse (rues étroites, dénivelé) — palier 16"
+            - "Signal sensoriel paramétrable / suppressible pour les contextes silencieux (poussette qui dort)"
+
+    anais_back_office:
+        pertinence: "Faible — domaine côté usage grand public, peu d'impact direct sur sa production"
+        scenarios_passes:
+            - scenario: >-
+                  Anaïs ne reçoit pas de notification de proximité — elle est
+                  back-office. Mais elle PRODUIT le contenu poussé par les modes
+                  2 et 3 : c'est elle qui rédige le texte court de la notification
+                  (palier 8), c'est elle qui définit les coordonnées du pin (D2)
+                  qui détermineront le déclenchement.
+              reponse: >-
+                  Couvert par renvoi vers D2 (pins, coordonnées) et palier 8
+                  (microcopy). D4 ne définit pas de surface pour Anaïs. Ce qu'elle
+                  doit savoir : le titre / teaser d'un pin peut servir de base à
+                  la notification. La double-utilisation est à cadrer au palier 8.
+        questions_levees:
+            - "Au palier 8, prévoir un champ dédié 'texte de notification' (court, contextuel) ou réutiliser le titre / teaser du pin ? À acter avec Anaïs"

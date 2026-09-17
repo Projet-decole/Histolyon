@@ -1,0 +1,697 @@
+# =============================================================================
+# Palier 3 — Domaine D10 — Production de contenu (back-office)
+# =============================================================================
+# Ce domaine décrit la machine de PRODUCTION du contenu d'HistoLyon : ce qui
+# se passe AVANT qu'un pin, un parcours ou un média n'arrive sur la carte
+# côté grand public. Il est isolé du reste du palier 3 — sa surface n'est pas
+# l'app mobile mais un environnement back-office (templates structurés en
+# phase 1, interface d'administration web en phase 2 si le temps le permet).
+#
+# Persona principal : Anaïs Lefèvre (cf. palier 02-personas § 4 figure
+# principale). Persona secondaire : valideur_scientifique (rôle complémentaire
+# du palier 2, qui peut être Anaïs elle-même au début ou un partenaire
+# institutionnel).
+#
+# Spécificité de priorisation : le domaine globalement est en priorité
+# 'si_le_temps', SAUF D10.1 (templates structurés) qui est une EXCEPTION COEUR
+# — sans templates, l'app est vide. Cette exception est explicitée dans la
+# fiche D10.1.
+#
+# Lien fort à l'essence (palier 1) : c'est ICI que le principe d'historicité
+# se tient ou tombe — toute affirmation publiée doit être sourcée et validée.
+# Le champ source est obligatoire dès D10.1.
+# =============================================================================
+
+document:
+    type: palier_fonctionnalites_domaine
+    domaine_id: D10
+    numero: 3
+    audience:
+        - "Tout agent qui rédige un palier en aval (4, 6, 7, 8, 13, 16)"
+        - "Anaïs (lead historienne, productrice de contenu) — pour valider que ses besoins sont bien compris"
+        - "Devs Flutter et dev IA — pour anticiper l'intégration du contenu produit"
+    role: >-
+        Décrire fonctionnellement la chaîne de production du contenu : structure
+        des templates de saisie (D10.1), workflow de validation scientifique
+        (D10.2), nomenclature des médias et gestion des sources (D10.3),
+        interface d'administration web phase 2 (D10.4), mécanique back-office
+        de modération des contenus communautaires (D10.5).
+    format: yaml
+    prerequis_de_lecture:
+        - "design/conception/intention.yaml — § 5.7 separation_des_responsabilites_entre_paliers et § 11 retours_d_experience"
+        - "design/conception/01-essence.yaml — § principe_historicite et § ce_qu_on_refuse"
+        - "design/conception/02-personas.yaml — fiche Anaïs Lefèvre (figure principale back-office) et rôles complémentaires"
+        - "design/conception/03-fonctionnalites/00-index.yaml — § 2 anti_perimetre_strict est OBLIGATOIRE"
+
+# -----------------------------------------------------------------------------
+# Raison d'être du domaine
+# -----------------------------------------------------------------------------
+raison_d_etre_du_domaine: >-
+    Sans contenu produit, l'app n'est qu'une carte. La sérendipité ne se
+    déclenche pas, l'émerveillement ne survient pas, l'historicité ne se
+    vérifie pas. Le domaine D10 est la chaîne qui transforme la matière
+    brute (archives, sources, recherches) en pins, parcours et médias
+    publiables — avec la double exigence non négociable du palier 1 :
+    rigueur scientifique ET ton conteur.
+
+    Ce domaine sert principalement Anaïs (lead historienne, persona
+    back-office du palier 2) qui PRODUIT, et le valideur scientifique qui
+    RELIT avant publication. Il sert aussi indirectement les 4 personas
+    grand public : la qualité de leur expérience finale dépend entièrement
+    de ce qui se passe ici — un template trop rigide brise la nuance, une
+    source mal tracée ruine la crédibilité de Mme Martin en classe, une
+    modération absente expose le père lyonnais à des contenus douteux.
+
+    Spécificité critique : la PRIORITÉ globale du domaine est 'si_le_temps',
+    mais D10.1 (templates structurés) est une EXCEPTION COEUR. Sans
+    templates fonctionnels et structurés, on ne peut pas commencer à
+    produire — donc l'app reste vide, donc les domaines D1, D2, D3 n'ont
+    rien à afficher. Le reste de D10 (workflow formel, interface
+    d'administration web, modération) peut être tenu plus tard ou par des
+    moyens dégradés (validation par échange direct, modération a posteriori).
+
+# -----------------------------------------------------------------------------
+# Sous-domaines
+# -----------------------------------------------------------------------------
+sous_domaines:
+    # ===========================================================================
+    - id: D10.1
+      nom: "Templates de contenu structurés"
+
+      raison_d_etre: >-
+          Donner à Anaïs un cadre de saisie qui garantit, pour chaque pin et
+          chaque parcours, la présence des informations indispensables (titre,
+          catégorie, époque(s), localisation, contenu narratif, médias,
+          SOURCES) sans dicter le ton ni brider la nuance narrative. C'est le
+          socle opérationnel du principe d'historicité (palier 1) : tout
+          contenu publié est structurellement contraint à porter ses sources.
+          C'est aussi le socle pragmatique qui permet à l'équipe de produire
+          du contenu dès la phase 1, AVANT toute interface d'administration
+          web. EXCEPTION COEUR du domaine — sans D10.1, l'app est vide.
+
+      comportement: >-
+          Anaïs ouvre un template structuré et saisit un pin (ou un parcours)
+          en remplissant des champs identifiés. Les champs obligatoires
+          cadrent l'information minimale requise (titre, catégorie, époque(s),
+          localisation, sources). Les champs optionnels accueillent les
+          enrichissements (médias supplémentaires, citations, anecdotes,
+          éléments interactifs). Le template accepte la nuance multi-époques
+          pour les sujets de patrimoine vivant qui traversent plusieurs
+          périodes — il ne force pas une époque unique. Une fois un pin saisi,
+          Anaïs peut le marquer comme prêt-à-relire, ce qui le bascule dans
+          le workflow de validation (D10.2). Tant qu'un pin n'est pas validé,
+          il reste à l'état brouillon et n'apparaît pas côté grand public.
+
+      regles_fonctionnelles:
+          - "Chaque pin a un ensemble de champs obligatoires (titre, catégorie, époque(s), localisation, contenu narratif, sources) et des champs optionnels"
+          - "Le champ source est OBLIGATOIRE et n'admet pas la valeur vide — un pin sans source ne peut pas passer en validation"
+          - "Le template accepte plusieurs époques par pin (patrimoine vivant qui traverse les siècles — Anaïs ne doit jamais être forcée à mentir)"
+          - "Le template cadre la STRUCTURE de l'information, pas le ton du récit (cf. essence § ce_qu_on_refuse — pas de templates qui dictent le ton)"
+          - "Un pin a un état (brouillon / prêt-à-relire / validé / publié)"
+          - "Tant qu'un pin n'est pas validé, il n'apparaît pas côté grand public"
+          - "Le format des templates doit être manipulable hors interface dédiée (saisie possible avant que l'interface d'administration web n'existe)"
+          - "Le même format de template sert pour pin et pour parcours, avec des champs adaptés"
+
+      capabilites:
+          - "Structurer la saisie d'un pin avec des champs identifiés et obligatoires"
+          - "Accepter plusieurs époques pour un même pin (patrimoine vivant)"
+          - "Imposer la présence d'au moins une source pour chaque pin"
+          - "Distinguer les états d'un pin (brouillon, prêt-à-relire, validé, publié)"
+          - "Permettre la saisie sans interface dédiée en phase 1"
+          - "Servir de format d'entrée pour le workflow de validation (D10.2)"
+          - "Servir de format d'entrée pour la nomenclature des médias et sources (D10.3)"
+          - "Servir de format de référence pour l'interface d'administration web phase 2 (D10.4)"
+
+      ce_qu_on_ne_fait_pas:
+          - "Pas de saisie libre sans structure (l'historicité l'interdit)"
+          - "Pas de pin sans source obligatoire — même pas en brouillon validable"
+          - "Pas de template qui impose un ton (le ton conteur vient d'Anaïs, pas du cadre)"
+          - "Pas de blocage sur une époque unique pour les sujets multi-époques"
+          - "Pas de publication directe depuis le template — la validation (D10.2) est intercalée"
+          - "Pas d'écriture libre par n'importe qui — les templates sont l'outil d'Anaïs et de l'équipe contenu, pas une surface ouverte"
+
+      criteres_de_reussite:
+          - "Atteint le test_litmus d'Anaïs n°1 : Anaïs saisit un nouveau pin moyen (sources déjà collectées) en moins de 30 minutes sans batailler avec le template"
+          - "Atteint le test_litmus d'Anaïs sur la nuance multi-époques : un pin de patrimoine vivant (ex. Fête des Lumières) est saisissable sans qu'Anaïs ait à mentir sur l'époque"
+          - "Anaïs ressent le template comme un cadre qui la guide, pas comme une cage qui la brime (cf. son rapport_a_son_role dans le palier 2)"
+          - "L'équipe peut commencer à produire du contenu avant qu'aucune interface d'administration web n'existe"
+
+      definition_of_done:
+          - "Un format de template existe pour les pins, avec champs obligatoires et optionnels identifiés"
+          - "Un format de template existe pour les parcours, avec ses champs propres"
+          - "Le champ source est marqué obligatoire et un pin sans source ne peut pas être marqué prêt-à-relire"
+          - "Le template accepte plusieurs époques pour un même pin"
+          - "Les états d'un pin (brouillon, prêt-à-relire, validé, publié) sont définis et distinguables"
+          - "Anaïs peut saisir un pin de bout en bout sans assistance technique"
+          - "Le format est lisible et manipulable par les devs Flutter pour intégrer le contenu dans l'app"
+
+      enjeux_transversaux:
+          accessibilite: >-
+              Anaïs travaille sur des sessions longues (2-4 h, cf. palier 2) :
+              l'environnement de saisie doit rester confortable visuellement et
+              cognitivement. Pas un enjeu d'a11y au sens grand public, mais un
+              enjeu d'ergonomie soutenue.
+          performance: >-
+              La saisie ne doit pas frustrer par des temps d'attente sur des
+              actions simples (création d'un pin, sauvegarde d'un brouillon).
+              Critères chiffrés au palier 16.
+          vie_privee: >-
+              Les sources et le matériau de travail (notes, archives en cours de
+              traitement) ne doivent pas fuiter hors du périmètre projet. Pas
+              d'exposition publique des brouillons. Cohérent avec la posture vie
+              privée globale du produit.
+
+      questions_ouvertes:
+          - "Format exact des templates (spreadsheet structuré, fichier YAML/JSON, formulaire web léger ?) — à acter avec Anaïs et les devs Flutter"
+          - "Pipeline de contenu : qui rédige (Anaïs seule, équipe, contributions ponctuelles ?), avec quel apport éventuel d'IA assistée pour ébaucher / traduire / résumer ? — discussion équipe, lead + dev IA"
+          - "Liste exacte des champs obligatoires et optionnels — à acter avec Anaïs sur la base des besoins éditoriaux du palier 8"
+          - "Articulation avec les types de contenu interactif (citation, frise, quiz, énigme, avant/après) côté grand public — comment ces blocs entrent-ils dans la structure ? — à articuler avec D2 et le palier 8"
+          - "Politique d'auto-validation au démarrage du projet (Anaïs valide ses propres pins faute de ressource) — à acter dans le quality plan, palier 16"
+
+      priorite: "coeur"
+
+      note_priorite: >-
+          EXCEPTION DU DOMAINE. Le domaine D10 est globalement en priorité
+          'si_le_temps' (cf. 00-index § 7 priorisation_globale et fiche
+          domaine D10), mais ce sous-domaine D10.1 est en priorité COEUR.
+          Justification : sans templates fonctionnels et structurés, l'équipe
+          ne peut pas produire le contenu qui alimente D1, D2, D3 ; donc
+          l'app reste vide ; donc rien d'autre ne tient. Le reste de D10
+          (workflow formel, interface d'administration web, modération
+          formelle) peut être tenu par des moyens dégradés ou plus tard.
+
+      personas_principaux:
+          - editeur_de_contenu
+
+      personas_secondaires:
+          - valideur_scientifique
+
+      dependances: []
+
+      comportements_transverses_referenced: []
+
+    # ===========================================================================
+    - id: D10.2
+      nom: "Workflow de validation scientifique"
+
+      raison_d_etre: >-
+          Garantir que rien n'arrive côté grand public sans avoir été relu
+          par un œil compétent. C'est l'incarnation procédurale du principe
+          d'historicité : la rigueur ne tient que parce qu'un contrôle est
+          tracé entre la saisie et la publication. Sert aussi le test_litmus
+          de Mme Martin (sources crédibles aux yeux d'un collègue) et la
+          promesse implicite à l'institution lyonnaise (palier 2 acteurs
+          hors-personas) : nous ne publions pas sans vérification.
+
+      comportement: >-
+          Quand Anaïs marque un pin comme prêt-à-relire, le pin entre dans
+          une file de validation accessible au valideur scientifique. Le
+          valideur peut consulter le pin tel qu'il sera vu par l'utilisateur
+          final, accéder rapidement aux sources citées, annoter ou commenter
+          sans modifier directement le contenu, et trancher : valider, refuser,
+          ou demander une correction. Une décision est tracée (qui a tranché,
+          quand, sur quoi). Un pin refusé ou en demande de correction revient
+          à Anaïs qui peut le retravailler. Un pin validé peut être publié
+          (la publication elle-même est une étape distincte qui peut être
+          différée). Au démarrage du projet, faute de ressource, Anaïs peut
+          assurer son propre rôle de validation — mais la mécanique reste la
+          même (auto-validation tracée comme telle).
+
+      regles_fonctionnelles:
+          - "Un pin ne peut pas passer à l'état publié sans avoir été validé"
+          - "La validation produit une trace identifiable (qui, quand, décision)"
+          - "Le valideur lit le pin tel qu'il sera vu par l'utilisateur final, pas une vue technique du template"
+          - "Le valideur peut annoter ou commenter sans modifier directement le contenu rédigé par Anaïs"
+          - "Trois décisions possibles : validé, refusé, demande de correction"
+          - "Un pin refusé ou en demande de correction revient à l'auteur"
+          - "L'auto-validation (Anaïs valide ses propres pins) est admise au démarrage, mais reste tracée comme telle (transparence sur la posture)"
+          - "La validation est une étape distincte de la publication — un pin peut être validé sans être encore mis en ligne"
+
+      capabilites:
+          - "Faire passer un pin de prêt-à-relire à validé / refusé / demande de correction"
+          - "Permettre au valideur de prévisualiser le pin tel qu'il sera vu côté grand public"
+          - "Permettre au valideur d'accéder rapidement aux sources citées"
+          - "Permettre au valideur d'annoter sans modifier le rédactionnel"
+          - "Tracer chaque décision de validation (qui, quand, décision, motif éventuel)"
+          - "Renvoyer un pin refusé ou à corriger à l'auteur"
+          - "Distinguer auto-validation et validation par tiers"
+
+      ce_qu_on_ne_fait_pas:
+          - "Pas de publication directe sans validation, même pour Anaïs"
+          - "Pas de validation tacite ou implicite (toute décision est tracée)"
+          - "Pas de modification silencieuse du rédactionnel par le valideur (annotations / commentaires uniquement, ou retour à l'auteur)"
+          - "Pas de file de validation absente — même au démarrage avec auto-validation, la mécanique existe"
+
+      criteres_de_reussite:
+          - "Atteint le test_litmus d'Anaïs n°2 : quand Anaïs soumet un pin à un valideur, le valideur peut relire et annoter dans la même surface sans changer d'outil"
+          - "Atteint le test_litmus de Mme Martin sur les sources : la source est visible et crédible aux yeux d'un collègue qui regarderait par-dessus son épaule (la validation amont garantit cette crédibilité)"
+          - "Anaïs ressent la validation comme un soutien à la rigueur, pas comme une bureaucratie qui ralentit son travail"
+          - "Le valideur n'a pas l'impression de rejouer le travail d'Anaïs — il valide, il ne réécrit pas"
+
+      definition_of_done:
+          - "Un pin marqué prêt-à-relire entre dans une file de validation"
+          - "Le valideur peut lire le pin comme l'utilisateur final le verra"
+          - "Le valideur peut accéder aux sources citées sans quitter son outil"
+          - "Le valideur peut annoter / commenter sans modifier le rédactionnel"
+          - "Trois décisions sont possibles : validé, refusé, demande de correction"
+          - "Chaque décision est tracée avec auteur, date et motif éventuel"
+          - "Un pin refusé ou en correction revient à l'auteur"
+          - "L'auto-validation est possible et tracée comme telle"
+
+      enjeux_transversaux:
+          accessibilite: >-
+              Le valideur peut être un partenaire institutionnel non-formé à
+              l'outil — l'accès à la file et la lecture du pin doivent rester
+              directs, sans courbe d'apprentissage lourde.
+          performance: >-
+              Le passage entre lecture du pin et accès aux sources doit être
+              fluide pour ne pas décourager une relecture méticuleuse.
+          vie_privee: >-
+              Les pins en cours de validation ne sont pas publics. La trace de
+              validation est interne à l'équipe / aux partenaires de
+              validation.
+
+      questions_ouvertes:
+          - "Qui assure la validation au démarrage : Anaïs en auto-validation, un membre senior de l'équipe, un partenaire institutionnel ? — à acter dans le quality plan (palier 16)"
+          - "Faut-il plusieurs niveaux de validation (relecture historienne + relecture éditoriale) ou un seul ? — à arbitrer avec la lead"
+          - "Politique pour les pins refusés (archivage ? itération obligatoire ?) — à acter"
+          - "Surface concrète du workflow (intégrée au template, séparée, intégrée à l'interface d'administration web phase 2 ?) — à acter avec D10.4"
+
+      priorite: "si_le_temps"
+
+      personas_principaux:
+          - editeur_de_contenu
+          - valideur_scientifique
+
+      dependances:
+          - "D10.1 (templates — fournit l'objet à valider)"
+
+      comportements_transverses_referenced: []
+
+    # ===========================================================================
+    - id: D10.3
+      nom: "Nomenclature des médias et gestion des sources"
+
+      raison_d_etre: >-
+          Donner aux médias (images d'archives, audio, vidéos courtes,
+          documents) et aux sources (références bibliographiques, archives,
+          crédits) un système de nommage et de rattachement qui résiste au
+          volume et au temps. Sans ce cadrage, on aboutit en quelques mois à
+          un dossier de fichiers ingérable, des sources stockées en commentaire
+          libre, et la fameuse promesse d'historicité devient inverifiable
+          sur le terrain. C'est aussi ce qui permet aux crédits institutionnels
+          d'être respectés (cf. palier 2 § acteurs_hors_personas — ce qu'on
+          doit à l'institution).
+
+      comportement: >-
+          Chaque média ajouté à un pin suit une nomenclature qui permet de
+          l'identifier, le rattacher à son pin et à son auteur / fournisseur,
+          et le retrouver. Chaque source citée dans un pin est traitée comme
+          une référence structurée (pas un texte libre dans un commentaire) :
+          type (archive, ouvrage, web, témoignage), référence précise,
+          crédit. Une affirmation rédactionnelle peut renvoyer à une ou
+          plusieurs sources. Côté grand public (D2), les sources sont
+          consultables sur le pin sous une forme adaptée à l'utilisateur ; en
+          back-office, elles sont consultables dans leur forme structurée
+          complète. Quand l'institution lyonnaise fournit un média ou une
+          source, son crédit est tracé et rendu visible côté grand public.
+
+      regles_fonctionnelles:
+          - "Chaque média a une nomenclature structurée (pas de fichier nommé librement)"
+          - "Chaque média est rattaché à un pin et à un fournisseur / auteur"
+          - "Chaque source est une référence structurée (type, référence, crédit), pas un commentaire libre"
+          - "Une affirmation peut être liée à plusieurs sources"
+          - "Les crédits institutionnels sont tracés et restent visibles côté grand public"
+          - "La gestion fonctionne dès la phase 1 (templates structurés), pas après l'interface d'administration web"
+          - "Un média manquant ou cassé est repérable (pas de pin publié pointant sur un fichier introuvable)"
+
+      capabilites:
+          - "Nommer chaque média selon une nomenclature partagée"
+          - "Rattacher un média à son pin et à son fournisseur"
+          - "Stocker une source comme référence structurée"
+          - "Lier une affirmation rédactionnelle à une ou plusieurs sources"
+          - "Tracer les crédits institutionnels"
+          - "Rendre les sources et crédits consultables côté grand public sous une forme adaptée"
+          - "Repérer les médias manquants ou cassés avant publication"
+
+      ce_qu_on_ne_fait_pas:
+          - "Pas de nommage libre des fichiers médias"
+          - "Pas de sources stockées comme commentaire libre (drapeau rouge persona Anaïs)"
+          - "Pas d'affirmation factuelle sans source rattachable"
+          - "Pas d'omission des crédits institutionnels"
+          - "Pas de publication d'un pin avec un média introuvable"
+
+      criteres_de_reussite:
+          - "Anaïs retrouve facilement un média ou une source plusieurs mois après sa saisie"
+          - "Quand Mme Martin cite une archive en cours, la source est visible, sourcée et créditée — c'est la conséquence directe du soin apporté ici"
+          - "Quand l'institution promeut l'app, elle reconnaît ses crédits sans avoir à les chercher"
+          - "L'équipe peut auditer à tout moment l'inventaire des médias et sources sans plonger dans des dossiers de fichiers nommés au hasard"
+
+      definition_of_done:
+          - "Une nomenclature des médias est définie et appliquée"
+          - "Chaque média est rattaché à son pin et à son fournisseur"
+          - "Les sources sont stockées comme références structurées, pas comme commentaires libres"
+          - "Une affirmation peut être liée à une ou plusieurs sources"
+          - "Les crédits institutionnels sont tracés et exportables côté grand public"
+          - "Un pin ne peut pas être publié avec un média manquant ou cassé"
+
+      enjeux_transversaux:
+          accessibilite: >-
+              Côté grand public, la consultation des sources doit rester
+              accessible (lisible, navigable au clavier ou par lecteurs d'écran)
+              — pas un pavé technique réservé aux initiés. Forme exacte
+              détaillée en D2 et au palier 7.
+          performance: >-
+              Le rattachement source/affirmation ne doit pas alourdir la lecture
+              ni le rendu côté grand public.
+          vie_privee: >-
+              Les sources et crédits qui mentionnent des personnes (témoignages,
+              photos d'archives privées) doivent respecter le consentement
+              et la posture vie privée du produit. Pas de crédit qui exposerait
+              une personne sans son accord.
+
+      questions_ouvertes:
+          - "Format de référence pour les sources (modèle bibliographique standard ? schéma maison ?) — à acter avec Anaïs et la lead"
+          - "Stockage des médias volumineux (audio, vidéos courtes) — à arbitrer avec les devs Flutter (mode hors-ligne, taille de l'app)"
+          - "Politique pour les médias générés par IA (colorisation d'archives, voix TTS) : comment les marquer comme tels, quel crédit ? — discussion équipe IA"
+          - "Forme exacte de l'affichage des sources côté grand public — détail au palier 7, mais l'intention fonctionnelle est posée ici"
+
+      priorite: "si_le_temps"
+
+      note_priorite: >-
+          Bien que classé 'si_le_temps', ce sous-domaine est intimement lié à
+          D10.1 : la nomenclature des médias et la structure des sources sont
+          pratiquement indissociables des templates en phase 1. Le 'si_le_temps'
+          vise ici la version FORMALISÉE et OUTILLÉE — la version pragmatique
+          minimale (un dossier nommé proprement, un schéma de référence des
+          sources) doit exister dès D10.1.
+
+      personas_principaux:
+          - editeur_de_contenu
+
+      personas_secondaires:
+          - valideur_scientifique
+
+      dependances:
+          - "D10.1 (templates — où les médias et sources sont rattachés)"
+
+      comportements_transverses_referenced: []
+
+    # ===========================================================================
+    - id: D10.4
+      nom: "Interface d'administration web (phase 2)"
+
+      raison_d_etre: >-
+          Une fois la phase 1 (templates structurés) opérationnelle et le
+          volume de contenu en croissance, donner à Anaïs une surface dédiée
+          qui rend la production plus directe — saisie, prévisualisation,
+          validation, gestion des médias et sources, sans avoir à manipuler
+          un format brut. C'est un confort opérationnel et une préparation à
+          la pérennité du projet (une équipe future pouvant reprendre le
+          contenu sans connaître le format brut interne). étape ultérieure explicite —
+          ne se substitue pas aux templates en phase 1, vient en relais.
+
+      comportement: >-
+          Anaïs accède à une interface d'administration web depuis son
+          navigateur, s'authentifie, et y retrouve l'ensemble du contenu (pins,
+          parcours, médias, sources). Elle peut créer un nouveau pin via un
+          formulaire qui reflète la structure des templates (D10.1), prévisualiser
+          en direct ce que l'utilisateur final verra, gérer les états (brouillon
+          / prêt-à-relire / validé / publié), parcourir l'inventaire des médias
+          et sources (D10.3), suivre la file de validation (D10.2), et tracer
+          les modifications dans le temps (versions). L'interface ne change
+          RIEN à la sémantique de la production — elle change la surface. Le
+          format de stockage interne reste compatible avec la phase 1 pour
+          garantir que les contenus produits en phase 1 restent éditables en
+          phase 2 sans conversion lourde.
+
+      regles_fonctionnelles:
+          - "L'interface d'administration web ne remplace pas les templates phase 1, elle vient en relais"
+          - "Le format de stockage est compatible entre phase 1 et phase 2 (pas de migration douloureuse)"
+          - "Toutes les capabilités de D10.1, D10.2, D10.3, D10.5 sont accessibles depuis l'interface (cohérence)"
+          - "Authentification requise (pas de surface ouverte au grand public)"
+          - "Modifications tracées avec versions accessibles"
+          - "La prévisualisation reflète exactement ce que l'utilisateur final verra"
+
+      capabilites:
+          - "Authentifier un éditeur ou un valideur"
+          - "Créer, modifier, supprimer un pin ou un parcours via une interface dédiée"
+          - "Gérer l'inventaire des médias et des sources"
+          - "Suivre la file de validation"
+          - "Prévisualiser le rendu côté grand public"
+          - "Tracer et restaurer les versions antérieures d'un contenu"
+          - "Modérer les contenus communautaires (D10.5) depuis la même surface"
+
+      ce_qu_on_ne_fait_pas:
+          - "Pas de remplacement abrupt des templates phase 1 (relais, pas rupture)"
+          - "Pas d'interface ouverte sans authentification"
+          - "Pas de format propriétaire qui empêcherait de revenir aux templates en cas de besoin"
+          - "Pas de sémantique différente entre phase 1 et phase 2 (l'interface ne change pas ce qu'est un pin, elle change comment on le saisit)"
+
+      criteres_de_reussite:
+          - "Atteint le test_litmus d'Anaïs n°3 : quand Anaïs prévisualise un pin avant publication, elle voit exactement ce que verra l'utilisateur final"
+          - "Anaïs gagne du temps par rapport à la phase 1 sur les opérations courantes (création, modification, suivi)"
+          - "Une équipe future qui reprendrait le projet peut prendre l'interface en main sans avoir à comprendre le format brut interne"
+          - "Aucune régression de capacité par rapport à la phase 1 (pas de feature qui marchait en templates et qui ne marche plus en interface)"
+
+      definition_of_done:
+          - "Un éditeur s'authentifie et accède à l'inventaire complet du contenu"
+          - "Un éditeur crée, modifie, supprime un pin ou un parcours via l'interface"
+          - "Un éditeur prévisualise en direct le rendu côté grand public"
+          - "L'inventaire des médias et sources est accessible et navigable"
+          - "La file de validation est accessible depuis l'interface"
+          - "La modération communautaire est accessible depuis l'interface"
+          - "Les versions antérieures sont consultables et restaurables"
+          - "Les contenus produits en phase 1 sont éditables en phase 2 sans conversion lourde"
+
+      enjeux_transversaux:
+          accessibilite: >-
+              Anaïs et les valideurs travaillent sur des sessions longues —
+              l'interface doit être ergonomique, navigable au clavier, et
+              respecter les standards a11y web (un partenaire institutionnel
+              qui valide doit pouvoir l'utiliser sans friction).
+          performance: >-
+              Réactivité des opérations courantes (sauvegarde d'un brouillon,
+              recherche dans l'inventaire) — critique pour ne pas casser le
+              flow de production. Critères chiffrés au palier 16.
+          vie_privee: >-
+              L'authentification protège l'accès. Les brouillons et la file de
+              validation ne sont jamais exposés publiquement. Les logs
+              d'activité (qui a édité quoi, quand) restent internes à l'équipe
+              et au partenariat de validation.
+
+      questions_ouvertes:
+          - "Stack technique de l'interface web (framework, hébergement, intégration avec le backend de l'app) — à arbitrer avec les devs Flutter"
+          - "Politique d'authentification (compte interne, SSO institutionnel, lien magique ?) — à acter"
+          - "Périmètre exact de la phase 2 si le temps est limité (créer/modifier seulement ? aussi modération ? aussi gestion fine des médias ?) — priorisation à arbitrer"
+          - "Mécanisme de transition phase 1 → phase 2 (import des contenus produits en templates) — à acter avec les devs"
+
+      priorite: "si_le_temps"
+
+      personas_principaux:
+          - editeur_de_contenu
+
+      personas_secondaires:
+          - valideur_scientifique
+          - moderateur_communaute
+
+      dependances:
+          - "D10.1 (templates — fournit la sémantique et le format de référence)"
+          - "D10.2 (workflow de validation — accessible depuis l'interface)"
+          - "D10.3 (médias et sources — gérés depuis l'interface)"
+          - "D10.5 (modération — accessible depuis l'interface)"
+
+      comportements_transverses_referenced: []
+
+    # ===========================================================================
+    - id: D10.5
+      nom: "Modération des contenus communautaires"
+
+      raison_d_etre: >-
+          Donner à l'équipe back-office la mécanique pour traiter les
+          contributions communautaires (commentaires sur les pins,
+          soumissions de pins, retours sur parcours communautaires,
+          signalements) côté D9 — qui est planifié en 'si le temps le permet'
+          mais qui ne peut pas exister sans cette contrepartie back-office.
+          Sert directement le principe d'historicité (rien d'invérifié ne
+          passe en publication) et le respect dû à tous les personas
+          (notamment Mme Martin qui ne projettera pas en classe une app où
+          circulent des contenus douteux non modérés).
+
+      comportement: >-
+          Quand une contribution communautaire arrive (commentaire, soumission
+          de pin, signalement d'un contenu existant, retour sur un parcours),
+          elle entre dans une file de modération priorisée. Les signalements
+          remontent en tête, suivis des soumissions de contenu, puis des
+          commentaires. Le modérateur (qui peut être Anaïs au début ou un
+          rôle dédié plus tard, cf. palier 2 § rôles complémentaires) consulte
+          la contribution dans son contexte (le pin concerné, le parcours
+          concerné) et tranche : publier, refuser, demander une correction
+          (pour les soumissions), ignorer le signalement avec motif. Pour les
+          cas standards récurrents, un mécanisme de réponse-type évite de
+          réécrire à chaque fois. Chaque décision est tracée. Un soumissionnaire
+          dont le pin est accepté ou refusé est notifié (côté grand public,
+          cf. D9). La file doit rester tenable avec peu de temps disponible
+          — c'est une exigence directe de la frustration_a_eviter du persona
+          modérateur.
+
+      regles_fonctionnelles:
+          - "Toute contribution communautaire entre dans une file avant publication"
+          - "La file est priorisée (signalements en tête, puis soumissions, puis commentaires)"
+          - "Le modérateur consulte la contribution dans son contexte (pin / parcours concerné)"
+          - "Les décisions possibles sont : publier, refuser, demande de correction, ignorer le signalement (avec motif)"
+          - "Chaque décision est tracée (qui, quand, décision, motif)"
+          - "Un mécanisme de réponse-type existe pour les cas récurrents"
+          - "Le soumissionnaire d'un pin accepté ou refusé est notifié (mécanique côté D9)"
+          - "La modération doit être tenable avec peu de temps (pas de surcharge structurelle)"
+
+      capabilites:
+          - "Recevoir une contribution communautaire dans une file"
+          - "Prioriser les contributions (signalements > soumissions > commentaires)"
+          - "Lire une contribution dans son contexte (pin, parcours)"
+          - "Trancher (publier / refuser / corriger / ignorer)"
+          - "Tracer chaque décision"
+          - "Utiliser des réponses-types pour les cas récurrents"
+          - "Déclencher la notification du soumissionnaire (côté D9)"
+
+      ce_qu_on_ne_fait_pas:
+          - "Pas de publication automatique d'une contribution sans passage par la file"
+          - "Pas de file uniforme sans priorisation (les signalements ne peuvent pas attendre derrière les commentaires)"
+          - "Pas de décision tacite — toute décision est tracée"
+          - "Pas de réponse-type qui remplace une vraie modération sur les cas non standards"
+          - "Pas de modération exécutée côté grand public — tout passe par cette mécanique back-office"
+
+      criteres_de_reussite:
+          - "Le modérateur ne se sent pas submergé : la file reste tenable avec quelques minutes par jour"
+          - "Aucun signalement ne reste sans réponse au-delà d'un délai raisonnable (à fixer au palier 16)"
+          - "Le ton de la modération reste cohérent avec l'esprit du produit (sobre, conteur, respectueux) — appuyé par les réponses-types"
+          - "L'équipe peut, à tout moment, exposer son historique de modération à un partenaire institutionnel sans honte"
+
+      definition_of_done:
+          - "Toute contribution communautaire entre dans la file avant d'apparaître"
+          - "La file est priorisée (signalements en tête)"
+          - "Le modérateur lit la contribution dans son contexte"
+          - "Les quatre décisions (publier / refuser / corriger / ignorer) sont disponibles"
+          - "Chaque décision est tracée"
+          - "Les réponses-types existent et sont réutilisables"
+          - "Le soumissionnaire d'un pin accepté ou refusé est notifié"
+
+      enjeux_transversaux:
+          accessibilite: >-
+              Le modérateur peut être une personne non-formée à des outils
+              complexes — l'accès à la file et la prise de décision doivent
+              rester directs.
+          performance: >-
+              Le passage entre file, contribution, contexte (pin / parcours)
+              doit être fluide pour ne pas allonger une opération qui se
+              répète des dizaines de fois.
+          vie_privee: >-
+              Les soumissions et signalements peuvent contenir des informations
+              sensibles (témoignages, identités). Pas d'exposition publique des
+              contenus refusés. Les motifs de refus restent internes ou
+              synthétisés en réponse-type pour le soumissionnaire.
+
+      questions_ouvertes:
+          - "Qui modère au démarrage : Anaïs, un membre de l'équipe, plusieurs personnes ? — à acter dans le quality plan (palier 16)"
+          - "Délai-cible de traitement d'un signalement — à acter au palier 16"
+          - "Politique pour les soumissions répétées d'un même utilisateur (acceptation tacite après N validations ?) — à arbitrer si le volume le justifie"
+          - "Articulation exacte avec D9 (qui notifie quoi, quand, sous quelle forme côté grand public) — à articuler avec le palier flows D9"
+
+      priorite: "si_le_temps"
+
+      note_priorite: >-
+          Strictement liée à D9 (Communauté), elle aussi 'si_le_temps'. Si D9
+          n'est pas livré, D10.5 ne se déclenche pas. Si D9 est livré même
+          partiellement (par exemple seulement les commentaires sur les pins),
+          la mécanique de modération correspondante (au moins pour les
+          commentaires) doit exister.
+
+      personas_principaux:
+          - moderateur_communaute
+
+      personas_secondaires:
+          - editeur_de_contenu
+
+      dependances:
+          - "D10.1 (templates — la modération produit ou fait produire des contenus qui passent par la même structure)"
+          - "D10.2 (workflow de validation — partage la mécanique de file et de décision tracée)"
+          - "D9 (communauté — alimente la file via les contributions grand public)"
+
+      comportements_transverses_referenced: []
+
+# -----------------------------------------------------------------------------
+# Persona-check du domaine D10
+# -----------------------------------------------------------------------------
+# D10 est un domaine BACK-OFFICE. Le persona principal est Anaïs Lefèvre. Les
+# 4 personas grand public ont une pertinence faible (ils ne touchent pas à
+# cette surface) — ils sont mentionnés pour traçabilité, mais leur scénarios
+# n'apparaissent pas ici. Les rôles complémentaires (valideur, modérateur)
+# sont nommés.
+persona_check:
+    editeur_de_contenu:
+        pertinence: "Très élevée — Anaïs est LE persona principal de ce domaine. Tous les sous-domaines la concernent."
+        scenarios_passes:
+            - scenario: "Saisie d'un nouveau pin moyen en moins de 30 minutes (test_litmus n°1)"
+              reponse: "Couvert par D10.1 (templates structurés conçus pour ne pas brider la nuance) et D10.3 (références structurées qui évitent de retaper les sources). Critère de réussite explicitement ancré dans D10.1."
+            - scenario: "Soumission à un valideur qui peut relire dans la même surface sans changer d'outil (test_litmus n°2)"
+              reponse: "Couvert par D10.2 (workflow intégré au format de saisie) et D10.4 (interface d'administration web qui rassemble tout). Critère de réussite explicite dans D10.2."
+            - scenario: "Prévisualisation conforme à ce que verra l'utilisateur (test_litmus n°3)"
+              reponse: "Couvert par D10.4 (interface phase 2 — prévisualisation directe). En phase 1, la prévisualisation peut être plus indirecte — question ouverte assumée dans D10.1."
+            - scenario: "Pin de patrimoine vivant qui traverse plusieurs siècles, sans être forcée à mentir"
+              reponse: "Règle fonctionnelle explicite dans D10.1 : le template accepte plusieurs époques. Drapeau rouge persona explicitement levé."
+            - scenario: "Source stockée comme référence traçable, pas comme commentaire libre"
+              reponse: "Règle fonctionnelle explicite dans D10.3. Drapeau rouge persona explicitement levé."
+            - scenario: "Templates qui guident sans dicter le ton"
+              reponse: "Règle fonctionnelle explicite dans D10.1 (cadre la STRUCTURE, pas le ton). Drapeau rouge persona explicitement levé."
+            - scenario: "Modification tracée avec version antérieure préservée (frustration_a_eviter)"
+              reponse: "Couvert par D10.4 (versions tracées et restaurables). étape ultérieure — en phase 1, géré au moins par discipline de l'équipe (question ouverte)."
+        questions_levees:
+            - "Format exact des templates en phase 1 (D10.1)"
+            - "Périmètre exact de la prévisualisation en phase 1 (D10.1)"
+            - "Politique de versioning en phase 1 avant l'interface d'administration web (D10.4)"
+
+    valideur_scientifique:
+        pertinence: "Élevée — rôle secondaire structurant sur D10.2 et D10.4. Le valideur peut être Anaïs en auto-validation au démarrage."
+        scenarios_passes:
+            - scenario: "Lecture du pin tel que vu par l'utilisateur final"
+              reponse: "Capabilité explicite dans D10.2 et critère de réussite. Couvert par prévisualisation D10.4 en phase 2."
+            - scenario: "Accès rapide aux sources citées"
+              reponse: "Capabilité explicite dans D10.2 (prévisualisation + accès aux sources structurées de D10.3)."
+            - scenario: "Annotation / commentaire sans modification directe"
+              reponse: "Règle fonctionnelle explicite dans D10.2 (annotations / commentaires uniquement, ou retour à l'auteur)."
+            - scenario: "Workflow de validation tracé (qui a validé quoi, quand)"
+              reponse: "Règle fonctionnelle explicite dans D10.2 (chaque décision est tracée)."
+        questions_levees:
+            - "Identité du valideur au démarrage (auto-validation ou tiers ?) — D10.2"
+            - "Niveau(x) de validation (un seul ou plusieurs ?) — D10.2"
+
+    moderateur_communaute:
+        pertinence: "Moyenne — pertinent uniquement si D9 (Communauté) est livré, ce qui reste 'si le temps le permet'. D10.5 lui est entièrement dédié."
+        scenarios_passes:
+            - scenario: "File de modération avec priorisation (signalements en tête)"
+              reponse: "Règle fonctionnelle explicite dans D10.5. Cohérent avec ce que le persona attend du produit (palier 2 § rôles complémentaires)."
+            - scenario: "Décisions tracées (publié, refusé, demandé en correction)"
+              reponse: "Règle fonctionnelle explicite dans D10.5."
+            - scenario: "Réponses-types pour cas standards"
+              reponse: "Capabilité explicite dans D10.5."
+            - scenario: "Modération tenable avec peu de temps"
+              reponse: "Critère de réussite explicite dans D10.5."
+        questions_levees:
+            - "Délais-cibles de traitement — D10.5"
+            - "Articulation exacte avec D9 — D10.5"
+
+    kenji:
+        pertinence: "Faible — persona grand public, ne touche pas à la production de contenu. Mentionné pour traçabilité."
+        impact_indirect: "La qualité du contenu qu'il consomme dépend entièrement de D10. Une nomenclature des médias soignée (D10.3) garantit que ses partages produisent une image jolie et non une URL cassée."
+
+    mme_dupont:
+        pertinence: "Faible — persona grand public, ne touche pas à la production de contenu. Mentionné pour traçabilité."
+        impact_indirect: "Le contenu adapté aux CM1-CM2 que Mme Dupont attend dépend de la rigueur éditoriale d'Anaïs cadrée par les templates (D10.1). Les sources citées dans les pins qu'elle fait lire à ses élèves sont tracées en D10.3."
+
+    mme_martin:
+        pertinence: "Faible côté production, mais BÉNÉFICIAIRE DIRECTE de la qualité produite. Mentionnée pour traçabilité forte."
+        impact_indirect: "Sa frustration_a_eviter principale ('sources d'archives invisibles ou douteuses') est levée par D10.3 (références structurées) et D10.2 (validation tracée). Son test_litmus 'la source est crédible aux yeux d'un collègue' est garanti par la mécanique amont de ce domaine."
+
+    pere_lyonnais:
+        pertinence: "Faible — persona grand public, ne touche pas à la production de contenu. Mentionné pour traçabilité."
+        impact_indirect: "Le ton conteur des anecdotes qu'il reçoit en mode Surprenez-moi vient d'Anaïs, cadrée structurellement (et NON tonalement) par D10.1. Sa protection vis-à-vis de contenus douteux passe par D10.5 si la communauté est ouverte."

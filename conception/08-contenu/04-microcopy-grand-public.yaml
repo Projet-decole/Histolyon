@@ -1,0 +1,1127 @@
+# =============================================================================
+# Palier 8 — 04-microcopy-grand-public
+# =============================================================================
+# Microcopy des 40 écrans grand public du palier 7. Application stricte du
+# pilote 01-strategie-narrative (ton conteur, voix récit/app, P1-P7, PT1-PT7,
+# anti-patterns).
+#
+# Convention : libellés communs au dictionnaire, référencés par id (D1, D2…).
+# Les écrans ne rappellent que ce qui leur est SPÉCIFIQUE.
+# =============================================================================
+
+document:
+  type: palier_contenu_microcopy_grand_public
+  version: "0.1"
+  date: "2026-05-05"
+  format: yaml
+
+# -----------------------------------------------------------------------------
+# 1. Périmètre
+# -----------------------------------------------------------------------------
+perimetre:
+
+  inclus:
+    - "Dictionnaire transversal (verbes, statuts, sections, entités, connecteurs)"
+    - "Patterns par mode de présentation (P5.M2-M9)"
+    - "Microcopy structurante par écran grand public (palier 7)"
+    - "Demandes de permission contextualisées (PT4)"
+    - "Erreurs et états dégradés génériques"
+    - "Microcopy de cohésion narrative (Parcours, proximité)"
+
+  exclus:
+    - "Microcopy admin — voir 05"
+    - "Contenu narratif réel des Pins/Parcours — matière éditoriale"
+    - "Structure des templates — voir 02, 03"
+    - "Stratégie i18n — voir 06"
+    - "Mesures chiffrées — paliers 11, 16"
+    - "Composants UI, dimensions — paliers 9, 10, 12"
+
+  test_de_purete: "Si demain l'app passe à un autre stack, les libellés tiennent-ils ? Si oui, c'est bon."
+
+# -----------------------------------------------------------------------------
+# 2. Dictionnaire transversal
+# -----------------------------------------------------------------------------
+# Format compact : { id, libelle, usage }. Voix = app par défaut sauf mention.
+# Référencé partout par id. Les écrans ne rappellent que les SPÉCIFIQUES.
+dictionnaire:
+
+  verbes_d_action:
+    - { id: D1,  libelle: "Continuer",                 usage: "Avancer dans un flow engagé sans valider de sensible." }
+    - { id: D2,  libelle: "Annuler",                   usage: "Renoncer sans effet ; conserver le contexte. Jamais « OK »." }
+    - { id: D3,  libelle: "Confirmer",                 usage: "Acquiescer décision NON sensible. Sensible → libellé qui dit l'action (cf. P5)." }
+    - { id: D4,  libelle: "Réessayer",                 usage: "Relancer après échec réseau ou chargement." }
+    - { id: D5,  libelle: "Plus tard",                 usage: "Reporter une proposition non bloquante. Préférable à « Refuser »." }
+    - { id: D6,  libelle: "Retour",                    usage: "Revenir à la surface précédente (P5.N1)." }
+    - { id: D7,  libelle: "Voir plus",                 usage: "Étendre une liste tronquée. Préférable à « Charger plus » (technique)." }
+    - { id: D8,  libelle: "Fermer",                    usage: "Refermer une surface ponctuelle (M6) ou un message persistant." }
+    - { id: D9,  libelle: "Enregistrer",               usage: "Sauvegarde explicite (brouillon, image, code visuel)." }
+    - { id: D10, libelle: "Partager",                  usage: "Partage natif système (F1, F2, F3)." }
+    - { id: D11, libelle: "Copier le lien",            usage: "Copier le Lien universel. Retour PT1 = D52." }
+    - { id: D12, libelle: "Modifier",                  usage: "Entrer en édition d'un objet existant." }
+    - { id: D13, libelle: "Supprimer",                 usage: "Détruire définitivement. Toujours précédé d'un dialogue M8." }
+    - { id: D14, libelle: "Démarrer",                  usage: "Lancer un Parcours." }
+    - { id: D15, libelle: "Reprendre",                 usage: "Continuer un Parcours en cours, ou audio en pause." }
+    - { id: D16, libelle: "Relancer",                  usage: "Recommencer un Parcours déjà complété ou abandonné." }
+    - { id: D17, libelle: "Mettre en pause",           usage: "Suspendre un Parcours ou une lecture audio." }
+    - { id: D18, libelle: "Abandonner",                usage: "Sortir d'un Parcours en cours (dialogue M8)." }
+    - { id: D19, libelle: "Sauter cette étape",        usage: "Marquer l'étape non complétée, passer à la suivante." }
+    - { id: D20, libelle: "Approfondir",               usage: "Passer M2 → M3." }
+    - { id: D21, libelle: "Mettre en favori",          usage: "Marquer un Pin/Parcours favori (B7)." }
+    - { id: D22, libelle: "Retirer des favoris",       usage: "Retour PT1 attendu : D54." }
+    - { id: D23, libelle: "Signaler",                  usage: "Ouvrir le formulaire de signalement (G3) sur communautaire." }
+    - { id: D24, libelle: "Soumettre",                 usage: "Envoyer contribution à modération. Préférable à « Publier » (visibilité non garantie)." }
+    - { id: D25, libelle: "Publier",                   usage: "Publication communautaire d'un Parcours personnel (C13). Seul cas où « Publier » est employé." }
+    - { id: D26, libelle: "Se connecter",              usage: "Authentifier un Compte existant." }
+    - { id: D27, libelle: "Créer un compte",           usage: "Toujours formulé comme une option, jamais comme une obligation." }
+    - { id: D28, libelle: "Se déconnecter",            usage: "Sortir du Compte sur cet appareil sans le supprimer." }
+    - { id: D29, libelle: "Effacer l'historique",      usage: "Effacement total. Précédé d'un dialogue M8." }
+    - { id: D30, libelle: "Autoriser",                 usage: "Acceptation contextuelle avant le prompt OS." }
+    - { id: D31, libelle: "Ouvrir les paramètres système", usage: "Permission refusée définitivement (cf. PT5)." }
+
+  statuts:
+    - { id: D40, libelle: "Chargement",                usage: "Préférable à « Loading » ou à un blanc." }
+    - { id: D41, libelle: "En cours",                  usage: "Parcours engagé, audio active, soumission en traitement." }
+    - { id: D42, libelle: "Terminé",                   usage: "Parcours complété, action aboutie." }
+    - { id: D43, libelle: "En modération",             usage: "Visible à l'auteur seul. Préférable à « En attente » (vague)." }
+    - { id: D44, libelle: "Hors ligne",                usage: "Sans tiret. Bandeau P3 et dérivés." }
+    - { id: D45, libelle: "Erreur de chargement",      usage: "Toujours suivi de D4 disponible." }
+    - { id: D46, libelle: "Brouillon",                 usage: "Contribution sauvegardée non encore soumise." }
+    - { id: D47, libelle: "Publié",                    usage: "Contribution validée et visible." }
+    - { id: D48, libelle: "Refusé",                    usage: "Décision de modération négative. Toujours avec motif (§ 6)." }
+    - { id: D49, libelle: "Retiré",                    usage: "Contenu dépublié (modération ou auteur)." }
+    - { id: D50, libelle: "Sources en cours de vérification", usage: "Marque distinctive Pin/Parcours communautaire (cluster 04 I3)." }
+
+  retours_app_pt1:
+    - { id: D52, libelle: "Lien copié",                usage: "Après D11 (PT1)." }
+    - { id: D53, libelle: "Favori ajouté",             usage: "Après D21." }
+    - { id: D54, libelle: "Favori retiré",             usage: "Après D22. Peut être suivi de D55 (M9 avec action secondaire)." }
+    - { id: D55, libelle: "Annuler",                   usage: "Action secondaire optionnelle d'un M9 (cf. D54)." }
+    - { id: D56, libelle: "Modifications enregistrées", usage: "Après modification de paramètres." }
+    - { id: D57, libelle: "Brouillon enregistré",      usage: "Après sauvegarde explicite d'un brouillon." }
+    - { id: D58, libelle: "Envoyé pour modération",    usage: "Après soumission. Préférable à « Soumis » (technique)." }
+
+  sections:
+    - { id: D70, libelle: "Carte",            usage: "Section S1." }
+    - { id: D71, libelle: "Parcours",         usage: "Section S2 — vue catalogue." }
+    - { id: D72, libelle: "Profil",           usage: "Section S3. Préférable à « Mon compte » (exclut anonyme) ou « Moi » (familier)." }
+    - { id: D73, libelle: "Mes parcours",     usage: "Vue interne S2 (brouillons, en cours, historique)." }
+    - { id: D74, libelle: "Catalogue",        usage: "Vue interne S2 du contenu éditorial et communautaire." }
+    - { id: D75, libelle: "Favoris",          usage: "Sous-section S3." }
+    - { id: D76, libelle: "Historique",       usage: "Sous-section S3 (sans qualificatif)." }
+    - { id: D77, libelle: "Paramètres",       usage: "Sous-section S3." }
+    - { id: D78, libelle: "Mes contributions", usage: "Préférable à « Mes soumissions » (technique) ou « Mes Pins » (incomplet)." }
+    - { id: D79, libelle: "Mon compte",       usage: "Sous-section S3 quand un Compte est rattaché." }
+
+  entites_libelles_visibles:
+    note: "Cohérence terminologique (cf. pilote P7). Pas de variation lexicale (« point d'intérêt », « itinéraire »)."
+    entrees:
+      - { id: D90,  libelle: "Pin",                  usage: "Capitalisé en début de phrase, minuscule au fil." }
+      - { id: D91,  libelle: "Parcours",             usage: "Invariable au pluriel. Minuscule au fil." }
+      - { id: D92,  libelle: "Étape",                usage: "Numérotation : « Étape 3 sur 7 »." }
+      - { id: D93,  libelle: "Catégorie",            usage: "Catalogue ouvert." }
+      - { id: D94,  libelle: "Époque",               usage: "Préférable à « Période » (vague)." }
+      - { id: D95,  libelle: "Source",               usage: "Source documentaire. Pluriel courant." }
+      - { id: D96,  libelle: "Couche cartographique", usage: "Souvent abrégé en « couche »." }
+      - { id: D97,  libelle: "Commentaire",          usage: "Minuscule au fil." }
+      - { id: D98,  libelle: "Signalement",          usage: "Soumission de modération." }
+      - { id: D99,  libelle: "Retour de parcours",   usage: "Forme courte « retour » au fil." }
+      - { id: D100, libelle: "Compte",               usage: "Distinct du Profil (qui existe par défaut)." }
+      - { id: D101, libelle: "Code visuel",          usage: "Préférable à « QR code » (anglicisme)." }
+      - { id: D102, libelle: "Lien",                 usage: "Forme courte du Lien universel." }
+
+  connecteurs_listes:
+    - { id: D110, libelle: "Aucun",             usage: "État vide. « Aucun favori pour l'instant »." }
+    - { id: D111, libelle: "Tous",              usage: "Filtre maximal. Préférable à « Tout » (vague)." }
+    - { id: D112, libelle: "Récents",           usage: "Tri par date la plus récente." }
+    - { id: D113, libelle: "Plus anciens",      usage: "Préférable à « Anciens » (suggère obsolescence)." }
+    - { id: D114, libelle: "Tout réinitialiser", usage: "Lever tous les filtres." }
+    - { id: D115, libelle: "Voir tout",         usage: "Vers liste exhaustive depuis aperçu tronqué." }
+    - { id: D116, libelle: "Filtrer",           usage: "Ouvrir M6 de filtres." }
+    - { id: D117, libelle: "Trier",             usage: "Modifier l'ordre d'une liste." }
+
+  modes_et_indicateurs:
+    - { id: D130, libelle: "Mode terrain",       usage: "Parcours en cours avec géoloc + alertes proximité (C5)." }
+    - { id: D131, libelle: "Mode canapé",        usage: "Parcours sans géoloc, navigation manuelle (C6). Familier ASSUMÉ." }
+    - { id: D132, libelle: "Mode présentation",  usage: "Variante M4 sans chrome." }
+    - { id: D133, libelle: "Surprenez-moi",      usage: "Notifications de proximité actives." }
+    - { id: D134, libelle: "Balade libre",       usage: "Notifications désactivées. Préférable à « Mode silencieux »." }
+    - { id: D135, libelle: "Audio en cours",     usage: "Indicateur sur surface persistante P1." }
+    - { id: D136, libelle: "Étape suivante", voix: récit, usage: "Transition Parcours en mode terrain (§ 7). Voix du récit." }
+    - { id: D137, libelle: "Reprendre la lecture", usage: "Depuis surface persistante audio en pause." }
+
+# -----------------------------------------------------------------------------
+# 3. Patterns de microcopy par mode de présentation
+# -----------------------------------------------------------------------------
+# Pour chaque mode P5.M2-M9 : voix, longueur, libellés structurants, exemples.
+# Patterns PT1-PT7 référencés par id (cf. pilote).
+patterns_par_mode:
+
+  - mode: P5.M2
+    nom: "Aperçu rapide"
+    voix_par_defaut: récit (teaser) + app (boutons)
+    longueur_typique: phrase pour le teaser, haïku pour les actions
+    libelles_structurants:
+      titre: "titre du Pin (cf. cluster 01) — pas de qualificatif"
+      teaser: "extrait court du contenu narratif (cf. 02-template-pin) — voix du récit"
+      categorie_epoque: "libellé court issu du catalogue (D93, D94)"
+      actions:
+        - "D20 Approfondir (point d'accès vers M3)"
+        - "D21 Mettre en favori / D22 Retirer des favoris"
+        - "D10 Partager"
+        - "D23 Signaler (uniquement si Pin communautaire)"
+    exemples_canoniques:
+      - contexte: "Aperçu rapide d'un Pin sur la Carte (E-CARTE-APERCU-PIN)"
+        teaser: "Cette traboule traversait toute la maison. Les canuts l'utilisaient pour sortir leurs pièces de soie sans les abîmer dans la pluie."
+        note: "Phrase-fait-pourquoi. Le teaser réel est de la responsabilité éditoriale ; ici on capture le PATTERN de longueur et de cadrage."
+      - contexte: "Aperçu rapide d'un Parcours dans le catalogue (état hypothétique au sein de E-PARCOURS-FICHE-DETAIL)"
+        teaser_court: "Sept étapes, une heure de marche, du Vieil Lyon au Jardin des Curiosités."
+        note: "Métadonnées synthétisées en une phrase neutre."
+
+  - mode: P5.M3
+    nom: "Consultation approfondie"
+    voix_par_defaut: récit (récit principal) + app (chrome et boutons)
+    longueur_typique: récit ou paragraphe pour le contenu, haïku pour les actions
+    libelles_structurants:
+      titre: "titre du Pin ou du Parcours, sans préfixe (« Bellecour », pas « Pin : Bellecour »)"
+      sections_de_navigation:
+        - "Récit / Sources / Commentaires (Pin)"
+        - "Étapes / Retours / Détails (Parcours)"
+      actions:
+        - "D20 Approfondir (vers M4 si applicable)"
+        - "D21/D22 favoris, D10 partage, D23 signalement"
+        - "D6 Retour"
+    exemples_canoniques:
+      - contexte: "Section commentaires vide d'un Pin"
+        invite: "Soyez le premier à laisser un commentaire."
+        note: "PT3 invitation sobre. Pas de « Aucun commentaire pour l'instant 😊 ». Pas non plus « Personne n'a réagi »."
+      - contexte: "Pin communautaire en revue (marque distinctive)"
+        message: "Sources en cours de vérification."
+        note: "D50 du dictionnaire. Phrase nominale, factuelle."
+
+  - mode: P5.M4
+    nom: "Mode présentation"
+    voix_par_defaut: minimal — récit pour le contenu projeté, voix de l'app uniquement pour le retour
+    longueur_typique: récit pour le contenu ; haïku unique pour le retour
+    libelles_structurants:
+      contenu: "le contenu narratif du Pin tel qu'en M3, sans changement"
+      retour: "« D6 Retour » discret, OU pas de libellé textuel si l'icône suffit (palier 10)"
+    exemples_canoniques:
+      - contexte: "Mme Martin projette en classe — bascule M3 → M4"
+        retour: "Quitter la présentation"
+        note: "Légère reformulation de D6 acceptable ici (« Quitter la présentation » plutôt que « Retour ») parce que la notion de pile est invisible en M4."
+
+  - mode: P5.M6
+    nom: "Surface ponctuelle"
+    voix_par_defaut: app
+    longueur_typique: haïku ou phrase pour les libellés, paragraphe rare
+    libelles_structurants:
+      titre: "intention courte, formulée comme l'action (« Filtrer le catalogue », « Choisir une époque »). Préférable à un nom (« Filtres »)."
+      champs: "libellé du champ + indication courte si nécessaire"
+      actions: "validation positive (D14, D9, D24, D25 selon contexte) + D2 Annuler"
+    exemples_canoniques:
+      - contexte: "E-CARTE-RECHERCHE saisie vierge"
+        invite: "Cherchez un lieu, un quartier, une époque."
+        note: "PT3 invitation sobre. Le « cherchez » impératif est ici une invitation, pas une injonction."
+      - contexte: "E-PARCOURS-FILTRES validation"
+        bouton: "Voir les parcours"
+        note: "Plutôt que « Appliquer » (technique). Le libellé dit ce qu'il fait."
+      - contexte: "E-COMMUNAUTE-REDACTION-COMMENTAIRE — saisie invalide"
+        message: "Ajoutez quelques mots avant d'envoyer."
+        note: "PT5 refus gracieux. Pas « Champ obligatoire » (technique froid)."
+
+  - mode: P5.M7
+    nom: "Alerte ponctuelle"
+    voix_par_defaut: récit pour le message, app pour les actions
+    longueur_typique: phrase
+    libelles_structurants:
+      message: "phrase d'invitation ou de constat doux (PT2 alerte gracieuse OU PT3 invitation sobre)"
+      actions: "tap implicite = accepter, geste de fermeture = refuser, ou deux issues explicites pour invitations binaires (D2 / D14 selon contexte)"
+    exemples_canoniques:
+      - contexte: "Alerte de proximité Surprenez-moi (E1) sur E-CARTE-ALERTE-PROXIMITE"
+        message: "Une histoire t'attend à cinquante mètres."
+        note: "Voix du récit (tu). Le distance est volontairement floue — pas une mesure technique."
+      - contexte: "Alerte d'arrivée à étape (E2)"
+        message: "Tu es arrivé à l'étape 3 sur 7."
+        note: "Voix du récit. Cohérent avec PT2."
+      - contexte: "Invitation au micro-parcours découverte (E-TRANSVERSES-INVITATION-MICROPARCOURS)"
+        message: "Découvrir Lyon en quelques minutes ?"
+        actions: ["Découvrir", "Plus tard"]
+        note: "PT3 invitation sobre. Pas « Voulez-vous faire le tour ? » (timide). Pas « Profitez de notre tutoriel ! » (peppy)."
+
+  - mode: P5.M8
+    nom: "Dialogue de confirmation"
+    voix_par_defaut: app
+    longueur_typique: phrase pour le titre, paragraphe pour la description, haïku pour les boutons
+    libelles_structurants:
+      titre: "libellé d'action — ce que la confirmation va faire (« Supprimer votre Compte », « Abandonner ce parcours »). PAS un titre décoratif (« Êtes-vous sûr ? »)."
+      description: "court paragraphe qui dit ce qui sera fait, ce qui sera perdu, l'éventuelle réversibilité (P5)."
+      boutons:
+        - "issue de confirmation : libellé qui dit l'action (D13, D18, D25, etc.) — pas « OK »"
+        - "issue d'annulation : D2 Annuler"
+    exemples_canoniques:
+      - contexte: "Confirmation de suppression de Compte (E-PROFIL-PARAMETRES-COMPTE — flow D9)"
+        titre: "Supprimer votre Compte"
+        description: "La suppression efface vos données synchronisées (favoris, parcours créés, historique). Vos contributions publiques (commentaires, parcours partagés) restent visibles sans votre pseudonyme. Cette action est irréversible."
+        boutons: ["Supprimer", "Annuler"]
+        note: "Exemple canonique du pilote. P5 annoncer avant d'agir."
+      - contexte: "Confirmation d'abandon de Parcours en cours (flow C7)"
+        titre: "Abandonner ce parcours ?"
+        description: "Vous quittez le parcours en cours. Vous pourrez toujours le relancer plus tard depuis Mes parcours."
+        boutons: ["Abandonner", "Annuler"]
+        note: "P4 ne pas culpabiliser. Le « pourrez toujours » rassure sans flatter."
+      - contexte: "Confirmation de publication d'un Parcours personnel (flow C13)"
+        titre: "Publier ce parcours ?"
+        description: "La publication change la provenance du parcours en communautaire. Votre pseudonyme apparaît comme auteur. Avant publication, le parcours passe par modération."
+        boutons: ["Publier", "Annuler"]
+
+  - mode: P5.M9
+    nom: "Message éphémère"
+    voix_par_defaut: app
+    longueur_typique: haïku ou phrase
+    libelles_structurants:
+      message: "PT1 confirmation discrète OU PT2 alerte gracieuse"
+      action_secondaire: "rare — D55 « Annuler » uniquement quand l'action est réversible et que l'annulation est utile (cf. retrait d'un favori)"
+    exemples_canoniques:
+      - contexte: "Lien copié (PT1)"
+        message: "Lien copié."
+        note: "D52. Phrase nominale, point final, pas d'exclamation."
+      - contexte: "Éloignement du tracé (PT2)"
+        message: "Tu sembles t'éloigner du tracé."
+        note: "Voix du récit. Le « sembles » est une attention, pas une accusation. P4 ne pas culpabiliser."
+      - contexte: "Modération en cours après envoi d'un commentaire"
+        message: "Votre commentaire est en cours de modération. Il apparaîtra dès qu'il sera validé."
+        note: "Plus long qu'un haïku — admis ici parce que l'utilisateur a besoin du contexte. Cf. exemple canonique du pilote."
+
+# -----------------------------------------------------------------------------
+# 4. Microcopy par écran
+# -----------------------------------------------------------------------------
+# Pour chaque écran grand public du palier 7, on pose les libellés
+# STRUCTURANTS : titre, états clés (vide, erreur, offline, premier_usage),
+# actions principales, messages spécifiques. Le reste se déduit du dictionnaire
+# (D…) et du pattern de mode.
+ecrans:
+
+  carte:
+
+    - ecran: E-CARTE-PRINCIPALE
+      titre: "Carte"
+      libelles_specifiques:
+        premier_lancement_voix_recit: "Lyon. Tu peux remonter le temps, ici, là où tu marches."
+        navigateur_temporel_indication_premier_passage: "Glissez pour traverser les époques."
+        point_acces_recherche: "Rechercher"
+        point_acces_couches: "Couches"
+        point_acces_localisation: "Me localiser"
+        point_acces_surprenez_moi_actif: "Surprenez-moi (activé)"
+        point_acces_surprenez_moi_inactif: "Surprenez-moi"
+        message_hors_zone_lyon_voix_app: "Vous semblez être en dehors de la zone couverte. La carte revient sur Lyon."
+        vide_a_l_epoque: "Aucun pin à cette époque dans cette zone. Élargissez la vue ou changez d'époque."
+        offline_sans_cache: "Connexion indisponible et carte non préchargée. Reconnectez-vous pour explorer la carte."
+      reutilise_dictionnaire: [D70, D40, D44, D70, D96, D133, D134, D6, D2]
+
+    - ecran: E-CARTE-APERCU-PIN
+      titre: "(titre du Pin — pas de chrome de titre supplémentaire)"
+      libelles_specifiques:
+        bouton_approfondir: "Voir le récit"
+        signalement_uniquement_communautaire: "Signaler ce pin"
+        offline_sans_cache: "Ce pin n'a pas été préchargé. Reconnectez-vous pour le lire."
+        pin_retire: "Ce pin n'est plus disponible. Retour à la carte."
+      reutilise_dictionnaire: [D20, D21, D22, D10, D23, D8, D44, D49, D50, D90]
+
+    - ecran: E-CARTE-RECHERCHE
+      titre: "Rechercher"
+      libelles_specifiques:
+        invite_saisie_vierge: "Cherchez un lieu, un quartier, une époque."
+        compteur_resultats: "{n} résultats"
+        compteur_resultats_singulier: "1 résultat"
+        aucun_resultat: "Aucun résultat. Essayez d'élargir votre recherche."
+        offline_recherche_locale: "Recherche limitée au contenu téléchargé."
+      reutilise_dictionnaire: [D2, D40, D44, D94, D93, D8, D116, D117]
+
+    - ecran: E-CARTE-FILTRES-COUCHES
+      titre: "Couches"
+      libelles_specifiques:
+        compteur_pins_visibles: "{n} pins visibles"
+        raccourci_tout_voir: "Tout afficher"
+        aucune_couche_active: "Aucune couche active. La carte est vide."
+        nouveaute: "Nouveau"
+      reutilise_dictionnaire: [D96, D110, D8, D2]
+
+    - ecran: E-CARTE-ALERTE-PROXIMITE
+      titre: "(alerte transitoire — pas de titre dédié)"
+      libelles_specifiques:
+        alerte_e1_voix_recit: "Une histoire t'attend à proximité."
+        alerte_e2_voix_recit: "Tu es arrivé à l'étape {n} sur {total}."
+        action_implicite_e1: "(tap = ouvrir l'aperçu)"
+        action_implicite_e2: "(tap = ouvrir l'étape)"
+      reutilise_dictionnaire: [D8, D92, D133]
+
+  pin:
+
+    - ecran: E-PIN-CONSULTATION-APPROFONDIE
+      titre: "(titre du Pin)"
+      libelles_specifiques:
+        section_recit: "(pas de libellé de section — le récit est l'écran)"
+        section_3d: "Voir en 3D"
+        section_post_narrative_quiz: "Petite question"
+        section_post_narrative_lien_externe: "Pour aller plus loin"
+        section_pins_lies: "À voir aussi"
+        section_commentaires: "Commentaires"
+        action_rediger_commentaire: "Laisser un commentaire"
+        commentaires_section_vide: "Soyez le premier à laisser un commentaire."
+        bascule_mode_presentation: "Mode présentation"
+        controles_audio_lecture: "Écouter"
+        controles_audio_pause: "Pause"
+        pin_communautaire_marque_distinctive: "Sources en cours de vérification"
+        pin_retire_pendant_consultation: "Ce pin a été retiré. Retour à la carte."
+        offline_sans_cache: "Ce pin n'a pas été préchargé. Reconnectez-vous pour le lire."
+        pied_sources_intitule: "Sources"
+      reutilise_dictionnaire: [D6, D21, D22, D10, D23, D40, D44, D45, D49, D50, D90, D92, D95, D97, D131, D132, D135, D17]
+
+    - ecran: E-PIN-MODE-PRESENTATION
+      titre: "(aucun chrome de titre)"
+      libelles_specifiques:
+        retour: "Quitter la présentation"
+        navigation_multi_epoque_label: "(libellés des époques telles quelles : 'Antiquité', 'XVIIIe', 'Aujourd'hui')"
+      reutilise_dictionnaire: [D94]
+
+    - ecran: E-PIN-CONSULTATION-3D
+      titre: "(titre du Modèle 3D — issu du contenu)"
+      libelles_specifiques:
+        action_ar: "Voir sur place"
+        action_sources: "Sources de la reconstitution"
+        chargement: "Chargement de la reconstitution…"
+        ar_indisponible_terminal: "Votre appareil ne permet pas la superposition sur place."
+        offline_sans_cache: "Reconstitution indisponible hors ligne."
+        terminal_ressources_insuffisantes: "Votre appareil peine à afficher cette reconstitution."
+      reutilise_dictionnaire: [D6, D40, D44, D95]
+
+    - ecran: E-PIN-CONSULTATION-AR
+      titre: "(aucun chrome — vue caméra plein écran)"
+      libelles_specifiques:
+        recherche_calage: "Bougez doucement votre téléphone."
+        calage_perdu: "Calage perdu. Continuez à bouger pour le retrouver."
+        eloignement_position_reelle: "Vous êtes loin du lieu d'origine. La superposition est moins fidèle."
+        luminosite_insuffisante: "Lumière insuffisante. Revenez en plein jour pour une meilleure superposition."
+        retour: "Revenir au modèle 3D"
+      reutilise_dictionnaire: [D40, D95]
+
+  parcours:
+
+    - ecran: E-PARCOURS-PRINCIPAL
+      titre: "Parcours"
+      libelles_specifiques:
+        bascule_vue_catalogue: "Catalogue"
+        bascule_vue_mes_parcours: "Mes parcours"
+        action_filtrer: "Filtrer"
+        action_creer: "Créer un parcours"
+        catalogue_vide_apres_filtres: "Aucun parcours ne correspond à vos filtres."
+        mes_parcours_vide: "Vous n'avez pas encore de parcours. Explorez le catalogue ou créez le vôtre."
+        en_cours_surfacage: "En cours"
+        complete_surfacage: "Terminé"
+        abandonne_surfacage: "Abandonné"
+      reutilise_dictionnaire: [D71, D74, D73, D116, D14, D40, D41, D42, D44, D46, D49, D90, D91, D6]
+
+    - ecran: E-PARCOURS-FILTRES
+      titre: "Filtrer le catalogue"
+      libelles_specifiques:
+        groupe_provenance: "Source du parcours"
+        valeur_provenance_editorial: "HistoLyon"
+        valeur_provenance_communautaire: "Communautaire"
+        groupe_epoque: "Époque"
+        groupe_categorie: "Catégorie principale"
+        groupe_duree: "Durée"
+        groupe_distance: "Distance"
+        compteur_resultats: "{n} parcours correspondent"
+        action_valider: "Voir les parcours"
+        action_reinitialiser: "Tout réinitialiser"
+        aucun_resultat: "Aucun parcours ne correspond. Élargissez un critère."
+      reutilise_dictionnaire: [D2, D94, D93, D114, D71, D91, D40]
+
+    - ecran: E-PARCOURS-FICHE-DETAIL
+      titre: "(titre du Parcours)"
+      libelles_specifiques:
+        meta_duree: "Durée estimée"
+        meta_distance: "Distance"
+        meta_etapes: "{n} étapes"
+        meta_epoques: "Époques traversées"
+        meta_densite_legere: "Lecture légère"
+        meta_densite_intermediaire: "Lecture moyenne"
+        meta_densite_dense: "Lecture dense"
+        action_demarrer: "Démarrer ce parcours"
+        action_reprendre: "Reprendre"
+        action_relancer: "Recommencer"
+        action_partage_prive_personnel: "Partager en privé"
+        action_redaction_retour: "Laisser un retour"
+        retours_synthetises_intitule: "Ce qu'en disent ceux qui l'ont vécu"
+        parcours_communautaire_marque: "Sources en cours de vérification"
+        parcours_partage_prive_marque: "Parcours partagé en privé"
+        parcours_retire_message: "Ce parcours n'est plus disponible."
+        pin_etape_indisponible_inline: "Étape indisponible"
+      reutilise_dictionnaire: [D6, D14, D15, D16, D21, D22, D10, D23, D40, D44, D49, D50, D91, D92, D94, D99]
+
+    - ecran: E-PARCOURS-LANCEMENT
+      titre: "Démarrer le parcours"
+      libelles_specifiques:
+        proposition_terrain: "Mode terrain proposé — vous êtes à proximité de la première étape."
+        proposition_canape: "Mode canapé proposé — vous n'êtes pas à proximité de la première étape."
+        choix_terrain_titre: "Mode terrain"
+        choix_terrain_description: "L'app vous prévient quand vous arrivez à chaque étape. Géolocalisation requise."
+        choix_canape_titre: "Mode canapé"
+        choix_canape_description: "Vous parcourez les étapes manuellement, depuis chez vous ou en préparation."
+        action_valider: "Démarrer"
+        permission_geoloc_refusee: "Le mode terrain demande la géolocalisation. Vous pouvez l'autoriser ou rester en mode canapé."
+        parcours_deja_en_cours: "Un autre parcours est déjà en cours. Voulez-vous l'abandonner pour démarrer celui-ci ?"
+      reutilise_dictionnaire: [D2, D14, D130, D131]
+
+    - ecran: E-PARCOURS-EN-COURS-TERRAIN
+      titre: "(titre du Parcours)"
+      libelles_specifiques:
+        indicateur_mode: "Mode terrain"
+        progression_etapes: "Étape {n} sur {total}"
+        en_marche_voix_recit: "Tu te diriges vers l'étape {n}."
+        proche_etape_voix_recit: "Tu approches de l'étape {n}."
+        deviation_message_voix_recit: "Tu sembles t'éloigner du tracé."
+        proposition_recentrer_voix_app: "Vous pouvez revenir vers le tracé ou continuer à votre rythme."
+        bascule_canape: "Passer en mode canapé"
+        permission_geoloc_revoquee: "La géolocalisation a été désactivée. Le parcours continue en mode canapé."
+        action_pause: "Pause"
+        action_reprendre: "Reprendre"
+        action_saut: "Sauter cette étape"
+        action_abandon: "Abandonner"
+        offline_etape_indisponible: "Cette étape n'a pas été préchargée. Vous pouvez la sauter ou attendre la reconnexion."
+      reutilise_dictionnaire: [D6, D17, D15, D18, D19, D44, D92, D130, D131]
+
+    - ecran: E-PARCOURS-EN-COURS-CANAPE
+      titre: "(titre du Parcours)"
+      libelles_specifiques:
+        indicateur_mode: "Mode canapé"
+        progression_etapes: "Étape {n} sur {total}"
+        action_etape_suivante_voix_recit: "Étape suivante"
+        action_etape_precedente: "Étape précédente"
+        action_marquer_derniere_vue: "Marquer la dernière étape comme vue"
+        bascule_terrain: "Passer en mode terrain"
+        bascule_terrain_echec_proximite: "Vous êtes trop loin de l'étape courante pour le mode terrain."
+        bascule_terrain_echec_geoloc: "Le mode terrain demande la géolocalisation."
+        action_abandon: "Abandonner"
+      reutilise_dictionnaire: [D6, D18, D19, D92, D130, D131, D136]
+
+    - ecran: E-PARCOURS-SAUT-ETAPE
+      titre: "Sauter à une étape"
+      libelles_specifiques:
+        liste_intitule: "Choisir l'étape vers laquelle aller"
+        impact_intermediaire: "Les {n} étapes entre celle-ci et la cible seront marquées comme non vues."
+        impact_derniere: "Si vous validez, le parcours se termine. Il sera marqué comme partiellement complété."
+        action_valider: "Sauter à cette étape"
+      reutilise_dictionnaire: [D2, D92, D19]
+
+    - ecran: E-PARCOURS-FIN-CELEBRATION
+      titre: "(titre du Parcours, mention « Parcours achevé » ou « Parcours partiellement achevé »)"
+      libelles_specifiques:
+        ouverture_complete_voix_recit: "Tu as parcouru les {n} étapes du {nom_parcours}. Voici ce qu'on a vu ensemble."
+        ouverture_partielle_voix_recit: "Tu as parcouru {n} étapes sur {total}. Le reste t'attend quand tu voudras."
+        recap_intitule: "En chemin"
+        recap_etapes_completees: "{n} étapes parcourues"
+        recap_etapes_sautees: "{n} étapes laissées de côté"
+        recap_duree: "Durée totale"
+        recap_epoques: "Époques traversées"
+        action_partage_image: "Partager une trace de ce parcours"
+        action_redaction_retour: "Laisser un retour"
+        action_partage_lien: "Partager le parcours"
+        action_retour: "Revenir à mes parcours"
+        parcours_retire_pendant_voix_app: "Ce parcours n'est plus disponible publiquement, mais ce que tu as vu reste à toi."
+      reutilise_dictionnaire: [D6, D10, D73, D91, D92, D94]
+
+    - ecran: E-PARCOURS-EDITEUR
+      titre: "(« Nouveau parcours » si création, sinon titre du parcours en édition)"
+      libelles_specifiques:
+        meta_titre_label: "Titre du parcours"
+        meta_titre_placeholder: "Donnez-lui un titre"
+        meta_description_label: "Description (facultatif)"
+        meta_epoques_label: "Époques associées"
+        meta_image_label: "Image d'ouverture (facultatif)"
+        liste_etapes_intitule: "Étapes"
+        liste_etapes_vide: "Ajoutez une première étape pour commencer."
+        action_ajouter_etape: "Ajouter une étape"
+        ajout_etape_recherche_pin: "Chercher un pin"
+        ajout_etape_pin_inexistant: "Vous ne trouvez pas ce que vous voulez ? Proposez un nouveau pin."
+        recap_minimum_non_atteint: "Ajoutez au moins {n} étapes pour pouvoir démarrer le parcours."
+        action_test_parcours: "Tester le parcours"
+        action_partage_prive: "Partager en privé"
+        action_publication: "Publier dans la communauté"
+        action_supprimer_brouillon: "Supprimer ce brouillon"
+        sauvegarde_implicite: "(aucun libellé — sauvegarde silencieuse)"
+        publication_dialogue_titre: "Publier ce parcours ?"
+        publication_dialogue_description: "La publication change la provenance du parcours en communautaire. Votre pseudonyme apparaît comme auteur. Avant publication, le parcours passe par modération."
+        suppression_dialogue_titre: "Supprimer ce brouillon ?"
+        suppression_dialogue_description: "Ce parcours et ses étapes seront effacés. Cette action est irréversible."
+        offline_publication_attente: "Publication mise en attente. Elle sera envoyée dès la reconnexion."
+      reutilise_dictionnaire: [D6, D9, D12, D13, D14, D24, D25, D44, D57, D91, D92, D94, D90]
+
+  profil:
+
+    - ecran: E-PROFIL-PRINCIPAL
+      titre: "Profil"
+      libelles_specifiques:
+        bienvenue_anonyme_voix_app: "Votre profil reste sur cet appareil tant que vous n'avez pas de compte."
+        bienvenue_avec_compte_voix_app: "Bonjour {pseudonyme}."
+        section_engageante_titre: "Vos pas sur la carte"
+        action_voir_favoris: "Favoris"
+        action_voir_historique: "Historique"
+        action_voir_parametres: "Paramètres"
+        action_creer_compte: "Créer un compte"
+        action_se_connecter: "Se connecter"
+        action_voir_compte: "Mon compte"
+        action_voir_contributions: "Mes contributions"
+      reutilise_dictionnaire: [D72, D75, D76, D77, D26, D27, D78, D79, D6]
+
+    - ecran: E-PROFIL-FAVORIS
+      titre: "Favoris"
+      libelles_specifiques:
+        vide: "Vous n'avez pas encore de favori. Marquez un pin ou un parcours pour le retrouver ici."
+        filtre_pins: "Pins"
+        filtre_parcours: "Parcours"
+        filtre_tous: "Tous"
+        cible_indisponible_inline: "Contenu indisponible"
+        cible_indisponible_action_retirer: "Retirer ce favori"
+        action_retirer_favori: "Retirer"
+        confirmation_retrait: "Favori retiré"
+        confirmation_retrait_annuler: "Annuler"
+      reutilise_dictionnaire: [D6, D22, D40, D44, D54, D55, D90, D91, D110, D111, D112, D113, D117]
+
+    - ecran: E-PROFIL-HISTORIQUE
+      titre: "Historique"
+      libelles_specifiques:
+        vide_voix_app: "Votre historique se construira au fil de vos visites."
+        enregistrement_actif: "L'enregistrement de l'historique est actif."
+        enregistrement_pause: "L'enregistrement de l'historique est en pause."
+        action_reactiver_enregistrement: "Réactiver l'enregistrement"
+        action_effacer_tout: "Effacer tout l'historique"
+        type_consultation_pin: "Pin consulté"
+        type_etape_visitee: "Étape visitée"
+        type_parcours_engage: "Parcours commencé"
+        type_parcours_termine: "Parcours terminé"
+        type_quiz: "Quiz"
+        cible_indisponible_inline: "Contenu indisponible"
+        confirmation_effacement: "Historique effacé."
+        effacement_dialogue_titre: "Effacer tout l'historique ?"
+        effacement_dialogue_description: "Toutes les entrées de votre historique seront effacées de cet appareil. Cette action est irréversible."
+      reutilise_dictionnaire: [D6, D29, D40, D44, D76, D90, D91, D92]
+
+    - ecran: E-PROFIL-PARAMETRES
+      titre: "Paramètres"
+      libelles_specifiques:
+        rubrique_langue: "Langue"
+        rubrique_accessibilite: "Accessibilité"
+        rubrique_notifications: "Notifications de proximité"
+        rubrique_notifications_choix_libre: "Balade libre — pas de notification"
+        rubrique_notifications_choix_surprise: "Surprenez-moi — me prévenir près d'un pin"
+        rubrique_historique: "Historique"
+        rubrique_historique_actif_label: "Enregistrer ma visite"
+        rubrique_historique_action_effacer: "Effacer l'historique"
+        rubrique_compte: "Compte"
+        rubrique_mentions_legales: "Mentions légales"
+        rubrique_confidentialite: "Politique de confidentialité"
+        permission_systeme_refusee_definitivement: "Vous avez refusé cette permission. Pour la réactiver, ouvrez les paramètres de votre téléphone."
+        action_ouvrir_parametres_systeme: "Ouvrir les paramètres système"
+      reutilise_dictionnaire: [D6, D29, D31, D77, D79, D133, D134, D56]
+
+    - ecran: E-PROFIL-CREATION-COMPTE
+      titre: "Créer un compte"
+      libelles_specifiques:
+        chapeau_origine_publication_pin: "Pour proposer un pin, il faut un compte."
+        chapeau_origine_publication_commentaire: "Pour laisser un commentaire, il faut un compte."
+        chapeau_origine_publication_retour: "Pour laisser un retour, il faut un compte."
+        chapeau_origine_publication_signalement: "Pour signaler un contenu, il faut un compte."
+        chapeau_origine_publication_parcours: "Pour publier votre parcours, il faut un compte."
+        chapeau_origine_publication_neutre: "Un compte vous permet de publier vos parcours et de retrouver vos favoris sur tous vos appareils."
+        rubrique_pseudonyme_label: "Pseudonyme"
+        rubrique_pseudonyme_placeholder: "Comment voulez-vous apparaître ?"
+        rubrique_pseudonyme_disponible: "Disponible"
+        rubrique_pseudonyme_indisponible: "Ce pseudonyme est déjà pris."
+        rubrique_pseudonyme_retention: "Ce pseudonyme n'est pas disponible pour l'instant."
+        rubrique_pseudonyme_suggestion: "Suggestion : {suggestion}"
+        rubrique_avatar_label: "Choisir une représentation"
+        rubrique_email_label: "Adresse électronique"
+        rubrique_email_placeholder: "Pour récupérer votre compte si besoin"
+        rubrique_email_collision: "Cet email est associé à un compte existant. Vous pouvez vous connecter."
+        rubrique_secret_label: "Mot de passe"
+        rubrique_tiers_intitule: "Ou continuer avec"
+        rubrique_politique_intitule: "En créant un compte, vous acceptez la politique de confidentialité."
+        action_valider: "Créer mon compte"
+        action_deja_compte: "J'ai déjà un compte"
+        succes_voix_app: "Compte créé."
+        erreur_reseau: "Connexion perdue. Vos informations sont conservées, vous pouvez réessayer."
+        annulation_implicite: "(retour gracieux à la surface précédente, sans message)"
+      reutilise_dictionnaire: [D2, D4, D6, D8, D26, D27, D44]
+
+    - ecran: E-PROFIL-CONNEXION-COMPTE
+      titre: "Se connecter"
+      libelles_specifiques:
+        rubrique_email_label: "Adresse électronique"
+        rubrique_secret_label: "Mot de passe"
+        action_valider: "Se connecter"
+        action_mot_de_passe_oublie: "Mot de passe oublié"
+        action_pas_de_compte: "Pas encore de compte"
+        echec_authentification: "Email ou mot de passe incorrect."
+        compte_suspendu: "Ce compte est suspendu. Pour en savoir plus, contactez l'équipe."
+        compte_supprime: "Ce compte a été supprimé. Vous pouvez en créer un nouveau."
+        conflit_de_profils_voix_app: "Bienvenue. Vos favoris et votre historique de cet appareil ont été conservés."
+        recuperation_secret_titre: "Récupérer votre compte"
+        recuperation_secret_invite: "Indiquez l'adresse de votre compte. Nous vous enverrons un lien pour réinitialiser votre mot de passe."
+        recuperation_secret_envoye: "Email envoyé. Suivez le lien pour réinitialiser votre mot de passe."
+      reutilise_dictionnaire: [D2, D4, D6, D8, D26, D27, D44]
+
+    - ecran: E-PROFIL-PARAMETRES-COMPTE
+      titre: "Mon compte"
+      libelles_specifiques:
+        recap_pseudonyme: "Pseudonyme"
+        recap_email: "Adresse électronique"
+        recap_creation: "Compte créé le {date}"
+        recap_derniere_connexion: "Dernière connexion : {date}"
+        rubrique_modifier_pseudonyme: "Modifier le pseudonyme"
+        rubrique_modifier_avatar: "Changer la représentation"
+        rubrique_sync_intitule: "Synchronisation"
+        rubrique_sync_description: "Choisissez ce que vous voulez retrouver sur vos autres appareils. Tout est désactivé par défaut."
+        rubrique_sync_categorie_favoris: "Favoris"
+        rubrique_sync_categorie_parcours_personnels: "Mes parcours personnels"
+        rubrique_sync_categorie_historique: "Historique"
+        rubrique_sync_categorie_preferences: "Préférences"
+        rubrique_sync_etat_a_jour: "À jour"
+        rubrique_sync_etat_en_cours: "Synchronisation en cours"
+        rubrique_sync_etat_attente_connexion: "En attente de connexion"
+        rubrique_sync_historique_consentement_titre: "Synchroniser l'historique ?"
+        rubrique_sync_historique_consentement_description: "Votre historique est une donnée sensible : il indique où votre attention s'est portée dans la ville. La synchronisation est désactivée par défaut, même quand un compte est rattaché."
+        rubrique_sync_historique_consentement_boutons: ["Synchroniser", "Annuler"]
+        rubrique_sync_desactivation_titre: "Conserver les données dans le cloud ?"
+        rubrique_sync_desactivation_description: "Vous désactivez la synchronisation de cette catégorie. Voulez-vous conserver les données déjà synchronisées dans le cloud, ou les effacer ?"
+        rubrique_sync_desactivation_boutons: ["Conserver", "Effacer du cloud"]
+        rubrique_deconnexion_action: "Se déconnecter de cet appareil"
+        rubrique_deconnexion_dialogue_titre: "Se déconnecter ?"
+        rubrique_deconnexion_dialogue_description: "Votre compte reste actif. Vous pourrez vous reconnecter plus tard. Les données de cet appareil ne sont pas effacées."
+        rubrique_suppression_action: "Supprimer mon compte"
+        rubrique_suppression_dialogue_titre: "Supprimer votre Compte"
+        rubrique_suppression_dialogue_description: "La suppression efface vos données synchronisées (favoris, parcours créés, historique). Vos contributions publiques (commentaires, parcours partagés) restent visibles sans votre pseudonyme. Cette action est irréversible."
+        rubrique_suppression_dialogue_boutons: ["Supprimer", "Annuler"]
+        compte_suspendu_message: "Ce compte est suspendu. Les actions de modification sont indisponibles."
+        offline_action_serveur_attente: "Modification mise en attente. Elle sera appliquée à la reconnexion."
+      reutilise_dictionnaire: [D2, D6, D12, D13, D28, D44, D56, D79, D100]
+
+  communaute:
+
+    - ecran: E-COMMUNAUTE-REDACTION-COMMENTAIRE
+      titre: "Laisser un commentaire"
+      libelles_specifiques:
+        rappel_cible: "Sur le pin {titre_pin}"
+        identite_publique_intitule: "Vous apparaissez comme"
+        champ_label: "Votre commentaire"
+        champ_placeholder: "Souvenir, précision, question…"
+        compteur_caracteres: "{n} / {max}"
+        action_valider: "Envoyer"
+        rappel_moderation: "Votre commentaire passe par modération avant d'apparaître."
+        saisie_invalide: "Ajoutez quelques mots avant d'envoyer."
+        succes: "Votre commentaire est en cours de modération. Il apparaîtra dès qu'il sera validé."
+        echec: "L'envoi n'a pas abouti. Réessayez."
+        offline: "Connexion perdue. Votre commentaire sera envoyé dès la reconnexion."
+        cible_retiree_pendant: "Ce pin a été retiré. L'envoi n'est plus possible."
+        abandon_dialogue_titre: "Abandonner ce commentaire ?"
+        abandon_dialogue_description: "Le texte que vous avez saisi sera perdu."
+        abandon_dialogue_boutons: ["Abandonner", "Continuer la rédaction"]
+      reutilise_dictionnaire: [D2, D4, D6, D8, D43, D44, D49, D58, D90, D97]
+
+    - ecran: E-COMMUNAUTE-REDACTION-SIGNALEMENT
+      titre: "Signaler ce contenu"
+      libelles_specifiques:
+        rappel_cible_pin: "Pin signalé : {titre}"
+        rappel_cible_parcours: "Parcours signalé : {titre}"
+        rappel_cible_commentaire: "Commentaire de {auteur}"
+        rappel_cible_retour: "Retour de {auteur}"
+        motif_intitule: "Pourquoi signalez-vous ce contenu ?"
+        motif_inapproprie: "Contenu inapproprié"
+        motif_historiquement_faux: "Historiquement faux"
+        motif_hors_sujet: "Hors sujet"
+        motif_atteinte_vie_privee: "Atteinte à la vie privée"
+        motif_autre: "Autre raison"
+        precision_label: "Précisez (facultatif)"
+        precision_label_obligatoire_si_autre: "Précisez votre signalement"
+        masquage_local_label: "Ne plus voir ce contenu en attendant la décision"
+        rappel_anonymat: "Votre identité n'est jamais exposée à l'auteur du contenu."
+        action_valider: "Envoyer le signalement"
+        succes: "Votre signalement a été transmis à l'équipe."
+        echec: "L'envoi n'a pas abouti. Réessayez."
+        cible_pin_editorial: "Ce pin est édité par l'équipe HistoLyon. Pour proposer une correction, contactez-nous."
+        cible_deja_signalee: "Vous avez déjà signalé ce contenu. L'équipe l'examine."
+        cible_retiree_pendant: "Ce contenu a déjà été traité par l'équipe."
+      reutilise_dictionnaire: [D2, D4, D6, D8, D23, D44, D90, D91, D97, D98, D99]
+
+    - ecran: E-COMMUNAUTE-SOUMISSION-PIN
+      titre: "Proposer un pin"
+      libelles_specifiques:
+        identite_publique_intitule: "Vous apparaîtrez comme"
+        mode_credit_pseudonyme: "Avec mon pseudonyme"
+        mode_credit_anonyme: "Sans signature (anonyme)"
+        mode_credit_attribution: "Avec une attribution explicite"
+        titre_label: "Titre du pin"
+        titre_placeholder: "Donnez-lui un nom court et reconnaissable"
+        categorie_label: "Catégorie"
+        categorie_proposer_nouvelle: "Proposer une nouvelle catégorie"
+        epoques_label: "Époques associées"
+        epoques_invite: "Au moins une époque"
+        localisation_label: "Localisation"
+        localisation_action_carte: "Désigner sur la carte"
+        localisation_action_position: "Utiliser ma position"
+        localisation_action_omettre: "Pas de lieu précis (patrimoine immatériel)"
+        contenu_narratif_label: "Le récit"
+        contenu_narratif_placeholder: "Racontez ce qui se passe ici, et pourquoi ça compte."
+        sources_label: "Sources"
+        sources_invite: "Au moins une source documentaire"
+        sources_action_ajouter: "Ajouter une source"
+        medias_label: "Médias (facultatif)"
+        medias_action_ajouter: "Ajouter une image, un audio"
+        medias_metadonnees_nettoyees: "Les informations sensibles (GPS, appareil) sont retirées avant envoi."
+        recap_incomplet: "Il manque encore : {liste}"
+        action_soumettre: "Envoyer pour relecture"
+        action_brouillon: "Enregistrer en brouillon"
+        succes: "Pin envoyé. L'équipe le relit avant publication. Il apparaît déjà dans le catalogue avec une marque distinctive."
+        succes_brouillon: "Brouillon enregistré. Vous le retrouvez dans Mes contributions."
+        echec: "L'envoi n'a pas abouti. Votre brouillon est conservé."
+        offline_attente: "Envoi en attente de connexion."
+        edition_demande_complement_chapeau: "L'équipe demande un complément : {motif}"
+        permission_geoloc_refusee: "Vous pouvez désigner manuellement un lieu sur la carte ou laisser ce pin sans localisation précise."
+      reutilise_dictionnaire: [D2, D4, D6, D9, D24, D44, D46, D57, D58, D78, D90, D93, D94, D95]
+
+    - ecran: E-COMMUNAUTE-SUIVI-SOUMISSIONS
+      titre: "Mes contributions"
+      libelles_specifiques:
+        groupe_pins: "Mes pins"
+        groupe_commentaires: "Mes commentaires"
+        groupe_retours: "Mes retours"
+        filtre_statut_intitule: "Filtrer par statut"
+        statut_brouillon: "Brouillon"
+        statut_en_attente: "En modération"
+        statut_en_revue: "En relecture"
+        statut_valide: "Validé"
+        statut_publie: "Publié"
+        statut_refuse: "Refusé"
+        statut_retire: "Retiré"
+        statut_demande_complement: "Complément demandé"
+        action_reprendre_brouillon: "Reprendre"
+        action_completer_demande: "Compléter"
+        action_consulter: "Voir le pin"
+        action_retirer_soumission: "Retirer ma soumission"
+        retrait_dialogue_titre: "Retirer ce pin ?"
+        retrait_dialogue_description: "Le pin repassera en brouillon. Vous pourrez le modifier ou le supprimer ensuite."
+        motif_moderation_chapeau: "Motif transmis par l'équipe : {motif}"
+        vide: "Vous n'avez pas encore proposé de contenu. Vos contributions futures apparaîtront ici."
+        type_vide: "Aucun {type} pour l'instant."
+      reutilise_dictionnaire: [D6, D40, D43, D44, D46, D47, D48, D49, D78, D97, D99]
+
+    - ecran: E-COMMUNAUTE-REDACTION-RETOUR-PARCOURS
+      titre: "Laisser un retour"
+      libelles_specifiques:
+        rappel_cible: "Sur le parcours « {titre} » de {auteur}"
+        identite_publique_intitule: "Vous apparaîtrez comme"
+        evaluation_label: "Votre évaluation"
+        commentaire_libre_label: "Quelques mots (facultatif)"
+        commentaire_libre_placeholder: "Ce que vous avez aimé, ce qui pourrait être ajusté…"
+        action_valider: "Envoyer"
+        rappel_moderation: "Votre retour passe par modération avant d'apparaître."
+        succes: "Votre retour a été transmis. Il apparaîtra dès qu'il sera validé."
+        mode_edition_chapeau: "Vous modifiez votre retour précédent."
+        parcours_retire_pendant: "Ce parcours n'est plus disponible. L'envoi n'est plus possible."
+        retours_desactives_pendant: "L'auteur du parcours a désactivé les retours. L'envoi n'est plus possible."
+      reutilise_dictionnaire: [D2, D4, D6, D8, D43, D44, D49, D58, D91, D99]
+
+  partage:
+
+    - ecran: E-PARTAGE-CODE-VISUEL
+      titre: "Code visuel"
+      libelles_specifiques:
+        rappel_cible_pin: "Pour le pin « {titre} »"
+        rappel_cible_parcours: "Pour le parcours « {titre} »"
+        action_enregistrer_image: "Enregistrer l'image"
+        action_imprimer: "Imprimer"
+        action_partager_natif: "Partager"
+        instruction_imprimable: "Scannez ce code avec votre téléphone pour ouvrir HistoLyon."
+        chargement: "Génération du code…"
+        erreur_generation: "Le code n'a pas pu être généré. Réessayez."
+        succes_enregistrement: "Image enregistrée."
+      reutilise_dictionnaire: [D4, D6, D9, D10, D40, D44, D101]
+
+    - ecran: E-PARTAGE-FIN-PARCOURS-IMAGE
+      titre: "Une trace de votre parcours"
+      libelles_specifiques:
+        action_partager: "Partager"
+        action_enregistrer: "Enregistrer l'image"
+        action_regenerer: "Générer une nouvelle image"
+        chargement: "Composition de l'image…"
+        erreur_generation_fallback: "L'image n'a pas pu être générée. Vous pouvez partager le lien du parcours."
+        offline_attente: "Le partage sera disponible à la reconnexion."
+        action_partage_lien_seul: "Partager le lien seulement"
+      reutilise_dictionnaire: [D4, D6, D9, D10, D40, D44, D102]
+
+  transverses:
+
+    - ecran: E-TRANSVERSES-AUDIO-PERSISTANT
+      titre: "(surface réduite — pas de titre dédié)"
+      libelles_specifiques:
+        identite_lecture: "{titre_pin}"
+        action_lecture: "Écouter"
+        action_pause: "Pause"
+        action_retour_source: "Revenir au pin"
+        action_fermer: "Arrêter la lecture"
+        chargement_media: "Chargement de l'audio…"
+        erreur_lecture: "La lecture a été interrompue."
+      reutilise_dictionnaire: [D40, D135, D17]
+
+    - ecran: E-TRANSVERSES-PARCOURS-PERSISTANT
+      titre: "(surface réduite — pas de titre dédié)"
+      libelles_specifiques:
+        identite_parcours: "{titre_parcours}"
+        progression: "Étape {n} sur {total}"
+        indicateur_terrain: "Mode terrain"
+        indicateur_canape: "Mode canapé"
+        action_retour_etape: "Revenir au parcours"
+        action_abandon: "Quitter le parcours"
+      reutilise_dictionnaire: [D18, D92, D130, D131]
+
+    - ecran: E-TRANSVERSES-BANDEAU-OFFLINE
+      titre: "(bandeau persistant)"
+      libelles_specifiques:
+        message_principal: "Hors ligne. Vous lisez le contenu déjà téléchargé."
+        message_reconnexion: "Connexion retrouvée."
+      reutilise_dictionnaire: [D44]
+
+    - ecran: E-TRANSVERSES-DIALOGUE-CONFIRMATION
+      titre: "(template — instances dans § 6 et dans les écrans concernés)"
+      libelles_specifiques:
+        note: >-
+          Toutes les instances de ce template sont définies au niveau de l'écran
+          appelant (E-PARCOURS-EDITEUR pour publication, E-PROFIL-PARAMETRES-COMPTE
+          pour suppression, E-PROFIL-HISTORIQUE pour effacement, etc.). Le
+          pattern P5.M8 du § 3 cadre la structure : titre = libellé d'action,
+          description = paragraphe explicatif, deux boutons dont l'un dit
+          l'action et l'autre est D2 « Annuler ».
+        erreur_execution_apres_confirmation: "L'action n'a pas pu aboutir. Vous pouvez réessayer."
+      reutilise_dictionnaire: [D2, D4]
+
+    - ecran: E-TRANSVERSES-MESSAGE-EPHEMERE
+      titre: "(template — instances dans le dictionnaire D52-D58 et dans les écrans concernés)"
+      libelles_specifiques:
+        note: >-
+          Les libellés sont dans le dictionnaire (D52 « Lien copié », D53
+          « Favori ajouté », D54 « Favori retiré », D56 « Modifications
+          enregistrées », D57 « Brouillon enregistré », D58 « Envoyé pour
+          modération »). Les instances spécifiques (éloignement du tracé,
+          parcours retiré, etc.) sont définies au niveau de l'écran appelant.
+      reutilise_dictionnaire: [D52, D53, D54, D55, D56, D57, D58]
+
+    - ecran: E-TRANSVERSES-DIALOGUE-PERMISSION
+      titre: "(défini par instance — voir § 5)"
+      libelles_specifiques:
+        action_acceptation_contextuelle: "Autoriser"
+        action_report: "Plus tard"
+        action_parametres_systeme: "Ouvrir les paramètres système"
+        deja_refusee_orientation: "Vous avez précédemment refusé cette permission. Pour la réactiver, ouvrez les paramètres de votre téléphone."
+        impossible_re_demande: "Cette permission ne peut plus être demandée depuis l'app. Ouvrez les paramètres de votre téléphone pour la modifier."
+        erreur_systeme: "L'autorisation n'a pas pu être demandée. Réessayez plus tard."
+      reutilise_dictionnaire: [D4, D5, D8, D30, D31]
+
+    - ecran: E-TRANSVERSES-INDICATION-ONBOARDING
+      titre: "(indication ponctuelle ancrée — pas de titre)"
+      libelles_specifiques:
+        slider_epoque: "Glissez pour traverser les époques."
+        couches: "Choisissez ce que la carte vous montre."
+        surprenez_moi: "Activez Surprenez-moi pour recevoir des anecdotes en marchant."
+        selecteur_section: "Trois sections : la carte, les parcours, votre profil."
+        favori_premier_marquage: "Vous pouvez retrouver vos favoris à tout moment depuis votre profil."
+      reutilise_dictionnaire: [D70, D71, D72, D75, D94, D96, D133]
+
+    - ecran: E-TRANSVERSES-INVITATION-MICROPARCOURS
+      titre: "(invitation transitoire — pas de titre)"
+      libelles_specifiques:
+        invitation: "Découvrir Lyon en quelques minutes ?"
+        action_accepter: "Découvrir"
+        action_reporter: "Plus tard"
+      reutilise_dictionnaire: [D5]
+
+# -----------------------------------------------------------------------------
+# 5. Microcopy de demande de permission
+# -----------------------------------------------------------------------------
+# Pour chaque permission, un dialogue préalable (E-TRANSVERSES-DIALOGUE-PERMISSION)
+# qui explique le bénéfice contextuel ET la garantie de cadre AVANT que l'OS
+# n'affiche son prompt. Application stricte de PT4.
+permissions:
+
+  - permission: geolocalisation
+    contexte_d_appel: "Tap sur le point d'accès localisation de la Carte, ou démarrage d'un Parcours en mode terrain (C4 → C5), ou activation de Surprenez-moi (A5)."
+    titre_dialogue: "Activer la localisation"
+    description_dialogue: >-
+      Pour vous proposer ce qui se trouve à proximité, l'app a besoin de
+      connaître votre position. Aucune donnée n'est transmise au-delà de
+      votre téléphone.
+    boutons: ["Autoriser", "Plus tard"]
+    refus_consequence: "Vous pouvez utiliser HistoLyon sans la localisation. Vous explorerez la carte manuellement."
+    deja_refusee_orientation: "Vous avez précédemment refusé la localisation. Pour la réactiver, ouvrez les paramètres de votre téléphone."
+
+  - permission: notifications
+    contexte_d_appel: "Activation du mode Surprenez-moi (A5), ou démarrage d'un Parcours en mode terrain qui s'appuie sur des alertes d'arrivée à étape (C5)."
+    titre_dialogue: "Activer les notifications"
+    description_dialogue: >-
+      Pour vous prévenir quand vous passez près d'un lieu intéressant ou
+      quand vous arrivez à une étape, l'app a besoin de pouvoir vous
+      envoyer des notifications. Vous pouvez les désactiver à tout moment.
+    boutons: ["Autoriser", "Plus tard"]
+    refus_consequence: "Le mode Surprenez-moi reste désactivé. Vous pourrez l'activer plus tard depuis les paramètres."
+    deja_refusee_orientation: "Vous avez précédemment refusé les notifications. Pour les réactiver, ouvrez les paramètres de votre téléphone."
+
+  - permission: camera
+    contexte_d_appel: "Bascule vers la consultation AR (B4 → B5) sur un Pin doté d'un Modèle 3D ancré géographiquement."
+    titre_dialogue: "Activer la caméra"
+    description_dialogue: >-
+      Pour superposer la reconstitution 3D à l'emplacement réel, l'app a
+      besoin d'accéder à votre caméra. La caméra n'est utilisée que pendant
+      la consultation AR — aucune image n'est enregistrée.
+    boutons: ["Autoriser", "Plus tard"]
+    refus_consequence: "Vous pouvez consulter le modèle 3D sans superposition à la caméra."
+    deja_refusee_orientation: "Vous avez précédemment refusé l'accès à la caméra. Pour le réactiver, ouvrez les paramètres de votre téléphone."
+
+# -----------------------------------------------------------------------------
+# 6. Microcopy d'erreurs et d'états dégradés
+# -----------------------------------------------------------------------------
+# Libellés génériques. Une instance d'écran peut surcharger en spécifiant
+# (cf. § 4), mais ces formes sont la base si rien n'est précisé.
+erreurs_et_etats_degrades:
+
+  connexion_perdue_pendant_action:
+    voix: app
+    libelle: "Connexion perdue. Vos modifications sont conservées, vous pouvez réessayer dès le retour de la connexion."
+    note: "PT5 refus gracieux. Pas « Erreur réseau » (technique), pas « Oups ! » (peppy)."
+
+  connexion_retrouvee:
+    voix: app
+    libelle: "Connexion retrouvée."
+    note: "M9 simple. À utiliser en complément du bandeau P3 quand l'utilisateur a une opération en attente."
+
+  cible_pin_retiree:
+    voix: app
+    libelle_inline: "Ce pin n'est plus disponible."
+    libelle_avec_action: "Ce pin n'est plus disponible. Retour à la carte."
+    note: "Ne JAMAIS dire « Erreur 404 » ou « Contenu introuvable ». Le retrait est une décision, pas un bug."
+
+  cible_parcours_retiree:
+    voix: app
+    libelle_inline: "Ce parcours n'est plus disponible."
+    libelle_complet: "Ce parcours n'est plus disponible publiquement. Si vous l'aviez en cours, votre progression reste à vous."
+
+  permission_refusee_apres_demande:
+    voix: app
+    libelles_par_permission:
+      geolocalisation: "Permission de localisation refusée. Vous pouvez explorer la carte manuellement."
+      notifications: "Permission de notifications refusée. Le mode Surprenez-moi reste désactivé."
+      camera: "Permission de caméra refusée. Vous pouvez consulter le modèle 3D sans la superposition à la caméra."
+    note: "PT5. Ce que la suite reste possible, posé sereinement."
+
+  permission_definitivement_refusee_par_os:
+    voix: app
+    libelle: "Cette permission a été refusée définitivement. Pour la réactiver, ouvrez les paramètres de votre téléphone."
+    action: "Ouvrir les paramètres système"
+    reutilise_dictionnaire: [D31]
+
+  echec_de_chargement:
+    voix: app
+    libelle_court: "Erreur de chargement."
+    libelle_avec_action: "Erreur de chargement. Réessayez."
+    note: "D45 + D4. PT5. Pas de stack trace, pas de code d'erreur visible utilisateur."
+
+  echec_d_envoi:
+    voix: app
+    libelle: "L'envoi n'a pas abouti. Réessayez."
+    note: "Préférable à « Échec de la requête ». Le « n'a pas abouti » est neutre, pas accusateur."
+
+  validation_manquante_champ_requis:
+    voix: app
+    libelle_generique: "Ce champ est requis."
+    libelle_email_invalide: "Cet email n'a pas le bon format."
+    libelle_pseudonyme_pris: "Ce pseudonyme est déjà pris."
+    note: "Toujours une indication précise du quoi. Pas de « Saisie incorrecte » (vague)."
+
+  saisie_invalide_seuil_minimum:
+    voix: app
+    libelle_pattern: "Ajoutez encore quelques caractères avant d'envoyer."
+    libelle_specifique_commentaire: "Ajoutez quelques mots avant d'envoyer."
+    note: "Pas de compteur en mode reproche (« 0/200 caractères »). Le compteur reste un indicateur neutre."
+
+  serveur_indisponible:
+    voix: app
+    libelle: "Le service est momentanément indisponible. Réessayez dans quelques instants."
+    note: "Rare. Préférable à « Erreur 500 »."
+
+# -----------------------------------------------------------------------------
+# 7. Microcopy de cohésion narrative
+# -----------------------------------------------------------------------------
+# Transitions et notifications qui tissent la narration AU FIL des Parcours
+# et des notifications de proximité. Voix DU RÉCIT (tutoiement narratif).
+# Articulation directe avec les flows C5, C6 et E1, E2.
+cohesion_narrative:
+
+  transitions_mode_terrain_c5:
+    voix: récit
+    note: "Voix du récit cohérente avec le tutoiement narratif (cf. pilote § conteur.voix)."
+    patterns:
+      - situation: "Démarrage d'un parcours en mode terrain (étape 1)"
+        libelle: "Tu démarres le parcours. La première étape est à {distance}."
+      - situation: "Approche de l'étape courante"
+        libelle: "Tu approches de l'étape {n}."
+      - situation: "Arrivée à l'étape (E2)"
+        libelle: "Tu es arrivé à l'étape {n} sur {total}."
+      - situation: "Étape suivante"
+        libelle: "L'étape suivante est à {distance}."
+      - situation: "Éloignement du tracé"
+        libelle: "Tu sembles t'éloigner du tracé."
+      - situation: "Dernière étape franchie"
+        libelle: "Dernière étape. Le bout du chemin."
+
+  transitions_mode_canape_c6:
+    voix: récit (titres / transitions narratives) ; app (libellés d'action)
+    patterns:
+      - situation: "Bouton de transition vers étape suivante"
+        libelle: "Étape suivante"
+        voix: app
+      - situation: "Bouton de transition vers étape précédente"
+        libelle: "Étape précédente"
+        voix: app
+      - situation: "Étape courante mise en évidence (titre narratif)"
+        libelle: "Étape {n} sur {total} — {titre_pin}"
+        voix: app
+        note: "Composé de libellés app, mais l'enveloppe peut être enrichie en mode présentation par une transition narrative tirée du contenu éditorial du Parcours (cf. cluster 02 transitions_narratives — hors périmètre microcopy)."
+
+  notifications_de_proximite:
+    voix: récit pour le message, app pour les libellés d'action
+    e1_surprenez_moi:
+      message: "Une histoire t'attend à proximité."
+      action_implicite: "(tap sur la notification = ouverture de l'aperçu rapide du Pin concerné)"
+    e2_arrivee_a_etape:
+      message: "Tu es arrivé à l'étape {n} sur {total}."
+      action_implicite: "(tap sur la notification = ouverture de la consultation approfondie de l'étape)"
+    notification_systeme_externe:
+      note: >-
+        Quand l'app n'est pas au premier plan, la notification est rendue
+        par l'OS. Le titre est « HistoLyon » (le système ajoute le nom de
+        l'app), le corps suit les patterns ci-dessus. Le tu narratif est
+        conservé.
+
+  reconnaissance_de_fin_de_parcours_c9:
+    voix: récit
+    note: "PT6 reconnaissance de fin et PT7 tonalité de complétion partielle (cf. pilote)."
+    patterns:
+      - situation: "Complétion totale"
+        libelle: "Tu as parcouru les {n} étapes du {nom_parcours}. Voici ce qu'on a vu ensemble."
+      - situation: "Complétion partielle"
+        libelle: "Tu as parcouru {n} étapes sur {total}. Le reste t'attend quand tu voudras."
+      - situation: "Parcours retiré pendant qu'il était en cours"
+        libelle: "Ce parcours n'est plus disponible publiquement, mais ce que tu as vu reste à toi."
+
+  premier_lancement_a1:
+    voix: récit
+    libelle: "Lyon. Tu peux remonter le temps, ici, là où tu marches."
+    note: "Exemple canonique du pilote. Apparaît en accueil discret au tout premier lancement (E-CARTE-PRINCIPALE — état premier_lancement)."

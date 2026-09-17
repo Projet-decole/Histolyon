@@ -1,0 +1,101 @@
+# =============================================================================
+# E-PARCOURS-FICHE-DETAIL — Fiche détaillée d'un Parcours
+# =============================================================================
+# Consultation approfondie (P5.M3) d'un Parcours, atterrissage par défaut
+# depuis E-PARCOURS-PRINCIPAL ou via Lien universel. Inclut comme zone
+# l'aperçu d'une étape (pas d'écran APERCU-ETAPE distinct). Surface également
+# point de départ du lancement (C4), du partage (F2), du retour (G6).
+# =============================================================================
+
+document:
+  type: palier_ecrans_fiche
+  format: yaml
+
+ecran:
+  id: E-PARCOURS-FICHE-DETAIL
+  nom: "Fiche détaillée d'un Parcours"
+
+  mode: P5.M3
+  surface_parente: P5.S2
+
+  raison_d_etre: >-
+    Permet à l'utilisateur de décider s'il veut démarrer ce Parcours.
+    Présente la mise en condition narrative (teaser), les métadonnées
+    qui aident à projeter (durée, distance, époques, densité, badge),
+    la liste des étapes consultable une à une, l'auteur (signature
+    éditoriale, pseudonyme communautaire ou auteur personnel), et
+    selon provenance les retours synthétisés.
+
+  composition:
+    - zone: "en-tête narratif"
+      role: "image d'ouverture, titre, teaser narratif, auteur (signature éditoriale, pseudonyme communautaire ou auteur personnel selon provenance), badge éventuel, marque distinctive communautaire (I3) si applicable"
+      entites_affichees: [Parcours, Badge, "Compte (auteur)", "Profil (auteur personnel)"]
+
+    - zone: "métadonnées synthétiques"
+      role: "durée estimée, distance estimée, nombre d'étapes, époques traversées, densité du contenu (légère / intermédiaire / dense)"
+      entites_affichees: [Parcours, Époque]
+
+    - zone: "liste des étapes"
+      role: "énumération ordonnée des Étapes du Parcours, chacune affichant sa position, le titre du Pin référencé, la catégorie, l'époque ; permet de taper sur une étape pour voir son aperçu détaillé sans quitter la fiche"
+      entites_affichees: [Étape, Pin]
+
+    - zone: "aperçu d'une étape"
+      role: "vue de l'étape sélectionnée dans la liste — affiche le Pin référencé (titre, teaser, médias d'aperçu), l'introduction d'étape éventuelle, et l'option d'ouvrir la consultation approfondie du Pin (B2). Pas un écran distinct : zone interne à la fiche"
+      entites_affichees: [Étape, Pin]
+
+    - zone: "retours synthétisés"
+      role: "présent uniquement si Parcours communautaire avec retours suffisants (D9.3) ; affiche un résumé des retours et permet d'accéder aux retours détaillés"
+      entites_affichees: ["Retour de parcours"]
+
+    - zone: "actions"
+      role: "regroupe le démarrage du Parcours, le marquage favori, le partage (Lien universel ou Code visuel), la rédaction d'un retour (si éligible), le signalement (si Parcours communautaire)"
+
+  etats:
+    nominal_charge: "Fiche complète chargée, toutes les zones disponibles selon provenance"
+    chargement: "Métadonnées et étapes en cours de chargement"
+    parcours_communautaire_en_verification: "Marque distinctive visible signalant que les sources / l'itinéraire sont en cours de vérification (instanciation locale de I3) ; la fiche reste consultable et lançable"
+    parcours_personnel_consulte_par_destinataire: "Le Parcours est de provenance personnelle, atteint via un Lien universel partagé par capability (cf. décision 2026-05-05) ; vue lecture seule sans actions de modération ni de marquage favori communautaire ; précision visuelle que c'est un parcours partagé en privé"
+    parcours_retire_ou_supprime: "Le Parcours n'est plus disponible (retrait communautaire suite à signalement honoré, ou suppression personnelle par auteur) ; message gracieux 'ce parcours n'est plus disponible' et bouton de retour vers E-PARCOURS-PRINCIPAL"
+    parcours_complete_par_utilisateur: "L'utilisateur a déjà complété ce Parcours (relancement C10) ; affichage de la précédente complétion (date, étapes complétées vs sautées) ; option de relancer"
+    parcours_abandonne_par_utilisateur: "L'utilisateur avait abandonné ce Parcours ; option de reprendre ou de relancer à zéro"
+    parcours_en_cours: "L'utilisateur a déjà ce Parcours en cours ; le bouton démarrer est remplacé par 'reprendre' qui bascule directement vers E-PARCOURS-EN-COURS-TERRAIN ou E-PARCOURS-EN-COURS-CANAPE"
+    pin_d_etape_indisponible: "Au moins un Pin référencé par une étape est retiré ; signalement non bloquant dans la zone liste des étapes (cf. cluster 02 invariant)"
+    offline_avec_cache: "Réseau indisponible mais Parcours préchargé ; consultation pleine ; bandeau P3 visible"
+    offline_sans_cache: "Réseau indisponible et Parcours non préchargé ; consultation dégradée (métadonnées de base, étapes listées mais sans contenu d'aperçu)"
+    erreur: "Échec de chargement de la fiche ; message gracieux invitant à réessayer"
+
+  elements_interactifs:
+    - "Tap sur une étape de la liste → ouverture de la zone aperçu de l'étape"
+    - "Tap dans l'aperçu d'étape → bascule vers E-PIN-CONSULTATION-APPROFONDIE (B2) du Pin référencé ; le retour ramène à la fiche"
+    - "Tap démarrer → flow C4, bascule vers E-PARCOURS-LANCEMENT"
+    - "Tap reprendre (parcours en cours) → bascule directe vers E-PARCOURS-EN-COURS-TERRAIN ou E-PARCOURS-EN-COURS-CANAPE"
+    - "Tap relancer (parcours déjà complété ou abandonné) → flow C10, ouvre E-PARCOURS-LANCEMENT"
+    - "Tap favori → marquage du Parcours en favori (référencé par le Profil)"
+    - "Tap partage → flow F2, ouvre E-PARTAGE-CODE-VISUEL ou bascule vers le partage natif système"
+    - "Tap rédaction de retour (Parcours communautaire, déjà vécu, non auteur) → flow G6, bascule vers E-COMMUNAUTE-REDACTION-RETOUR-PARCOURS"
+    - "Tap signalement (Parcours communautaire) → flow G3, bascule vers E-COMMUNAUTE-REDACTION-SIGNALEMENT avec cible Parcours"
+    - "Retour → ramène à E-PARCOURS-PRINCIPAL ou à la source d'entrée (Lien universel → P5.S2)"
+
+  flows_actifs:
+    - C3   # Consultation de la fiche
+    - F2   # Partage d'une fiche de parcours
+    - G6   # Soumission d'un Retour de parcours
+
+  surfaces_imbriquees:
+    - E-PARCOURS-LANCEMENT                      # M6 quand démarrage
+    - E-PARCOURS-EN-COURS-TERRAIN               # M3 reprise d'un parcours en cours
+    - E-PARCOURS-EN-COURS-CANAPE                # M3 reprise d'un parcours en cours
+    - E-PIN-CONSULTATION-APPROFONDIE            # M3 consultation hors contexte d'un Pin d'étape
+    - E-PARTAGE-CODE-VISUEL                     # M6 si partage par Code visuel
+    - E-COMMUNAUTE-REDACTION-RETOUR-PARCOURS    # M6 si rédaction d'un retour
+    - E-COMMUNAUTE-REDACTION-SIGNALEMENT        # M6 si signalement
+    - E-TRANSVERSES-AUDIO-PERSISTANT            # P1 si audio en cours
+    - E-TRANSVERSES-PARCOURS-PERSISTANT         # P2 si autre parcours en cours
+    - E-TRANSVERSES-BANDEAU-OFFLINE             # P3 si offline
+    - E-TRANSVERSES-MESSAGE-EPHEMERE            # M9 récurrent
+
+  questions_ouvertes:
+    - "Marque distinctive 'parcours partagé en privé via capability' : forme exacte et copie — palier 8 / 10. La distinction avec un parcours public communautaire doit être lisible sans confusion"
+    - "Quand un Parcours communautaire est en cours de vérification (I3), la marque distinctive de vérification doit-elle apparaître AUSSI sur l'auteur (réputation) ou seulement sur le contenu ? — relève cluster 04 + palier 8"
+    - "L'aperçu d'étape comme zone interne reste-t-il pertinent en mobile (place limitée) ou faut-il une bascule en M3 dédié pour l'étape ? — relève palier 10. Pour l'instant, on fait l'hypothèse de la zone interne conformément à la note du 00-index"
+    - "Affichage des transitions narratives entre étapes (réservées aux éditoriaux, cf. cluster 02) : visibles dans l'aperçu d'étape, ou seulement pendant le déroulé en C5/C6 ? — palier 8"

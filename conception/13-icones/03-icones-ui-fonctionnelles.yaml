@@ -1,0 +1,606 @@
+# =============================================================================
+# Palier 13 — 03 Icônes UI fonctionnelles
+# =============================================================================
+# ~30 icônes mappées aux ~25 slots palier 10 (audit § 10 du 00-index).
+# Format compact — chaque fiche tient en 8-12 lignes. Toutes conformes
+# à la charte 01 (monoline, stroke 1.5, OUTLINED strict).
+# =============================================================================
+
+document:
+  type: palier_icones_ui_fonctionnelles
+  numero: 13
+  fichier: "03-icones-ui-fonctionnelles.yaml"
+  version: "0.3"
+  date: "2026-05-08"
+  format: yaml
+  prerequis_de_lecture:
+    - "design/conception/13-icones/01-charte-graphique.yaml — style, états, mapping couleurs"
+    - "design/conception/13-icones/00-index.yaml — § 10 audit slots palier 10"
+
+raison_d_etre: >-
+  Couvrir exhaustivement les ~28 slots d'icônes du palier 10. Aucun slot
+  ne reste orphelin. Format compact car la complexité réside dans la
+  charte (01), pas dans chaque fiche.
+
+# -----------------------------------------------------------------------------
+# 1. Navigation
+# -----------------------------------------------------------------------------
+navigation:
+
+  - id: ICON-UI-RETOUR
+    nom_palier_13: "navigation_retour"
+    source: "lucide:arrow-left"
+    metaphore: "Flèche vers la gauche — convention universelle de retour gracieux (P5.N1)."
+    slot_palier_10: ["comp-button-back slot icone (palier 10 01-atomes)"]
+    variants: { tailles: [LG], etats: [default, pressed, disabled] }
+    mapping_couleurs:
+      sur_fond_clair: TOK-COLOR-TEXTE-PRINCIPAL
+      en_M4_sur_fond_sombre: TOK-COLOR-PRIMARY-CLAIR
+    fichier_svg_attendu: "assets/ui/navigation-retour.svg"
+
+  - id: ICON-UI-FERMETURE
+    nom_palier_13: "fermeture_overlay"
+    source: "lucide:x"
+    metaphore: "Croix — convention universelle de fermeture / annulation."
+    slot_palier_10:
+      - "comp-button-fermeture-overlay slot icone (01-atomes)"
+      - "comp-chip-filtre slot icone_retrait (01-atomes) — fermeture du filtre actif"
+    variants: { tailles: [LG, MD], etats: [default, pressed] }
+    mapping_couleurs: { sur_fond_clair: TOK-COLOR-TEXTE-PRINCIPAL }
+    fichier_svg_attendu: "assets/ui/fermeture.svg"
+
+  - id: ICON-UI-CREATION-FAB
+    nom_palier_13: "creation_fab"
+    source: "lucide:plus"
+    metaphore: "Croix mathématique — convention universelle d'addition / création."
+    slot_palier_10: ["comp-button-fab-creation slot icone (01-atomes)"]
+    variants: { tailles: [XL], etats: [default, pressed] }
+    mapping_couleurs: { sur_fond_terracotta_FAB: TOK-COLOR-BLANC-NARRATIF }
+    fichier_svg_attendu: "assets/ui/creation-fab.svg"
+
+# -----------------------------------------------------------------------------
+# 2. Audio / Média
+# -----------------------------------------------------------------------------
+audio_media:
+
+  - id: ICON-UI-PLAY
+    nom_palier_13: "audio_play"
+    source: "lucide:play"
+    metaphore: "Triangle pointant à droite — convention universelle de lecture."
+    slot_palier_10: ["comp-button-play-audio slot icone (01-atomes) variant état=paused/buffering/ended"]
+    variants: { tailles: [LG, MD], etats: [default, pressed] }
+    mapping_couleurs:
+      defaut_sur_fond_clair: TOK-COLOR-PRIMARY
+      en_persistante_P1: TOK-COLOR-PRIMARY
+    fichier_svg_attendu: "assets/ui/audio-play.svg"
+    note: "comp-button-play-audio choisit dynamiquement entre ICON-UI-PLAY et ICON-UI-PAUSE selon ETAT-AUDIO-EN-COURS (palier 10 § 4)."
+
+  - id: ICON-UI-PAUSE
+    nom_palier_13: "audio_pause"
+    source: "lucide:pause"
+    metaphore: "Deux barres verticales — convention universelle de pause."
+    slot_palier_10: ["comp-button-play-audio slot icone (01-atomes) variant état=playing"]
+    variants: { tailles: [LG, MD], etats: [default, pressed] }
+    mapping_couleurs: { defaut: TOK-COLOR-PRIMARY }
+    fichier_svg_attendu: "assets/ui/audio-pause.svg"
+
+# -----------------------------------------------------------------------------
+# 3. Saisie (slots préfixes de comp-champ-saisie-*)
+# -----------------------------------------------------------------------------
+saisie:
+
+  - id: ICON-UI-CALENDRIER
+    nom_palier_13: "saisie_date"
+    source: "lucide:calendar"
+    metaphore: "Calendrier mural simplifié — convention universelle de saisie de date."
+    slot_palier_10: ["comp-champ-saisie-date slot icone_calendrier (01-atomes)"]
+    variants: { tailles: [MD], etats: [default, focused, error] }
+    mapping_couleurs:
+      default: TOK-COLOR-TEXTE-TERTIAIRE
+      focused: TOK-COLOR-PRIMARY
+      error: TOK-COLOR-FONCTIONNEL-ERREUR
+    fichier_svg_attendu: "assets/ui/saisie-calendrier.svg"
+
+  - id: ICON-UI-LIEU
+    nom_palier_13: "saisie_lieu"
+    source: "lucide:map-pin"
+    metaphore: "Pin de carte — convention universelle de localisation géographique."
+    slot_palier_10: ["comp-champ-saisie-lieu slot icone_lieu (01-atomes)"]
+    variants: { tailles: [MD], etats: [default, focused, error] }
+    mapping_couleurs:
+      default: TOK-COLOR-TEXTE-TERTIAIRE
+      focused: TOK-COLOR-PRIMARY
+      error: TOK-COLOR-FONCTIONNEL-ERREUR
+    fichier_svg_attendu: "assets/ui/saisie-lieu.svg"
+    note_distinction: >-
+      map-pin (cette icône, dans un champ de saisie) ≠ comp-pin
+      (le composant Pin sur la carte). Le composant Pin a sa
+      propre forme (teardrop palier 10) avec ICON-CAT-* à l'intérieur.
+      Pas de risque de confusion (contextes spatiaux disjoints :
+      formulaire vs carte).
+
+  - id: ICON-UI-VISIBILITE
+    nom_palier_13: "saisie_visibilite_reveler"
+    source: "lucide:eye"
+    metaphore: "Œil ouvert — révéler le contenu masqué d'un champ mot de passe."
+    slot_palier_10: ["comp-champ-saisie-texte slot icone_suffixe (01-atomes) variant type=password — état masqué (tap pour révéler)"]
+    variants: { tailles: [MD], etats: [default, pressed] }
+    mapping_couleurs:
+      default: TOK-COLOR-TEXTE-TERTIAIRE
+      pressed: TOK-COLOR-PRIMARY
+    fichier_svg_attendu: "assets/ui/saisie-visibilite.svg"
+    note_mutualisation: >-
+      Mutualise la géométrie d'ICON-ADMIN-PREVISUALISATION (fichier 04,
+      lucide:eye) — un seul tracé eye. Contextes disjoints (toggle
+      password côté saisie vs prévisualisation côté back-office).
+
+  - id: ICON-UI-VISIBILITE-OFF
+    nom_palier_13: "saisie_visibilite_masquer"
+    source: "lucide:eye-off"
+    metaphore: "Œil barré — masquer à nouveau le contenu révélé d'un champ mot de passe."
+    slot_palier_10: ["comp-champ-saisie-texte slot icone_suffixe (01-atomes) variant type=password — état révélé (tap pour masquer)"]
+    variants: { tailles: [MD], etats: [default, pressed] }
+    mapping_couleurs:
+      default: TOK-COLOR-TEXTE-TERTIAIRE
+      pressed: TOK-COLOR-PRIMARY
+    fichier_svg_attendu: "assets/ui/saisie-visibilite-off.svg"
+    note: >-
+      comp-champ-saisie-texte variant password alterne ICON-UI-VISIBILITE
+      (état masqué, tap pour révéler) ↔ ICON-UI-VISIBILITE-OFF (état révélé,
+      tap pour masquer) au tap du suffixe. Paire créée au palier 5 maquette
+      (champs de saisie), absente de la conception initiale → cette cascade.
+
+# -----------------------------------------------------------------------------
+# 4. États inline (erreur / succès)
+# -----------------------------------------------------------------------------
+etats_inline:
+
+  - id: ICON-UI-ERREUR
+    nom_palier_13: "etat_erreur_inline"
+    source: "lucide:circle-alert"
+    metaphore: "Cercle avec point d'exclamation — convention universelle d'alerte / erreur."
+    slot_palier_10: ["comp-message-erreur-inline slot icone_erreur (01-atomes)"]
+    variants: { tailles: [MD, SM], etats: [default] }
+    mapping_couleurs: { default: TOK-COLOR-FONCTIONNEL-ERREUR }
+    fichier_svg_attendu: "assets/ui/etat-erreur.svg"
+    note_renommage_lucide: "Lucide a renommé alert-circle → circle-alert ; les anciens noms restent en alias."
+
+  - id: ICON-UI-SUCCES
+    nom_palier_13: "etat_succes_inline"
+    source: "lucide:circle-check"
+    metaphore: "Cercle avec coche — convention universelle de validation / succès."
+    slot_palier_10: ["comp-message-success-inline slot icone_succes (01-atomes)"]
+    variants: { tailles: [MD, SM], etats: [default] }
+    mapping_couleurs: { default: TOK-COLOR-FONCTIONNEL-SUCCES }
+    fichier_svg_attendu: "assets/ui/etat-succes.svg"
+    note_renommage_lucide: "Lucide a renommé check-circle → circle-check."
+    note_mutualisation_admin: "Mutualisé avec ICON-ADMIN-VALIDER (fichier 04) — un seul SVG produites sous ce chemin assets/ui/etat-succes.svg."
+
+  - id: ICON-UI-INFO
+    nom_palier_13: "etat_info_inline"
+    source: "lucide:info"
+    metaphore: "Cercle avec lettre i — convention universelle d'information."
+    slot_palier_10:
+      - "comp-message-ephemere slot icone (04-shell) variant info"
+      - "comp-indication-onboarding slot icone (04-shell)"
+    variants: { tailles: [MD, SM], etats: [default] }
+    mapping_couleurs: { default: TOK-COLOR-FONCTIONNEL-INFO }
+    fichier_svg_attendu: "assets/ui/etat-info.svg"
+
+# -----------------------------------------------------------------------------
+# 5. Actions communes (favori, partage, signalement)
+# -----------------------------------------------------------------------------
+actions_communes:
+
+  - id: ICON-UI-FAVORI
+    nom_palier_13: "controle_favori"
+    source: "lucide:heart"
+    metaphore: "Cœur — convention universelle de mise en favori. OUTLINED actuellement (décision D5 palier 13). Activation signalée par couleur + animation, pas par fill."
+    slot_palier_10: ["comp-controle-favori (palier 10 02-molecules)"]
+    variants: { tailles: [LG, MD], etats: [default, active, pressed, disabled] }
+    mapping_couleurs:
+      default: TOK-COLOR-TEXTE-TERTIAIRE
+      active: TOK-COLOR-PRIMARY
+      pressed: TOK-COLOR-PRIMARY-FONCE
+    fichier_svg_attendu: "assets/ui/controle-favori.svg"
+    cohérences_paliers_aval:
+      - "Activation : palier 11 CRV-SPRING-NET + DUR-COURT + HAP-NET (cf. fichier 11/01 mapping_classes_evenement.activation_favori)"
+
+  - id: ICON-UI-PARTAGE
+    nom_palier_13: "controle_partage"
+    source: "lucide:share"
+    metaphore: "Trois nœuds reliés — convention universelle de partage / share."
+    slot_palier_10: ["comp-controle-partage (palier 10 02-molecules)"]
+    variants: { tailles: [LG, MD], etats: [default, pressed] }
+    mapping_couleurs: { default: TOK-COLOR-TEXTE-PRINCIPAL }
+    fichier_svg_attendu: "assets/ui/controle-partage.svg"
+
+  - id: ICON-UI-SIGNALEMENT
+    nom_palier_13: "controle_signalement"
+    source: "lucide:flag"
+    metaphore: "Drapeau — convention universelle de signalement / report."
+    slot_palier_10: ["comp-controle-signalement (palier 10 02-molecules)"]
+    variants: { tailles: [LG, MD], etats: [default, pressed, disabled] }
+    mapping_couleurs: { default: TOK-COLOR-TEXTE-PRINCIPAL }
+    fichier_svg_attendu: "assets/ui/controle-signalement.svg"
+
+  - id: ICON-UI-RECHERCHE
+    nom_palier_13: "recherche"
+    source: "lucide:search"
+    metaphore: "Loupe — convention universelle de recherche."
+    slot_palier_10:
+      - "Point d'accès recherche dans comp-layout-carte-principale (palier 10 04-shell)"
+      - "Champ de recherche dans comp-recherche-surface (palier 10 03-fonctionnels)"
+    variants: { tailles: [LG, MD], etats: [default, focused, pressed] }
+    mapping_couleurs: { default: TOK-COLOR-TEXTE-PRINCIPAL }
+    fichier_svg_attendu: "assets/ui/recherche.svg"
+
+  - id: ICON-UI-FILTRE
+    nom_palier_13: "filtre"
+    source: "lucide:sliders-horizontal"
+    metaphore: "Curseurs horizontaux — convention universelle de filtre / paramètres."
+    slot_palier_10: ["Point d'accès filtres dans comp-layout-carte-principale, comp-chip-filtre default state (01-atomes)"]
+    variants: { tailles: [LG, MD], etats: [default, active] }
+    mapping_couleurs:
+      default: TOK-COLOR-TEXTE-TERTIAIRE
+      active: TOK-COLOR-PRIMARY
+    fichier_svg_attendu: "assets/ui/filtre.svg"
+
+  - id: ICON-UI-CHECK
+    nom_palier_13: "validation_check"
+    source: "lucide:check"
+    metaphore: "Coche simple — confirmation d'état activé. Distinct de ICON-UI-SUCCES (circle-check) par l'absence de cercle : check seul = état activé d'un toggle/case ; circle-check = retour de validation après action."
+    slot_palier_10:
+      - "comp-toggle-switch state on (palier 10 02-molecules)"
+      - "Cases à cocher éventuelles dans formulaires"
+    variants: { tailles: [MD, SM], etats: [default, active] }
+    mapping_couleurs:
+      active: TOK-COLOR-PRIMARY
+      default: TOK-COLOR-TEXTE-TERTIAIRE
+    fichier_svg_attendu: "assets/ui/validation-check.svg"
+    note_distinction: "check (cette icône) ≠ circle-check (ICON-UI-SUCCES). Sémantiques disjointes : check = état stable ON ; circle-check = retour validation transitoire."
+
+# -----------------------------------------------------------------------------
+# 6. Sélecteur de section principale (S1 / S2 / S3)
+# -----------------------------------------------------------------------------
+selecteur_section:
+
+  - id: ICON-UI-SECTION-CARTE
+    nom_palier_13: "section_S1_carte"
+    source: "lucide:map"
+    metaphore: "Carte pliée — la surface S1 est la carte temporelle (palier 5 S1)."
+    slot_palier_10: ["comp-selecteur-section-principale slot icone_S1 (04-shell)"]
+    variants: { tailles: [LG], etats: [default, active, inactive] }
+    mapping_couleurs:
+      active: TOK-COLOR-PRIMARY
+      inactive: TOK-COLOR-TEXTE-TERTIAIRE
+    fichier_svg_attendu: "assets/ui/section-carte.svg"
+
+  - id: ICON-UI-SECTION-PARCOURS
+    nom_palier_13: "section_S2_parcours"
+    source: "lucide:route"
+    metaphore: "Tracé routier avec marqueurs — la surface S2 est l'inventaire des parcours."
+    slot_palier_10: ["comp-selecteur-section-principale slot icone_S2 (04-shell)"]
+    variants: { tailles: [LG], etats: [default, active, inactive] }
+    mapping_couleurs:
+      active: TOK-COLOR-PRIMARY
+      inactive: TOK-COLOR-TEXTE-TERTIAIRE
+    fichier_svg_attendu: "assets/ui/section-parcours.svg"
+
+  - id: ICON-UI-SECTION-PROFIL
+    nom_palier_13: "section_S3_profil"
+    source: "lucide:circle-user-round"
+    metaphore: "Silhouette dans un cercle — la surface S3 est l'espace personnel."
+    slot_palier_10: ["comp-selecteur-section-principale slot icone_S3 (04-shell)"]
+    variants: { tailles: [LG], etats: [default, active, inactive] }
+    mapping_couleurs:
+      active: TOK-COLOR-PRIMARY
+      inactive: TOK-COLOR-TEXTE-TERTIAIRE
+    fichier_svg_attendu: "assets/ui/section-profil.svg"
+    note_distinction: "circle-user-round (Profil S3) ≠ user-round (catégorie Personne fichier 02). Distinction par le cercle externe."
+
+# -----------------------------------------------------------------------------
+# 7. Réseau / système
+# -----------------------------------------------------------------------------
+reseau_systeme:
+
+  - id: ICON-UI-OFFLINE
+    nom_palier_13: "etat_offline"
+    source: "lucide:wifi-off"
+    metaphore: "Wifi barré — convention universelle d'absence de connexion."
+    slot_palier_10: ["comp-bandeau-information-offline slot icone_offline (04-shell)"]
+    variants: { tailles: [MD], etats: [default] }
+    mapping_couleurs: { default: TOK-COLOR-FONCTIONNEL-INFO }   # info, pas erreur — l'offline est un état documenté, pas un échec
+    fichier_svg_attendu: "assets/ui/etat-offline.svg"
+
+  - id: ICON-UI-CHARGEMENT
+    nom_palier_13: "etat_chargement"
+    source: "lucide:loader-circle"
+    metaphore: "Cercle pointillé évoquant la rotation — convention universelle d'attente / chargement."
+    slot_palier_10:
+      - "comp-indicateur-chargement (palier 10 01-atomes) — fallback statique en mode prefers-reduced-motion (palier 11)"
+      - "comp-status-pin-verification variant alternatif (cf. fichier 13/03 ICON-UI-VERIFICATION-EN-COURS clock — choix selon contexte)"
+    variants: { tailles: [LG, MD, SM], etats: [default] }
+    mapping_couleurs: { default: TOK-COLOR-PRIMARY }
+    fichier_svg_attendu: "assets/ui/etat-chargement.svg"
+    note: >-
+      Animation rotation continue gérée par palier 11 (CRV-LINEAIRE,
+      indicateur de progression continu — fichier 11/01 mapping
+      classes_evenement). En reduce-motion, l'icône reste statique
+      mais visible. Trance la question ouverte précédente sur
+      'icône chargement statique fallback'."
+
+  # Permissions système (caméra, notification) — cascade palier 5 maquette 2026-06-25
+  - id: ICON-UI-CAMERA
+    nom_palier_13: "permission_camera"
+    source: "lucide:camera"
+    metaphore: "Appareil photo — accès caméra (réalité augmentée + demande de permission OS juste-à-temps)."
+    slot_palier_10:
+      - "comp-dialogue-permission slot icone variant target_permission=camera (04-shell)"
+      - "comp-camera-ar carte permission (03-fonctionnels)"
+    variants: { tailles: [MD, LG], etats: [default] }
+    mapping_couleurs:
+      sur_pastille_PRIMARY: TOK-COLOR-BLANC-NARRATIF
+      default: TOK-COLOR-TEXTE-PRINCIPAL
+    fichier_svg_attendu: "assets/ui/permission-camera.svg"
+    note: "Créée en Figma au palier 5 maquette (659:5) — slot permission caméra orphelin d'icône dans la conception initiale → cette cascade."
+
+  - id: ICON-UI-NOTIFICATION
+    nom_palier_13: "permission_notification"
+    source: "lucide:bell"
+    metaphore: "Cloche — notifications de proximité (mode Surprenez-moi) + demande de permission OS."
+    slot_palier_10:
+      - "comp-dialogue-permission slot icone variant target_permission=notification (04-shell)"
+    variants: { tailles: [MD, LG], etats: [default] }
+    mapping_couleurs:
+      sur_pastille_PRIMARY: TOK-COLOR-BLANC-NARRATIF
+      default: TOK-COLOR-TEXTE-PRINCIPAL
+    fichier_svg_attendu: "assets/ui/permission-notification.svg"
+    note: "Créée en Figma au palier 5 maquette (659:9) — slot permission notification orphelin d'icône dans la conception initiale → cette cascade."
+
+# -----------------------------------------------------------------------------
+# 8. Liens, anonymat, provenance, vérification (slots tags / mentions / status)
+# -----------------------------------------------------------------------------
+liens_meta:
+
+  - id: ICON-UI-LIEN-EXTERNE
+    nom_palier_13: "lien_externe"
+    source: "lucide:external-link"
+    metaphore: "Carré avec flèche sortante — convention universelle de lien hors application."
+    slot_palier_10: ["comp-lien-texte slot icone_externe (01-atomes)"]
+    variants: { tailles: [SM], etats: [default] }
+    mapping_couleurs: { default: TOK-COLOR-FONCTIONNEL-INFO }
+    fichier_svg_attendu: "assets/ui/lien-externe.svg"
+
+  - id: ICON-UI-ANONYMAT
+    nom_palier_13: "anonymat"
+    source: "lucide:user-x"
+    metaphore: "Silhouette humaine barrée — signale l'anonymat d'un contributeur (cas d'auteur communautaire qui n'a pas souhaité son pseudo apparaissant)."
+    slot_palier_10: ["comp-mention-anonymat slot icone_anonymat (01-atomes)"]
+    variants: { tailles: [SM], etats: [default] }
+    mapping_couleurs: { default: TOK-COLOR-TEXTE-SECONDAIRE }
+    fichier_svg_attendu: "assets/ui/anonymat.svg"
+
+  - id: ICON-UI-PROVENANCE-EDITORIAL
+    nom_palier_13: "provenance_editorial"
+    source: "lucide:badge-check"
+    metaphore: >-
+      Badge avec coche — signale qu'un contenu vient de l'équipe éditoriale
+      vérifiée. Remplace le badge 'Officiel' à plume de la charte DA archivée
+      (ABANDONNÉ par palier 9 D6) par une métaphore moderne et universelle.
+    slot_palier_10: ["comp-tag-provenance slot icone_provenance (01-atomes) variant editorial"]
+    variants: { tailles: [SM], etats: [default] }
+    mapping_couleurs: { default: TOK-COLOR-PIN-EDITORIAL }
+    fichier_svg_attendu: "assets/ui/provenance-editorial.svg"
+
+  - id: ICON-UI-PROVENANCE-COMMUNAUTAIRE
+    nom_palier_13: "provenance_communautaire"
+    source: "lucide:users"
+    metaphore: "Silhouettes plurielles — signale qu'un contenu vient de la communauté. Réutilise users (catégorie Vie quotidienne) — pas de conflit (contextes spatiaux disjoints : tag de provenance dans badge vs icône de catégorie dans Pin)."
+    slot_palier_10: ["comp-tag-provenance slot icone_provenance variant communautaire"]
+    variants: { tailles: [SM], etats: [default] }
+    mapping_couleurs: { default: TOK-COLOR-PIN-COMMUNAUTAIRE }
+    fichier_svg_attendu: "assets/ui/provenance-communautaire.svg"
+
+  - id: ICON-UI-VERIFICATION-EN-COURS
+    nom_palier_13: "verification_en_cours"
+    source: "lucide:clock"
+    metaphore: "Horloge — signale qu'une vérification est en cours (statut transitoire d'un Pin/Parcours communautaire en revue, palier 4 I3)."
+    slot_palier_10: ["comp-status-pin-verification slot icone_verification (01-atomes)"]
+    variants: { tailles: [SM], etats: [default] }
+    mapping_couleurs: { default: TOK-COLOR-FONCTIONNEL-INFO }
+    fichier_svg_attendu: "assets/ui/verification-en-cours.svg"
+    note: >-
+      L'icône clock est inline dans un tag textuel de statut. Le CONTOUR
+      du Pin (palier 9 D5 = pointillé) signale la vérification sur la
+      carte. Les deux signaux sont CO-OCCURRENTS (le tag inline accompagne
+      souvent le Pin) mais véhiculent une même info à deux échelles
+      visuelles différentes.
+
+# -----------------------------------------------------------------------------
+# 9. Cartographie (couches)
+# -----------------------------------------------------------------------------
+cartographie:
+
+  - id: ICON-UI-COUCHE
+    nom_palier_13: "couche_cartographique"
+    source: "lucide:layers"
+    metaphore: "Couches superposées — convention universelle de calques cartographiques."
+    slot_palier_10: ["comp-chip-couche-carte slot icone (01-atomes)"]
+    variants: { tailles: [MD], etats: [default, active] }
+    mapping_couleurs:
+      default: TOK-COLOR-TEXTE-TERTIAIRE
+      active: TOK-COLOR-PRIMARY
+    fichier_svg_attendu: "assets/ui/couche-cartographique.svg"
+
+# -----------------------------------------------------------------------------
+# 10. Modes (Surprenez-moi, Présentation)
+# -----------------------------------------------------------------------------
+modes:
+
+  - id: ICON-UI-MODE-SURPRENEZ-MOI
+    nom_palier_13: "mode_surprenez_moi"
+    source: "lucide:dice-5"
+    metaphore: >-
+      Dé à 5 points — métaphore du hasard, de la surprise géolocalisée
+      proposée par le mode Surprenez-moi (D4.2). Distinct de sparkles
+      (catégorie Anecdote — l'anecdote est un CONTENU surprenant ;
+      Surprenez-moi est un MODE de découverte aléatoire).
+    slot_palier_10: ["Point d'accès mode dans comp-layout-carte-principale ou paramètres Profil"]
+    variants: { tailles: [LG, MD], etats: [default, active, inactive] }
+    mapping_couleurs:
+      active: TOK-COLOR-PRIMARY
+      inactive: TOK-COLOR-TEXTE-TERTIAIRE
+    fichier_svg_attendu: "assets/ui/mode-surprenez-moi.svg"
+    note_resolution_conflit: "Conflit potentiel avec sparkles (Anecdote) tracé en fichier 02 — résolu ici par dice-5. La distinction métaphorique (hasard vs anecdote) est claire."
+
+  - id: ICON-UI-MODE-PRESENTATION
+    nom_palier_13: "mode_presentation_M4"
+    source: "lucide:monitor-play"
+    metaphore: "Écran avec triangle de lecture — métaphore de la projection / présentation. Pertinent pour Mme Martin qui projette en classe."
+    slot_palier_10: ["Point d'accès mode présentation depuis M3 consultation approfondie (cf. CHO-ENTREE-M4 palier 11 fichier 03)"]
+    variants: { tailles: [LG], etats: [default, pressed] }
+    mapping_couleurs:
+      defaut_dans_M3: TOK-COLOR-TEXTE-PRINCIPAL
+    fichier_svg_attendu: "assets/ui/mode-presentation.svg"
+    note_alternative: "Alternative envisagée : maximize (plein écran) — moins évocateur. monitor-play retient car évoque explicitement la diffusion / projection."
+
+# -----------------------------------------------------------------------------
+# 11. Métadonnées de Parcours (durée, distance, étapes)
+# -----------------------------------------------------------------------------
+# Trio d'icônes métadonnées affichées en bloc compact sur la fiche d'un
+# Parcours (palier 7 parcours/), dans la vue Parcours sur la page web
+# responsive (palier 14 fichier 02 SHA-WEB-VUE-PARCOURS), et utilisable
+# dans tout libellé de métadonnée éditoriale comparable. Les 3 partagent
+# un mapping couleur identique pour cohérence visuelle en bloc.
+metadonnees_parcours:
+
+  - id: ICON-UI-DUREE
+    nom_palier_13: "metadonnee_duree"
+    source: "lucide:clock"
+    metaphore: >-
+      Cadran horloge — convention universelle pour la durée d'un
+      contenu temporel. Affichée à côté d'une durée estimée (ex. d'un
+      Parcours, d'une narration audio).
+    slot_palier_10:
+      - "comp-info-progress-etape ou bloc métadonnées de fiche Parcours (consommé palier 7 parcours/ et palier 14 fichier 02 SHA-WEB-VUE-PARCOURS)"
+    variants: { tailles: [SM, MD], etats: [default] }
+    mapping_couleurs:
+      default: TOK-COLOR-TEXTE-SECONDAIRE
+    fichier_svg_attendu: "assets/ui/metadonnee-duree.svg"
+    note_resolution_conflit: >-
+      clock est aussi consommé par ICON-UI-VERIFICATION-EN-COURS
+      (badge de vérification d'un Pin communautaire). Contextes
+      spatiaux disjoints (tag de provenance vs métadonnée de fiche)
+      — patron déjà accepté pour ICON-UI-PROVENANCE-COMMUNAUTAIRE
+      vs ICON-CAT-VIE-QUOTIDIENNE. Pas de risque de confusion.
+
+  - id: ICON-UI-DISTANCE
+    nom_palier_13: "metadonnee_distance"
+    source: "lucide:route"
+    metaphore: >-
+      Itinéraire stylisé reliant deux points — convention pour la
+      distance d'un parcours géolocalisé. Préféré à ruler (qui évoque
+      la mesure stricte plutôt que le tracé). Cohérent avec la
+      sémantique 'parcours' du domaine D3.
+    slot_palier_10:
+      - "Bloc métadonnées de fiche Parcours (consommé palier 7 parcours/ et palier 14 fichier 02 SHA-WEB-VUE-PARCOURS)"
+    variants: { tailles: [SM, MD], etats: [default] }
+    mapping_couleurs:
+      default: TOK-COLOR-TEXTE-SECONDAIRE
+    fichier_svg_attendu: "assets/ui/metadonnee-distance.svg"
+
+  - id: ICON-UI-ETAPES
+    nom_palier_13: "metadonnee_etapes"
+    source: "lucide:milestone"
+    metaphore: >-
+      Borne directionnelle — métaphore du jalon, de l'étape franchie
+      sur un parcours. Évoque la progression patrimoniale (parcours
+      historique avec ses points d'intérêt successifs).
+    slot_palier_10:
+      - "Bloc métadonnées de fiche Parcours (consommé palier 7 parcours/ et palier 14 fichier 02 SHA-WEB-VUE-PARCOURS)"
+    variants: { tailles: [SM, MD], etats: [default] }
+    mapping_couleurs:
+      default: TOK-COLOR-TEXTE-SECONDAIRE
+    fichier_svg_attendu: "assets/ui/metadonnee-etapes.svg"
+    note_alternative: "Alternative envisagée : flag (drapeau) — moins évocateur du cheminement. milestone retient pour le caractère 'borne sur un parcours'."
+
+# -----------------------------------------------------------------------------
+# 12. Internationalisation
+# -----------------------------------------------------------------------------
+internationalisation:
+
+  - id: ICON-UI-LANGUE
+    nom_palier_13: "selecteur_langue"
+    source: "lucide:languages"
+    statut: "NON UTILISÉE — application mono-langue (palier 8 06-i18n). Conservée dans le système au cas où une sélection de langue serait introduite plus tard ; aucun écran ne la consomme actuellement."
+    metaphore: "Deux glyphes superposés évoquant deux systèmes d'écriture — convention universelle pour la sélection de langue."
+    slot_palier_10: []
+    variants: { tailles: [MD, LG], etats: [default, pressed] }
+    mapping_couleurs:
+      default: TOK-COLOR-TEXTE-PRINCIPAL
+      sur_fond_sombre: TOK-COLOR-PRIMARY-CLAIR
+    fichier_svg_attendu: "assets/ui/selecteur-langue.svg"
+
+# -----------------------------------------------------------------------------
+# 13. Récapitulatif et couverture
+# -----------------------------------------------------------------------------
+recapitulatif:
+
+  total_icones_uniques: 37   # 35 → 37 (cascade palier 5 maquette 2026-06-25 : + ICON-UI-CAMERA + ICON-UI-NOTIFICATION, permissions caméra/notification de comp-dialogue-permission + comp-camera-ar)
+
+  couverture_slots_palier_10:
+    description: "Chaque slot d'icône inventorié au § 10 de l'index est résolu par une icône ICON-UI-X ou ICON-CAT-X (fichier 02)."
+    audit:
+      - "Atomes : 21 slots → couverts par ICON-UI-* (21 occurrences mappées) + ICON-CAT-* pour comp-chip-categorie / comp-tag-categorie"
+      - "Molécules : 1 slot → couvert (controle-favori ICON-UI-FAVORI ; controle-partage ICON-UI-PARTAGE ; controle-signalement ICON-UI-SIGNALEMENT — vignette-pin slot decoration optionnelle reste libre)"
+      - "Shell : 6 slots → couverts (sélecteur S1/S2/S3, message-ephemere/indication-onboarding via ICON-UI-INFO, bandeau-offline)"
+      - "Fonctionnels : 1 slot → couvert par fichier 02 (catégorie)"
+
+  slots_optionnels_non_resolus_volontairement:
+    - "comp-button-primary/secondary/tertiary slot icone (cardinalité 0..1) — POLYMORPHIQUE, l'écran qui l'instancie choisit selon contexte"
+    - "comp-chip-epoque slot icone optionnelle (01-atomes) — pas d'icône par défaut (le libellé d'Époque suffit)"
+    - "comp-badge-statut slot icone optionnelle (01-atomes) — selon variant"
+    - "comp-champ-saisie-texte slot icone_prefix optionnelle (01-atomes) — selon contexte (recherche → ICON-UI-RECHERCHE en préfixe ; mot de passe → pas d'icône, etc.)"
+    - "comp-vignette-pin slot icone_decoration optionnelle (02-molecules)"
+
+# -----------------------------------------------------------------------------
+# 14. Persona check
+# -----------------------------------------------------------------------------
+persona_check:
+
+  kenji:
+    impact: ÉLEVÉ
+    note: >-
+      Toutes les métaphores sont universelles (heart, search, share, calendar,
+      map-pin, x, plus, play/pause, etc.). Aucune référence culturelle
+      obscure. Test 'comprendre l'app sans tutoriel' : ~95% des icônes
+      reconnaissables sans hésitation.
+
+  mme_dupont:
+    impact: moyen
+    note: "Icônes saisie (calendar, map-pin) confortables pour création de Parcours en mobilité."
+
+  mme_martin:
+    impact: ÉLEVÉ
+    note: >-
+      ICON-UI-MODE-PRESENTATION (monitor-play) est SON point d'accès.
+      Validation palier 16 : icônes 24px LG perceptibles depuis fond
+      de classe.
+
+  pere_lyonnais:
+    impact: ÉLEVÉ
+    note: "ICON-UI-FAVORI (heart), ICON-UI-PARTAGE (share), ICON-UI-MODE-SURPRENEZ-MOI (dice-5) sont ses interactions principales en flânerie."
+
+  anais_back_office:
+    impact: faible
+    note: "Le back-office utilise principalement les icônes du fichier 04 ; quelques icônes UI partagées (recherche, fermeture, etc.)."
+
+# -----------------------------------------------------------------------------
+# 15. Questions ouvertes
+# -----------------------------------------------------------------------------
+questions_ouvertes:
+  - "ICON-UI-PROVENANCE-COMMUNAUTAIRE (lucide:users) réutilise users qui est aussi ICON-CAT-VIE-QUOTIDIENNE — risque de confusion ? Proposition : non (contextes spatiaux disjoints : tag de provenance vs icône intérieure d'un Pin sur la carte). À VALIDER palier 16 sur cas concret."
+  - "ICON-UI-VERIFICATION-EN-COURS (lucide:clock) — alternative possible : lucide:loader (animation rotation) si on veut signaler l'aspect 'en cours'. Mais palier 11 anime déjà via les chorégraphies — clock statique cohérent avec la posture sobre. À VALIDER palier 16."
+  - "ICON-UI-MODE-PRESENTATION (lucide:monitor-play) vs alternative lucide:maximize ou lucide:fullscreen : monitor-play retenu pour évocation diffusion/projection. À VALIDER palier 16 sur retour Mme Martin proxy-personae."
+  - "ICON-UI-CHARGEMENT non défini — comp-indicateur-chargement palier 10 utilise une animation circulaire pure (pas un SVG fixe). Si une icône statique de fallback est nécessaire (cas reduce-motion), candidate : lucide:loader-circle. À ARBITRER palier 16."

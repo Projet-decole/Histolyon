@@ -1,0 +1,71 @@
+# =============================================================================
+# E-TRANSVERSES-AUDIO-PERSISTANT — Surface persistante de lecture audio (P1)
+# =============================================================================
+# Surface réduite et persistante (P5.M5, P5.P1) qui survit à la navigation
+# entre surfaces top-level dès qu'une narration audio est en lecture. Permet
+# à l'utilisateur de continuer à entendre la narration tout en explorant la
+# Carte, en passant en Parcours ou en Profil, sans perdre le fil — et de
+# retourner d'un geste à la consultation approfondie du Pin lu.
+# =============================================================================
+
+document:
+  type: palier_ecrans_fiche
+  format: yaml
+
+ecran:
+  id: E-TRANSVERSES-AUDIO-PERSISTANT
+  nom: "Surface persistante de lecture audio (P1)"
+
+  mode: P5.M5
+  surface_parente: "transverse"
+
+  raison_d_etre: >-
+    Empêcher l'utilisateur de PERDRE une lecture audio entreprise lorsqu'il
+    quitte la consultation approfondie qui l'a démarrée. Sert directement
+    le test_litmus de Kenji (« écouter la narration en marchant, casque sur
+    les oreilles, sans regarder l'écran ») et le scénario du père lyonnais
+    qui repasse à la Carte pendant que la narration continue.
+
+  composition:
+    - zone: "identité de la lecture en cours"
+      role: "rappelle de quel Pin (et éventuellement de quelle Époque dans le cas multi-époque) provient la narration audio en cours"
+      entites_affichees: [Pin, "Média audio_narration", Époque]
+
+    - zone: "indicateur d'état de lecture"
+      role: "signale lecture en cours, en pause, ou en chargement ; surface une progression au sein de la narration"
+      entites_affichees: ["Média audio_narration"]
+
+    - zone: "commandes de lecture courtes"
+      role: "lecture/pause au minimum ; les autres commandes (recul, avance, reprise depuis le début) sont à arbitrer en palier 7 fin / palier 10"
+
+    - zone: "point d'accès retour à la source"
+      role: "tap sur la surface elle-même → retour à E-PIN-CONSULTATION-APPROFONDIE du Pin en cours de lecture"
+
+    - zone: "action de fermeture explicite"
+      role: "termine la lecture audio (cessation P1 § cluster 05) ; la surface persistante disparaît"
+
+  etats:
+    nominal_lecture: "Audio en cours de lecture, surface visible sur S1, S2, S3 et leurs sous-surfaces"
+    pause: "Audio en pause, l'utilisateur peut reprendre depuis la surface persistante ou en revenant au Pin"
+    chargement_media: "Le média audio est en cours de chargement ou de bufferisation"
+    sommeil_visuel_m4: "P5.C2 — l'app est en mode présentation (M4), la surface est masquée visuellement mais la lecture survit ; un retour à un mode standard la fait réapparaître"
+    arriere_plan_systeme: "L'app est en arrière-plan, la lecture continue si l'OS l'autorise (D7.4) ; les commandes système OS prennent le relais"
+    coexistence_avec_p2: "P5.C1 — un Parcours en cours est actif simultanément ; les deux surfaces persistantes coexistent, articulation visuelle palier 7 fin / palier 10"
+    coexistence_avec_p3: "Bandeau offline actif simultanément ; la lecture continue depuis le cache si la narration est préchargée"
+    erreur_lecture: "Échec de chargement ou interruption non contrôlée ; surface une indication gracieuse, propose une reprise ou la fermeture"
+
+  elements_interactifs:
+    - "Tap sur la surface → retour à E-PIN-CONSULTATION-APPROFONDIE du Pin en lecture"
+    - "Action lecture/pause"
+    - "Action de fermeture explicite → termine la lecture (cessation)"
+    - "(à arbitrer) gestes de balayage pour avance/recul rapide — palier 7 fin / palier 10"
+
+  flows_actifs:
+    - B2   # Consultation approfondie d'un Pin avec audio (déclencheur de P1)
+
+  surfaces_imbriquees: []   # P1 ne s'imbrique rien : c'est elle qui flotte sur les autres
+
+  questions_ouvertes:
+    - "Inclure ou non un point d'accès direct vers la file de narrations à venir si plusieurs Médias audio dans le Pin (cluster 01) — palier 7 fin"
+    - "Comportement en cas de nouvelle lecture déclenchée alors qu'une est déjà en cours : remplacement immédiat, file, ou dialogue de confirmation ? (cessation P1 mentionne 'remplacement' — à confirmer)"
+    - "Représentation visuelle du Fragment musical d'ambiance s'il est tissé (cluster 01) — palier 9 / 10"

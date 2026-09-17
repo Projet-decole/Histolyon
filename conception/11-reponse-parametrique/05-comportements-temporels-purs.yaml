@@ -1,0 +1,367 @@
+# =============================================================================
+# Palier 11 — 05 Comportements temporels purs
+# =============================================================================
+# Valeurs temporelles attachées à des comportements qui ne sont ni des
+# transitions (DUR fichier 01) ni des chorégraphies (CHO fichier 03) :
+# auto-dismiss, debounce, throttle, long-press, double-tap, timeouts.
+#
+# Ce sont des PARAMÈTRES qui pilotent COMBIEN DE TEMPS un comportement
+# attend, échantillonne, ou reste en place. Distincts des durées de
+# transition — ici on parle de SEUILS et de FENÊTRES, pas d'animations.
+# =============================================================================
+
+document:
+  type: palier_reponse_parametrique_comportements_temporels
+  numero: 11
+  fichier: "05-comportements-temporels-purs.yaml"
+  version: "0.1"
+  date: "2026-05-07"
+  format: yaml
+  prerequis_de_lecture:
+    - "design/conception/11-reponse-parametrique/00-index.yaml — § 5 format TMP"
+    - "design/conception/10-composants/03-fonctionnels.yaml — machines d'état (recherche, formulaire saisie pin, slider) qui consomment ces TMP"
+    - "design/conception/10-composants/04-shell.yaml — comp-message-ephemere (M9) et comp-alerte-proximite (M7) qui consomment les auto-dismiss"
+
+raison_d_etre: >-
+  Sans ces valeurs, chaque comportement temporel serait improvisé à
+  l'implémentation — message éphémère qui dure 1s ou 5s selon le dev,
+  debounce de recherche à 100ms ou 500ms selon le moment, long-press
+  à 200ms ou 600ms. Ici on pose 9 comportements avec leurs valeurs et
+  leurs justifications.
+
+# -----------------------------------------------------------------------------
+# 1. Auto-dismiss (TMP-AUTO-DISMISS-*)
+# -----------------------------------------------------------------------------
+auto_dismiss:
+
+  - id: TMP-AUTO-DISMISS-M9
+    nom: "Délai d'auto-dismiss du message éphémère"
+    description: >-
+      M9 disparaît seul après ce délai si l'utilisateur n'agit pas.
+      Cohérent P5.M9 (« disparaît seul après un délai court ») et P5.C6
+      (file simple de remplacement).
+    valeur_ms: 3000
+    justification: >-
+      Assez long pour permettre la lecture d'un message court (~3-5 mots
+      en français), assez court pour ne pas encombrer durablement.
+      Convention UX standard (Material Design 'short' = 4s, on raccourcit
+      légèrement au profit de la sobriété).
+    comportement_si_message_remplace: "Le message courant est immédiatement remplacé par le suivant (file simple, P5.C6)"
+    comportement_si_app_arriere_plan: "Le timer pause à l'arrière-plan, reprend au retour au premier plan (cohérent P5.N7)"
+    composants_concernes:
+      - "comp-message-ephemere (palier 10 shell)"
+    chorégraphie_de_fin: "CHO-DISMISS-M9 (fichier 03)"
+    questions_ouvertes:
+      - "Délai différencié si message à long libellé (i18n japonais peut être plus long en caractères) ? Proposition : valeur fixe 3000ms actuellement, à reconsidérer palier 16 si utilisateurs JA signalent gêne."
+
+  - id: TMP-AUTO-DISMISS-M7
+    nom: "Délai d'auto-dismiss de l'alerte de proximité"
+    description: >-
+      M7 alerte de proximité (Surprenez-moi ou En parcours) disparaît
+      seule si l'utilisateur ne tape pas pour accepter ou rejeter.
+      Plus long que M9 — l'utilisateur peut être en marche, casque
+      audio, écran éteint.
+    valeur_ms: 8000
+    justification: >-
+      Assez long pour qu'un utilisateur en marche sorte le téléphone et
+      lise (vibration HAP-FRANC + apparition visuelle). Plus court qu'une
+      notification persistante — c'est une OPPORTUNITÉ ponctuelle, pas
+      une obligation. Si l'utilisateur ignore, l'alerte disparaît
+      gracieusement.
+    comportement_si_app_arriere_plan: "Le timer continue (l'alerte est aussi une notification système — gérée par OS au-delà de l'app)"
+    composants_concernes:
+      - "comp-alerte-proximite (palier 10 fonctionnels)"
+    chorégraphie_de_fin: "CHO-DISMISS-M7 (fichier 03)"
+    questions_ouvertes:
+      - "Délai augmenté si plusieurs alertes M7 en queue (cf. CHO-OUVERTURE-M7 cohabitation C5) ? Probablement non — chaque alerte garde son TMP-AUTO-DISMISS-M7. À acter palier 16."
+
+  - id: TMP-AUTO-DISMISS-INDICATION-ONBOARDING
+    nom: "Délai d'auto-dismiss d'une indication d'onboarding traversant"
+    description: >-
+      Indication ponctuelle de premier usage (M9 à comportement étendu).
+      Plus longue qu'un M9 standard car instructive.
+    valeur_ms: 6000
+    justification: >-
+      L'utilisateur découvre — il a besoin de plus de temps pour lire et
+      assimiler. Pas de file (l'onboarding gère sa propre progression).
+    composants_concernes:
+      - "comp-indication-onboarding (palier 10 shell)"
+    questions_ouvertes:
+      - "Adaptation à i18n longueur de texte : valeur fixe ou ajustée selon longueur effective du libellé ? Proposition : valeur fixe actuellement, ajustement si retours utilisateur palier 16."
+
+# -----------------------------------------------------------------------------
+# 2. Debounce (TMP-DEBOUNCE-*)
+# -----------------------------------------------------------------------------
+# Délai après lequel on considère que l'utilisateur a fini de taper / d'agir,
+# avant de déclencher une action coûteuse (requête réseau, validation).
+debounce:
+
+  - id: TMP-DEBOUNCE-RECHERCHE
+    nom: "Fenêtre de debounce avant query de recherche"
+    description: >-
+      Délai d'inactivité de saisie avant déclenchement de la query
+      (recherche full-text). Évite de spammer l'API à chaque frappe.
+    valeur_ms: 300
+    justification: >-
+      Convention UX bien établie (Google Suggest ~150ms, plus large pour
+      app mobile car saisie plus lente). 300ms permet à un utilisateur
+      qui finit son mot de voir les résultats apparaître naturellement,
+      sans flicker à chaque caractère.
+    composants_concernes:
+      - "comp-recherche-surface (palier 10 fonctionnels:249) — machine d'état transition typing → querying"
+    questions_ouvertes:
+      - "Valeur identique pour saisie vocale (si introduit plus tard) ? À reconsidérer palier suivant."
+
+  - id: TMP-DEBOUNCE-VALIDATION-FORMULAIRE
+    nom: "Fenêtre de debounce avant validation cross-fields formulaire"
+    description: >-
+      Délai d'inactivité avant de revalider un formulaire complet
+      (vérifier cohérence titre + époque + localisation cohérents).
+      Évite la validation à chaque frappe.
+    valeur_ms: 500
+    justification: >-
+      Plus large que la recherche — la validation cross-fields est
+      coûteuse et n'a pas besoin d'être instantanée. L'utilisateur a
+      le temps de finir une saisie avant de voir les erreurs.
+    composants_concernes:
+      - "comp-formulaire-saisie-pin (palier 10 fonctionnels:510)"
+      - "comp-formulaire-creation-compte (palier 10 fonctionnels:473)"
+      - "comp-formulaire-creation-parcours (palier 10 fonctionnels:536)"
+    questions_ouvertes: []
+
+# -----------------------------------------------------------------------------
+# 3. Throttle (TMP-THROTTLE-*)
+# -----------------------------------------------------------------------------
+# Fréquence MAXIMALE à laquelle un événement continu est échantillonné.
+# Garantit fluidité ET maîtrise du coût CPU.
+throttle:
+
+  - id: TMP-THROTTLE-DRAG-SLIDER
+    nom: "Fréquence d'échantillonnage du drag du slider d'Époque"
+    description: >-
+      Fréquence à laquelle la position du slider est lue pendant le drag,
+      pour piloter MAP-SLIDER-VERS-AXES-CARTE (interpolation continue
+      des 5 axes carte).
+    valeur_hz: 60
+    valeur_ms_equivalente: 16   # 1/60s ≈ 16.67ms
+    justification: >-
+      60 Hz = fréquence de rafraîchissement écran standard, garantit la
+      fluidité visuelle de l'interpolation paramétrique. Cohérent avec
+      le critère 60fps perçus pendant le drag (palier 9 § 7 enjeux
+      transversaux performance).
+    note_implementation: >-
+      Sur device 120Hz (ProMotion iOS, 120Hz Android haut de gamme),
+      l'implémentation peut monter à 120Hz si la pipeline GPU le supporte.
+      Le palier 11 fixe le minimum (60Hz) — au-delà est un bonus.
+    composants_concernes:
+      - "comp-slider-epoque (palier 10 fonctionnels:171) état dragging"
+    chorégraphies_associees:
+      - "MAP-SLIDER-VERS-AXES-CARTE (fichier 04) — consomme l'échantillonnage"
+    questions_ouvertes:
+      - "Fallback à 30Hz sur devices très bas de gamme si 60Hz pas tenable ? Proposition : non — la fluidité est non négociable (palier 9 § 7), si 60Hz pas tenable l'app ne va pas chercher cet utilisateur actuellement. À reconsidérer palier 16 sur tests devices cibles."
+
+  - id: TMP-THROTTLE-PAN-ZOOM-CARTE
+    nom: "Fréquence d'échantillonnage du pan/pinch-zoom de la Carte"
+    description: >-
+      Fréquence à laquelle la position et l'échelle de la Carte sont
+      mises à jour pendant un pan ou un pinch-zoom.
+    valeur_hz: 60
+    valeur_ms_equivalente: 16
+    justification: "Identique TMP-THROTTLE-DRAG-SLIDER — fluidité 60fps non négociable."
+    composants_concernes:
+      - "comp-carte (palier 10 fonctionnels:138) états panning, zooming"
+
+  - id: TMP-THROTTLE-SCROLL
+    nom: "Fréquence d'échantillonnage du scroll"
+    description: >-
+      Fréquence d'échantillonnage du scroll d'une grille ou liste,
+      utilisée pour déclencher 'load more' en scroll infini.
+    valeur_hz: 30
+    valeur_ms_equivalente: 33
+    justification: >-
+      Fréquence inférieure suffisante — le scroll lui-même est rendu à
+      60fps par l'OS, mais la détection de proximité du bas (déclencheur
+      load more) n'a pas besoin d'être à 60Hz. 30Hz épargne le CPU sans
+      perte perçue.
+    composants_concernes:
+      - "comp-grid-recherche (palier 10 fonctionnels:276)"
+    questions_ouvertes: []
+
+# -----------------------------------------------------------------------------
+# 4. Long-press et gestes prolongés (TMP-LONG-PRESS, TMP-DOUBLE-TAP)
+# -----------------------------------------------------------------------------
+gestes_prolonges:
+
+  - id: TMP-LONG-PRESS
+    nom: "Durée de long-press"
+    description: >-
+      Durée minimale d'appui continu pour qu'un long-press soit reconnu.
+      Au-delà, le composant émet un événement long-press distinct du tap.
+    valeur_ms: 500
+    justification: >-
+      Convention plateforme standard (≈ 500ms partagés iOS et Android par
+      défaut). En dessous, conflit avec tap intentionnel ; au-dessus,
+      l'utilisateur relâche par incertitude.
+    feedback_haptique_au_seuil: HAP-FRANC
+    note_haptique: >-
+      Confirme à l'utilisateur que le seuil est franchi — sans cet
+      haptique, beaucoup d'apps perdent leur utilisateur en long-press
+      (cf. fichier 02 mapping_classes_evenement.long_press).
+    composants_concernes:
+      - "comp-pin (palier 10 fonctionnels:49) — long-press → signalement potentiel (mais pattern long-press retiré du catalogue § 5 de l'index palier 10 faute de composants attachés confirmés)"
+    questions_ouvertes:
+      - "Long-press utilisé actuellement ? Pattern retiré du catalogue palier 10 § 5. À reconsidérer plus tard si menus contextuels introduits."
+
+  - id: TMP-DOUBLE-TAP
+    nom: "Fenêtre de double-tap"
+    description: >-
+      Délai maximal entre deux taps successifs pour qu'ils soient
+      reconnus comme un double-tap.
+    valeur_ms: 300
+    justification: "Convention UX standard."
+    composants_concernes: []   # aucun usage actif actuellement
+    note_v3: >-
+      Aucun composant ne consomme actuellement le double-tap. Valeur
+      posée pour cohérence du système — si introduit plus tard (zoom rapide
+      sur Carte ?), la fenêtre est documentée.
+
+# -----------------------------------------------------------------------------
+# 5. Timeouts réseau (TMP-TIMEOUT-*)
+# -----------------------------------------------------------------------------
+timeouts:
+
+  - id: TMP-TIMEOUT-RESEAU-STANDARD
+    nom: "Timeout standard d'une requête réseau"
+    description: >-
+      Délai maximal d'attente d'une réponse réseau pour les requêtes
+      standard (chargement de Pins, fetch d'un Parcours, query de
+      recherche). Au-delà, transition vers état error.
+    valeur_ms: 10000
+    justification: >-
+      10s — confortable pour réseaux 3G dégradés tout en évitant
+      l'attente indéfinie. Conforme aux pratiques courantes mobile.
+    composants_concernes:
+      - "comp-recherche-surface état querying → error"
+      - "comp-grid-recherche état scroll_loading_more → erreur"
+      - "comp-carte état loading_tuiles"
+
+  - id: TMP-TIMEOUT-RESEAU-SOUMISSION
+    nom: "Timeout d'une soumission asynchrone"
+    description: >-
+      Délai maximal pour la soumission d'un Pin communautaire, d'un
+      Parcours personnel publié, d'une création de Compte. Plus long
+      car la soumission peut inclure upload de médias.
+    valeur_ms: 30000
+    justification: >-
+      30s — tolère un upload de médias volumineux sur réseau moyen.
+      Au-delà, basculer vers offline_queued (la machine d'état du
+      formulaire le permet — cf. comp-formulaire-saisie-pin palier 10
+      § 2).
+    composants_concernes:
+      - "comp-formulaire-saisie-pin (palier 10 fonctionnels:510)"
+      - "comp-formulaire-creation-compte (palier 10 fonctionnels:473)"
+      - "comp-formulaire-connexion-compte (palier 10 fonctionnels:493)"
+    questions_ouvertes:
+      - "Bascule offline_queued automatique au timeout, ou demande explicite à l'utilisateur ? Proposition : automatique avec M9 'Soumission différée — sera envoyée dès retour de connexion'. À acter palier 16."
+
+# -----------------------------------------------------------------------------
+# 6. Cohérence inter-comportements
+# -----------------------------------------------------------------------------
+coherence_inter_comportements:
+
+  hierarchie_des_seuils:
+    description: >-
+      TMP-DOUBLE-TAP (300ms) < TMP-LONG-PRESS (500ms). Garantit qu'un
+      utilisateur qui presse longuement pour double-tapper a le temps
+      de relâcher avant de déclencher un long-press par erreur.
+
+  hierarchie_des_timeouts:
+    description: >-
+      TMP-TIMEOUT-RESEAU-STANDARD (10s) < TMP-TIMEOUT-RESEAU-SOUMISSION (30s).
+      Une soumission en attente n'est pas considérée comme 'standard
+      timeout' — elle a sa fenêtre élargie.
+
+  hierarchie_auto_dismiss:
+    description: >-
+      TMP-AUTO-DISMISS-M9 (3s) < TMP-AUTO-DISMISS-INDICATION-ONBOARDING (6s)
+      < TMP-AUTO-DISMISS-M7 (8s). Cohérent avec l'urgence/l'importance
+      de chaque type — un message courant est éphémère, une indication
+      d'onboarding est instructive, une alerte de proximité demande
+      d'être vue par un utilisateur potentiellement distrait.
+
+# -----------------------------------------------------------------------------
+# 7. Persona check
+# -----------------------------------------------------------------------------
+persona_check:
+
+  kenji:
+    impact: ÉLEVÉ
+    note: >-
+      TMP-AUTO-DISMISS-M7 à 8s lui laisse le temps de sortir le téléphone
+      après vibration HAP-FRANC. TMP-DEBOUNCE-RECHERCHE à 300ms permet
+      une recherche réactive même en saisissant en japonais (IME).
+      TMP-THROTTLE-DRAG-SLIDER à 60Hz garantit son test_litmus 'fluidité
+      du voyage temporel'.
+
+  mme_dupont:
+    impact: moyen
+    note: >-
+      TMP-DEBOUNCE-VALIDATION-FORMULAIRE à 500ms confortable pour la
+      création d'un Parcours sans validations spammées. TMP-TIMEOUT-RESEAU-
+      SOUMISSION à 30s tolère un upload de médias.
+
+  mme_martin:
+    impact: ÉLEVÉ
+    note: >-
+      TMP-THROTTLE-DRAG-SLIDER critique pour son test_litmus 'défilement
+      entre 3 époques en 30s' avec fluidité visible depuis le fond de
+      classe. 60Hz minimum non négociable.
+
+  pere_lyonnais:
+    impact: ÉLEVÉ
+    note: >-
+      TMP-AUTO-DISMISS-M7 principal — il ignore les alertes qu'il ne
+      juge pas pertinentes, l'app respecte sa flânerie sans le bloquer.
+
+  anais_back_office:
+    impact: moyen
+    note: >-
+      TMP-DEBOUNCE-VALIDATION-FORMULAIRE et TMP-TIMEOUT-RESEAU-SOUMISSION
+      principaux pour son outil de saisie Pin admin (palier 10
+      05-back-office).
+
+# -----------------------------------------------------------------------------
+# 8. Enjeux transversaux
+# -----------------------------------------------------------------------------
+enjeux_transversaux:
+
+  accessibilite: >-
+    TMP-AUTO-DISMISS-M9, M7, INDICATION-ONBOARDING : sujets aux
+    contraintes WCAG 2.2.1 (timing ajustable). À VALIDER palier 16 —
+    peut nécessiter une préférence utilisateur 'allonger les délais'
+    pour profils avec handicap cognitif. Préférence non incluse actuellement
+    par défaut.
+
+  performance: >-
+    TMP-THROTTLE-DRAG-SLIDER et TMP-THROTTLE-PAN-ZOOM-CARTE à 60Hz —
+    fluidité non négociable. Validation palier 16 sur device cible.
+
+  vie_privee: "Aucun enjeu spécifique."
+
+  i18n: >-
+    TMP-AUTO-DISMISS-M9 et INDICATION-ONBOARDING : valeurs fixes actuellement
+    indépendantes de la longueur du texte. À reconsidérer palier 16 si
+    utilisateurs JA (texte parfois plus dense) signalent gêne.
+
+# -----------------------------------------------------------------------------
+# 9. Questions ouvertes (récapitulatif)
+# -----------------------------------------------------------------------------
+questions_ouvertes:
+  - "TMP-AUTO-DISMISS-M9 : valeur fixe vs ajustée selon longueur texte i18n ? Proposition : fixe actuellement."
+  - "TMP-AUTO-DISMISS-M7 : valeur augmentée si plusieurs alertes en queue ? Proposition : non, chaque alerte garde son délai."
+  - "TMP-AUTO-DISMISS-INDICATION-ONBOARDING : adaptation i18n ? Proposition : fixe actuellement."
+  - "TMP-DEBOUNCE-RECHERCHE : valeur identique pour saisie vocale future ?"
+  - "TMP-THROTTLE-DRAG-SLIDER : fallback 30Hz sur device très bas de gamme ? Proposition : non (fluidité non négociable)."
+  - "TMP-LONG-PRESS : pattern utilisé actuellement ? Retiré du catalogue palier 10 § 5 — à reconsidérer plus tard."
+  - "TMP-TIMEOUT-RESEAU-SOUMISSION : bascule offline_queued automatique ou demande explicite ? Proposition : automatique avec M9. À acter palier 16."
+  - "Préférence utilisateur 'allonger les délais auto-dismiss' (a11y cognitif) ? À reconsidérer palier 16."

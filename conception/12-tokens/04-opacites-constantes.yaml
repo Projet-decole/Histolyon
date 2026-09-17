@@ -1,0 +1,185 @@
+# =============================================================================
+# Palier 12 — 04 Opacités constantes
+# =============================================================================
+# Opacités constantes du système. Distinct des modulations dynamiques du
+# palier 11 (Pin hors-parcours, déjà-visité, mode offline carte, sommeil
+# M4 persistantes) qui sont indexées par état dynamique.
+#
+# Frontière nette : si une opacité dépend d'un état applicatif
+# (ETAT-PARCOURS-EN-COURS, contexte_parcours, etc.), elle est au palier 11
+# (fichier 04 mappings). Si elle est constante (backdrop d'un dialogue
+# bloquant, séparateur, état désactivé), elle est ICI.
+# =============================================================================
+
+document:
+  type: palier_tokens_opacites_constantes
+  numero: 12
+  fichier: "04-opacites-constantes.yaml"
+  version: "0.1"
+  date: "2026-05-07"
+  format: yaml
+  prerequis_de_lecture:
+    - "design/conception/12-tokens/00-index.yaml — § 5 format OPACITY, § 2 frontière 11/12"
+    - "design/conception/11-reponse-parametrique/04-mappings-parametriques.yaml — modulations dynamiques (à NE PAS dupliquer ici)"
+
+raison_d_etre: >-
+  Les opacités constantes méritent un fichier dédié pour la clarté
+  de la frontière 11/12. Sans ce fichier, le risque serait double :
+  soit les opacités constantes seraient dispersées dans 01-couleurs
+  (mélange opacité/teinte), soit elles seraient confondues avec les
+  modulations dynamiques palier 11. Quatre tokens couvrent l'ensemble
+  des usages constants de l'app.
+
+# -----------------------------------------------------------------------------
+# 1. Opacités constantes
+# -----------------------------------------------------------------------------
+opacites:
+
+  - id: TOK-OPACITY-BACKDROP-M6
+    nom: "Backdrop surface ponctuelle M6"
+    description: >-
+      Backdrop léger qui assombrit la surface principale derrière
+      une surface ponctuelle (M6 — recherche, filtres, lancement,
+      saut-étape) sans la masquer complètement. Le contexte reste
+      perceptible derrière.
+    valeur_alpha: 0.4
+    couleur_de_base: TOK-COLOR-TEXTE-PRINCIPAL   # encre brune (cohérent règle d'or)
+    usages:
+      - "comp-surface-ponctuelle-recherche backdrop"
+      - "comp-surface-ponctuelle-filtres-couches backdrop"
+      - "comp-surface-ponctuelle-lancement-parcours backdrop"
+      - "comp-surface-ponctuelle-filtres-parcours backdrop"
+      - "comp-surface-ponctuelle-saut-etape backdrop"
+
+  - id: TOK-OPACITY-BACKDROP-M8
+    nom: "Backdrop dialogue bloquant M8"
+    description: >-
+      Backdrop plus opaque qu'un M6, signalant le caractère bloquant
+      du dialogue. La surface principale derrière reste perceptible
+      mais clairement en retrait — l'utilisateur comprend qu'il doit
+      répondre avant de continuer.
+    valeur_alpha: 0.65
+    couleur_de_base: TOK-COLOR-TEXTE-PRINCIPAL
+    usages:
+      - "comp-dialogue-confirmation backdrop"
+      - "comp-dialogue-permission backdrop"
+    note: >-
+      Cohérent avec la charte DA archivée (overlay sombre 0.65 pour
+      gradient hero image — réutilisé ici car l'usage 'overlay
+      bloquant' partage la sémantique de mise en retrait).
+
+  - id: TOK-OPACITY-DESACTIVE
+    nom: "État désactivé"
+    description: >-
+      Opacité appliquée à un composant entier en état disabled
+      (bouton désactivé, item de liste non interactif, formulaire
+      en attente). Signalement visuel uniforme.
+    valeur_alpha: 0.5
+    note_revision_post_review: >-
+      Valeur révisée 2026-05-07 — précédemment 0.4, sous le seuil
+      effectif de contraste 3:1 sur composants à teinte primaire
+      (terracotta désactivé sur parchemin ~2.5). Nouvelle valeur 0.5
+      ASSOCIÉE à une stratégie de bascule de couleur du contenu
+      désactivé (cf. ci-dessous).
+    strategie_associee:
+      principe: >-
+        En état disabled, le composant entier passe à opacité 0.5 ET
+        sa couleur de fond/contour bascule vers une teinte neutre
+        (TOK-COLOR-TEXTE-TERTIAIRE #9B7B5A) plutôt que de conserver
+        une teinte primaire atténuée.
+      exemple: >-
+        comp-button-primary disabled : fond TOK-COLOR-TEXTE-TERTIAIRE
+        (au lieu de TOK-COLOR-PRIMARY) + opacité 0.5 globale + texte
+        TOK-COLOR-TEXTE-TERTIAIRE → contraste effectif estimé 4.5:1
+        sur fond parchemin (au-dessus du seuil 3:1 non-textuel et
+        proche du seuil 4.5:1 texte normal). Validation palier 16.
+      pourquoi: >-
+        Garantit le contraste sans changer l'opacité globale qui
+        signale 'disabled' à l'utilisateur. La teinte neutre +
+        opacité 0.5 produisent un signal disabled cohérent et lisible.
+    usages:
+      - "comp-button-* en état disabled (avec stratégie de bascule couleur ci-dessus)"
+      - "comp-toggle-switch en état disabled"
+      - "comp-rangee-profil-action variant désactivé (selon présence Compte)"
+      - "comp-item-liste-* non interactif"
+
+  - id: TOK-OPACITY-SEPARATEUR
+    nom: "Séparateur léger"
+    description: >-
+      Opacité d'un filet de séparation discret entre items d'une
+      liste, entre sections d'un écran.
+    valeur_alpha: 0.12
+    couleur_de_base: TOK-COLOR-TEXTE-PRINCIPAL
+    usages:
+      - "comp-separateur (palier 10 atomes)"
+      - "Filets entre items dans comp-rangee-historique"
+      - "Filets entre items dans comp-rangee-favori"
+
+# -----------------------------------------------------------------------------
+# 2. Cas-limites — différenciation avec palier 11
+# -----------------------------------------------------------------------------
+differenciation_palier_11:
+
+  cas_appartenant_au_palier_11:
+    description: "Toute opacité indexée par un état dynamique (slider, contexte parcours, déjà-visité, mode offline, mode présentation M4) est au palier 11 fichier 04."
+    exemples:
+      - "Opacité 0.35 d'un Pin hors-parcours → palier 11 MAP-CONTEXTE-PARCOURS-VERS-PIN"
+      - "Opacité 0.85 d'un Pin étape complétée → palier 11 MAP-CONTEXTE-PARCOURS-VERSPIN"
+      - "Opacité 0.5 des tuiles Carte en mode offline_sans_cache → palier 11 MAP-MODE-OFFLINE-VERS-CARTE"
+      - "Opacité 0.0 des persistantes en mode présentation M4 → palier 11 MAP-MODE-M4-VERS-PERSISTANTES"
+    note: "Ces opacités ne doivent PAS apparaître dans le présent fichier — elles seraient un doublon."
+
+  cas_appartenant_au_palier_12:
+    description: "Toute opacité constante non indexée par un état dynamique."
+    exemples_listes_ci_dessus:
+      - "Backdrop M6 (0.4) — invariant, ne dépend pas de l'état applicatif"
+      - "Backdrop M8 (0.65) — idem"
+      - "Désactivé (0.4) — appliqué uniformément quand un composant est en état disabled (qui est un état du composant, pas un état applicatif partagé palier 10 § 4)"
+      - "Séparateur (0.12) — invariant"
+
+# -----------------------------------------------------------------------------
+# 3. Persona check
+# -----------------------------------------------------------------------------
+persona_check:
+
+  mme_martin:
+    impact: moyen
+    note: >-
+      Backdrop M8 (0.65) signale clairement le caractère bloquant
+      depuis le fond de classe. Backdrop M6 (0.4) plus léger — le
+      contexte reste lisible.
+
+  anais_back_office:
+    impact: moyen
+    note: >-
+      Modales et dialogues du back-office utilisent les mêmes
+      backdrops. Cohérence inter-plateforme.
+
+  autres:
+    impact: nul
+
+# -----------------------------------------------------------------------------
+# 4. Enjeux transversaux
+# -----------------------------------------------------------------------------
+enjeux_transversaux:
+
+  accessibilite: >-
+    TOK-OPACITY-DESACTIVE (0.4) à VALIDER palier 16 — vérifier que
+    le ratio de contraste effectif d'un comp-button-primary désactivé
+    sur fond parchemin reste ≥ 3:1 (seuil WCAG éléments non textuels).
+    Calcul indicatif : terracotta #B85220 à 0.4 sur parchemin
+    #F5E8D0 ≈ contraste effectif ~2.5 — RISQUE. Ajustement possible
+    actuellement.1 si palier 16 confirme insuffisant : monter à 0.5 ou
+    changer la stratégie (composant désactivé en niveau de gris
+    uniforme plutôt qu'en couleur primaire atténuée).
+
+  performance: "Aucun enjeu."
+  vie_privee: "Aucun enjeu spécifique."
+  i18n: "Indépendant de la locale."
+
+# -----------------------------------------------------------------------------
+# 5. Questions ouvertes
+# -----------------------------------------------------------------------------
+questions_ouvertes:
+  - "TOK-OPACITY-DESACTIVE à 0.5 + stratégie de bascule couleur vers TOK-COLOR-TEXTE-TERTIAIRE — décision tranchée étape ultérieure+ (après relecture 2026-05-07). Validation finale du contraste effectif estimé 4.5:1 sur fond parchemin par le palier 16 sur cas concret comp-button-primary disabled."
+  - "Doit-on séparer TOK-OPACITY-BACKDROP-M6 et TOK-OPACITY-BACKDROP-M8 ou un seul token avec deux usages ? Conservé séparé actuellement pour clarté sémantique — fusion possible plus tard si maintenance trop coûteuse."

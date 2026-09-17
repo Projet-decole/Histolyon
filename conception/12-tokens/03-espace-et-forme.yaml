@@ -1,0 +1,239 @@
+# =============================================================================
+# Palier 12 — 03 Espace et forme
+# =============================================================================
+# Échelle de spacing (multiples de 4 — décision D9 palier 12), radius (5
+# niveaux), ombres (3 niveaux). Tokens constants utilisés par tous les
+# composants (palier 10) et écrans (palier 7).
+# =============================================================================
+
+document:
+  type: palier_tokens_espace_et_forme
+  numero: 12
+  fichier: "03-espace-et-forme.yaml"
+  version: "0.1"
+  date: "2026-05-07"
+  format: yaml
+  prerequis_de_lecture:
+    - "design/conception/12-tokens/00-index.yaml — § 5 format SPACE_FORM, § 9 décision D9 (multiples de 4)"
+
+raison_d_etre: >-
+  Une échelle finie de spacing/radius/ombres garantit l'alignement
+  pixel-perfect et la cohérence visuelle entre composants. Sans
+  échelle, chaque composant inventerait son padding (14, 15, 17px),
+  son radius (8, 10, 12px), son ombre (`0 1px 3px`, `0 2px 6px`, etc.)
+  — et le système perdrait sa cohérence.
+
+# -----------------------------------------------------------------------------
+# 1. Échelle de spacing (multiples de 4)
+# -----------------------------------------------------------------------------
+# Décision D9 palier 12 : multiples de 4. Convention UX standard (Material
+# Design 4dp grid, Apple HIG 8pt grid). 7 tokens couvrent l'ensemble des
+# usages de l'app.
+spacing:
+
+  - id: TOK-SPACE-XS
+    valeur_px: 4
+    description: "Espacement minimal entre éléments très proches (gap entre icône et libellé d'un chip)"
+    usages_typiques:
+      - "Gap entre icône et libellé dans comp-chip-categorie"
+      - "Padding interne minimal d'un comp-badge-nombre"
+
+  - id: TOK-SPACE-SM
+    valeur_px: 8
+    description: "Espacement court entre éléments groupés"
+    usages_typiques:
+      - "Gap entre items d'une liste compacte"
+      - "Padding vertical interne de comp-button-* compact"
+      - "Gap entre label et icône d'un bouton"
+
+  - id: TOK-SPACE-MD
+    valeur_px: 12
+    description: "Espacement intermédiaire — usage modéré"
+    usages_typiques:
+      - "Padding interne d'un encart"
+      - "Gap entre titre et description dans un item de liste standard"
+
+  - id: TOK-SPACE-LG
+    valeur_px: 16
+    description: "Espacement par défaut — la valeur 'standard' utilisée le plus souvent"
+    usages_typiques:
+      - "Padding interne d'une comp-card-parcours-large"
+      - "Padding latéral des layouts d'écran (chrome marge écran)"
+      - "Gap entre paragraphes du récit narratif"
+
+  - id: TOK-SPACE-XL
+    valeur_px: 24
+    description: "Espacement généreux — séparation forte"
+    usages_typiques:
+      - "Padding top après hero image dans un M3 consultation approfondie"
+      - "Marge entre sections d'un écran"
+
+  - id: TOK-SPACE-XXL
+    valeur_px: 32
+    description: "Espacement très généreux — séparation majeure"
+    usages_typiques:
+      - "Marge entre titre d'écran et début du contenu (M3)"
+      - "Padding vertical d'un écran de célébration de fin de Parcours"
+
+  - id: TOK-SPACE-XXXL
+    valeur_px: 48
+    description: "Espacement maximal — usages cérémoniels (très rare)"
+    usages_typiques:
+      - "Marge centrale d'un écran de splash ou d'une célébration de fin"
+
+note_usage_global: >-
+  Les composants palier 10 et écrans palier 7 référencent ces tokens
+  par id (TOK-SPACE-LG plutôt que '16px'). Toute valeur de spacing
+  visible dans l'app DOIT mapper sur un de ces 7 tokens. Si un cas
+  émerge qui ne tient pas dans l'échelle, il s'arbitre ICI (ajouter
+  un token intermédiaire ou casser la règle multiples de 4 — à éviter).
+
+# -----------------------------------------------------------------------------
+# 2. Radius
+# -----------------------------------------------------------------------------
+# 5 niveaux. Le radius est un registre visuel discret : trop varié, on
+# perd la signature ; trop uniforme, on perd la respiration.
+radius:
+
+  - id: TOK-RADIUS-NONE
+    valeur_px: 0
+    description: "Coin angle — pour les éléments visuellement structurels (séparateurs, filets)"
+    usages_typiques:
+      - "comp-separateur"
+      - "Filets décoratifs"
+
+  - id: TOK-RADIUS-SM
+    valeur_px: 4
+    description: "Arrondi subtil — éléments interactifs compacts"
+    usages_typiques:
+      - "comp-badge-statut, comp-badge-nombre"
+      - "comp-chip-* compact"
+      - "comp-message-erreur-inline / -success-inline"
+
+  - id: TOK-RADIUS-MD
+    valeur_px: 8
+    description: "Arrondi modéré — éléments interactifs standard"
+    usages_typiques:
+      - "comp-button-primary / -secondary / -tertiary"
+      - "comp-champ-saisie-* (bordure)"
+      - "Encart 'Le saviez-vous ?' dans la zone narrative (cohérent charte DA archivée)"
+
+  - id: TOK-RADIUS-LG
+    valeur_px: 12
+    description: "Arrondi marqué — surfaces et cards"
+    usages_typiques:
+      - "comp-card-parcours-large / -compact"
+      - "comp-encart-information"
+      - "comp-apercu-rapide-pin (M2)"
+      - "comp-dialogue-confirmation / -permission (M8)"
+      - "comp-surface-ponctuelle-* (M6)"
+
+  - id: TOK-RADIUS-PILL
+    valeur_px: 9999
+    description: "Arrondi total — éléments en forme de pilule"
+    usages_typiques:
+      - "comp-chip-* (forme pill — chip selectionnable)"
+      - "comp-button-fab-creation (forme circulaire)"
+      - "comp-avatar (cercle)"
+    note: "Valeur 9999 = radius infini (donne une pilule horizontale ou un cercle selon les proportions)."
+
+# -----------------------------------------------------------------------------
+# 3. Ombres
+# -----------------------------------------------------------------------------
+# 3 niveaux d'élévation. Toutes les ombres utilisent la teinte encre
+# brune (cohérent règle d'or 'pas de noir pur') avec alpha croissant.
+ombres:
+
+  - id: TOK-SHADOW-SM
+    description: "Ombre légère — élévation discrète, élément flottant subtil"
+    valeur: "0 1px 3px rgba(28, 17, 8, 0.12)"
+    usages_typiques:
+      - "comp-card-parcours-* en état default"
+      - "comp-chip-* en variant selected"
+      - "comp-message-ephemere (M9)"
+
+  - id: TOK-SHADOW-MD
+    description: "Ombre moyenne — élévation marquée, surface flottante"
+    valeur: "0 2px 8px rgba(28, 17, 8, 0.20)"
+    usages_typiques:
+      - "comp-pin sur la Carte (cohérent charte DA archivée)"
+      - "comp-card-parcours-* en état pressed/hover"
+      - "comp-button-fab-creation"
+      - "comp-apercu-rapide-pin (M2)"
+
+  - id: TOK-SHADOW-LG
+    description: "Ombre forte — élévation importante, surface bloquante"
+    valeur: "0 4px 16px rgba(28, 17, 8, 0.30)"
+    usages_typiques:
+      - "comp-dialogue-confirmation / -permission (M8)"
+      - "comp-surface-persistante-audio / -parcours (P1, P2)"
+      - "comp-surface-ponctuelle-* (M6)"
+
+note_ombres: >-
+  Pas de noir pur dans les ombres (cohérent règle d'or fichier 01).
+  La teinte 'rgba(28, 17, 8, alpha)' reprend TOK-COLOR-TEXTE-PRINCIPAL
+  avec alpha variable. Sur fond parchemin, l'ombre brune chaude
+  s'intègre mieux qu'une ombre noire neutre.
+
+# -----------------------------------------------------------------------------
+# 4. Note sur les bordures
+# -----------------------------------------------------------------------------
+note_bordures: >-
+  Les bordures (1px solid couleur) ne font PAS l'objet de tokens dédiés
+  ici — elles utilisent directement les TOK-COLOR-* du fichier 01 et
+  une épaisseur 1px par défaut. Cas spécifiques :
+    - Bordure de comp-champ-saisie-* default : 1px solid TOK-COLOR-TEXTE-TERTIAIRE
+    - Bordure de comp-champ-saisie-* focused : 1.5px solid TOK-COLOR-PRIMARY
+    - Bordure de comp-champ-saisie-* error : 1.5px solid TOK-COLOR-FONCTIONNEL-ERREUR
+    - Contour de vérification d'un Pin : pointillé (palier 9 D5 + palier 12 D6),
+      épaisseur précise au palier 10 (anatomie du composant Pin).
+  Si un usage de bordure récurrent émerge nécessitant un token dédié,
+  l'ajouter ici actuellement.1.
+
+# -----------------------------------------------------------------------------
+# 5. Persona check
+# -----------------------------------------------------------------------------
+persona_check:
+
+  mme_martin:
+    impact: faible
+    note: "Spacing et radius n'ont pas d'enjeu projection spécifique. Les ombres légères restent perceptibles depuis le fond de classe."
+
+  anais_back_office:
+    impact: ÉLEVÉ
+    note: >-
+      Le back-office desktop utilise les mêmes tokens. Les surfaces
+      desktop plus grandes (tableaux de modération) appliquent les
+      mêmes paddings TOK-SPACE-LG/XL pour cohérence inter-plateforme.
+
+  autres:
+    impact: nul
+    note: "Aucun impact spécifique pour Kenji, Mme Dupont, père lyonnais."
+
+# -----------------------------------------------------------------------------
+# 6. Enjeux transversaux
+# -----------------------------------------------------------------------------
+enjeux_transversaux:
+
+  accessibilite: >-
+    Spacing généreux (TOK-SPACE-LG = 16px par défaut) facilite la
+    lisibilité et les cibles tactiles. Les cibles tactiles chiffrées
+    (≥ 44px) sont validées au palier 16 — ici on pose les paddings
+    qui contribuent à atteindre cette cible.
+
+  performance: "Aucun enjeu — valeurs statiques."
+
+  vie_privee: "Aucun enjeu spécifique."
+
+  i18n: >-
+    Indépendant de la locale. Le spacing reste valide quel que soit
+    le script. Cas particulier : les textes japonais peuvent être
+    plus denses verticalement — line-height typographique (fichier
+    02) plus déterminant que spacing inter-éléments.
+
+# -----------------------------------------------------------------------------
+# 7. Questions ouvertes
+# -----------------------------------------------------------------------------
+questions_ouvertes:
+  - "Si un cas de spacing intermédiaire (entre TOK-SPACE-MD 12 et TOK-SPACE-LG 16) émerge dans la rédaction des écrans palier 7, ajouter un token (rester multiples de 4) ou arrondir vers le voisin ?"
+  - "TOK-SHADOW-LG sur fond parchemin foncé (TOK-COLOR-FOND-SECONDAIRE) — visible suffisamment ? À VALIDER palier 16."

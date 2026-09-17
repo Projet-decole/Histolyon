@@ -1,0 +1,490 @@
+# =============================================================================
+# Palier 6 — 08-back-office — Famille H
+# =============================================================================
+# Famille des flows de PRODUCTION et de MODÉRATION côté back-office. Six flows :
+# saisie d'un nouveau Pin éditorial via Template (H1), validation scientifique
+# (H2), modération d'un Commentaire ou Retour (H3), modération d'une soumission
+# communautaire de Pin ou de Parcours (H4), promotion communautaire → éditorial
+# (H5), retrait ou réouverture d'un Pin publié (H6).
+#
+# Persona principal : Anaïs Lefèvre. Au démarrage du projet, elle cumule les
+# rôles d'éditeur, de validateur scientifique et de modérateur (auto-validation
+# tracée comme telle, cf. palier 4 cluster 05). Les flows distinguent quand
+# même les rôles fonctionnels — H2 et H5 mobilisent le validateur, H3 et H4
+# le modérateur, H1 l'éditeur — pour rester valides quand un partenaire
+# institutionnel ou un modérateur dédié rejoindra l'équipe.
+#
+# Surfaces : ces flows N'OPÈRENT PAS sur le palier 5 (qui ne couvre que l'app
+# grand public). On parle génériquement de « surface back-office » ; le détail
+# d'environnement (tableur structuré phase 1, interface d'administration web
+# phase 2, autre) relève du palier 13 admin et n'est pas tranché ici.
+# =============================================================================
+
+document:
+  type: palier_flows_cluster
+  cluster_id: "08-back-office"
+  nom: "Back-office et production"
+  version: "0.1"
+  date: "2026-05-05"
+  format: yaml
+
+raison_d_etre_du_cluster: >-
+  Sans cette famille, l'app reste vide ou se remplit sans filet : aucun Pin
+  éditorial ne peut être saisi proprement, aucune contribution communautaire
+  ne peut être traitée, aucune décision de validation ou de modération ne
+  laisse de Trace opposable. Cette famille incarne procéduralement les
+  invariants I3, I4, I10 et le principe d'historicité. Elle est l'envers
+  back-office des familles A à G qui couvrent l'app grand public.
+
+# -----------------------------------------------------------------------------
+# Flows
+# -----------------------------------------------------------------------------
+flows:
+
+  # ---------------------------------------------------------------------------
+  - id: H1
+    nom: "Saisie d'un nouveau Pin éditorial via Template"
+
+    declencheur: "Anaïs (ou un éditeur) ouvre un nouveau Pin à saisir dans l'environnement back-office"
+    acteurs: [Anaïs, editeur_de_contenu]
+
+    pre_requis_specifiques:
+      - "Permission d'accès au back-office (rôle éditeur)"
+      - "Au moins un Template de type pin en état actif (cf. cluster 05 — au plus 1 actif par type)"
+
+    deroule:
+      - etape: 1
+        action: "L'éditeur instancie un nouveau Pin en provenance éditoriale, état brouillon, à partir du Template actif de type pin. La version du Template instanciée est enregistrée pour audit."
+      - etape: 2
+        action: "L'éditeur saisit les attributs requis (titre, Catégorie, ≥ 1 Époque, contenu_narratif teaser+narration+post-narratif, localisation si applicable, ≥ 1 Source). Le format de saisie de chaque champ relève du palier 13 — le flow décrit la complétion conceptuelle."
+      - etape: 3
+        action: "L'éditeur rattache les Médias optionnels (images d'archives, audio_narration, audio_ambiance, éléments interactifs) avec leur crédit obligatoire ; chaque Source est saisie comme référence structurée (type + référence + crédit), pas comme commentaire libre."
+      - etape: 4
+        action: "L'éditeur peut sauvegarder le brouillon à tout moment et le reprendre plus tard ; le Pin reste invisible côté grand public tant qu'il n'est pas publié."
+      - etape: 5
+        action: "Quand l'éditeur juge la saisie complète, il vérifie la cohérence (au moins une Source, au moins une Époque, contenu_narratif rempli, Médias non cassés) puis bascule explicitement le Pin de brouillon → en_revue."
+
+    bifurcations:
+      - si: "L'éditeur tente de basculer en en_revue sans Source rattachée"
+        alors: "le système refuse la transition (instanciation de I4 au niveau Template) ; le Pin reste en brouillon avec un signal d'erreur explicite"
+      - si: "L'éditeur tente de basculer en en_revue sans Époque ou sans Catégorie"
+        alors: "le système refuse la transition (champs requis du Template) ; le Pin reste en brouillon"
+      - si: "L'éditeur abandonne la saisie sans bascule"
+        alors: "le Pin reste en brouillon, ré-éditable ultérieurement"
+      - si: "L'éditeur saisit un Pin sans localisation (patrimoine vivant immatériel — fêtes, traditions)"
+        alors: "saisie autorisée (instanciation de I9) ; le Pin sera accessible par recherche ou catégorie côté grand public, pas affiché sur la Carte"
+      - si: "L'éditeur sélectionne plusieurs Époques pour un Pin de patrimoine vivant qui traverse les siècles"
+        alors: "saisie autorisée (instanciation de I8) ; aucun forçage sur une époque unique"
+
+    sorties_normales:
+      - "Pin enregistré en brouillon, prêt pour reprise ultérieure"
+      - "Pin basculé en en_revue, prêt pour le flow H2 (Validation scientifique)"
+
+    cas_particuliers:
+      - cas: "Pin saisi sous une version de Template dépréciée"
+        comportement: "Cas rare (Template déprécié = remplacé par une version active plus récente). Politique de migration / conservation à arbitrer en palier 13 (cf. question ouverte cluster 05). Par défaut, l'éditeur est invité à migrer la saisie vers la version active du Template."
+      - cas: "Média rattaché introuvable au moment de la bascule en en_revue"
+        comportement: "Le système signale le Média manquant ou cassé ; la bascule est bloquée tant que le Média n'est pas remplacé ou retiré (cf. règle D10.3 — pas de Pin publié pointant sur un fichier introuvable)"
+      - cas: "Saisie interrompue (perte de focus, fermeture de l'environnement)"
+        comportement: "Le brouillon survit selon la politique de sauvegarde de l'environnement (palier 13). Le flow ne tranche pas — il pose que la sauvegarde existe."
+
+    entites_impliquees: [Pin, Template, Catégorie, Époque, Source, Média]
+    references_palier_3: [D10.1, D10.3]
+    invariants_respectes: [I3, I4, I7, I8, I9]
+
+    questions_ouvertes:
+      - "Le Template porte-t-il les notes_éditoriales (guides de ton, longueurs indicatives) directement à la saisie, ou sont-elles consultables à part ? — relève du palier 13"
+      - "Politique de sauvegarde des brouillons (auto-save, save explicite, périodicité) — palier 13"
+
+  # ---------------------------------------------------------------------------
+  - id: H2
+    nom: "Validation scientifique d'un Pin éditorial"
+
+    declencheur: "Un validateur (Anaïs en auto-validation au démarrage, ou un partenaire institutionnel ultérieurement) prend en charge un Pin ÉDITORIAL en état en_revue dans la file de validation"
+    acteurs: [Anaïs, valideur_scientifique]
+
+    pre_requis_specifiques:
+      - "Permission d'accès au back-office (rôle validateur)"
+      - "Pin de provenance éditoriale en état en_revue (sortie du flow H1) — pour les Pins de provenance communautaire, c'est le flow H4 qui s'applique avec une Trace de modération unique (décision utilisateur 2026-05-05)"
+
+    deroule:
+      - etape: 1
+        action: "Le validateur ouvre le Pin tel qu'il sera vu côté grand public (prévisualisation conforme au rendu palier 7) et accède en parallèle aux Sources structurées rattachées."
+      - etape: 2
+        action: "Le validateur relit le contenu_narratif, vérifie la cohérence historique, contrôle que chaque affirmation factuelle s'appuie sur une Source rattachée et créditée."
+      - etape: 3
+        action: "Le validateur peut poser des annotations granulaires sur des passages précis (ex. « cette date est-elle exacte ? », « sourcer cette affirmation ») sans modifier le contenu rédigé par l'éditeur."
+      - etape: 4
+        action: "Le validateur tranche entre trois décisions : approuvé, demande_complément, refusé. Une Trace de validation immuable est créée (validateur, horodatage, décision, motif si décision négative, type_de_validation, version_template_utilisée)."
+
+    bifurcations:
+      - si: "Décision = approuvé"
+        alors: "le Pin transite en_revue → validé. Une étape distincte de publication peut être différée (validation et publication sont séparées, cf. cluster 05)."
+      - si: "Décision = demande_complément"
+        alors: "le Pin retourne en brouillon avec motif obligatoire. L'éditeur reprend H1 pour amender."
+      - si: "Décision = refusé"
+        alors: "le Pin retourne en brouillon ou est retiré (politique pour les Pins refusés à arbitrer en palier 16). Motif obligatoire."
+      - si: "Le validateur est la même personne que l'auteur du Pin"
+        alors: "type_de_validation = auto_validation (cohérence : validateur = auteur). La Trace matérialise sans masquer la posture de démarrage du projet."
+      - si: "Le validateur est distinct de l'auteur"
+        alors: "type_de_validation = validation_par_tiers. Posture cible quand un partenaire institutionnel rejoindra l'équipe."
+
+    sorties_normales:
+      - "Pin en validé, prêt pour publication ultérieure"
+      - "Pin de retour en brouillon (demande_complément ou refusé) avec Trace négative tracée"
+
+    cas_particuliers:
+      - cas: "Pin de provenance communautaire (hors périmètre H2)"
+        comportement: "H2 ne s'applique PAS aux Pins communautaires. Voir flow H4 (modération communautaire) qui produit une Trace de modération unique incluant la dimension validation scientifique."
+      - cas: "Plusieurs niveaux de validation requis (relecture historienne + relecture éditoriale)"
+        comportement: "Modélisé en plusieurs Traces successives chaînées par horodatage (cf. cluster 05 question ouverte). Le Pin n'atteint validé qu'après la dernière Trace approuvé."
+      - cas: "Validateur interrompu en cours de relecture"
+        comportement: "Les annotations posées sont conservées comme brouillon de Trace ; aucune Trace n'est créée tant que la décision n'est pas tranchée (immutabilité de la Trace)."
+
+    entites_impliquees: [Pin, "Trace de validation", Template, Source, Compte]
+    references_palier_3: [D10.2]
+    invariants_respectes: [I1, I3, I4]
+
+    questions_ouvertes:
+      - "Politique de publication après validation : automatique (validé → publié immédiat) ou étape distincte explicite ? — relève du palier 13"
+      - "Délai-cible de prise en charge d'un Pin en file de validation — palier 16"
+      - "Modélisation de plusieurs niveaux de validation (cf. cluster 05) — à acter dans le quality plan"
+
+  # ---------------------------------------------------------------------------
+  - id: H3
+    nom: "Modération d'un Commentaire ou Retour communautaire"
+
+    declencheur: "Un modérateur (Anaïs ou rôle dédié) prend en charge un Commentaire ou un Retour de parcours en état en_attente dans la file de modération"
+    acteurs: [Anaïs, moderateur_communaute]
+
+    pre_requis_specifiques:
+      - "Permission d'accès au back-office (rôle modérateur)"
+      - "Commentaire ou Retour en état en_attente (issu du flow G2 ou G6)"
+
+    deroule:
+      - etape: 1
+        action: "Le modérateur ouvre la contribution dans son contexte : pour un Commentaire, le Pin cible et son contenu_narratif sont accessibles ; pour un Retour, le Parcours communautaire cible et son auteur sont accessibles."
+      - etape: 2
+        action: "Le modérateur lit le contenu de la contribution et vérifie qu'il respecte les règles éditoriales (ton, pertinence, absence d'atteinte à la vie privée, absence de contenu manifestement faux)."
+      - etape: 3
+        action: "Le modérateur tranche : publié ou refusé (avec motif obligatoire). La décision peut s'appuyer sur une réponse-type pour les cas récurrents."
+      - etape: 4
+        action: "Une Trace de modération immuable est créée (cible polymorphe, modérateur, décision, horodatage, motif si décision négative). Le statut de la cible transite en cohérence (en_attente → publié ou en_attente → refusé)."
+
+    bifurcations:
+      - si: "Décision = publié"
+        alors: "la contribution devient visible publiquement. L'auteur reçoit confirmation côté grand public (canal de notification — modélisé indirectement, cf. flow G5 côté communauté pour les soumissions ; pour Commentaire / Retour, retour silencieux à la visibilité)."
+      - si: "Décision = refusé"
+        alors: "la contribution n'apparaît pas publiquement. L'auteur est notifié avec motif (transmis sans humiliation, cf. critère de réussite D9.1). La contribution reste tracée (jamais supprimée — la Trace survit)."
+      - si: "La cible est un Commentaire dont le Pin a été retiré entre-temps (cf. flow H6)"
+        alors: "le Commentaire reste tracé mais ne sera pas visible publiquement même si publié — comportement défini par le cluster 04 ; le modérateur peut soit publier (cohérent), soit refuser avec motif explicite ; les deux sont valides"
+
+    sorties_normales:
+      - "Contribution publiée, Trace approuvé enregistrée"
+      - "Contribution refusée avec motif, Trace négative enregistrée, auteur notifié"
+
+    cas_particuliers:
+      - cas: "Modération a posteriori (contribution visible immédiatement avec marque distinctive)"
+        comportement: "Si le mode de modération a posteriori est retenu en D10.5, la contribution est visible dès sa création avec marque distinctive ; le flow H3 confirme ou retire la marque. Modèle conceptuel inchangé, seule la visibilité de l'état en_attente change (cf. cluster 04)."
+      - cas: "Cible déjà signalée massivement (file priorisée)"
+        comportement: "La contribution remonte en tête de file. Le motif du Signalement honoré peut alimenter la décision du modérateur."
+      - cas: "Cible dont l'auteur a supprimé son Compte entre-temps"
+        comportement: "La contribution reste à modérer (pseudonyme conservé). Si publiée, elle est visible avec son pseudonyme tracé même si le Compte est supprimé (cf. cluster 04)."
+      - cas: "Édition substantielle d'un Commentaire déjà publié (re-soumission)"
+        comportement: "Politique à arbitrer en D10.5 (cf. cluster 04 question ouverte) : redéclenchement d'un cycle de modération ou non. Si redéclenché, le Commentaire repasse en en_attente et le flow H3 s'applique à nouveau."
+
+    entites_impliquees: [Commentaire, "Retour de parcours", "Trace de modération", Pin, Parcours, Compte]
+    references_palier_3: [D10.5]
+    invariants_respectes: [I1, I2, I3]
+
+    questions_ouvertes:
+      - "Mode de modération (a priori / a posteriori) à acter en D10.5"
+      - "Délai-cible de traitement d'une contribution en file — palier 16"
+      - "Réouverture d'un Commentaire refusé (état refusé → en_attente sur correction de l'auteur) — non modélisé pour l'instant"
+
+  # ---------------------------------------------------------------------------
+  - id: H4
+    nom: "Modération d'une soumission communautaire (Pin ou Parcours)"
+
+    declencheur: "Un modérateur prend en charge une soumission communautaire en attente de vérification : Pin de provenance communautaire en état en_revue (issu de G4) ou Parcours communautaire récemment publié avec marque distinctive (issu de C13)"
+    acteurs: [Anaïs, moderateur_communaute, valideur_scientifique]
+
+    pre_requis_specifiques:
+      - "Permission d'accès au back-office (rôle modérateur ou validateur — selon politique D10.5 / cluster 05)"
+      - "Pin communautaire en en_revue OU Parcours communautaire récemment publié avec marque distinctive non levée"
+
+    deroule:
+      cas_pin_communautaire:
+        - etape: 1
+          action: "Le modérateur ouvre le Pin soumis dans son contexte (auteur_communautaire pseudonyme, contenu_narratif, Sources rattachées, Médias). La marque distinctive « en cours de vérification » est visible côté grand public (I3)."
+        - etape: 2
+          action: "Le modérateur vérifie la cohérence historique, la présence et la qualité des Sources (I4), l'absence de plagiat ou d'atteinte à la vie privée. La validation conjugue ici la vérification scientifique des sources (rôle d'un validateur côté éditorial) et la modération communautaire."
+        - etape: 3
+          action: "Le modérateur tranche : validé_sources_vérifiées, demande_complément, ou retiré_sources_insuffisantes. UNE SEULE Trace de modération est créée (décision utilisateur 2026-05-05) — pas de Trace de validation parallèle pour ce cas. La Trace de modération matérialise l'unique acte d'audit, incluant la dimension validation scientifique."
+        - etape: 4
+          action: "Si validé_sources_vérifiées : le Pin transite en validé puis publié, la marque distinctive est LEVÉE. Si demande_complément : le Pin retourne en brouillon (côté auteur communautaire, accessible depuis son Profil — cf. flow G5). Si retiré_sources_insuffisantes : le Pin transite en retiré, l'auteur est notifié avec motif."
+
+      cas_parcours_communautaire:
+        - etape: 1
+          action: "Le modérateur ouvre le Parcours soumis dans son contexte (auteur, étapes, Pins référencés, époques associées). La marque distinctive est visible côté grand public."
+        - etape: 2
+          action: "Le modérateur vérifie la cohérence de l'itinéraire, la pertinence des Étapes, l'absence d'atteinte à la vie privée."
+        - etape: 3
+          action: "Le modérateur tranche : publié (validé, marque distinctive levée), refusé (Parcours passe en retiré côté communautaire), ou demande de correction (Parcours reste publié avec marque distinctive le temps de la correction par l'auteur)."
+        - etape: 4
+          action: "Une Trace de modération immuable est créée. L'auteur est notifié de la décision (canal cf. flow G5)."
+
+    bifurcations:
+      - si: "Le Pin communautaire référence des Sources insuffisantes ou non vérifiables"
+        alors: "décision demande_complément avec motif explicite ; le Pin retourne en brouillon côté auteur"
+      - si: "Le Parcours communautaire enchaîne des Pins éditoriaux validés sans étape spécifique de l'auteur"
+        alors: "modération sur la cohérence d'itinéraire seulement (les Pins eux-mêmes sont déjà validés en amont via H2)"
+      - si: "Le Parcours communautaire référence un Pin communautaire encore en cours de vérification"
+        alors: "publication possible — la marque distinctive sur le Parcours et celle sur le Pin coexistent (cf. flow C13 cas particulier)"
+
+    sorties_normales:
+      - "Pin communautaire validé puis publié, marque distinctive levée, Trace approuvé"
+      - "Parcours communautaire validé, marque distinctive levée, Trace publié"
+      - "Soumission refusée avec motif, Trace négative enregistrée, auteur notifié"
+      - "Soumission en demande_complément, retour à l'auteur"
+
+    cas_particuliers:
+      - cas: "Soumission honorant un signalement préalable (cf. flow G3)"
+        comportement: "Le motif du signalement remonte au modérateur dans le contexte. Si le signalement portait sur le Pin / Parcours soumis lui-même (ce qui est rare puisqu'il est encore en vérification), la décision intègre l'argumentaire du signaleur."
+      - cas: "Auteur de la soumission ayant supprimé son Compte entre-temps"
+        comportement: "La soumission reste à modérer (pseudonyme conservé pour audit, I1). Si refusée, aucune notification n'est envoyée (Compte absent). Si publiée, le pseudonyme reste tracé en crédit."
+      - cas: "Soumission identifiée comme candidate à promotion éditoriale par le modérateur"
+        comportement: "Hors périmètre de H4 (modération communautaire). Le flow H5 prend le relais après publication du Pin communautaire."
+
+    entites_impliquees: [Pin, Parcours, "Trace de modération", Source, Compte]
+    references_palier_3: [D9.2, D9.3, D10.5, D10.2]
+    invariants_respectes: [I1, I2, I3, I4]
+
+    questions_ouvertes:
+      - "Promotion communautaire → éditorial pour les PARCOURS (analogue à I10 pour Pin) : actuellement non couverte par H5 — à arbitrer côté cluster 02 et palier 13"
+      - "Politique pour les soumissions répétées d'un même auteur communautaire (acceptation tacite après N validations ?) — D10.5"
+
+  # ---------------------------------------------------------------------------
+  - id: H5
+    nom: "Promotion communautaire → éditorial"
+
+    declencheur: "Décision éditoriale de promouvoir un Pin de provenance communautaire (déjà validé et publié) en provenance éditoriale"
+    acteurs: [Anaïs, valideur_scientifique]
+
+    pre_requis_specifiques:
+      - "Permission d'accès au back-office (rôle éditeur senior ou validateur)"
+      - "Pin communautaire en état publié (déjà sorti du flow H4 avec succès) ET dont la qualité justifie l'adoption éditoriale"
+
+    deroule:
+      - etape: 1
+        action: "L'éditeur identifie un Pin communautaire candidat à promotion (qualité du contenu, sources solides, alignement avec la ligne éditoriale). Le Pin garde son auteur_communautaire pseudonyme tracé."
+      - etape: 2
+        action: "L'éditeur peut compléter ou affiner le Pin si besoin (ajout de Sources éditoriales, enrichissement des Médias) — ces modifications passent par H1 en mode édition d'un Pin existant. Le Pin retourne alors en brouillon ou en_revue le temps de l'amendement."
+      - etape: 3
+        action: "L'éditeur déclenche la promotion : l'attribut provenance bascule de communautaire → éditorial (instanciation de I10). L'attribut auteur_communautaire est CONSERVÉ pour traçage du crédit (l'auteur original reste mentionné côté grand public)."
+      - etape: 4
+        action: "Une Trace de validation est créée avec décision = approuvé et mention spécifique en motif (« promotion communautaire → éditorial ») — cf. cluster 05 question ouverte tranchée en faveur de cette modalité."
+      - etape: 5
+        action: "Le Pin reste en publié. La marque distinctive « en cours de vérification » (s'il en restait une) est levée définitivement. Le Pin apparaît désormais comme éditorial côté grand public, avec crédit pseudonyme à l'auteur original."
+
+    bifurcations:
+      - si: "L'éditeur juge que le Pin nécessite une réécriture substantielle"
+        alors: "passage par H1 en édition + nouveau cycle H2 sur le Pin amendé, AVANT la promotion. Évite de promouvoir un Pin qui n'est pas à la hauteur éditoriale."
+      - si: "L'auteur communautaire a supprimé son Compte entre-temps"
+        alors: "promotion possible ; le pseudonyme reste tracé en crédit (cf. cluster 04 et 05 — la suppression d'un Compte n'efface pas son passage)"
+
+    sorties_normales:
+      - "Pin promu en provenance éditoriale, auteur original tracé en crédit, Trace de promotion enregistrée"
+
+    cas_particuliers:
+      - cas: "Pin communautaire référencé par un Parcours communautaire qui le mentionne nommément"
+        comportement: "Promotion sans effet sur le Parcours. Le Parcours reste communautaire ; il référence simplement un Pin devenu éditorial. La cohérence est préservée."
+      - cas: "Refus de promotion par l'auteur original (s'il devait être consulté)"
+        comportement: "À arbitrer : le palier 4 dit que la promotion n'efface pas l'auteur original mais ne dit pas si son consentement explicite est requis. Position assumée : la promotion est une décision ÉDITORIALE qui n'altère pas le Pin de l'auteur (le Pin communautaire originel reste tracé via la Trace) ; le consentement n'est pas formellement requis mais la courtoisie d'une notification l'est. Question ouverte palier 13."
+      - cas: "Pin communautaire encore en cours de vérification (marque distinctive non levée)"
+        comportement: "Promotion non admise tant que le Pin n'est pas en publié sans marque distinctive. Le flow H5 est postérieur à H4 réussi."
+
+    entites_impliquees: [Pin, "Trace de validation", Compte]
+    references_palier_3: [D10.2]
+    invariants_respectes: [I1, I3, I10]
+
+    questions_ouvertes:
+      - "Consentement explicite de l'auteur communautaire requis pour la promotion ? — palier 13"
+      - "Promotion ANALOGUE pour un Parcours communautaire (I10 ne couvre actuellement que les Pins) — à arbitrer côté cluster 02"
+      - "Modalité de notification de l'auteur original au moment de la promotion — palier 13"
+
+  # ---------------------------------------------------------------------------
+  - id: H6
+    nom: "Retrait ou réouverture d'un Pin publié"
+
+    declencheur: >-
+      Soit décision éditoriale de retirer un Pin publié (erreur factuelle
+      identifiée, source remise en cause, contenu obsolète), soit signalement
+      honoré entraînant retrait, soit décision de réouverture d'un Pin
+      précédemment retiré après correction.
+    acteurs: [Anaïs, editeur_de_contenu, moderateur_communaute, valideur_scientifique]
+
+    pre_requis_specifiques:
+      - "Permission d'accès au back-office (rôle éditeur ou modérateur selon le motif)"
+      - "Pin en état publié (pour retrait) OU Pin en état retiré (pour réouverture)"
+
+    deroule:
+      cas_retrait_editorial:
+        - etape: 1
+          action: "L'éditeur identifie un Pin publié à retirer (erreur factuelle, source compromise, obsolescence). Motif explicite consigné."
+        - etape: 2
+          action: "Le Pin transite publié → retiré. Une Trace de validation négative ex post est créée (décision = refusé portant la mention « retrait éditorial » en motif — cf. cluster 05 question ouverte tranchée en faveur de cette modalité)."
+        - etape: 3
+          action: "Le Pin disparaît de la Carte et des résultats de recherche côté grand public. Les Commentaires associés restent tracés mais invisibles publiquement (cf. cluster 04). Les Étapes de Parcours qui le référencent pointent vers un Pin indisponible — comportement géré côté flows palier 6 (cf. C12 cas particulier)."
+
+      cas_retrait_par_signalement_honore:
+        - etape: 1
+          action: "Un Signalement (cf. flow G3) sur un Pin de provenance communautaire publié est traité par H3 / H4 et la décision est de remédier par retrait."
+        - etape: 2
+          action: "Le Pin communautaire transite publié → retiré. Une Trace de modération est créée côté communautaire (décision = remédié, action_prise_sur_la_cible = cible_retirée). L'auteur est notifié avec motif."
+        - etape: 3
+          action: "Effet identique au cas éditorial sur la visibilité grand public (Carte, recherche, Étapes de Parcours référençant le Pin)."
+
+      cas_reouverture:
+        - etape: 1
+          action: "L'éditeur identifie un Pin retiré qui a été corrigé (source remplacée, contenu amendé, erreur factuelle levée). Il rouvre le Pin pour amendement."
+        - etape: 2
+          action: "Le Pin retourne en brouillon le temps de la correction (passage par H1) puis en en_revue puis validé via un nouveau cycle H2."
+        - etape: 3
+          action: "Quand H2 conclut par approuvé, le Pin transite retiré → publié. Une nouvelle Trace de validation approuvé est enregistrée — l'historique des Traces antérieures (refusé / retiré) est conservé (immutabilité)."
+
+    bifurcations:
+      - si: "Le retrait porte sur un Pin éditorial"
+        alors: "Trace de validation négative ex post (cluster 05). Aucune Trace de modération côté communautaire (le Pin n'est pas issu d'un signalement communautaire)."
+      - si: "Le retrait porte sur un Pin communautaire suite à signalement"
+        alors: "Trace de modération côté communautaire. Optionnellement, une Trace de validation négative ex post peut compléter pour cohérence audit (à arbitrer en D10.5 / cluster 05)."
+      - si: "L'éditeur juge que la correction est mineure et ne nécessite pas un nouveau cycle de validation complet"
+        alors: "à arbitrer (cf. question ouverte) — par défaut, toute réouverture passe par H2 pour respecter le contrat I3 + I4"
+
+    sorties_normales:
+      - "Pin retiré, invisible côté grand public, Traces enregistrées"
+      - "Pin réouvert (publié à nouveau) après correction et nouveau cycle de validation, Traces enregistrées"
+
+    cas_particuliers:
+      - cas: "Pin retiré référencé par un Parcours communautaire en cours d'utilisation par un utilisateur (flow C5 / C6)"
+        comportement: "L'utilisateur côté grand public continue son Parcours ; l'Étape qui référence le Pin retiré déclenche un message gracieux (cf. C5 cas particulier 'Connexion réseau perdue' / C12 'Pin associé à une étape retiré'). Le palier 6 grand public gère la dégradation gracieuse."
+      - cas: "Pin retiré dont les Sources et Médias ne sont plus rattachables"
+        comportement: "Politique de conservation à arbitrer (cf. cluster 01 question ouverte). Par défaut, les Sources et Médias restent rattachés au Pin retiré pour audit ; aucune suppression hard."
+      - cas: "Réouverture impossible (erreur fondamentale non corrigeable)"
+        comportement: "Le Pin reste en retiré indéfiniment. Pas de transition vers un état « supprimé hard » modélisé (cf. cluster 01 — l'état retiré est terminal en pratique)."
+
+    entites_impliquees: [Pin, "Trace de validation", "Trace de moderation", Signalement, Source, Média, Étape, Commentaire]
+    references_palier_3: [D10.2, D10.5]
+    invariants_respectes: [I1, I3, I4, I10]
+
+    questions_ouvertes:
+      - "Réouverture d'un Pin retiré : nouveau cycle H2 complet obligatoire, ou Trace approuvé directe pour les corrections mineures ? — D10.2"
+      - "Articulation Trace de validation négative ex post / Trace de modération pour les retraits sur Pin communautaire — cluster 04 + 05"
+      - "Conservation profonde vs archivage des Sources et Médias d'un Pin retiré — cluster 01"
+      - "Existence d'un état terminal « supprimé » distinct de retiré (RGPD, demande explicite de l'auteur communautaire) — palier 16 et cluster 01"
+
+# -----------------------------------------------------------------------------
+# Persona check
+# -----------------------------------------------------------------------------
+persona_check:
+
+  kenji:
+    impact: "indirect"
+    note: >-
+      Kenji ne touche pas au back-office. Il en consomme les EFFETS : la
+      qualité d'un Pin éditorial qu'il découvre en marchant dans le Vieux
+      Lyon dépend entièrement de la rigueur de H1 (saisie cadrée par
+      Template) et de H2 (validation tracée). S'il signale une erreur
+      factuelle dans un Pin éditorial, le canal de correction passe par
+      H6 (retrait éditorial après vérification interne) — le Signalement
+      sur Pin éditorial n'est pas modélisé en cluster 04 (cf. question
+      ouverte). Côté Pin communautaire, son signalement déclenche H3 / H6.
+
+  mme_dupont:
+    impact: "indirect"
+    note: >-
+      Mme Dupont ne modère pas. Mais ses contributions (Parcours communautaire
+      pour sortie scolaire publié via C13, Retours de parcours via G6) passent
+      par H3 (Retours) et H4 (Parcours communautaire). La qualité des Pins
+      qu'elle fait lire à ses élèves repose sur H1+H2. Son drapeau rouge
+      'contenu manifestement trop adulte pour CM1-CM2' est cadré indirectement
+      par H2 (relecture éditoriale) — la validation scientifique n'est pas
+      la même chose qu'une validation pédagogique, à acter en palier 8 si
+      nécessaire.
+
+  mme_martin:
+    impact: "indirect"
+    note: >-
+      Mme Martin ne touche pas au back-office mais elle est BÉNÉFICIAIRE
+      DIRECTE de sa rigueur : son test_litmus 'la source est crédible aux
+      yeux d'un collègue' est garanti par H2 (validation tracée + Sources
+      structurées). Son drapeau rouge 'sources d'archives invisibles ou
+      douteuses' est levé par H1 (Sources obligatoires au niveau Template,
+      I4) et H2 (Trace de validation immuable). Si elle projette en classe
+      un Pin retiré entre-temps (rare mais possible), le comportement de
+      dégradation gracieuse est défini en C5 / C6.
+
+  pere_lyonnais:
+    impact: "indirect"
+    note: >-
+      Le père lyonnais ne modère pas. Sa protection vis-à-vis de contenus
+      douteux passe par H3 (modération des Commentaires) et H4 (modération
+      des soumissions communautaires). Si lui-même publie un Commentaire
+      ou un Pin communautaire (cf. flow G2, G4), sa contribution traverse
+      H3 ou H4. Son drapeau rouge 'rumeurs urbaines maquillées en fait'
+      est levé par H4 + I4 (Sources obligatoires aussi pour les Pins
+      communautaires).
+
+  anais_back_office:
+    impact: "MAJEUR"
+    note: >-
+      Anaïs est le persona PRINCIPAL de cette famille — TOUS les flows la
+      concernent. Au démarrage du projet, elle cumule les rôles :
+        - éditeur sur H1 (saisie via Template)
+        - validateur sur H2 (auto-validation tracée comme telle, cf.
+          type_de_validation = auto_validation, cluster 05)
+        - modérateur sur H3 et H4 (modération communautaire si D9 livré)
+        - éditeur senior sur H5 (promotion) et H6 (retrait / réouverture)
+      Points de vigilance pour les paliers en aval :
+        - Le test_litmus n°1 (saisie en moins de 30 minutes) repose sur
+          un Template ergonomique en H1 — détail palier 13.
+        - Le test_litmus n°2 (relecture sans changer d'outil) repose sur
+          une surface back-office unifiée H1 + H2 — palier 13.
+        - Le test_litmus n°3 (prévisualisation conforme grand public)
+          repose sur la prévisualisation en H2 — palier 13 phase 2.
+        - La frustration_a_eviter 'modifications qui se propagent en
+          prod sans relecture' est levée par H2 (validation obligatoire
+          avant validé, instanciation I3) et H6 (Trace négative ex post
+          pour tout retrait).
+        - Le cumul de rôles au démarrage est explicitement assumé via
+          type_de_validation = auto_validation et l'identité de validateur
+          / modérateur via Compte (pseudonyme) — cf. I1 maintenu y compris
+          pour Anaïs elle-même côté Trace.
+        - Charge de modération tenable (D10.5 critère) : H3 et H4 doivent
+          rester franchement opérables avec quelques minutes par jour
+          — détail palier 13 + 16.
+
+  valideur_scientifique:
+    impact: "direct (sur H2 et H5)"
+    note: >-
+      Le validateur (qu'il soit Anaïs en auto-validation, un membre senior
+      de l'équipe, ou un partenaire institutionnel ultérieurement) opère
+      directement sur H2 et H5. Ses trois décisions (approuvé /
+      demande_complément / refusé) reflètent les trois issues attendues du
+      palier 2 (rôle complémentaire). Ses annotations granulaires (H2 étape
+      3) lui permettent de relire sans réécrire — capabilité explicite du
+      cluster 05. Son identité reste pseudonymisée via Compte (I1), même
+      s'il s'agit d'un partenaire institutionnel.
+
+  moderateur_communaute:
+    impact: "direct (sur H3 et H4)"
+    note: >-
+      Le modérateur (Anaïs au démarrage, ou rôle dédié plus tard) opère
+      directement sur H3 (Commentaires / Retours) et H4 (soumissions
+      communautaires). La file priorisée (signalements en tête, puis
+      soumissions, puis commentaires — D10.5) cadre son ordre de
+      traitement. Les réponses-types lui font économiser du temps sur les
+      cas récurrents. La Trace de modération matérialise chaque décision
+      sans ambiguïté. Sa frustration_a_eviter 'submersion' est cadrée
+      par la priorisation et les réponses-types — opérationnalisation
+      en palier 13 + 16.

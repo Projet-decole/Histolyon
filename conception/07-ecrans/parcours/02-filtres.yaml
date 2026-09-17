@@ -1,0 +1,62 @@
+# =============================================================================
+# E-PARCOURS-FILTRES — Filtres du catalogue de parcours
+# =============================================================================
+# Surface ponctuelle (P5.M6) qui s'ouvre depuis E-PARCOURS-PRINCIPAL pour
+# affiner le catalogue. Disparaît à la validation, à l'annulation, ou à un
+# geste neutre vers l'extérieur. Ne déplace pas la pile de navigation.
+# =============================================================================
+
+document:
+  type: palier_ecrans_fiche
+  format: yaml
+
+ecran:
+  id: E-PARCOURS-FILTRES
+  nom: "Filtres du catalogue de parcours"
+
+  mode: P5.M6
+  surface_parente: P5.S2
+
+  raison_d_etre: >-
+    Permet à l'utilisateur de restreindre le catalogue selon des critères
+    fonctionnellement signifiants : provenance, époque, durée estimée,
+    distance estimée, catégorie principale. Le compteur dynamique de
+    correspondances aide à naviguer entre filtres trop larges et trop
+    étroits avant de valider.
+
+  composition:
+    - zone: "critères de filtrage"
+      role: "groupe de sélecteurs par critère ; chaque critère peut combiner valeurs multiples (ex. plusieurs époques, plusieurs catégories)"
+      entites_affichees: [Époque, Catégorie, Parcours]
+
+    - zone: "compteur dynamique"
+      role: "indique le nombre de Parcours correspondant à la combinaison courante des filtres ; se met à jour à chaque ajustement"
+
+    - zone: "résumé des critères actifs"
+      role: "récapitule les filtres déjà posés et permet de retirer un critère individuellement, ou de tout réinitialiser"
+
+  etats:
+    nominal_aucun_filtre: "Surface ouverte sans filtre actif ; le compteur reflète la totalité du catalogue"
+    nominal_filtres_actifs: "Au moins un critère sélectionné ; compteur recalculé"
+    aucun_resultat: "La combinaison de filtres aboutit à zéro Parcours correspondant ; message gracieux suggérant d'élargir un critère"
+    chargement: "Recalcul du compteur en cours (court délai si appel serveur)"
+    offline_avec_cache: "Filtrage limité aux Parcours préchargés ; bandeau P3 visible derrière ; le compteur reflète l'inventaire local"
+    erreur: "Échec technique du calcul de correspondances ; message gracieux invitant à réessayer ; les valeurs déjà saisies restent intactes"
+
+  elements_interactifs:
+    - "Sélection / désélection d'une valeur dans un critère (Époque, Catégorie, provenance...)"
+    - "Réglage des bornes de durée et de distance estimées (sélection d'intervalle)"
+    - "Retrait individuel d'un critère depuis le résumé"
+    - "Réinitialisation totale des filtres"
+    - "Validation de la sélection → la surface se ferme, retour à E-PARCOURS-PRINCIPAL avec liste filtrée"
+    - "Annulation explicite ou geste neutre de fermeture → la surface se ferme, état antérieur du catalogue préservé (P5.N5)"
+
+  flows_actifs:
+    - C2   # Filtrage du catalogue
+
+  surfaces_imbriquees: []
+
+  questions_ouvertes:
+    - "Persistance des filtres entre sessions : retenu jusqu'à effacement explicite, ou réinitialisé à chaque ouverture du catalogue ? — déjà soulevé en C2"
+    - "Filtre par badge (officiel, partenaire, communautaire en avant-première) : à inclure dans cette surface ou réservé à une vue séparée ? — palier 10"
+    - "Filtre 'parcours déjà vécus / pas encore vécus' : pertinent ici, ou réservé à la vue mes parcours ? — relève d'arbitrage palier 10"

@@ -1,0 +1,469 @@
+# =============================================================================
+# Palier 13 — 01 Charte graphique (PILOTE)
+# =============================================================================
+# Le cœur du palier. Pose un STYLE INDÉPENDANT de toute bibliothèque externe :
+# si Lucide disparaissait demain, la charte permettrait de reconstituer toutes
+# les icônes en cohérence stricte. Lucide est juste un fournisseur conforme
+# à la charte par défaut — pas une dépendance fragile.
+#
+# Pilote — calibre le ton (style indépendant, métaphores
+# universelles, OUTLINED exclusivement) que les fichiers 02/03/04 vont suivre.
+# =============================================================================
+
+document:
+  type: palier_icones_charte_graphique
+  numero: 13
+  fichier: "01-charte-graphique.yaml"
+  version: "0.1"
+  date: "2026-05-07"
+  format: yaml
+  pilote: true
+  prerequis_de_lecture:
+    - "design/conception/13-icones/00-index.yaml — § 5 format de fiche, § 9 décisions D3/D4/D5/D7"
+    - "design/conception/12-tokens/01-couleurs.yaml — TOK-COLOR-PRIMARY (active), TOK-COLOR-TEXTE-TERTIAIRE (inactive), TOK-COLOR-PRIMARY-CLAIR (sur fond sombre), TOK-COLOR-FONCTIONNEL-* (succès / erreur / info)"
+
+raison_d_etre: >-
+  Sans charte indépendante, Lucide deviendrait une dépendance non
+  questionnée — l'app importerait des icônes sans cohérence interne
+  à elle-même, et la moindre rupture (changement de version Lucide,
+  trou de couverture, besoin custom) provoquerait incohérence. La
+  charte pose les règles AVANT le choix de la bibliothèque, garantissant
+  que Lucide est adopté PARCE QU'il est conforme — pas par défaut.
+
+# -----------------------------------------------------------------------------
+# 1. Style fondamental
+# -----------------------------------------------------------------------------
+style_fondamental:
+
+  approche: monoline_outlined_strict
+
+  description: >-
+    Toutes les icônes de l'app sont rendues en TRAITS (outlined),
+    sans remplissage (fill). Le poids du trait est uniforme à
+    l'intérieur d'une même icône et identique sur toute l'app.
+    Les coins des traits sont arrondis (round caps). Aucune zone
+    pleine, aucun aplat de couleur, aucune ombre, aucun effet 3D,
+    aucun duotone.
+
+  principes:
+    - "MONOLINE : trait d'épaisseur constante (stroke uniforme)"
+    - "OUTLINED EXCLUSIF : aucun remplissage (fill: none) — décision D5 validée utilisateur"
+    - "ROUND CAPS : extrémités et jonctions de traits arrondies (cohérence avec sobriété chaleureuse de l'essence)"
+    - "MÉTAPHORES UNIVERSELLES : icônes lisibles par un utilisateur étranger (Kenji) sans tutoriel"
+    - "NEUTRALITÉ STYLISTIQUE : pas de jeu visuel ni d'élément décoratif au-delà du sens fonctionnel"
+
+  pourquoi_outlined_strict:
+    description: >-
+      Cohérence visuelle absolue. Toutes les icônes sont d'une seule
+      famille graphique — même si elles viennent de catégories
+      différentes (catégories Pin, UI, back-office). L'activation
+      d'un état (favori activé, section sélectionnée) se signale par
+      changement de COULEUR, par animation et par feedback haptique
+      (palier 11), pas par changement de remplissage.
+    cohérence_avec_paliers_amont:
+      - "Posture B palier 9 (sobriété, pas de surcharge visuelle)"
+      - "Décision palier 13 D5 (validée utilisateur 2026-05-07)"
+      - "Palier 11 CRV-SPRING-NET + HAP-NET pour activation favori"
+      - "Palier 12 TOK-COLOR-PRIMARY pour signaler activation"
+
+# -----------------------------------------------------------------------------
+# 2. Grille technique
+# -----------------------------------------------------------------------------
+grille_technique:
+
+  viewbox_svg:
+    valeur: "0 0 24 24"
+    description: "Toutes les icônes sont dessinées sur une grille 24×24 unités SVG. Cohérent avec la convention Lucide et la majorité des bibliothèques modernes. Toute taille de rendu effectif (14, 16, 20, 24, 32 px) est obtenue par mise à l'échelle proportionnelle."
+
+  stroke_width:
+    valeur: "1.5"
+    unite: "unités SVG (le SVG est rendu à n'importe quelle taille — la valeur 1.5 du stroke s'adapte avec)"
+    description: >-
+      Trait de 1.5 unités SVG sur une grille 24×24. À 24px de rendu,
+      le trait fait 1.5 px ; à 14px (icône intérieure du Pin), le
+      trait fait ~0.875 px (ratio préservé). L'optical correction
+      par taille (§ 4) compense les éventuelles imprécisions de
+      rendu sub-pixel.
+
+  stroke_linecap: "round"
+  stroke_linejoin: "round"
+  fill: "none"
+  color_attribute: "currentColor"
+  description_color_attribute: >-
+    Les SVG utilisent stroke=\"currentColor\" pour hériter de la
+    couleur du contexte CSS / Flutter. Cela permet d'appliquer
+    n'importe quel TOK-COLOR-X (palier 12) à l'icône via la
+    couleur du texte parent, sans modifier le SVG. Convention
+    moderne universelle.
+
+  exemple_svg_minimal:
+    description: "Squelette de tout fichier SVG d'icône (les attributs path/circle varient selon l'icône)"
+    structure: |
+      <svg xmlns=\"http://www.w3.org/2000/svg\"
+           viewBox=\"0 0 24 24\"
+           fill=\"none\"
+           stroke=\"currentColor\"
+           stroke-width=\"1.5\"
+           stroke-linecap=\"round\"
+           stroke-linejoin=\"round\">
+        <!-- éléments path / line / circle / rect / polyline propres à l'icône -->
+      </svg>
+    note: >-
+      Squelette technique seulement. Les éléments graphiques internes
+      (formes constituant l'icône) varient pour chaque icône et sont
+      produits plus tard dans assets/.
+
+# -----------------------------------------------------------------------------
+# 3. Tailles nommées et correspondance
+# -----------------------------------------------------------------------------
+tailles:
+
+  - nom: XS
+    px_de_rendu: 14
+    description: "Icône intérieure d'un Pin sur la carte. Taille critique — l'icône doit rester lisible à cette taille minuscule."
+    usages:
+      - "comp-pin slot icone_categorie (palier 10 03-fonctionnels:65) — couleur blanche sur fond Pin"
+    note: "Optical correction obligatoire (cf. § 4) — le stroke 1.5 SVG donne ~0.875 px effectif, à la limite basse du perceptible. La métaphore choisie pour chaque catégorie doit être lisible dépouillée à cette taille."
+
+  - nom: SM
+    px_de_rendu: 16
+    description: "Icônes décoratives ou métadonnées dans une rangée d'item compact"
+    usages:
+      - "comp-tag-* slot icone (palier 10 01-atomes)"
+      - "Icônes décoratives dans comp-vignette-pin"
+
+  - nom: MD
+    px_de_rendu: 20
+    description: "Icônes UI compactes (chips, badges, items de liste)"
+    usages:
+      - "comp-chip-* slot icone (palier 10 01-atomes:359 et autres) — chip catégorie en aperçu rapide M2"
+      - "comp-button-* compact (variant taille=compact)"
+      - "Icônes dans champs de saisie (slot icone_prefix, icone_calendrier, icone_lieu)"
+
+  - nom: LG
+    px_de_rendu: 24
+    description: "Taille standard de TOUTES les icônes UI fonctionnelles non-compactes"
+    usages:
+      - "comp-button-* (primary, secondary, tertiary, back, fermeture-overlay) slot icone"
+      - "comp-button-play-audio slot icone"
+      - "comp-selecteur-section-principale slots icone_S1/S2/S3"
+      - "Icônes en consultation approfondie M3"
+      - "Icônes back-office desktop (palier 10 05-back-office)"
+    note: "Taille la plus fréquente — référence par défaut quand le contexte ne précise pas autrement."
+
+  - nom: XL
+    px_de_rendu: 32
+    description: "FAB de création (floating action button), accents visuels ponctuels"
+    usages:
+      - "comp-button-fab-creation slot icone (palier 10 01-atomes:232)"
+      - "Icônes d'écran de célébration de fin de Parcours (cohérent palier 11 CHO-FIN-PARCOURS)"
+
+# -----------------------------------------------------------------------------
+# 4. Optical correction par taille
+# -----------------------------------------------------------------------------
+# À 14px (XS), le stroke 1.5 SVG produit un trait de ~0.875 px effectif —
+# au sub-pixel. Sans correction, les icônes XS deviendraient floues. La
+# politique d'optical correction garantit la lisibilité à toutes les tailles.
+optical_correction:
+
+  principe: >-
+    Pour chaque taille nommée (XS/SM/MD/LG/XL), produire UNE VERSION
+    DÉDIÉE du SVG avec ajustements visuels qui compensent la
+    perception à cette taille. Ce n'est pas juste mettre à l'échelle
+    le 24×24 — c'est dessiner spécifiquement pour la taille cible
+    si la lisibilité l'exige.
+
+  cas_typiques:
+    XS_14px:
+      regles:
+        - "Simplification du tracé : retirer les détails non essentiels (1-2 traits internes peuvent disparaître)"
+        - "Réduction du nombre de points d'ancrage (moins de précision = plus de lisibilité)"
+        - "Augmentation relative des espaces vides (l'icône respire à cette taille)"
+        - "Le stroke peut être épaissi optiquement à 1.75 voire 2 (si SVG dédié à 14×14 unités)"
+      production: >-
+        Pour les 11 icônes catégories (utilisées en XS dans le Pin),
+        produire une version simplifiée 14×14 dédiée en plus de la
+        version 24×24 de base. Sous-dossier assets/categories/14/
+        et assets/categories/ (24px par défaut).
+    SM_16px:
+      regle: "Vérification visuelle ; si nécessaire production 16×16 dédiée. Sinon réutiliser le 24×24 mis à l'échelle."
+    MD_20px_LG_24px_XL_32px:
+      regle: "Mise à l'échelle directe du 24×24. Pas de SVG dédié sauf cas particulier."
+
+  outils_de_validation:
+    - "Visualisation à toutes les tailles dans une grille de comparaison"
+    - "Test sur device cible (smartphone) pour validation rendu réel"
+    - "Validation palier 16 inclut un test 'lisibilité Pin XS sur fond carte interpolé'"
+
+# -----------------------------------------------------------------------------
+# 5. États et mapping aux tokens couleur palier 12
+# -----------------------------------------------------------------------------
+etats_et_mapping_couleurs:
+
+  principe: >-
+    Une icône est rendue par une COULEUR (le stroke SVG via
+    currentColor hérite de la couleur du parent). Le palier 13 dit
+    QUEL token utiliser dans QUEL contexte ; le palier 12 fournit la
+    valeur hex.
+
+  etats:
+
+    - id: default
+      description: "État au repos, icône perceptible mais non mise en avant"
+      mapping_couleur:
+        sur_fond_clair_TOK-COLOR-FOND-PRINCIPAL: TOK-COLOR-TEXTE-PRINCIPAL
+        sur_fond_secondaire_TOK-COLOR-FOND-SECONDAIRE: TOK-COLOR-TEXTE-PRINCIPAL
+        sur_fond_sombre_overlay_M4_M8: TOK-COLOR-PRIMARY-CLAIR
+        sur_fond_couleur_pin_dans_pin: TOK-COLOR-BLANC-NARRATIF   # icône catégorie blanche dans le Pin
+
+    - id: active
+      description: "État activé / sélectionné — la fonction est en cours ou actuellement choisie"
+      mapping_couleur:
+        general: TOK-COLOR-PRIMARY
+        sur_fond_sombre_overlay_M4_M8: TOK-COLOR-PRIMARY-CLAIR
+      exemples:
+        - "comp-toggle-switch en état on : icône check ou indicateur en TOK-COLOR-PRIMARY"
+        - "comp-controle-favori activé : icône heart en TOK-COLOR-PRIMARY (sans changement de fill — outlined strict)"
+        - "comp-selecteur-section-principale section active : icône en TOK-COLOR-PRIMARY"
+        - "comp-chip-* selected : icône en TOK-COLOR-BLANC-NARRATIF (sur fond TOK-COLOR-PRIMARY du chip)"
+
+    - id: inactive
+      description: "État éteint ou non sélectionné — l'option existe mais n'est pas choisie"
+      mapping_couleur:
+        general: TOK-COLOR-TEXTE-TERTIAIRE
+      exemples:
+        - "comp-selecteur-section-principale sections non actives"
+        - "Boutons non principaux dans une zone d'action"
+
+    - id: disabled
+      description: "État désactivé (le composant entier est non interactif)"
+      mapping_couleur:
+        general: TOK-COLOR-TEXTE-TERTIAIRE   # cohérent avec stratégie palier 12 TOK-OPACITY-DESACTIVE
+      note: "Cohérent avec la stratégie de bascule couleur de TOK-OPACITY-DESACTIVE (palier 12 fichier 04 v0.2 après relecture)."
+
+    - id: hover_pressed
+      description: "État transitoire pendant l'interaction (tap pressed)"
+      mapping_couleur:
+        general: TOK-COLOR-PRIMARY-FONCE   # variante foncée du primaire
+      note: "Transition default→pressed gérée par palier 11 CRV-EASE-OUT + DUR-COURT."
+
+    - id: erreur
+      description: "Icône signalant une erreur (slot icone_erreur)"
+      mapping_couleur:
+        general: TOK-COLOR-FONCTIONNEL-ERREUR
+
+    - id: succes
+      description: "Icône signalant un succès (slot icone_succes)"
+      mapping_couleur:
+        general: TOK-COLOR-FONCTIONNEL-SUCCES
+
+# -----------------------------------------------------------------------------
+# 6. Politique de bibliothèque source
+# -----------------------------------------------------------------------------
+politique_bibliotheque_source:
+
+  source_par_defaut:
+    nom: "Lucide"
+    site: "lucide.dev"
+    licence: "ISC (très permissive — autorise reproduction et redistribution avec attribution)"
+    pourquoi: >-
+      Lucide est conforme à la charte (monoline strict, stroke 1.5px,
+      grille 24×24, round caps). Couvre ~90% des besoins UI courants
+      d'HistoLyon. La licence ISC autorise la reproduction des SVG
+      avec attribution dans assets/README.md.
+    note_attribution: >-
+      Les SVG produits plus tard à partir de Lucide incluent une
+      mention d'attribution dans assets/README.md (« Icons derived
+      from Lucide — ISC License »). Pas de mention par fichier SVG
+      requise par la licence ISC.
+
+    procede_recuperation_phase_3:
+      description: >-
+        Pour chaque icône avec source `lucide:nom`, le rédacteur
+        étape ultérieure récupère le SVG officiel depuis le repo Lucide
+        (https://github.com/lucide-icons/lucide/tree/main/icons)
+        ou depuis lucide.dev (URL canonique de chaque icône :
+        https://lucide.dev/icons/<nom>). Format attendu : SVG source
+        24×24 avec stroke="currentColor", stroke-width="2"
+        (Lucide canonique) — à AJUSTER en stroke-width="1.5" pour
+        respecter la charte HistoLyon.
+      etapes:
+        - "1. Lire le nom Lucide depuis la fiche d'icône palier 13 (champ source: lucide:nom)"
+        - "2. Récupérer le SVG officiel (curl https://lucide.dev/icons/<nom>.svg ou clone du repo Lucide)"
+        - "3. Ajuster stroke-width=2 (Lucide) → stroke-width=1.5 (charte HistoLyon)"
+        - "4. Vérifier viewBox=\"0 0 24 24\", stroke=\"currentColor\", fill=\"none\", stroke-linecap=\"round\", stroke-linejoin=\"round\""
+        - "5. Écrire dans assets/<famille>/<nom-icone>.svg selon le chemin spécifié dans la fiche (fichier_svg_attendu)"
+        - "6. Ajouter ligne d'attribution dans assets/README.md (un fichier global, pas par SVG)"
+      cas_custom:
+        description: "Pour les icônes avec source `custom:slug`, le rédacteur dessine selon les notes de la fiche en respectant strictement la charte (stroke 1.5, monoline, round caps, viewBox 24×24)."
+        cas_v3: ["custom:archway (arche simple semi-circulaire sur 2 piliers)"]
+        note_landmark_off: "lucide:landmark-off corrigé après relecture — récupéré comme icône Lucide standard."
+      cas_optical_correction_XS:
+        description: >-
+          Pour les 11 icônes catégories (décision D10 palier 13),
+          produire EN PLUS du SVG 24×24 une version 14×14 dédiée :
+          tracé simplifié si nécessaire, stroke=2 (compense la
+          réduction d'échelle), même métaphore. Sous-dossier
+          assets/categories/14/ avec mêmes noms.
+      manifest_attendu:
+        chemin: "assets/MANIFEST.yaml"
+        contenu: >-
+          Liste exhaustive des SVG cibles avec id ICON-* + chemin
+          + source (lucide:nom ou custom:slug) + statut production
+          (à_produire / produit / vérifié). Produit étape ultérieure par le
+          premier rédacteur ; les rédacteurs suivants cochent au
+          fur et à mesure.
+
+  custom_si_trou:
+    cas_attendus_v3:
+      - "Lieu disparu : landmark-off — n'existe pas natif Lucide, à dessiner custom (ICON-CAT-LIEU-DISPARU)"
+      - "Mode présentation M4 : pas d'équivalent Lucide direct — à arbitrer fichier 03 (presentation, slideshow ou custom monitor-play)"
+      - "Surprenez-moi (mode notification) : sparkles convient (héritage charte DA archivée pour Anecdote — ambiguïté possible avec catégorie ; à arbitrer fichier 03)"
+    politique:
+      - "Tout custom respecte STRICTEMENT la charte (stroke 1.5, grille 24×24, monoline, round caps, fill none)"
+      - "Métaphore validée par l'utilisateur (universelle, sans cliché)"
+      - "Inscription dans assets/categories/, assets/ui/ ou assets/back-office/ avec note custom dans la fiche"
+      - "Aucun mélange de bibliothèques (pas de Material Symbols + Lucide cohabitants — pureté monoline)"
+
+  changement_de_bibliotheque_source_futur:
+    description: >-
+      Si Lucide est jugé non maintenable plus tard (ou si un fork
+      conforme émerge), basculer vers la nouvelle source ne casse
+      rien : la charte reste valide, et le mapping (chaque ICON-X →
+      nouveau slug) se met à jour. Les SVG d'assets/ sont remplacés
+      mais leur structure technique (viewBox, stroke-width,
+      currentColor) reste identique.
+
+# -----------------------------------------------------------------------------
+# 7. Règles de cohérence inter-familles
+# -----------------------------------------------------------------------------
+coherence_inter_familles:
+
+  test_d_homogeneite: >-
+    Une icône catégorie Pin (ex. landmark pour Classique) et une icône
+    UI (ex. share pour partage) côte à côte doivent se sentir d'une
+    SEULE FAMILLE GRAPHIQUE. Pas de rupture stylistique perçue.
+
+  contraintes_communes:
+    - "Même grille 24×24"
+    - "Même stroke 1.5"
+    - "Mêmes round caps"
+    - "Même politique outlined strict"
+    - "Même approche optical correction par taille"
+    - "Même politique custom si trou"
+
+  exception_unique_documentee:
+    description: >-
+      Aucune exception ne devrait exister actuellement. Si une exception
+      émerge en cours de rédaction (par ex. icône logo qui aurait
+      besoin de fill pour être reconnaissable), la documenter
+      explicitement avec justification utilisateur — sinon refuser.
+
+# -----------------------------------------------------------------------------
+# 8. Cibles tactiles et accessibilité
+# -----------------------------------------------------------------------------
+cibles_tactiles:
+
+  principe: >-
+    L'icône elle-même fait 14/16/20/24/32 px selon la taille nommée.
+    La ZONE TACTILE associée inclut un padding implicite autour de
+    l'icône pour atteindre la cible 44×44 minimum (palier 16 valide).
+
+  application:
+    icones_24px:
+      padding_recommande: "10px de tous les côtés (24 + 10×2 = 44)"
+      note: "Suffit pour atteindre la cible 44×44."
+    icones_20px:
+      padding_recommande: "12px de tous les côtés (20 + 12×2 = 44)"
+    icones_16px:
+      padding_recommande: "14px de tous les côtés (16 + 14×2 = 44)"
+    icones_14px:
+      cas_particulier: >-
+        Icône XS dans le Pin sur la carte — la cible tactile EST
+        la totalité du Pin (forme teardrop ~32×40 px palier 10),
+        pas l'icône seule. Cible tactile fournie par le composant
+        comp-pin, pas par l'icône.
+    icones_32px_FAB:
+      padding_recommande: "10px (32 + 10×2 = 52, au-dessus du minimum)"
+
+  delegation_palier_16: >-
+    Le palier 13 dit QU'UN PADDING IMPLICITE est nécessaire ; le
+    palier 16 valide les valeurs effectives (ex. 44×44 minimum
+    requis vs 48×48 souhaité Material Design). Si une cible
+    tactile est insuffisante en validation, ajustement du padding
+    palier 13/12.
+
+# -----------------------------------------------------------------------------
+# 9. Persona check
+# -----------------------------------------------------------------------------
+persona_check:
+
+  kenji:
+    impact: ÉLEVÉ
+    note: >-
+      Métaphores universelles non négociables. Aucune référence
+      culturelle obscure. Test : un utilisateur qui voit la grille
+      d'icônes pour la première fois sans tutoriel doit deviner ~80%
+      des fonctions. La charte impose 'métaphores universelles'
+      (§ 1 principes).
+
+  mme_dupont:
+    impact: moyen
+    note: >-
+      Optical correction garantit lisibilité icônes Pin XS sur
+      terrain (luminosité variable). Stroke 1.5 + round caps gardent
+      la lecture fluide.
+
+  mme_martin:
+    impact: ÉLEVÉ
+    note: >-
+      Lisibilité depuis fond de classe : icônes 24px LG avec stroke
+      1.5 = ratio robuste. Validation palier 16 sur cas concret
+      (sélecteur de section visible depuis 6-8m de distance).
+
+  pere_lyonnais:
+    impact: moyen
+    note: >-
+      Icône catégorie sur Pin lui-même + icône partage + icône
+      favori — ses interactions principales en flânerie. Métaphores
+      simples (heart, share, etc.) immédiatement reconnaissables.
+
+  anais_back_office:
+    impact: ÉLEVÉ
+    note: >-
+      Charte commune avec UI mobile = pas de rupture sur le passage
+      entre prévisualisation mobile et back-office desktop. Cohérence
+      visuelle perçue 'même produit'.
+
+# -----------------------------------------------------------------------------
+# 10. Enjeux transversaux
+# -----------------------------------------------------------------------------
+enjeux_transversaux:
+
+  accessibilite: >-
+    Cibles tactiles ≥ 44×44 garanties par padding implicite (validation
+    palier 16). Distinguabilité daltonisme : icônes catégories sont la
+    distinction primaire (palier 9 D1) — la forme visuelle compte plus
+    que la couleur. Test palier 16 inclut simulation daltonisme. Label
+    vocal de chaque icône fournie par palier 8 microcopy (cohérent
+    avec persona Kenji + accessibilité visuelle).
+
+  performance: >-
+    SVG = format vectoriel léger (~1-3 KB par icône). Pas de rasterisation
+    coûteuse. Fallback PNG/WebP non nécessaire.
+
+  vie_privee: "Aucun enjeu spécifique."
+
+  i18n: >-
+    Métaphores universelles (heart, search, share, etc.) compatibles
+    avec les 3 langues fr/en/ja palier 8. Pas d'icône à orientation
+    culturelle (pas de drapeaux nationaux, pas de symboles religieux).
+
+# -----------------------------------------------------------------------------
+# 11. Questions ouvertes
+# -----------------------------------------------------------------------------
+questions_ouvertes:
+  - "Optical correction XS : décision D10 palier 13 après relecture 2026-05-07 — production version dédiée 14×14 SYSTÉMATIQUE pour les 11 icônes catégories. Question fermée."
+  - "Mode présentation M4 : tranché fichier 03 ICON-UI-MODE-PRESENTATION = lucide:monitor-play. Question fermée."
+  - "Mode Surprenez-moi vs Anecdote : tranché fichier 03 ICON-UI-MODE-SURPRENEZ-MOI = lucide:dice-5 (Anecdote conserve sparkles). Question fermée."
+  - "Variante check toggle-switch : tranché fichier 03 ICON-UI-CHECK = lucide:check (distinct de circle-check pour ICON-UI-SUCCES). Question fermée."

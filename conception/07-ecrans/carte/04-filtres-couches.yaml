@@ -1,0 +1,58 @@
+# =============================================================================
+# E-CARTE-FILTRES-COUCHES — Sélection des couches cartographiques
+# =============================================================================
+# Surface ponctuelle (P5.M6) qui permet à l'utilisateur de sélectionner les
+# Couches cartographiques actives sur la Carte. Décide quel sous-ensemble
+# de Pins est visible selon le critère éditorial de chaque Couche.
+# =============================================================================
+
+document:
+  type: palier_ecrans_fiche
+  format: yaml
+
+ecran:
+  id: E-CARTE-FILTRES-COUCHES
+  nom: "Sélection des Couches cartographiques"
+
+  mode: P5.M6
+  surface_parente: P5.S1
+
+  raison_d_etre: >-
+    Permet d'activer ou désactiver les Couches cartographiques (catalogue
+    contrôlé par l'équipe éditoriale). Chaque Couche regroupe un
+    sous-ensemble de Pins selon un critère éditorial (patrimoine vivant,
+    bâtiments historiques, événements passés…). L'écran rend lisible le
+    catalogue de Couches et leur état d'activation.
+
+  composition:
+    - zone: "liste des Couches disponibles"
+      role: "présente toutes les Couches du catalogue avec leur libellé, leur description courte (palier 8) et un indicateur d'activation"
+      entites_affichees: ["Couche cartographique"]
+
+    - zone: "indicateur d'effet sur la Carte"
+      role: "compteur dynamique du nombre de Pins visibles selon les Couches actives ; aide l'utilisateur à comprendre l'effet d'un changement avant de fermer la surface"
+
+    - zone: "raccourci 'tout voir'"
+      role: "active toutes les Couches en un geste — utile pour repartir d'une vue complète"
+
+  etats:
+    nominal_charge: "Catalogue de Couches affiché, état d'activation reflétant les préférences courantes du Profil"
+    chargement_initial: "Catalogue en cours de chargement (rare car le catalogue est petit et probablement préchargé)"
+    aucune_couche_active: "L'utilisateur a tout désactivé — aucun Pin sur la Carte derrière ; message gracieux invitant à réactiver au moins une Couche"
+    offline_avec_cache: "Catalogue local disponible, modification possible mais effet limité aux Pins préchargés"
+    catalogue_evolue: "Une nouvelle Couche est apparue depuis la dernière session (le catalogue est ouvert, cf. cluster 01) — mise en évidence légère de la nouveauté"
+
+  elements_interactifs:
+    - "Activation / désactivation d'une Couche → application immédiate sur la Carte derrière, le compteur d'indicateur d'effet se met à jour"
+    - "Activation du raccourci 'tout voir' → toutes les Couches activées"
+    - "Geste de fermeture → la surface se referme (P5.N5), les choix sont persistés dans les préférences du Profil"
+
+  flows_actifs:
+    - A3   # Navigation cartographique (point d'accès couches)
+
+  surfaces_imbriquees: []
+
+  questions_ouvertes:
+    - "Les choix de Couches actives sont-ils persistés entre sessions du Profil (probablement oui, cluster 03 préférences), ou réinitialisés à chaque ouverture ? — recommandation : persistés"
+    - "Combien de Couches typiquement (catalogue ouvert) ? — affecte la composition visuelle, palier 10"
+    - "Si une Couche est archivée (cf. cluster 01 — pas d'archivage prévu actuellement), quel comportement ? — non bloquant pour le palier 7"

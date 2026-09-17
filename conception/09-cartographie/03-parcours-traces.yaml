@@ -1,0 +1,186 @@
+# =============================================================================
+# Palier 9 — Tracés de Parcours
+# =============================================================================
+# Mapping registre visuel ↔ dimension fonctionnelle pour les tracés de
+# Parcours, et leurs variantes contextuelles. Pas de valeurs (palier 12),
+# pas de durées (palier 11), pas de composants nommés (palier 10).
+# =============================================================================
+
+document:
+  type: palier_cartographie_parcours_traces
+  numero: 9
+  fichier: "03-parcours-traces.yaml"
+  version: "0.1"
+  date: "2026-05-06"
+  format: yaml
+  prerequis_de_lecture:
+    - "design/conception/09-cartographie/00-index.yaml — décisions D3, D5, D9"
+    - "design/conception/09-cartographie/02-pins.yaml — mappings provenance et étape courante"
+    - "design/conception/04-donnees/02-parcours.yaml — Parcours et Étape"
+    - "design/conception/06-flows/03-parcours.yaml — C5 (terrain), C6 (canapé), C7 (déviation)"
+
+raison_d_etre: >-
+  Le tracé d'un Parcours est l'autre objet visuel structurant de la
+  carte (avec les Pins). Il signale la nature du Parcours, l'avancée
+  dans le Parcours, et l'étape en cours. Sans grammaire d'allocation
+  des registres, chaque palier aval déciderait en silo.
+
+# -----------------------------------------------------------------------------
+# 1. Mappings registre visuel ↔ dimension fonctionnelle
+# -----------------------------------------------------------------------------
+mappings:
+
+  - dimension: provenance_du_parcours
+    registre: "couleur du tracé"
+    valeurs_qualifiees:
+      editorial: "même teinte chaude que le Pin éditorial"
+      communautaire: "même teinte neutre que le Pin communautaire"
+    pourquoi: >-
+      Cohérence verticale avec le mapping Pin (cf. fichier 02-pins
+      décision D3). L'utilisateur lit instantanément la nature du
+      Parcours qu'il consulte ou suit. Évite la collision avec le
+      filtre carte par Époque (qui occupe le fond).
+
+  - dimension: avancee_dans_le_parcours
+    registres:
+      segment_a_parcourir: "rendu plein, couleur de provenance vive"
+      segment_parcouru: "rendu atténué"
+    pourquoi: >-
+      L'à-parcourir est l'invitation visuelle (tendu, vif, appelant).
+      Le parcouru est la trace mémoire (présent mais en retrait,
+      sans culpabiliser). Convention cartographique commune.
+    note: >-
+      Le registre du parcouru s'exprime par opacité — pas par un
+      changement de forme du tracé (forme exacte au palier 10).
+      Pas de pointillé pour le parcouru — le pointillé est réservé
+      au contour de vérification (cf. 02-pins) pour ne pas mélanger
+      les sémantiques.
+
+  - dimension: etape_courante_sur_le_trace
+    registre: "convergence avec le mapping étape courante du Pin (cf. 02-pins variante etape_courante_du_parcours_actif)"
+    extension_sur_le_trace: "le segment qui MÈNE à l'étape courante peut être légèrement renforcé pour ancrer visuellement le mouvement vers cette étape"
+    delegation: "Nature exacte du renforcement au palier 12. Animation éventuelle au palier 11."
+
+  - dimension: statut_de_verification_du_parcours_communautaire
+    registre: "contour du tracé"
+    pourquoi: >-
+      Cohérence verticale avec le mapping Pin (cf. 02-pins
+      dimension statut_de_verification). I3 admet la nuance
+      Parcours communautaire visible immédiatement avec marque
+      distinctive ; le contour de tracé est cette marque.
+    delegation: "Forme exacte du contour au palier 12 (pointillé recommandé, cohérent avec le Pin)."
+
+  - dimension: numerotation_des_etapes
+    registre: "numéro intégré au Pin de l'Étape (pas un label séparé sur le tracé)"
+    pourquoi: >-
+      Sobriété — un seul artefact visuel par Étape (le Pin). Le
+      numéro est attaché au Pin, pas dispersé sur la carte.
+    delegation: "Anatomie du Pin avec numéro au palier 10. Mapping numéro → représentation typographique au palier 13."
+
+# -----------------------------------------------------------------------------
+# 2. Variantes contextuelles
+# -----------------------------------------------------------------------------
+variantes_contextuelles:
+
+  - etat: trace_non_commence
+    contexte: "Parcours consulté en fiche détail (M3) avant lancement, ou consultation depuis le catalogue"
+    rendu: "Tracé visible en intégralité avec couleur de provenance, sans distinction parcouru/à parcourir, sans étape courante"
+    note: "Permet à l'utilisateur de voir l'itinéraire complet avant de décider de lancer."
+
+  - etat: trace_en_cours_mode_terrain
+    contexte: "Parcours actif (cf. P5.P2), mode terrain (C5), géolocalisation accordée"
+    rendu:
+      - "Distinction segments parcourus / à parcourir active"
+      - "Étape courante en relief (cohérent 02-pins)"
+      - "Position utilisateur signalée sur la carte (D1.1 géolocalisation — registre du palier 10/12)"
+    invariant: "Le tracé reste lisible à toute valeur d'axe paramétrique du fond carte (renvoi L2 fichier 01)"
+
+  - etat: trace_en_cours_mode_canape
+    contexte: "Parcours actif, mode canapé (C6), absence de proximité géographique ou bascule explicite"
+    rendu:
+      - "Distinction segments parcourus / à parcourir active (selon les Étapes consultées par l'utilisateur)"
+      - "Étape courante en relief"
+      - "Pas de position utilisateur signalée (l'utilisateur n'est pas in situ)"
+    note: >-
+      Le mode canapé n'est pas un mode dégradé (cf. essence
+      § ce_qu_on_refuse). Le tracé est aussi soigné qu'en mode
+      terrain — seule l'absence de position utilisateur fait la
+      différence visuelle.
+
+  - etat: deviation_mode_terrain
+    contexte: "Mode terrain, l'utilisateur s'éloigne du tracé (C7)"
+    rendu_palier_9: >-
+      Le tracé conserve son rendu nominal — pas de modulation visuelle
+      du tracé lui-même. Le signal de déviation est porté par un
+      message éphémère (M9, pattern PT2 'alerte gracieuse' du
+      palier 8 — cf. 01-strategie-narrative.yaml) et éventuellement
+      par le surlignage de la position utilisateur. Le palier 9
+      tranche : pas de réaction visuelle du tracé aux déviations
+      (sobriété, le tracé reste un repère stable).
+    pourquoi: >-
+      Faire 'clignoter' le tracé en cas de déviation surchargerait la
+      carte et culpabiliserait l'utilisateur (P4 essence). Le message
+      éphémère suffit à signaler.
+
+  - etat: parcours_communautaire_en_revue
+    contexte: "Parcours de provenance communautaire dans l'état en_revue (I3)"
+    rendu: "Tracé avec couleur communautaire (teinte neutre) + contour distinctif (pointillé recommandé)"
+    note: "Cohérent avec le rendu Pin (02-pins variante équivalente). La marque est levée quand la modération a confirmé."
+
+# -----------------------------------------------------------------------------
+# 3. Règles d'unicité et de cohabitation
+# -----------------------------------------------------------------------------
+unicite_et_cohabitation:
+
+  - regle: "Un seul tracé actif visible à la fois"
+    fondement: "P5.P2 (surface persistante de parcours en cours, unicité visible) + cluster 02 question ouverte (pas de Parcours simultanés)."
+    consequence: "Si l'utilisateur consulte la fiche d'un autre Parcours pendant qu'un Parcours est en cours, le tracé du Parcours en cours reste seul affiché sur la carte ; la fiche détail montre son tracé en aperçu interne (palier 10) sans le superposer à celui du Parcours actif."
+
+  - regle: "Cohabitation avec les Pins hors-Parcours"
+    rendu: "Pendant qu'un Parcours est actif, les Pins hors-Parcours sont atténués (cf. 02-pins variante hors_parcours). Le tracé reste pleinement visible — c'est le contexte qui prime."
+    invariant: "Aucune accumulation visuelle ne doit empêcher de voir le tracé entier (renvoi L2 fichier 01)."
+
+  - regle: "Cohabitation avec les Couches d'archives (D1.5)"
+    rendu: "Le tracé se superpose à toute couche d'archive active. Sa couleur de provenance reste lisible quelle que soit la couche d'archive."
+    delegation: "Ajustement de l'opacité des couches d'archives au palier 12 si nécessaire pour garantir la lisibilité du tracé."
+
+# -----------------------------------------------------------------------------
+# 4. Enjeux transversaux
+# -----------------------------------------------------------------------------
+enjeux_transversaux:
+
+  accessibilite: >-
+    La distinction parcouru/à parcourir repose sur l'opacité — le
+    daltonisme n'est pas affecté. La distinction provenance repose
+    sur la couleur — vérification daltonisme requise (deux teintes
+    choisies au palier 12 doivent rester distinguables). Mode
+    présentation Mme Dupont (sortie scolaire) : tracé visible et
+    distinctif depuis loin (les parents accompagnateurs peuvent
+    être à plusieurs mètres de leur téléphone).
+
+  performance: >-
+    Le tracé est un élément vectoriel léger ; pas d'enjeu propre.
+    Critères de fluidité globaux au palier 16.
+
+  vie_privee: >-
+    Le rendu segments parcourus / à parcourir s'appuie sur l'avancée
+    locale dans le Parcours (Profil local, I6). Aucun enjeu d'exposition.
+
+  i18n: "Pas d'enjeu spécifique."
+
+# -----------------------------------------------------------------------------
+# 5. Questions ouvertes
+# -----------------------------------------------------------------------------
+questions_ouvertes:
+
+  - "Renforcement du segment menant à l'étape courante : nature exacte (épaisseur ? halo ?) — palier 11/12 décide."
+  - "Cohabitation tracé + couches d'archives (D1.5) avec une couche d'archive très chargée chromatiquement : palier 16 valide la lisibilité."
+  - "Si le segment menant à l'étape courante traverse une zone de pins hors-parcours denses, ne devient-il pas confus ? — palier 16 valide."
+
+# -----------------------------------------------------------------------------
+# 6. Dépendances internes
+# -----------------------------------------------------------------------------
+dependances:
+  - "01-fond-et-epoques.yaml — invariant L2 (tracé visible à toute valeur d'axe)"
+  - "02-pins.yaml — cohérence couleur de provenance + contour de vérification + mise en relief étape courante"
+  - "04-densite-zoom.yaml — comportement du tracé quand l'Étape est masquée par un cluster"

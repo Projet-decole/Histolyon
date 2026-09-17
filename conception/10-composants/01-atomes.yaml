@@ -1,0 +1,1003 @@
+# =============================================================================
+# Palier 10 — Composants atomes
+# =============================================================================
+# Atomes = briques indivisibles de l'UI. Boutons, chips, badges, libellés,
+# icônes, champs de saisie, switches, séparateurs, indicateurs, marqueurs
+# visuels. Inclut les atomes à intention CLOSE (button-back, button-fab-
+# creation, button-fermeture-overlay, button-play-audio) et les atomes à
+# intention OUVERTE (button-primary, button-secondary, chip-couche, etc.).
+#
+# Calibrage du format selon le pilote 03-fonctionnels.yaml v0.1.
+# =============================================================================
+
+document:
+  type: palier_composants_atomes
+  numero: 10
+  fichier: "01-atomes.yaml"
+  version: "0.1"
+  date: "2026-05-06"
+  format: yaml
+  pilote: false
+  audience:
+    - "relecture"
+    - "Auteurs des fichiers 02-molecules, 04-shell, 05-back-office (résolution des références d'atomes)"
+    - "Auteurs paliers 11, 12, 13, 16"
+  role: >-
+    Inventaire des atomes UI réutilisables d'HistoLyon avec leur intention
+    portée (close ou ouverte), échelle d'interaction (E1-E4), états
+    interactifs, variants, conséquences de variabilité, et couplages
+    éventuels à l'état applicatif partagé.
+  prerequis_de_lecture:
+    - "design/conception/10-composants/00-index.yaml v0.2 — § 3 échelles E1-E5, § 4 état applicatif partagé (7 ETAT-XXX), § 5 patterns d'interaction (PI-XXX), § 7 format de fiche enrichi"
+    - "design/conception/10-composants/03-fonctionnels.yaml v0.1 (PILOTE) — fiche-exemplaire comp-pin et calibrage du format compact"
+    - "design/conception/05-architecture-info.yaml — modes M1-M9, surfaces persistantes P1-P3, règles N1-N7, entrées E1-E3"
+    - "design/conception/04-donnees/ — invariants I3 vérification, I8 multi-époques"
+  scope_v3:
+    nombre_d_atomes: 42
+    repartition:
+      boutons_generiques: 6
+      bouton_specialise: 1
+      chips: 4
+      badges: 2
+      representations: 2
+      switch: 1
+      slider: "1 (renvoi vers 03-fonctionnels.yaml)"
+      champs_saisie: 5
+      icone: 1
+      libelles: 3
+      spatiaux: 2
+      indicateurs_messages: 5
+      autres_atomes: 5
+      marqueurs_visuels: 3
+
+# -----------------------------------------------------------------------------
+# Raison d'être de ce fichier
+# -----------------------------------------------------------------------------
+raison_d_etre: >-
+  Les atomes sont les briques DRY de toute l'app — un seul comp-button-primary
+  câblé dans des dizaines d'écrans, un seul comp-libelle-texte qui s'inscrit
+  dans la quasi-totalité des compositions, un seul comp-icone qui mappera au
+  palier 13 plus de 30 catégories/actions/états. Mais certains atomes sont
+  AUSSI à intention close — comp-button-back POLYMORPHE qui sait faire
+  retour gracieux ET sortir du mode présentation, comp-button-fab-creation
+  qui sait déclencher la création de Parcours personnel. La distinction
+  intention close/ouverte (cf. § 7 index v0.2) est ICI fondamentale : elle
+  conditionne ce que l'écran doit câbler.
+
+# -----------------------------------------------------------------------------
+# Composants atomes — fiches
+# -----------------------------------------------------------------------------
+composants:
+
+  # ===========================================================================
+  # BOUTONS GÉNÉRIQUES (6)
+  # ===========================================================================
+
+  - id: comp-button-primary
+    nom: "Bouton primaire"
+    famille: atome
+    raison_d_etre: "Cible d'action principale dans toute surface, affirmée visuellement. Pivot du palier 10 (≥8 intégrations recensées dans les 48 écrans palier 7)."
+    ancrage:
+      ecrans: ["la quasi-totalité des écrans M3 avec une action principale", "E-CARTE-RECHERCHE", "E-PARCOURS-FICHE-DETAIL", "E-PARCOURS-LANCEMENT", "E-PROFIL-CREATION-COMPTE", "E-PROFIL-CONNEXION-COMPTE", "E-COMMUNAUTE-SOUMISSION-PIN", "E-PARCOURS-EDITEUR"]
+      composants_qui_l_integrent: ["comp-dialogue-confirmation", "comp-dialogue-permission", "comp-message-ephemere", "comp-formulaire-creation-compte", "comp-formulaire-connexion-compte", "comp-formulaire-saisie-pin", "comp-formulaire-creation-parcours", "comp-quiz", "comp-alerte-proximite (variante action)"]
+    composition:
+      - { id: comp-libelle-bouton, slot: "label", cardinalite: 1 }
+      - { id: comp-icone, slot: "icone", cardinalite: 0..1, note: "icône fonctionnelle optionnelle, mapping concret palier 13" }
+    variants:
+      - { dimension: taille, valeurs: [standard, compact] }
+      - { dimension: pleine_largeur, valeurs: [oui, non] }
+    etats_interactifs: [default, pressed, disabled, loading, focused]
+    interactions_natives:
+      - "Tap → émet signal d'action (callback parent, intention ouverte)"
+      - "Focus clavier (a11y) → état focused"
+    intention_portee:
+      parametrable: true
+      echelle: variable   # E2 / E3 / E4 selon contexte d'instanciation
+      intention: "action_principale"
+      contrats:
+        - "L'écran qui l'intègre DOIT définir la cible (flow palier 6 ou intention P5)"
+        - "Voir elements_interactifs des écrans palier 7 pour les câblages concrets"
+      note: "Composant à INTENTION OUVERTE. Selon contexte : E2 (soumission inline), E3 (navigation push) ou E4 (ex. 'Lancer le parcours' produit ETAT-PARCOURS-EN-COURS)."
+    consequences_variabilite:
+      - "Texte variable → truncate avec ellipse au-delà d'un seuil (palier 12)"
+      - "i18n FR/EN/JA divergent ; perceptibilité validée palier 16"
+      - "État loading → libellé remplacé par indicateur visuel inline"
+
+  - id: comp-button-secondary
+    nom: "Bouton secondaire"
+    famille: atome
+    raison_d_etre: "Cible d'action secondaire (alternative ou complément du primaire). Pivot du palier 10 (≥6 intégrations)."
+    ancrage:
+      ecrans: ["E-PROFIL-CREATION-COMPTE (alternative connexion)", "E-PROFIL-CONNEXION-COMPTE (alternative création)", "E-CARTE-ALERTE-PROXIMITE (rejet)", "E-PIN-CONSULTATION-APPROFONDIE", "écrans avec dialogue confirmation/annulation"]
+      composants_qui_l_integrent: ["comp-dialogue-confirmation (slot annulation)", "comp-alerte-proximite (action_accepter)", "comp-lecteur-video (play_pause)", "comp-quiz (réponses)"]
+    composition:
+      - { id: comp-libelle-bouton, slot: "label", cardinalite: 1 }
+      - { id: comp-icone, slot: "icone", cardinalite: 0..1 }
+    variants:
+      - { dimension: taille, valeurs: [standard, compact] }
+    etats_interactifs: [default, pressed, disabled, loading, focused]
+    interactions_natives:
+      - "Tap → émet signal d'action (callback parent)"
+    intention_portee:
+      parametrable: true
+      echelle: variable   # E2 le plus souvent, E3 occasionnel
+      intention: "action_secondaire"
+      contrats:
+        - "L'écran instancie la cible. Visuellement subordonné au primaire."
+      note: "Intention OUVERTE — câblage parent."
+    consequences_variabilite:
+      - "Texte variable → truncate (palier 12)"
+
+  - id: comp-button-tertiary
+    nom: "Bouton tertiaire"
+    famille: atome
+    raison_d_etre: "Action légère, contextuelle, sans dominance visuelle (lien-action discret). Souvent utilisé pour les actions optionnelles ou alternatives."
+    ancrage:
+      ecrans: ["E-PIN-CONSULTATION-APPROFONDIE (play audio inline avant la résorption en composant dédié)", "E-VIEWER-3D (bascule AR)", "écrans M6 avec actions secondaires"]
+      composants_qui_l_integrent: ["comp-viewer-3d (slot bascule_ar)", "comp-dialogue-confirmation (variante annulation discrète)"]
+    composition:
+      - { id: comp-libelle-bouton, slot: "label", cardinalite: 0..1 }
+      - { id: comp-icone, slot: "icone", cardinalite: 0..1 }
+    variants:
+      - { dimension: forme, valeurs: [compact, icon-only] }
+    etats_interactifs: [default, pressed, disabled, focused]
+    interactions_natives:
+      - "Tap → émet signal d'action"
+    intention_portee:
+      parametrable: true
+      echelle: variable
+      intention: "action_legere"
+      note: "Intention OUVERTE — le parent câble. Variante icon-only requiert un libellé d'accessibilité (palier 16)."
+    consequences_variabilite:
+      - "Variante icon-only → cible tactile généreuse (palier 12) + libellé d'a11y obligatoire"
+
+  - id: comp-button-back
+    nom: "Bouton retour"
+    famille: atome
+    raison_d_etre: >-
+      Cible navigationnelle de retour gracieux (P5.N1) ET de sortie de mode
+      présentation (P5.N4). Composant POLYMORPHE selon contexte — le
+      composant sait à quel mode il appartient via son variant context.
+    ancrage:
+      ecrans: ["la quasi-totalité des écrans M3", "écrans M6 ponctuelles non fermées par tap-hors", "templates M8", "E-PIN-MODE-PRESENTATION (M4 — variant darked)", "E-PIN-CONSULTATION-AR (M4)"]
+      composants_qui_l_integrent: ["comp-header-titre-action (variant avec retour)", "comp-viewer-3d (slot retour)", "comp-camera-ar (slot retour)"]
+    composition:
+      - { id: comp-icone, slot: "icone", cardinalite: 1, note: "icône fonctionnelle de retour ; concrète au palier 13" }
+    variants:
+      - { dimension: context, valeurs: [normal, darked], note: "normal pour M3/M6 ; darked pour M4 mode présentation (lisibilité sur média immersif)" }
+    etats_interactifs: [default, pressed, disabled, focused]
+    interactions_natives:
+      - "Tap → déclenche le retour gracieux (intention close)"
+    intention_portee:
+      parametrable: false
+      echelle: E3_navigationnelle
+      intention: "retour_gracieux_polymorphe"
+      cibles_referencees:
+        - "P5.N1 — un seul geste vers le niveau immédiatement supérieur (variant normal)"
+        - "P5.N4 — sortie M4 mode présentation vers M3 (variant darked)"
+      cas_deep_link: "Si l'écran a été atteint via Lien universel sans pile constituée, le retour mène à la surface principale logique de la cible (cf. P5.E2). PRÉCISION IMPORTANTE — sans elle, les devs feront faux."
+      note: >-
+        Composant à INTENTION CLOSE — non surchargeable. L'écran qui l'instancie
+        n'a pas à câbler son comportement, seulement à fixer son variant
+        context. Le routing concret (push/pop/Navigator) est hors composant
+        (palier 11 chorégraphie + architecture Flutter).
+    consequences_variabilite:
+      - "Pas de texte variable (icône uniquement)"
+      - "Variant darked nécessite contraste suffisant sur média immersif (palier 12 + 16)"
+    questions_ouvertes:
+      - "Variant 'retour avec libellé' (ex. libellé visible) pour certains contextes a11y ? — palier 13 et palier 16."
+
+  - id: comp-button-fermeture-overlay
+    nom: "Bouton de fermeture d'overlay"
+    famille: atome
+    raison_d_etre: >-
+      Cible explicite pour renoncer à une surface ponctuelle (M6 recherche,
+      M6 filtres-couches, M2 aperçu rapide, M8 dialogue à fermeture explicite,
+      M7 alerte de proximité — rejet). Sémantique « renoncer », distincte
+      du retour gracieux (P5.N1) qui remonte la pile.
+    ancrage:
+      ecrans: ["E-CARTE-APERCU-PIN (aperçu M2)", "E-CARTE-RECHERCHE (M6)", "E-CARTE-FILTRES-COUCHES (M6)", "E-CARTE-ALERTE-PROXIMITE (M7 rejet)"]
+      composants_qui_l_integrent: ["comp-recherche-surface (slot fermeture)", "comp-filtres-couches (slot fermeture)", "comp-alerte-proximite (slot rejet)", "comp-apercu-rapide-pin (futur, en 04-shell)"]
+    composition:
+      - { id: comp-icone, slot: "icone", cardinalite: 1, note: "icône fonctionnelle de fermeture ; concrète au palier 13" }
+    etats_interactifs: [default, pressed, disabled, focused]
+    interactions_natives:
+      - "Tap → ferme la surface ponctuelle (intention close)"
+    intention_portee:
+      parametrable: false
+      echelle: E3_navigationnelle
+      intention: "fermeture_renoncement"
+      cible_referencee: "P5.N5 fermeture implicite par interaction extérieure (ici rendue explicite)"
+      note: >-
+        Sémantique « renoncer » distincte du retour gracieux. Le bouton ne
+        remonte PAS d'un niveau dans la pile — il ferme la surface ponctuelle
+        en place. Si l'overlay supporte aussi PI-TAP-HORS, le bouton est
+        l'alternative explicite (a11y, clarté).
+    patterns_attaches: [PI-TAP-HORS]
+    consequences_variabilite:
+      - "Pas de texte variable"
+
+  - id: comp-button-fab-creation
+    nom: "Bouton flottant de création"
+    famille: atome
+    raison_d_etre: >-
+      Cible flottante pour déclencher la création d'un Parcours personnel
+      (flow C11). Geste constitutif du parcours créatif — composant à
+      intention close.
+    ancrage:
+      ecrans: ["E-PARCOURS-PRINCIPAL (catalogue de Parcours)"]
+      composants_qui_l_integrent: ["comp-formulaire-creation-parcours (slot ajout_etape — variante)", "comp-layout-parcours"]
+    composition:
+      - { id: comp-icone, slot: "icone", cardinalite: 1, note: "icône fonctionnelle de création ; concrète au palier 13" }
+      - { id: comp-libelle-bouton, slot: "label", cardinalite: 0..1, note: "libellé optionnel selon variante FAB étendu/compact" }
+    variants:
+      - { dimension: forme, valeurs: [compact, etendu] }
+    etats_interactifs: [default, pressed, disabled, focused]
+    interactions_natives:
+      - "Tap → ouvre le flow de création de Parcours (intention close)"
+    intention_portee:
+      parametrable: false
+      echelle: E3_navigationnelle
+      intention: "creation_parcours_personnel"
+      cible_referencee: "flow C11 (création Parcours) — palier 6"
+      note: >-
+        Intention CLOSE — le bouton sait qu'il déclenche la création de
+        Parcours. Désactivé si Compte non connecté (consommateur de
+        ETAT-COMPTE-CONNECTE — I2 publication requiert Compte). Variante
+        accessible aux non-connectés : sauvegarde locale jusqu'à publication
+        (cf. I6).
+    couplage_etat_partage:
+      - { etat: ETAT-COMPTE-CONNECTE, role: consommateur, note: "désactivation gracieuse si déconnecté ET fonctionnalité requiert publication" }
+    consequences_variabilite:
+      - "Variante compact → cible tactile préservée (palier 12)"
+
+  # ===========================================================================
+  # BOUTON SPÉCIALISÉ (1)
+  # ===========================================================================
+
+  - id: comp-button-play-audio
+    nom: "Bouton de lecture audio"
+    famille: atome
+    raison_d_etre: >-
+      Déclenche la narration audio du Pin courant. Distinct du bouton tertiaire
+      générique car porteur d'une intention close (lance la narration audio
+      contextuelle ET produit ETAT-AUDIO-EN-COURS via cascade depuis le
+      lecteur audio parent).
+    ancrage:
+      ecrans: ["E-PIN-CONSULTATION-APPROFONDIE (zone audio)", "E-PIN-MODE-PRESENTATION"]
+      composants_qui_l_integrent: ["comp-lecteur-audio (slot play_pause)"]
+    composition:
+      - { id: comp-icone, slot: "icone", cardinalite: 1, note: "icône fonctionnelle de lecture/pause selon état ; mapping palier 13" }
+    etats_interactifs: [default, pressed, playing, paused, loading, disabled, focused]
+    interactions_natives:
+      - "Tap → toggle play/pause (intention close — sait qu'il pilote la narration du Pin courant)"
+    intention_portee:
+      parametrable: false
+      echelle: E4_systemique
+      intention: "declenchement_narration_audio"
+      cible_referencee: "zone audio du Pin courant ; cascade ETAT-AUDIO-EN-COURS via comp-lecteur-audio parent"
+      note: >-
+        Intention CLOSE — le bouton sait qu'il déclenche la narration audio
+        du Pin courant. Production effective de ETAT-AUDIO-EN-COURS portée
+        par le lecteur audio parent (cf. comp-lecteur-audio en
+        03-fonctionnels.yaml), mais ce bouton est le point d'ancrage du
+        geste utilisateur.
+    couplage_etat_partage:
+      - { etat: ETAT-AUDIO-EN-COURS, role: producteur, note: "via le lecteur audio parent (cascade P1 surface persistante)" }
+    consequences_variabilite:
+      - "Audio absent → bouton masqué (cohérent avec comp-lecteur-audio)"
+      - "État loading → indicateur visuel pendant buffering"
+
+  # ===========================================================================
+  # CHIPS (4)
+  # ===========================================================================
+
+  - id: comp-chip-epoque
+    nom: "Chip d'Époque"
+    famille: atome
+    raison_d_etre: >-
+      Sélection d'une Époque alternative pour un Pin multi-époques (flow B3,
+      palier 4 I8) ou affichage d'une Époque dans un filtre. Selon contexte :
+      producteur OU consommateur de ETAT-EPOQUE-COURANTE.
+    ancrage:
+      ecrans: ["E-PIN-CONSULTATION-APPROFONDIE (zone navigation multi-époque)", "E-CARTE-RECHERCHE (filtre)"]
+      composants_qui_l_integrent: ["comp-frise-chronologique (slot epoques)", "comp-recherche-surface (variante filtre)"]
+    composition:
+      - { id: comp-libelle-chip, slot: "label", cardinalite: 1 }
+      - { id: comp-icone, slot: "icone", cardinalite: 0..1 }
+    variants:
+      - { dimension: etat_selection, valeurs: [default, active, disabled] }
+    etats_interactifs: [default, pressed, active, disabled, focused]
+    interactions_natives:
+      - "Tap → E2 émet 'epoque_alternative_selectionnee' (variante frise) OU E4 modifie ETAT-EPOQUE-COURANTE (variante filtre carte)"
+    intention_portee:
+      parametrable: true
+      echelle: variable   # E2 dans frise multi-époque, E4 dans filtre carte (rare)
+      intention: "selection_epoque_alternative"
+      contrats:
+        - "Le parent (frise ou filtre) câble la cible. La frise consomme l'événement E2 ; un filtre carte produirait E4."
+    couplage_etat_partage:
+      - { etat: ETAT-EPOQUE-COURANTE, role: "variable selon contexte", note: "consommateur (highlight Époque courante dans frise) OU producteur (filtre carte)" }
+    consequences_variabilite:
+      - "Libellé Époque variable (longueurs FR/EN/JA divergentes) → truncate (palier 12)"
+
+  - id: comp-chip-couche-carte
+    nom: "Chip de Couche cartographique"
+    famille: atome
+    raison_d_etre: "Toggle d'activation/désactivation d'une Couche cartographique (palier 4 cluster 01 entité Couche cartographique)."
+    ancrage:
+      ecrans: ["E-CARTE-FILTRES-COUCHES"]
+      composants_qui_l_integrent: ["comp-filtres-couches (slot couches)"]
+    composition:
+      - { id: comp-libelle-chip, slot: "label", cardinalite: 1 }
+      - { id: comp-icone, slot: "icone", cardinalite: 1, note: "icône fonctionnelle de la couche ; mapping palier 13" }
+    variants:
+      - { dimension: etat_activation, valeurs: [active, inactive] }
+    etats_interactifs: [default, pressed, active, inactive, disabled, focused]
+    interactions_natives:
+      - "Tap → toggle activation, émet E2 'couche_togglee' (le parent comp-filtres-couches agrège)"
+    intention_portee:
+      parametrable: true
+      echelle: E2_inter_composant
+      intention: "toggle_couche"
+      contrats: ["Le parent câble l'application effective des couches sur la Carte"]
+    consequences_variabilite:
+      - "Libellé i18n divergent → truncate (palier 12)"
+
+  - id: comp-chip-categorie
+    nom: "Chip de Catégorie (display)"
+    famille: atome
+    raison_d_etre: >-
+      Affichage non-interactif de la Catégorie d'un Pin/Parcours (palier 4
+      cluster 01). Pivot du palier 10 (≥10 intégrations dans cards, items
+      de liste, fiches).
+    ancrage:
+      ecrans: ["la quasi-totalité des écrans qui exposent un Pin ou Parcours"]
+      composants_qui_l_integrent: ["comp-item-liste-pin-apercu", "comp-item-liste-parcours-simple", "comp-formulaire-saisie-pin (slot categorie sélectionnée)", "comp-grid-recherche", "comp-frise-chronologique"]
+    composition:
+      - { id: comp-icone, slot: "icone", cardinalite: 1, note: "icône fonctionnelle de catégorie" }
+      - { id: comp-libelle-chip, slot: "label", cardinalite: 1 }
+    variants:
+      - { dimension: taille, valeurs: [standard, compact] }
+    intention_portee: { non_interactif: true }
+    interactions_natives: []
+    consequences_variabilite:
+      - "Libellé Catégorie variable (FR/EN/JA) → truncate (palier 12)"
+      - "Icône absente → fallback générique (palier 13)"
+
+  - id: comp-chip-filtre
+    nom: "Chip de filtre"
+    famille: atome
+    raison_d_etre: "Application/retrait d'un filtre dans une surface de recherche (filtre par Époque, Catégorie, état, provenance)."
+    ancrage:
+      ecrans: ["E-CARTE-RECHERCHE", "E-PARCOURS-PRINCIPAL (catalogue)"]
+      composants_qui_l_integrent: ["comp-recherche-surface (slot filtres_actifs)", "comp-grid-recherche"]
+    composition:
+      - { id: comp-libelle-chip, slot: "label", cardinalite: 1 }
+      - { id: comp-icone, slot: "icone_retrait", cardinalite: 0..1, note: "icône fonctionnelle de retrait quand filtre actif" }
+    variants:
+      - { dimension: type_filtre, valeurs: [epoque, categorie, etat, provenance] }
+      - { dimension: etat, valeurs: [active, inactive] }
+    etats_interactifs: [default, pressed, active, inactive, focused]
+    interactions_natives:
+      - "Tap → toggle activation/désactivation, émet E2 'filtre_togglé'"
+    intention_portee:
+      parametrable: true
+      echelle: E2_inter_composant
+      intention: "application_filtre"
+      contrats: ["Le parent (surface de recherche) câble l'agrégation des filtres et le requêtage"]
+    consequences_variabilite:
+      - "Libellé i18n → truncate (palier 12)"
+
+  # ===========================================================================
+  # BADGES (2)
+  # ===========================================================================
+
+  - id: comp-badge-statut
+    nom: "Badge de statut"
+    famille: atome
+    raison_d_etre: "Marqueur permanent indiquant un statut (officiel, en revue, retiré, brouillon, archivé) — affichage non-interactif distinct du tag-provenance et du status-pin-verification."
+    ancrage:
+      ecrans: ["E-PIN-CONSULTATION-APPROFONDIE", "E-COMMUNAUTE-FILE-MODERATION (back-office)", "E-PROFIL-CONTRIBUTIONS"]
+      composants_qui_l_integrent: ["comp-item-liste-pin-apercu"]
+    composition:
+      - { id: comp-libelle-texte, slot: "texte", cardinalite: 1 }
+      - { id: comp-icone, slot: "icone", cardinalite: 0..1 }
+    variants:
+      - { dimension: type, valeurs: [officiel, en_revue, retire, brouillon, archive] }
+    intention_portee: { non_interactif: true }
+    interactions_natives: []
+    consequences_variabilite:
+      - "Libellé court (palier 8 microcopy) — pas de truncate attendu"
+
+  - id: comp-badge-nombre
+    nom: "Badge de nombre"
+    famille: atome
+    raison_d_etre: "Compteur visuel — multi-époques sur Pin (palier 9 02-pins, badge_multi_epoques), comptage cluster, nombre d'éléments."
+    ancrage:
+      ecrans: ["E-CARTE-PRINCIPALE (Pins multi-époques, clusters)"]
+      composants_qui_l_integrent: ["comp-pin (slot badge_multi_epoques)", "comp-cluster-densite (variante compteur intégré)", "comp-item-liste-* (variantes avec compteur)"]
+    composition:
+      - { id: comp-libelle-texte, slot: "compteur", cardinalite: 1, note: "abréviation au-delà d'un seuil — palier 16" }
+    variants:
+      - { dimension: taille, valeurs: [standard, compact] }
+    intention_portee: { non_interactif: true }
+    interactions_natives: []
+    consequences_variabilite:
+      - "Compteur élevé → abréviation (ex. au-delà d'un seuil — palier 16)"
+
+  # ===========================================================================
+  # REPRÉSENTATIONS (2)
+  # ===========================================================================
+
+  - id: comp-avatar
+    nom: "Avatar"
+    famille: atome
+    raison_d_etre: "Représentation visuelle d'un Profil ou d'un Compte (palier 4 cluster 03). Fallback silhouette si photo absente."
+    ancrage:
+      ecrans: ["E-PROFIL-PRINCIPAL", "E-PROFIL-CREATION-COMPTE (preview)", "E-COMMUNAUTE-FICHE-CONTRIBUTEUR"]
+      composants_qui_l_integrent: ["comp-rangee-profil-action (variante avec avatar)"]
+    composition: []
+    variants:
+      - { dimension: source, valeurs: [photo, silhouette, initiales] }
+      - { dimension: taille, valeurs: [grande, standard, petite] }
+    intention_portee: { non_interactif: true }
+    interactions_natives: []
+    consequences_variabilite:
+      - "Photo absente → fallback silhouette générique (provenance palier 13 illustration ou monogramme)"
+      - "Initiales : 1 ou 2 caractères selon disponibilité du pseudonyme"
+
+  - id: comp-image-hero
+    nom: "Image hero"
+    famille: atome
+    raison_d_etre: >-
+      Illustration immersive en tête d'écran de consultation (Pin, Parcours,
+      onboarding). Réifie le mapping palier 9 cluster 04 (média principal du
+      Pin/Parcours).
+    ancrage:
+      ecrans: ["E-PIN-CONSULTATION-APPROFONDIE", "E-PIN-MODE-PRESENTATION", "E-PARCOURS-FICHE-DETAIL", "E-ONBOARDING-*"]
+      composants_qui_l_integrent: ["comp-layout-consultation-pin-approfondie", "comp-avant-apres (slots avant/après)", "comp-card-parcours (variante hero)"]
+    composition: []
+    variants:
+      - { dimension: ratio, valeurs: ["16:9", "4:3", "1:1", "21:9"] }
+      - { dimension: hauteur, valeurs: [standard, immersive, compact] }
+    intention_portee: { non_interactif: true }
+    interactions_natives: []
+    consequences_variabilite:
+      - "Image absente → placeholder gracieux (palier 13 illustration de remplacement)"
+      - "Image basse résolution → flou progressif jusqu'à chargement (palier 11 chorégraphie)"
+
+  # ===========================================================================
+  # SWITCH (1)
+  # ===========================================================================
+
+  - id: comp-toggle-switch
+    nom: "Bascule (switch)"
+    famille: atome
+    raison_d_etre: "Bascule booléenne d'un paramètre (notifications, modes, préférences). Distinct du chip-couche : sémantique de paramètre persistant plutôt que de filtre temporaire."
+    ancrage:
+      ecrans: ["E-PROFIL-PARAMETRES", "E-PROFIL-NOTIFICATIONS"]
+      composants_qui_l_integrent: ["comp-rangee-profil-action (variante toggle)", "comp-formulaire-* (variantes paramètres)"]
+    composition: []
+    variants:
+      - { dimension: taille, valeurs: [standard, compact] }
+    etats_interactifs: [off, on, disabled, focused]
+    interactions_natives:
+      - "Tap → bascule off↔on (intention E1 atomique sur le visuel ; signal E2 vers parent pour persistance)"
+    intention_portee:
+      parametrable: true
+      echelle: E2_inter_composant
+      intention: "bascule_booleenne"
+      contrats: ["Le parent persiste l'état (préférence Profil, paramètre système). Sur Surprenez-moi, modifie ETAT-MODE-NOTIFICATION (E4 via parent)."]
+    couplage_etat_partage:
+      - { etat: ETAT-MODE-NOTIFICATION, role: "producteur indirect (via parent)", note: "instance Surprenez-moi de E-PROFIL-PARAMETRES" }
+    consequences_variabilite:
+      - "État disabled si une dépendance manque (ex. Surprenez-moi désactivable si géoloc refusée — cf. ETAT-PERMISSIONS-SYSTEME)"
+
+  # ===========================================================================
+  # SLIDER — renvoi (PAS un atome top-level : défini en 03-fonctionnels.yaml)
+  # ===========================================================================
+  # comp-slider-epoque = composant FONCTIONNEL à machine d'état riche,
+  # producteur primaire de ETAT-EPOQUE-COURANTE. Définition canonique UNIQUE
+  # en 03-fonctionnels.yaml. Retiré de la LISTE top-level des atomes — cascade
+  # depuis palier 5 maquette (doublon top-level élucidé → 117 composants
+  # uniques / 118 fiches avant correction).
+
+  # ===========================================================================
+  # CHAMPS DE SAISIE (5)
+  # ===========================================================================
+
+  - id: comp-champ-saisie-texte
+    nom: "Champ de saisie texte"
+    famille: atome
+    raison_d_etre: "Saisie texte simple (single-line). Pivot du palier 10 (≥8 intégrations : recherche, formulaires Compte, formulaire Pin, éditeur Parcours)."
+    ancrage:
+      ecrans: ["E-CARTE-RECHERCHE", "E-PROFIL-CREATION-COMPTE", "E-PROFIL-CONNEXION-COMPTE", "E-COMMUNAUTE-SOUMISSION-PIN", "E-PARCOURS-EDITEUR"]
+      composants_qui_l_integrent: ["comp-recherche-surface (slot requete)", "comp-formulaire-creation-compte", "comp-formulaire-connexion-compte", "comp-formulaire-saisie-pin", "comp-formulaire-creation-parcours"]
+    composition:
+      - { id: comp-libelle-texte, slot: "label", cardinalite: 0..1 }
+      - { id: comp-libelle-texte, slot: "placeholder", cardinalite: 0..1 }
+      - { id: comp-icone, slot: "icone_prefix", cardinalite: 0..1 }
+      - { id: comp-message-erreur-inline, slot: "erreur", cardinalite: 0..1 }
+    variants:
+      - { dimension: type, valeurs: [default, search, email, password] }
+    etats_interactifs: [default, focused, filled, disabled, error]
+    interactions_natives:
+      - "Tap → focus, ouvre clavier OS"
+      - "Saisie → émet E2 'valeur_changée' (debounce optionnel selon contexte)"
+      - "Submit (clavier) → émet E2 'submit_demandé'"
+    intention_portee:
+      parametrable: true
+      echelle: E2_inter_composant
+      intention: "saisie_texte"
+      contrats: ["Le parent gère la persistance, validation, debounce"]
+    consequences_variabilite:
+      - "Texte saisi long → scroll horizontal interne ou troncature affichage (palier 12)"
+      - "i18n : layout clavier varie selon langue OS"
+      - "Variant password : masquage caractères + toggle révélation"
+
+  - id: comp-champ-saisie-textarea
+    nom: "Champ de saisie texte multi-ligne"
+    famille: atome
+    raison_d_etre: "Saisie longue (narration de Pin, description de Parcours)."
+    ancrage:
+      ecrans: ["E-COMMUNAUTE-SOUMISSION-PIN (slot narration)", "E-PARCOURS-EDITEUR (slot description)"]
+      composants_qui_l_integrent: ["comp-formulaire-saisie-pin", "comp-formulaire-creation-parcours"]
+    composition:
+      - { id: comp-libelle-texte, slot: "label", cardinalite: 0..1 }
+      - { id: comp-libelle-texte, slot: "placeholder", cardinalite: 0..1 }
+      - { id: comp-message-erreur-inline, slot: "erreur", cardinalite: 0..1 }
+    variants:
+      - { dimension: hauteur_min, valeurs: [trois_lignes, cinq_lignes, etendu] }
+    etats_interactifs: [default, focused, filled, disabled, error]
+    interactions_natives:
+      - "Tap → focus, ouvre clavier OS"
+      - "Saisie → émet E2 'valeur_changée'"
+    intention_portee:
+      parametrable: true
+      echelle: E2_inter_composant
+      intention: "saisie_texte_long"
+      contrats: ["Le parent gère persistance + validation longueur min/max"]
+    consequences_variabilite:
+      - "Texte long → scroll vertical interne au-delà de la hauteur courante"
+      - "i18n FR/EN/JA divergent en densité"
+
+  - id: comp-champ-saisie-nombre
+    nom: "Champ de saisie nombre"
+    famille: atome
+    raison_d_etre: "Saisie numérique avec contraintes (ex. nombre d'étapes, coordonnées approximées sans cartographie)."
+    ancrage:
+      ecrans: ["E-COMMUNAUTE-SOUMISSION-PIN (variantes)", "back-office"]
+      composants_qui_l_integrent: ["comp-formulaire-saisie-pin (variantes)"]
+    composition:
+      - { id: comp-libelle-texte, slot: "label", cardinalite: 0..1 }
+      - { id: comp-button-tertiary, slot: "increment", cardinalite: 0..1 }
+      - { id: comp-button-tertiary, slot: "decrement", cardinalite: 0..1 }
+    variants:
+      - { dimension: borne, valeurs: [min_max_definis, sans_borne] }
+      - { dimension: increment_buttons, valeurs: [oui, non] }
+    etats_interactifs: [default, focused, filled, disabled, error]
+    interactions_natives:
+      - "Tap → focus, clavier numérique OS"
+      - "Tap increment/decrement → émet E1 modification interne + E2 'valeur_changée'"
+    intention_portee:
+      parametrable: true
+      echelle: E2_inter_composant
+      intention: "saisie_numerique"
+      contrats: ["Le parent valide les bornes et arrondis"]
+    consequences_variabilite:
+      - "Format numérique localisé (séparateur décimal i18n)"
+
+  - id: comp-champ-saisie-date
+    nom: "Champ de saisie date/plage"
+    famille: atome
+    raison_d_etre: "Saisie d'une Époque (date approximée), d'une plage temporelle, ou d'une datetime. Composant locale-aware."
+    ancrage:
+      ecrans: ["E-COMMUNAUTE-SOUMISSION-PIN (slot epoque)", "back-office"]
+      composants_qui_l_integrent: ["comp-formulaire-saisie-pin (slot epoque)"]
+    composition:
+      - { id: comp-libelle-texte, slot: "label", cardinalite: 0..1 }
+      - { id: comp-icone, slot: "icone_calendrier", cardinalite: 1 }
+    variants:
+      - { dimension: mode, valeurs: [date_seule, datetime, range] }
+      - { dimension: precision, valeurs: [annee, mois, jour], note: "Pin avec Époque approximée souvent annee_seule" }
+    etats_interactifs: [default, focused, filled, picker_open, disabled, error]
+    interactions_natives:
+      - "Tap → ouvre picker natif OS (intention E1 locale au composant)"
+      - "Sélection picker → émet E2 'date_choisie'"
+    intention_portee:
+      parametrable: true
+      echelle: E2_inter_composant
+      intention: "saisie_temporelle"
+      contrats: ["Le parent valide la cohérence (range avec start≤end, date dans plage métier)"]
+    consequences_variabilite:
+      - "Format date locale-aware (FR jj/mm/aaaa, EN mm/dd/yyyy, JA aaaa年mm月jj日)"
+      - "Précision variable : si 'annee_seule' affichage abrégé"
+
+  - id: comp-champ-saisie-lieu
+    nom: "Champ de saisie lieu"
+    famille: atome
+    raison_d_etre: "Saisie de localisation (coordonnées, adresse, ou ancrage cartographique). Cas Pin sans coordonnées (I9) géré via mode 'adresse_seule'."
+    ancrage:
+      ecrans: ["E-COMMUNAUTE-SOUMISSION-PIN (slot localisation)", "back-office saisie Pin"]
+      composants_qui_l_integrent: ["comp-formulaire-saisie-pin (slot localisation)"]
+    composition:
+      - { id: comp-libelle-texte, slot: "label", cardinalite: 0..1 }
+      - { id: comp-icone, slot: "icone_lieu", cardinalite: 1 }
+      - { id: comp-button-tertiary, slot: "action_localiser", cardinalite: 0..1, note: "déclenche géoloc si permission accordée" }
+    variants:
+      - { dimension: mode, valeurs: [coordonnees, adresse, cartographique] }
+    etats_interactifs: [default, focused, filled, picker_carte_open, geoloc_demande, geoloc_refusee, disabled, error]
+    interactions_natives:
+      - "Tap action_localiser → demande ETAT-PERMISSIONS-SYSTEME géoloc (intention E1) puis remplit"
+      - "Tap mode cartographique → ouvre picker carte (M6)"
+      - "Saisie texte (mode adresse) → émet E2 'adresse_changée'"
+    intention_portee:
+      parametrable: true
+      echelle: E2_inter_composant
+      intention: "saisie_localisation"
+      contrats: ["Le parent valide cohérence + invariant I9 (Pin sans coordonnées admis avec adresse)"]
+    couplage_etat_partage:
+      - { etat: ETAT-PERMISSIONS-SYSTEME, role: consommateur, note: "géoloc requise pour mode coordonnees auto" }
+    consequences_variabilite:
+      - "Permission géoloc refusée → mode dégradé adresse manuelle"
+      - "Réseau absent → mode cartographique limité aux tuiles préchargées"
+
+  # ===========================================================================
+  # ICÔNE (1)
+  # ===========================================================================
+
+  - id: comp-icone
+    nom: "Icône"
+    famille: atome
+    raison_d_etre: >-
+      Symbole fonctionnel utilisé dans la quasi-totalité des autres composants
+      (boutons, chips, badges, headers, items de liste). Pivot DOMINANT du
+      palier 10 (≥30 intégrations recensées). Mapping concret au palier 13.
+    ancrage:
+      ecrans: ["la quasi-totalité des écrans"]
+      composants_qui_l_integrent: ["la quasi-totalité des composants atomes interactifs (boutons, chips, champs de saisie)", "comp-pin (slot icone_categorie)", "comp-cluster-densite", "comp-badge-statut", "comp-tag-categorie", "comp-rangee-profil-action", "comp-header-titre-action"]
+    composition: []
+    variants:
+      - { dimension: type, valeurs: [categorie, action, etat, statut, navigation] }
+      - { dimension: taille, valeurs: [tres_petit, petit, standard, grand] }
+    intention_portee: { non_interactif: true }
+    interactions_natives: []
+    consequences_variabilite:
+      - "Icône absente → fallback générique (palier 13)"
+      - "Densité du tracé adaptée à la taille (palier 13)"
+    note: "Composant pur de présentation. L'interactivité (tap, focus) est portée par le composant englobant (bouton, chip)."
+
+  # ===========================================================================
+  # LIBELLÉS (3)
+  # ===========================================================================
+
+  - id: comp-libelle-texte
+    nom: "Libellé texte"
+    famille: atome
+    raison_d_etre: >-
+      Brique textuelle générique pour titres, corps, métadonnées, captions.
+      Pivot DOMINANT du palier 10 (≥40 intégrations — toute composition contient
+      du texte).
+    ancrage:
+      ecrans: ["la quasi-totalité des écrans"]
+      composants_qui_l_integrent: ["la quasi-totalité des composants (atomes, molécules, fonctionnels, shell)"]
+    composition: []
+    variants:
+      - { dimension: variante_semantique, valeurs: [titre, corps, caption, overline, metadonnee] }
+      - { dimension: niveau_titre, valeurs: [H1, H2, H3, H4], note: "applicable si variante_semantique=titre" }
+      - { dimension: poids, valeurs: [regular, medium, bold] }
+    intention_portee: { non_interactif: true }
+    interactions_natives: []
+    consequences_variabilite:
+      - "Texte variable → truncate avec ellipse au-delà d'un seuil (palier 12)"
+      - "i18n FR/EN/JA divergent (densité visuelle JA en idéogrammes ≠ FR/EN)"
+      - "Multilignes selon variante (corps : oui ; titre : limité — palier 12)"
+
+  - id: comp-libelle-bouton
+    nom: "Libellé de bouton"
+    famille: atome
+    raison_d_etre: "Texte spécifique aux boutons — variante typographique distincte (poids, casse) pour signaler l'actionnabilité."
+    ancrage:
+      ecrans: ["transverse — utilisé par tous les boutons textuels"]
+      composants_qui_l_integrent: ["comp-button-primary (slot label)", "comp-button-secondary", "comp-button-tertiary", "comp-button-fab-creation (variante étendue)"]
+    composition: []
+    variants:
+      - { dimension: taille, valeurs: [standard, compact] }
+    intention_portee: { non_interactif: true }
+    interactions_natives: []
+    consequences_variabilite:
+      - "Texte variable → truncate (palier 12)"
+      - "i18n FR/EN/JA divergent ; perceptibilité validée palier 16"
+
+  - id: comp-libelle-chip
+    nom: "Libellé de chip"
+    famille: atome
+    raison_d_etre: "Texte intégré aux chips — variante typographique adaptée à la compacité du chip."
+    ancrage:
+      ecrans: ["transverse — utilisé par tous les chips"]
+      composants_qui_l_integrent: ["comp-chip-epoque", "comp-chip-couche-carte", "comp-chip-categorie", "comp-chip-filtre"]
+    composition: []
+    variants: []
+    intention_portee: { non_interactif: true }
+    interactions_natives: []
+    consequences_variabilite:
+      - "Texte court (palier 8 microcopy) ; truncate au-delà d'un seuil compact (palier 12)"
+
+  # ===========================================================================
+  # SPATIAUX (2)
+  # ===========================================================================
+
+  - id: comp-separateur
+    nom: "Séparateur"
+    famille: atome
+    raison_d_etre: "Délimitation visuelle entre groupes/sections (lignes horizontales, verticales)."
+    ancrage:
+      ecrans: ["la quasi-totalité des écrans avec sections multiples"]
+      composants_qui_l_integrent: ["comp-rangee-profil-action", "comp-liste-simple", "comp-header-titre-action"]
+    composition: []
+    variants:
+      - { dimension: orientation, valeurs: [horizontal, vertical] }
+      - { dimension: style, valeurs: [trait_plein, trait_pointille, trait_estompe] }
+    intention_portee: { non_interactif: true }
+    interactions_natives: []
+    consequences_variabilite: []
+
+  - id: comp-espaceur
+    nom: "Espaceur"
+    famille: atome
+    raison_d_etre: "Espace structurel inséré entre éléments (vertical ou horizontal). Distinct du séparateur (pas de trait visible)."
+    ancrage:
+      ecrans: ["transverse"]
+      composants_qui_l_integrent: ["transverse — toute composition utilisant la grille de spacing"]
+    composition: []
+    variants:
+      - { dimension: dimension, valeurs: [tres_petit, petit, standard, grand, tres_grand] }
+      - { dimension: orientation, valeurs: [vertical, horizontal] }
+    intention_portee: { non_interactif: true }
+    interactions_natives: []
+    consequences_variabilite: []
+    note: "Tailles concrètes au palier 12."
+
+  # ===========================================================================
+  # INDICATEURS / MESSAGES (5)
+  # ===========================================================================
+
+  - id: comp-indicateur-chargement
+    nom: "Indicateur de chargement"
+    famille: atome
+    raison_d_etre: "Feedback visuel d'opération asynchrone en cours (chargement réseau, traitement local long)."
+    ancrage:
+      ecrans: ["transverse"]
+      composants_qui_l_integrent: ["comp-grid-recherche (slot loader)", "comp-button-primary (état loading)", "comp-image-hero (chargement progressif)", "comp-recherche-surface (état querying)"]
+    composition: []
+    variants:
+      - { dimension: type, valeurs: [spinner, barre, pulse] }
+      - { dimension: taille, valeurs: [petit, standard, grand] }
+    intention_portee: { non_interactif: true }
+    interactions_natives: []
+    consequences_variabilite: []
+    note: "Chorégraphie temporelle (vitesse rotation/pulsation) au palier 11."
+
+  - id: comp-message-erreur-inline
+    nom: "Message d'erreur inline"
+    famille: atome
+    raison_d_etre: "Erreur attachée à un champ (field-level) ou à un formulaire (form-level). Microcopy palier 8."
+    ancrage:
+      ecrans: ["E-PROFIL-CREATION-COMPTE", "E-COMMUNAUTE-SOUMISSION-PIN", "tout écran avec validation"]
+      composants_qui_l_integrent: ["comp-champ-saisie-texte (slot erreur)", "comp-champ-saisie-textarea", "comp-champ-saisie-nombre", "comp-champ-saisie-date", "comp-champ-saisie-lieu", "comp-formulaire-* (slot erreur form-level)"]
+    composition:
+      - { id: comp-icone, slot: "icone_erreur", cardinalite: 0..1 }
+      - { id: comp-libelle-texte, slot: "message", cardinalite: 1 }
+    variants:
+      - { dimension: portee, valeurs: [field-level, form-level] }
+    intention_portee: { non_interactif: true }
+    interactions_natives: []
+    consequences_variabilite:
+      - "Message variable (microcopy palier 8) — truncate non admis (l'utilisateur DOIT lire)"
+
+  - id: comp-message-success-inline
+    nom: "Message de succès inline"
+    famille: atome
+    raison_d_etre: "Confirmation visuelle d'une action réussie attachée à un champ ou à un formulaire (distinct du message éphémère shell qui flotte)."
+    ancrage:
+      ecrans: ["E-PROFIL-PARAMETRES (sauvegarde paramètre)", "E-COMMUNAUTE-SOUMISSION-PIN (soumission acceptée)"]
+      composants_qui_l_integrent: ["comp-formulaire-* (slot succès)"]
+    composition:
+      - { id: comp-icone, slot: "icone_succes", cardinalite: 0..1 }
+      - { id: comp-libelle-texte, slot: "message", cardinalite: 1 }
+    intention_portee: { non_interactif: true }
+    interactions_natives: []
+    consequences_variabilite: []
+
+  - id: comp-indicateur-progression
+    nom: "Indicateur de progression"
+    famille: atome
+    raison_d_etre: "Affiche une avancée chiffrée ou en barre (étape n/N d'un Parcours, progression upload média)."
+    ancrage:
+      ecrans: ["E-PARCOURS-EN-COURS-TERRAIN", "E-COMMUNAUTE-SOUMISSION-PIN (upload médias)"]
+      composants_qui_l_integrent: ["comp-surface-persistante-parcours (P2 : étape n/N)", "comp-formulaire-saisie-pin (upload progression)"]
+    composition:
+      - { id: comp-libelle-texte, slot: "valeur_textuelle", cardinalite: 0..1 }
+    variants:
+      - { dimension: type, valeurs: [barre, texte, mixte] }
+    intention_portee: { non_interactif: true }
+    interactions_natives: []
+    consequences_variabilite:
+      - "Valeur indéterminée → fallback indicateur infini (cf. comp-indicateur-chargement)"
+
+  - id: comp-page-indicator
+    nom: "Indicateur de page"
+    famille: atome
+    raison_d_etre: "Pagination visuelle (dots) ou compteur (n/N) — utilisé en onboarding et en carrousels."
+    ancrage:
+      ecrans: ["E-ONBOARDING-PAS-1 → PAS-N", "écrans avec carrousel média"]
+      composants_qui_l_integrent: ["comp-carousel (slot indicateur)"]
+    composition: []
+    variants:
+      - { dimension: type, valeurs: [dots, counter] }
+    intention_portee: { non_interactif: true }
+    interactions_natives: []
+    consequences_variabilite:
+      - "Au-delà d'un seuil de pages, bascule de dots vers counter (palier 12)"
+
+  # ===========================================================================
+  # AUTRES ATOMES (5)
+  # ===========================================================================
+
+  - id: comp-lien-texte
+    nom: "Lien texte"
+    famille: atome
+    raison_d_etre: "Navigation textuelle (interne ou externe) — distinct du bouton tertiaire par sa sémantique de lien (cible référencée plutôt qu'action)."
+    ancrage:
+      ecrans: ["E-PROFIL-CREATION-COMPTE (mention légale)", "E-PROFIL-CONNEXION-COMPTE (oubli mdp)", "E-PIN-CONSULTATION-APPROFONDIE (sources)"]
+      composants_qui_l_integrent: ["comp-formulaire-creation-compte (slot legal)", "comp-formulaire-connexion-compte (slot oubli_mdp)", "comp-zone-sources"]
+    composition:
+      - { id: comp-libelle-texte, slot: "label", cardinalite: 1 }
+      - { id: comp-icone, slot: "icone_externe", cardinalite: 0..1, note: "icône fonctionnelle 'lien externe' si cible hors app" }
+    variants:
+      - { dimension: portee, valeurs: [interne, externe] }
+      - { dimension: style, valeurs: [inline, standalone] }
+    etats_interactifs: [default, pressed, visited, disabled, focused]
+    interactions_natives:
+      - "Tap → navigation vers cible (intention OUVERTE — câblée par le parent)"
+    intention_portee:
+      parametrable: true
+      echelle: E3_navigationnelle   # E2 si interne dans même surface
+      intention: "navigation_textuelle"
+      contrats: ["Le parent câble la cible. Externe → ouvre navigateur OS via intent système."]
+    consequences_variabilite:
+      - "Libellé variable (i18n) → truncate inline (palier 12)"
+
+  - id: comp-lien-universel-qr
+    nom: "Lien universel / QR code"
+    famille: atome
+    raison_d_etre: "Affichage d'un QR code de partage d'une cible (Pin, Parcours) avec action de partage. Réifie l'entrée externe E1 du palier 5 (Lien universel reçu)."
+    ancrage:
+      ecrans: ["E-PIN-PARTAGE", "E-PARCOURS-PARTAGE"]
+      composants_qui_l_integrent: ["comp-dialogue-partage", "comp-overlay-partage (M6)"]
+    composition:
+      - { id: comp-libelle-texte, slot: "url_lisible", cardinalite: 0..1 }
+    variants:
+      - { dimension: taille, valeurs: [standard, agrandi] }
+    etats_interactifs: [default, pressed, focused]
+    interactions_natives:
+      - "Tap → ouvre options de partage natives OS (intention E2 vers parent qui orchestre)"
+      - "Affichage QR scannable depuis device tiers (lien universel cf. P5.E1)"
+    intention_portee:
+      parametrable: true
+      echelle: E2_inter_composant
+      intention: "partage_lien_universel"
+      contrats: ["Le parent fournit l'URL cible et orchestre l'ouverture du share-sheet OS"]
+    patterns_attaches: [PI-TAP-HORS]
+    consequences_variabilite:
+      - "URL longue → version raccourcie affichée si pertinent"
+
+  - id: comp-image-avatar-small
+    nom: "Avatar miniature"
+    famille: atome
+    raison_d_etre: "Thumbnail d'avatar utilisateur dans des contextes denses (item de liste, mention en commentaire). Variante compacte de comp-avatar."
+    ancrage:
+      ecrans: ["E-COMMUNAUTE-FILE-MODERATION", "E-COMMUNAUTE-COMMENTAIRES"]
+      composants_qui_l_integrent: ["comp-item-liste-mention"]
+    composition: []
+    variants:
+      - { dimension: source, valeurs: [photo, silhouette, initiales] }
+    intention_portee: { non_interactif: true }
+    interactions_natives: []
+    consequences_variabilite:
+      - "Photo absente → fallback silhouette ou monogramme (palier 13)"
+    note: "Distinct de comp-avatar par sa taille fixe compacte. Réutilise les mêmes registres de variabilité de source."
+
+  - id: comp-tag
+    nom: "Tag (étiquette générique)"
+    famille: atome
+    raison_d_etre: "Étiquette textuelle optionnelle (mots-clés, métadonnées libres). Distinct du chip (non-interactif) et du tag-categorie (sémantique métier précise)."
+    ancrage:
+      ecrans: ["E-PIN-CONSULTATION-APPROFONDIE (zone métadonnées)", "E-PARCOURS-FICHE-DETAIL"]
+      composants_qui_l_integrent: []
+    composition:
+      - { id: comp-libelle-texte, slot: "texte", cardinalite: 1 }
+    variants:
+      - { dimension: couleur_semantique, valeurs: [neutre, accent, succes, attention, danger] }
+    intention_portee: { non_interactif: true }
+    interactions_natives: []
+    consequences_variabilite:
+      - "Texte court attendu (palier 8) ; truncate au-delà d'un seuil compact (palier 12)"
+
+  - id: comp-mention-anonymat
+    nom: "Mention d'anonymat"
+    famille: atome
+    raison_d_etre: "Texte légal rappelant l'anonymat du signaleur lors d'un signalement de Pin (cf. palier 6 flow signalement, palier 4 cluster modération)."
+    ancrage:
+      ecrans: ["E-COMMUNAUTE-SIGNALEMENT-PIN"]
+      composants_qui_l_integrent: ["comp-formulaire-signalement", "comp-dialogue-signalement"]
+    composition:
+      - { id: comp-icone, slot: "icone_anonymat", cardinalite: 0..1 }
+      - { id: comp-libelle-texte, slot: "texte_legal", cardinalite: 1 }
+    intention_portee: { non_interactif: true }
+    interactions_natives: []
+    consequences_variabilite:
+      - "Microcopy contractuel (palier 8) ; pas de truncate"
+
+  # ===========================================================================
+  # MARQUEURS VISUELS (3)
+  # ===========================================================================
+
+  - id: comp-tag-categorie
+    nom: "Tag de Catégorie (visuel)"
+    famille: atome
+    raison_d_etre: "Étiquette de Catégorie en variante visuelle/textuelle pure (sans icône — distinct de comp-chip-categorie qui inclut l'icône)."
+    ancrage:
+      ecrans: ["E-PIN-CONSULTATION-APPROFONDIE", "écrans communautaires denses"]
+      composants_qui_l_integrent: ["comp-item-liste-pin-apercu (variante)"]
+    composition:
+      - { id: comp-libelle-texte, slot: "texte", cardinalite: 1 }
+    intention_portee: { non_interactif: true }
+    interactions_natives: []
+    consequences_variabilite:
+      - "Libellé Catégorie i18n → truncate (palier 12)"
+    note: "Distinct de comp-chip-categorie : le tag-categorie est purement textuel/visuel sans icône. Ré-évaluation plus tard : fusion potentielle si redondance confirmée."
+
+  - id: comp-tag-provenance
+    nom: "Tag de provenance"
+    famille: atome
+    raison_d_etre: >-
+      Marqueur éditorial/communautaire/personnel — réifie le mapping palier 9
+      D3 (provenance via couleur) en variante texte hors carte. Pour les
+      contextes liste/fiche où la couleur du Pin n'est pas exposée.
+    ancrage:
+      ecrans: ["E-PIN-CONSULTATION-APPROFONDIE", "E-COMMUNAUTE-FICHE-CONTRIBUTEUR"]
+      composants_qui_l_integrent: ["comp-item-liste-pin-apercu"]
+    composition:
+      - { id: comp-libelle-texte, slot: "texte", cardinalite: 1 }
+      - { id: comp-icone, slot: "icone_provenance", cardinalite: 0..1 }
+    variants:
+      - { dimension: provenance, valeurs: [editorial, communautaire, personnel] }
+    intention_portee: { non_interactif: true }
+    interactions_natives: []
+    consequences_variabilite:
+      - "Microcopy de provenance constant (palier 8)"
+
+  - id: comp-status-pin-verification
+    nom: "Statut Pin en vérification"
+    famille: atome
+    raison_d_etre: >-
+      Badge distinctif communautaire « sources en vérification » — réifie
+      l'invariant I3 (Pin communautaire en cours de vérification). Distinct
+      de comp-badge-statut générique : sémantique précisément liée au flux
+      de modération (palier 6 flows D/G).
+    ancrage:
+      ecrans: ["E-PIN-CONSULTATION-APPROFONDIE (Pin communautaire en cours)", "E-COMMUNAUTE-FILE-MODERATION (vue contributeur)"]
+      composants_qui_l_integrent: []
+    composition:
+      - { id: comp-icone, slot: "icone_verification", cardinalite: 1 }
+      - { id: comp-libelle-texte, slot: "texte", cardinalite: 1 }
+    intention_portee: { non_interactif: true }
+    interactions_natives: []
+    consequences_variabilite:
+      - "Microcopy précis (palier 8) ; pas de truncate"
+    note: >-
+      Cohérent avec le registre 'contour distinctif' du Pin sur Carte
+      (palier 9 D5). Ce composant est l'équivalent textuel hors Carte.
+      Invariant I3 : Pin éditorial → ce badge n'apparaît JAMAIS.

@@ -1,0 +1,85 @@
+# =============================================================================
+# E-PIN-CONSULTATION-3D — Viewer 3D d'un Modèle 3D rattaché à un Pin
+# =============================================================================
+# Surface en P5.M3 dédiée à la manipulation immersive d'un Modèle 3D associé
+# à un Pin. S'inscrit dans la famille du mode présentation (D8.2) — chrome
+# non-essentiel masqué, surfaces persistantes en sommeil visuel (P5.C2).
+# Bascule possible vers AR (E-PIN-CONSULTATION-AR) avec demande de permission
+# caméra (flow A6).
+# =============================================================================
+
+document:
+  type: palier_ecrans_fiche
+  format: yaml
+
+ecran:
+  id: E-PIN-CONSULTATION-3D
+  nom: "Viewer 3D d'un Modèle 3D rattaché à un Pin"
+
+  mode: P5.M3
+  surface_parente: P5.S1
+
+  raison_d_etre: >-
+    Permettre à l'utilisateur d'explorer une reconstitution historique en
+    3D (bâtiment, monument, objet) attachée à un Pin. Manipulation libre
+    par rotation, rapprochement, éloignement. Point d'accès vers la
+    superposition AR (E-PIN-CONSULTATION-AR) si le Modèle dispose d'un
+    ancrage géographique et que le terminal est compatible. C'est ICI
+    que la couche 3D du patrimoine prend forme avant l'AR.
+
+  composition:
+    - zone: "scène 3D"
+      role: "occupe l'espace principal ; rendu interactif du Modèle 3D ; rotation, rapprochement, éloignement par gestes ; chrome non-essentiel masqué (D8.2 — famille du mode présentation)"
+      entites_affichees: ["Modèle 3D"]
+
+    - zone: "contextualisation discrète"
+      role: "titre du Modèle, Époque recréée, accès aux Sources qui justifient la fidélité de la reconstitution (I4 instancié pour Modèle 3D) ; reste accessible mais discret pour ne pas occulter la scène"
+      entites_affichees: ["Modèle 3D", Époque, Source]
+
+    - zone: "sélecteur de Modèle (si applicable)"
+      role: "présent uniquement si plusieurs Modèles 3D sont rattachés au Pin (ex. différents états ou différentes Époques — D8.4) ; permet de choisir le Modèle affiché"
+      entites_affichees: ["Modèle 3D", Époque]
+
+    - zone: "point d'accès AR"
+      role: "apparition conditionnelle (Modèle doté d'un ancrage_géographique ET terminal compatible AR) ; déclenche le flow B5 et la demande de permission caméra (A6) si non encore accordée → bascule vers E-PIN-CONSULTATION-AR"
+
+    - zone: "point de retour"
+      role: "retour à E-PIN-CONSULTATION-APPROFONDIE (B2 du Pin d'origine) ; libère les ressources de rendu 3D"
+
+  etats:
+    nominal_charge: "Modèle 3D chargé et manipulable ; surfaces persistantes (P1, P2, P3) en sommeil visuel (P5.C2)"
+    chargement: "Modèle en cours de téléchargement / rendu ; indicateur de progression discret ; sortie possible vers la consultation approfondie (B2) à tout moment"
+    plusieurs_modeles_disponibles: "Sélecteur de Modèle visible ; comportement de pré-sélection à arbitrer (cf. question ouverte D8.4 — calage sur l'Époque courante du slider ou choix explicite)"
+    audio_narratif_en_cours: "Audio narratif du Pin lancé en B2 toujours en cours ; politique à acter (continuation, remplacement par Fragment musical d'ambiance d'époque, silence — cf. D8.2 question ouverte)"
+    ar_disponible: "Point d'accès AR visible ; le Modèle a un ancrage_géographique ET le terminal est détecté compatible AR"
+    ar_indisponible_terminal: "Point d'accès AR absent (pas grisé) — terminal non compatible AR"
+    ar_indisponible_pas_d_ancrage: "Point d'accès AR absent — le Modèle n'a pas d'ancrage_géographique (cf. D8.4)"
+    offline_avec_cache: "Modèle préchargé disponible ; bandeau P3 en sommeil visuel ; bascule AR à acter (peut nécessiter du contenu non préchargé)"
+    offline_sans_cache: "Modèle non disponible hors ligne ; message éphémère P5.M9 ('reconstitution non disponible hors ligne') ; retour à B2"
+    terminal_ressources_insuffisantes: "Le terminal ne peut pas rendre le Modèle de manière fluide ; comportement à arbitrer avec le dev 3D (fallback vers version simplifiée, pré-rendu vidéo, ou message gracieux) ; ne bloque pas B2"
+    erreur_chargement: "Échec du chargement du Modèle ; message gracieux ; retour proposé vers la consultation approfondie"
+    parcours_en_cours: "P2 reste en sommeil visuel pendant la consultation 3D ; au retour vers B2 puis vers le Parcours, la progression du Parcours n'a pas avancé"
+
+  elements_interactifs:
+    - "Gestes de manipulation 3D : rotation, rapprochement, éloignement"
+    - "Tap sur un Modèle alternatif dans le sélecteur (si plusieurs Modèles rattachés) → re-rendu sur le nouveau Modèle"
+    - "Tap sur l'accès aux Sources → affichage des Sources de la reconstitution (palier 10 décide la modalité — surface ponctuelle, panneau coulissant)"
+    - "Tap sur le point d'accès AR → flow B5 ; déclenche A6 (permission caméra) si non encore accordée → bascule vers E-PIN-CONSULTATION-AR"
+    - "Tap sur le contrôle partage (à confirmer en palier 10) → flow F1 — la consultation 3D reste en arrière-plan"
+    - "Retour → libération des ressources 3D, retour à E-PIN-CONSULTATION-APPROFONDIE (B2 du Pin)"
+
+  flows_actifs:
+    - B4   # Accès à la consultation 3D (cet écran est l'instanciation de B4)
+    - A6   # Demande de permission caméra (déclenchée à la bascule vers AR)
+
+  surfaces_imbriquees:
+    - E-PIN-CONSULTATION-AR              # bascule vers M4 si AR activée
+    - E-PIN-CONSULTATION-APPROFONDIE     # cible du retour
+    - E-TRANSVERSES-DIALOGUE-PERMISSION  # M8 transverse pour A6 (caméra)
+    - E-TRANSVERSES-MESSAGE-EPHEMERE     # M9 si erreur de chargement, contenu indisponible
+
+  questions_ouvertes:
+    - "Sélection du Modèle quand plusieurs sont attachés : flow dédié de sélection préalable, ou intégré comme zone interne à E-PIN-CONSULTATION-3D ? — cf. B4 question ouverte"
+    - "Politique audio pendant la consultation 3D (continuation de la narration, bascule vers Fragment musical d'ambiance d'époque, silence) — cf. D8.2"
+    - "Disponibilité du contrôle partage depuis la 3D (capture du Modèle ou simple partage du Pin) — palier 10"
+    - "Politique de préchargement des Modèles 3D : par Pin consulté, par Époque sélectionnée, par Parcours téléchargé ? — palier 13 / palier 16"

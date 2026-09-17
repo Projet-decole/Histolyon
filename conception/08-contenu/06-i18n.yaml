@@ -1,0 +1,134 @@
+# =============================================================================
+# Palier 8 — 06-i18n — Langue de l'application
+# =============================================================================
+# HistoLyon est une application MONO-LANGUE : français uniquement. Aucune
+# traduction UI ni traduction de contenu n'est prévue pour l'instant. Ce
+# fichier documente les conventions du français (typographie, formats,
+# pluralisation) et les quelques cas particuliers qui restent pertinents
+# même sans multilinguisme (contenu communautaire dans une langue non
+# maîtrisée, glossage des termes historiques).
+#
+# Cohérence stricte avec le pilote 01-strategie-narrative (le ton conteur)
+# et 02-personas (Kenji : voir § 4 persona check).
+# =============================================================================
+
+document:
+  type: palier_contenu_langue
+  version: "0.2"
+  format: yaml
+
+# -----------------------------------------------------------------------------
+# 1. Décision
+# -----------------------------------------------------------------------------
+decision:
+  langue: "français uniquement"
+  perimetre_exclu:
+    - "Traduction de l'UI dans une autre langue"
+    - "Traduction du contenu narratif (Pins, Parcours)"
+    - "Toute infrastructure de traduction (clés i18n, gestion de locale, sélecteur de langue)"
+  raison: >-
+    Simplifie le développement et la production de contenu pour l'année de
+    développement. Une extension multilingue reste possible plus tard mais
+    n'est pas préparée activement (pas de sur-ingénierie anticipée).
+
+# -----------------------------------------------------------------------------
+# 2. Conventions du français
+# -----------------------------------------------------------------------------
+conventions_francais:
+
+  voix_recit_vs_voix_app:
+    rappel_pilote: "Cf. pilote § conteur.voix. La distinction tu/vous structure tout le texte — pivot du ton conteur."
+    voix_recit: "tutoiement narratif"
+    voix_app: "vouvoiement institutionnel"
+    regle_de_bascule: "doute → vouvoiement (cf. pilote)"
+
+  genre:
+    regle: "Neutralité par tournure quand possible (« Bienvenue » plutôt que « Bienvenu(e) »)."
+    ecriture_inclusive: "Pas de point médian ni de doublet systématique. Sobriété par tournure neutre."
+
+  typographie:
+    apostrophes: "courbes ' (U+2019)"
+    guillemets: "français à chevrons « » avec espace insécable interne"
+    espaces_insecables: "avant : ; ! ? et entre les chevrons"
+    tirets: "demi-cadratin – (incises et plages), cadratin — (incises emphatiques préférées au récit), trait d'union -"
+    points_de_suspension: "caractère unique … (U+2026)"
+
+  formats:
+    date_courte: "JJ/MM/AAAA"
+    date_longue: "« le 15 janvier 2026 »"
+    date_recit: "format littéraire libre selon contexte (« en janvier 1850 », « à la fin du XVIIIe siècle »)"
+    heure: "HH:MM en 24h"
+    nombre_decimal: "virgule (« 3,14 »)"
+    nombre_milliers: "espace insécable (« 12 345 »)"
+
+  pluralisation:
+    formes: 2
+    regle: "0/1 → singulier, 2+ → pluriel"
+    note_zero: "Le zéro est singulier en français. Préférer « Aucun favori » à « 0 favori »."
+
+  bonnes_pratiques_techniques:
+    cles_stables: "Toute chaîne affichée référencée par une clé stable côté code (pas par sa valeur française en dur) — facilite la maintenance et une éventuelle traduction future sans tout redévelopper."
+    interpolation: "Variables encadrées par des placeholders nommés (« Vous avez {count} favoris »), pas de concaténation ni de placeholder positionnel."
+
+# -----------------------------------------------------------------------------
+# 3. Cas particuliers
+# -----------------------------------------------------------------------------
+cas_particuliers:
+
+  - cas: "Noms propres lyonnais"
+    exemples: ["Lyon", "Croix-Rousse", "Vieux Lyon", "Fourvière", "Bellecour", "la Saône", "le Rhône"]
+    regle: "Jamais reformulés ou traduits."
+
+  - cas: "Termes historiques lyonnais"
+    exemples: ["canuts", "traboule", "bouchon", "soyeux", "guignol"]
+    regle: "GLOSSÉS au passage en première occurrence, intégré au récit, pas en note (cohérent P6)."
+    exemple_conceptuel: "« Tu vois ce passage qui traverse la maison ? C'est une traboule — un raccourci typique de Lyon, qu'utilisaient les canuts, les ouvriers de la soie... »"
+
+  - cas: "Citations historiques d'archives"
+    regle: "Restées dans leur langue d'origine si elle diffère du français (ex. citation latine), avec traduction française en regard (P6)."
+    saisie: "Le formulaire de saisie Pin admin prévoit le double champ (original + traduction)."
+
+  - cas: "Contenu communautaire soumis dans une autre langue"
+    description: "Commentaires, retours, contributions utilisateur"
+    regle: "Affiché dans sa langue d'origine, jamais traduit automatiquement — la traduction automatique de contributions ouvre des questions de modération, de fidélité et de droit moral du contributeur."
+    affichage: "Si une métadonnée de langue de soumission est disponible, indicateur discret (« commentaire en anglais »). Sinon on n'invente pas."
+
+  - cas: "Émojis et symboles"
+    rappel: "Le pilote interdit déjà les émojis (anti-pattern peppy)."
+
+# -----------------------------------------------------------------------------
+# 4. Persona check
+# -----------------------------------------------------------------------------
+persona_check:
+  kenji: >-
+    Kenji (touriste japonais, cf. 02-personas) navigue en français. L'audio
+    et la richesse visuelle des Pins (photos, 3D/AR, structure claire de
+    l'interface) compensent partiellement la barrière de langue — il peut
+    découvrir et se repérer sans lire le français couramment, mais le
+    contenu narratif détaillé lui reste largement fermé. Limitation
+    assumée et transparente, pas masquée.
+  autres_personas: "Aucune contrainte de langue pour Mme Dupont, Mme Martin, Marc Dubois et Anaïs (back-office) — tous francophones."
+
+# -----------------------------------------------------------------------------
+# 5. Questions ouvertes
+# -----------------------------------------------------------------------------
+questions_ouvertes:
+
+  - id: Q1
+    question: "Affichage de la langue source d'un commentaire utilisateur — comment sans alourdir l'UI ?"
+    notre_position: "Palier 7/10. Principe ici : si la métadonnée existe, on l'utilise discrètement."
+
+  - id: Q2
+    question: "Traduction automatique des contributions utilisateurs — un jour ?"
+    notre_position: "Hors périmètre actuel. À reprendre quand le volume le justifiera et que la modération multilingue sera tenable."
+
+# -----------------------------------------------------------------------------
+# 6. Cohérence avec autres paliers
+# -----------------------------------------------------------------------------
+coherence_paliers:
+  - { palier: "1 — essence",          point: "ton conteur (§ atmosphere_et_ton)" }
+  - { palier: "2 — personas",         point: "Kenji — limitation de langue assumée (§ 4)" }
+  - { palier: "8 — pilote",           point: "voix du récit / voix de l'app (§ conteur.voix)" }
+  - { palier: "8 — 05 admin",         point: "back-office en français" }
+  - { palier: "10 — composants",      point: "pas de contrainte de longueur variable multilingue à absorber" }
+  - { palier: "13 — admin",           point: "saisie citation (original + traduction française si besoin)" }

@@ -1,0 +1,93 @@
+# =============================================================================
+# E-PROFIL-PARAMETRES — Paramètres
+# =============================================================================
+# Vue dédiée aux paramètres généraux du Profil (P5.S3 en P5.M3) :
+# accessibilité, modes de notification de proximité, gestion de l'Historique,
+# entrée vers la gestion du Compte si rattaché, mentions légales et politique
+# de confidentialité. Le détail des libellés et la structure exacte des
+# rubriques relèvent du palier 8/10.
+# =============================================================================
+
+document:
+  type: palier_ecrans_fiche
+  format: yaml
+
+ecran:
+  id: E-PROFIL-PARAMETRES
+  nom: "Paramètres"
+
+  mode: P5.M3
+  surface_parente: P5.S3
+
+  raison_d_etre: >-
+    Permet à l'utilisateur d'ajuster ses préférences d'usage (langue,
+    accessibilité, notifications de proximité, enregistrement de
+    l'historique) et d'accéder aux mentions légales. Toutes les
+    modifications sont appliquées immédiatement et persistent entre
+    sessions. La permission système (notifications, géolocalisation, etc.)
+    n'est pas miroir-isée par l'app — quand une réactivation est nécessaire,
+    l'écran oriente vers les paramètres OS (cluster 03 permissions_systeme).
+
+  composition:
+    - zone: "rubrique accessibilité"
+      role: "expose l'ensemble des réglages d'accessibilité (Profil.préférences_accessibilité — taille de texte, contraste, animations réduites, alternatives audio, etc.) ; détail palier 12/16"
+      entites_affichees: [Profil]
+
+    - zone: "rubrique modes de notification de proximité"
+      role: "expose Profil.mode_notification_proximité (balade_libre / surprenez_moi) ; activation Surprenez-moi peut déclencher A6 (demande de permission notifications)"
+      entites_affichees: [Profil]
+
+    - zone: "rubrique gestion de l'Historique"
+      role: "expose Profil.enregistrement_historique_actif (drapeau) et un point d'accès vers l'effacement total (déclenche D4)"
+      entites_affichees: [Profil, "Historique de visite"]
+
+    - zone: "rubrique gestion du Compte"
+      role: "si Compte rattaché, point d'accès vers E-PROFIL-PARAMETRES-COMPTE ; sinon points d'accès Créer un compte (D6) et Se connecter (D7), discrets"
+      entites_affichees: [Compte]
+
+    - zone: "rubrique mentions légales et politique de confidentialité"
+      role: "ouverture de sous-vues P5.M3 dédiées (pas de bascule vers navigateur externe — cohérence ton sobre, cf. D5 bifurcations)"
+
+  etats:
+    nominal_charge: "Toutes les rubriques chargées et opérationnelles"
+    chargement: "Lecture locale (rare)"
+    permission_systeme_refusee_definitivement: "Sur la rubrique mode Surprenez-moi (ou toute autre rubrique dépendant d'une permission système — caméra pour AR, géoloc, etc.) : message éphémère ou bandeau dans la sous-vue informant que la permission doit être réactivée depuis les paramètres système ; point d'accès vers paramètres OS (cf. D5 cas particulier)"
+    rubrique_compte_absente_si_pas_compte: "Quand aucun Compte rattaché, la sous-vue 'Paramètres de Compte' n'existe pas ; les entrées Créer/Connexion la remplacent ; les rubriques liées à la sync ne sont pas exposées (D5 cas particulier — la sync n'existe pas sans Compte)"
+    historique_desactive: "La rubrique gestion de l'Historique reflète Profil.enregistrement_historique_actif = faux ; le contrôle reste opérable pour réactiver"
+    section_engageante_optionnelle: "Si la fonctionnalité D6.6 est livrée, une rubrique 'Statistiques et badges' permet de basculer Profil.affichage_section_engageante (opt-in, masqué par défaut)"
+    offline_avec_cache: "Lecture et modification des paramètres locaux fonctionnent normalement ; bandeau E-TRANSVERSES-BANDEAU-OFFLINE visible si pertinent ; les rubriques nécessitant réseau (sync, gestion Compte) signalent l'indisponibilité à la tentative"
+    offline_sans_cache: "Identique à offline_avec_cache pour les paramètres locaux"
+    en_cours_de_modification: "Une surface ponctuelle P5.M6 est ouverte par-dessus pour la sélection d'une valeur ; la vue paramètres reste visible derrière (P5.C3)"
+
+  elements_interactifs:
+    - "Bascule d'un drapeau d'accessibilité (taille de texte, contraste, etc.)"
+    - "Bascule du mode de notification de proximité ; activation Surprenez-moi peut déclencher A6 (E-TRANSVERSES-DIALOGUE-PERMISSION) si permission notifications non accordée"
+    - "Bascule de l'enregistrement de l'Historique (Profil.enregistrement_historique_actif)"
+    - "Tap sur 'Effacer l'historique' → flow D4 (E-TRANSVERSES-DIALOGUE-CONFIRMATION)"
+    - "Tap sur 'Paramètres de Compte' (avec Compte) → E-PROFIL-PARAMETRES-COMPTE"
+    - "Tap sur 'Créer un compte' (sans Compte) → E-PROFIL-CREATION-COMPTE (D6)"
+    - "Tap sur 'Se connecter' (sans Compte) → E-PROFIL-CONNEXION-COMPTE (D7)"
+    - "Tap sur 'Mentions légales' / 'Politique de confidentialité' → ouverture sous-vue P5.M3 dédiée"
+    - "Tap sur 'Ouvrir les paramètres système' (cas permission_systeme_refusee_definitivement) → main passée à l'OS"
+    - "Retour vers E-PROFIL-PRINCIPAL"
+
+  flows_actifs:
+    - D5   # Accès aux paramètres
+    - D4   # Effacement de l'historique (entrée alternative depuis ici)
+    - A6   # Demande de permission juste-à-temps (déclenchée à l'activation Surprenez-moi)
+
+  surfaces_imbriquees:
+    - E-PROFIL-CREATION-COMPTE             # depuis Créer un compte
+    - E-PROFIL-CONNEXION-COMPTE            # depuis Se connecter
+    - E-PROFIL-PARAMETRES-COMPTE           # depuis Paramètres de Compte
+    - E-TRANSVERSES-DIALOGUE-PERMISSION    # M8 transverse pour A6
+    - E-TRANSVERSES-DIALOGUE-CONFIRMATION  # M8 pour D4 effacement
+    - E-TRANSVERSES-MESSAGE-EPHEMERE
+    - E-TRANSVERSES-BANDEAU-OFFLINE
+
+  entites_affichees: [Profil, Compte, "Historique de visite"]
+
+  questions_ouvertes:
+    - "Mode présentation (utile à Mme Martin) : préférence persistante du Profil exposée ici, ou raccourci contextuel depuis P5.M3 d'un Pin (cf. D5 question ouverte) ? Recommandation : raccourci contextuel, donc PAS dans cet écran"
+    - "Liste exacte des réglages d'accessibilité (palier 12/16) — au palier 7 on garantit l'existence de la rubrique, pas son contenu"
+    - "Présentation de la rubrique 'gestion de l'Historique' : combinée avec la rubrique notifications (mode Surprenez-moi) car les deux portent des préférences sensibles, ou séparée ? — palier 7/10"

@@ -1,0 +1,55 @@
+# =============================================================================
+# E-TRANSVERSES-BANDEAU-OFFLINE — Bandeau d'information persistant offline (P3)
+# =============================================================================
+# Forme réduite d'une surface persistante (P5.M5 variante minimale, P5.P3)
+# qui informe que la connexion réseau est indisponible et que l'app
+# fonctionne en mode dégradé sur le contenu local. Apparaît tant que la
+# condition dure ; disparaît dès que la connexion est restaurée.
+# =============================================================================
+
+document:
+  type: palier_ecrans_fiche
+  format: yaml
+
+ecran:
+  id: E-TRANSVERSES-BANDEAU-OFFLINE
+  nom: "Bandeau d'information persistant (P3)"
+
+  mode: P5.M5
+  surface_parente: "transverse"
+
+  raison_d_etre: >-
+    Rendre LISIBLE pour l'utilisateur le fait que l'app est en mode
+    hors-ligne — pour qu'il comprenne pourquoi certaines actions (publier
+    un commentaire, soumettre un Pin, charger un Pin non préchargé) sont
+    indisponibles, et qu'il sache qu'elles redeviendront disponibles dès
+    la reconnexion. Sans un signal persistant, le mode offline deviendrait
+    une zone d'incertitude pour l'utilisateur.
+
+  composition:
+    - zone: "indicateur d'état réseau"
+      role: "signale visuellement que la connexion est indisponible et que l'app opère sur le contenu local préchargé (cluster 03 préférence Profil + politique d'implémentation)"
+
+    - zone: "indication contextuelle gracieuse"
+      role: "court message expliquant que certaines fonctionnalités sont indisponibles (microcopy palier 8) ; pas de point d'accès permanent — c'est une information, pas un point d'action"
+
+  etats:
+    nominal_offline: "Connexion indisponible, bandeau visible sur toutes les surfaces principales et leurs sous-surfaces"
+    transition_reconnexion: "La connexion est restaurée ; le bandeau disparaît gracieusement ; un message éphémère M9 peut confirmer la reprise (à arbitrer)"
+    sommeil_visuel_m4: "P5.C2 — en mode présentation, le bandeau est masqué visuellement comme les autres surfaces persistantes ; la condition continue d'être suivie"
+    priorite_p1_p2: "Si P1 et/ou P2 sont actifs simultanément, l'articulation visuelle est arbitrée en palier 7 fin / palier 10 (P3 reste subordonné en surface utile, mais l'information est toujours signalée)"
+    instabilite_reseau: "Connexion intermittente ; politique anti-rebond pour ne pas faire clignoter le bandeau (à arbitrer en palier 11 / 16)"
+
+  elements_interactifs:
+    - "Aucune interaction principale — c'est un bandeau informatif (pas de point d'accès permanent, cf. P5 § P3 propriétés)"
+    - "(facultatif, à arbitrer) tap → ouvre une explication courte (E-TRANSVERSES-MESSAGE-EPHEMERE ou ancre vers paramètres) — palier 7 fin"
+
+  flows_actifs: []   # transverse, déclenché par condition réseau, pas par un flow palier 6 spécifique
+
+  surfaces_imbriquees: []
+
+  questions_ouvertes:
+    - "Le bandeau peut-il être TAPÉ pour ouvrir une explication détaillée (quelles fonctionnalités sont indisponibles, comment vérifier sa connexion) ? — palier 7 fin"
+    - "Faut-il distinguer offline strict (aucune connexion) vs connexion restreinte (limitée par paramètre Profil, ex. mode données mobiles désactivé) ? — palier 6 / cluster 03"
+    - "Politique anti-rebond précise quand la connexion est instable — palier 11 / 16"
+    - "Si P3 s'avère sous-utilisé, fusion possible avec M9 message éphémère (cf. note P5 § P3) — à réévaluer en palier 7 final"

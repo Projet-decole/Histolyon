@@ -1,0 +1,588 @@
+# =============================================================================
+# Palier 3 — Domaine D5 — Onboarding et premier lancement
+# =============================================================================
+# L'onboarding d'HistoLyon est aussi minimal que possible : l'app s'ouvre
+# directement sur la carte, sans écran intermédiaire. Une invitation discrète
+# propose un micro-parcours d'apprentissage par flow ; à défaut, une indication
+# ponctuelle se déclenche au premier usage du seul élément non intuitif (le
+# slider). Les permissions système sont demandées juste-à-temps.
+#
+# Ce domaine porte la RÉFÉRENCE CANONIQUE du comportement transverse
+# "Permissions juste-à-temps" (D5.5), réutilisé en D1.1 (GPS), D4 (notifs),
+# D7 (potentiellement micro), D8.3 (caméra AR).
+#
+# Format strict v1.1 (cf. 00-index.yaml § 5). Périmètre fonctionnel pur —
+# aucune décision d'écran, de composant, de couleur, de microcopy ou de
+# mesure technique chiffrée n'est prise ici.
+# =============================================================================
+
+document:
+    type: palier_fonctionnalites_domaine
+    domaine_id: D5
+    numero: 3
+    audience:
+        - "Tout agent qui rédige un palier en aval (4 à 16)"
+        - "Devs Flutter (cahier des charges fonctionnel pour le premier lancement)"
+        - "Auteurs de contenu (palier 8 — la microcopy de l'invitation y sera produite)"
+    role: >-
+        Décrire fonctionnellement ce qui se passe au premier lancement et
+        pendant les premières utilisations de l'app, jusqu'à ce que
+        l'utilisateur soit autonome. Définit aussi, comme référence canonique,
+        le comportement de demande de permissions juste-à-temps réutilisé
+        par plusieurs autres domaines.
+    format: yaml
+    prerequis_de_lecture:
+        - "design/conception/intention.yaml — § 5.7 separation_des_responsabilites_entre_paliers et § 11 retours_d_experience"
+        - "design/conception/01-essence.yaml — en particulier § ce_qu_on_refuse"
+        - "design/conception/02-personas.yaml"
+        - "design/conception/03-fonctionnalites/00-index.yaml — § 2 anti_perimetre_strict est OBLIGATOIRE"
+        - "design/conception/03-fonctionnalites/01-carte-exploration-temporelle.yaml — modèle pilote"
+
+# -----------------------------------------------------------------------------
+# Raison d'être du domaine
+# -----------------------------------------------------------------------------
+raison_d_etre_du_domaine: >-
+    L'onboarding d'HistoLyon est en tension avec deux refus de l'essence :
+    "Toute friction au lancement" et "Le mur d'inscription". L'essence
+    impose donc que l'app s'ouvre sur la carte sans détour. Mais certains
+    mécanismes (le slider d'époques en particulier) ne sont pas immédiatement
+    intuitifs, et certaines fonctionnalités demandent des permissions
+    système. Ce domaine réconcilie ces deux contraintes : ouverture directe,
+    apprentissage par le faire, demandes système au moment où elles servent.
+
+    Il sert directement les 4 personas grand public à des intensités
+    différentes : Kenji (premier contact à l'hôtel, doit comprendre sans
+    français et sans tutoriel), le père lyonnais (zéro friction sinon il
+    quitte), Mme Dupont (préparation rapide, parents accompagnateurs sans
+    formation), Mme Martin (entrée propre dans l'app pour préparer son
+    cours). Le persona back-office (Anaïs) n'est pas concerné — sa surface
+    est ailleurs.
+
+# -----------------------------------------------------------------------------
+# Sous-domaines
+# -----------------------------------------------------------------------------
+sous_domaines:
+    # ===========================================================================
+    - id: D5.1
+      nom: "Premier lancement direct sur la carte"
+
+      raison_d_etre: >-
+          Honorer l'engagement le plus dur de l'essence : zéro friction au
+          lancement (cf. essence § ce_qu_on_refuse). L'utilisateur qui ouvre
+          l'app la première fois doit voir immédiatement de quoi il s'agit —
+          la carte de Lyon, prête à être explorée. Aucun écran intermédiaire,
+          aucune slide d'introduction, aucune demande de permission, aucun
+          mur d'inscription. C'est le geste fondateur qui distingue HistoLyon
+          d'une appli touristique générique.
+
+      comportement: >-
+          Au tout premier lancement de l'app, l'utilisateur arrive directement
+          sur la carte de Lyon centrée Bellecour (cf. D1.1), exactement comme
+          lors de tous les lancements suivants. Aucun écran d'accueil,
+          aucune slide explicative, aucune demande de compte, aucune demande
+          de permission ne précède la carte. Si l'utilisateur n'interagit
+          pas, l'app reste passive — il peut explorer librement, refermer
+          sans rien faire, revenir plus tard. Le lancement n'introduit aucune
+          différence visible entre un nouvel utilisateur et un utilisateur
+          qui revient, à l'exception de l'invitation discrète portée par D5.2.
+
+      regles_fonctionnelles:
+          - "Aucun écran intermédiaire avant la carte au premier lancement"
+          - "Aucune demande de permission au lancement (les permissions sont demandées juste-à-temps — cf. D5.5)"
+          - "Aucune création ni demande de compte au lancement"
+          - "Aucune slide d'introduction, aucun tutoriel imposé"
+          - "L'utilisateur peut refermer l'app sans avoir fait quoi que ce soit"
+          - "Le premier lancement et les lancements suivants partagent le même point d'entrée — la carte"
+
+      capabilites:
+          - "Ouvrir l'app directement sur la carte au premier lancement"
+          - "Détecter qu'il s'agit d'un premier lancement (pour conditionner D5.2 et D5.4)"
+          - "Permettre une exploration libre immédiate, sans préalable"
+
+      ce_qu_on_ne_fait_pas:
+          - "Pas de slides d'onboarding au lancement (essence § ce_qu_on_refuse — toute friction au lancement)"
+          - "Pas de tutoriel imposé"
+          - "Pas de demande de compte (essence § ce_qu_on_refuse — le mur d'inscription)"
+          - "Pas de bloc de permissions au lancement"
+          - "Pas d'écran 'À propos' avant la carte"
+
+      criteres_de_reussite:
+          - "Atteint le test_litmus de Kenji (premier lancement à l'hôtel : il comprend qu'il est sur Lyon en moins de 60 secondes, sans tutoriel et même s'il ne lit pas le français)"
+          - "Atteint le test_litmus du père lyonnais (zéro friction — sinon il quitte)"
+          - "L'utilisateur ne ressent aucune impression d'être 'onboarder' — l'app le laisse libre"
+
+      definition_of_done:
+          - "Au premier lancement, l'app affiche la carte centrée Bellecour, sans écran préalable"
+          - "Aucune permission n'est demandée au lancement"
+          - "Aucun compte n'est demandé au lancement"
+          - "L'utilisateur peut explorer la carte immédiatement sans avoir à valider quoi que ce soit"
+          - "L'app peut distinguer un premier lancement d'un lancement ultérieur, pour activer les comportements conditionnels D5.2 et D5.4"
+
+      enjeux_transversaux:
+          accessibilite: >-
+              Critique pour Kenji (compréhension sans français, sans tutoriel)
+              et pour tout utilisateur qui découvre l'app sans préparation.
+              L'absence de tutoriel impose que la carte elle-même soit
+              immédiatement compréhensible — la conception cartographique
+              (palier 9) et l'architecture d'information (palier 5) doivent
+              prendre cette charge.
+          performance: >-
+              Le délai entre le tap sur l'icône de l'app et l'apparition de la
+              carte est le premier indicateur de qualité perçue. Toute attente
+              contredit la promesse de zéro friction. Critères chiffrés en
+              palier 16.
+          vie_privee: >-
+              Aucune donnée n'est demandée ni collectée au lancement. La
+              détection du premier lancement repose sur un état strictement
+              local et anonyme.
+
+      questions_ouvertes:
+          - "L'invitation D5.2 doit-elle apparaître immédiatement ou laisser quelques secondes d'exploration libre avant de surgir ? — à arbitrer"
+          - "Réinitialisation de l'état 'premier lancement' lors d'une réinstallation : comportement à confirmer avec les devs Flutter"
+
+      priorite: "important"
+
+      personas_principaux:
+          - kenji
+          - pere_lyonnais
+          - mme_dupont
+          - mme_martin
+
+      dependances:
+          - "D1.1 (carte de base — c'est ce qui s'affiche)"
+
+      comportements_transverses_referenced:
+          - "Permissions juste-à-temps (canonique D5.5) — appliqué ici par défaut : aucune permission n'est demandée au lancement"
+
+    # ===========================================================================
+    - id: D5.2
+      nom: "Invitation discrète au micro-parcours découverte"
+
+      raison_d_etre: >-
+          Offrir une porte d'entrée à l'utilisateur qui le souhaite, sans
+          l'imposer à celui qui ne le veut pas. Le micro-parcours (D5.3)
+          est de loin la meilleure manière d'apprendre l'app — apprentissage
+          par flow, avec du vrai contenu — mais l'imposer trahirait l'essence
+          (zéro friction). L'invitation est le compromis : visible mais
+          sobre, refusable sans pénalité.
+
+      comportement: >-
+          Au premier lancement, après l'apparition de la carte, une invitation
+          discrète propose à l'utilisateur de suivre un micro-parcours
+          découverte. L'utilisateur peut accepter (ce qui démarre D5.3) ou
+          reporter. S'il reporte, l'invitation ne réapparaît pas spontanément
+          à chaque lancement ; le micro-parcours reste accessible plus tard
+          (cf. D3 — il est tagué comme parcours pour commencer dans le
+          catalogue des parcours). L'invitation ne masque pas la carte au
+          point d'empêcher l'exploration — l'utilisateur peut l'ignorer et
+          commencer à manipuler la carte directement.
+
+      regles_fonctionnelles:
+          - "L'invitation n'apparaît qu'au tout premier lancement, pas aux lancements suivants"
+          - "Deux choix offerts : accepter l'invitation ou la reporter — pas de troisième option"
+          - "Le report n'est pas pénalisant : aucun rappel agressif, aucune réapparition spontanée à chaque lancement"
+          - "L'invitation laisse la carte explorable en cas d'ignorance simple (l'utilisateur peut commencer à manipuler la carte sans avoir tranché)"
+          - "Le micro-parcours reste accessible ultérieurement via le catalogue des parcours (D3), tagué comme parcours pour commencer"
+          - "L'invitation ne demande aucune permission système (cf. D5.5)"
+
+      capabilites:
+          - "Proposer une invitation au micro-parcours au premier lancement"
+          - "Démarrer le micro-parcours D5.3 si l'utilisateur accepte"
+          - "Reporter l'invitation sans pénalité si l'utilisateur refuse"
+          - "Préserver l'accessibilité du micro-parcours dans le catalogue des parcours"
+          - "Ne pas réapparaître spontanément après un report"
+
+      ce_qu_on_ne_fait_pas:
+          - "Pas d'invitation imposée (l'utilisateur peut toujours l'ignorer ou la reporter)"
+          - "Pas de réapparition agressive de l'invitation après report"
+          - "Pas d'invitation aux lancements ultérieurs"
+          - "Pas de parcours imposé sans choix de l'utilisateur"
+          - "Pas de demande de permission portée par l'invitation elle-même"
+
+      criteres_de_reussite:
+          - "Atteint le test_litmus du père lyonnais (zéro friction — il peut ignorer l'invitation et explorer immédiatement)"
+          - "L'utilisateur qui accepte se sent entré dans une expérience de découverte, pas dans un tutoriel"
+          - "L'utilisateur qui refuse n'a pas l'impression de manquer quelque chose d'obligatoire"
+
+      definition_of_done:
+          - "Une invitation au micro-parcours apparaît au premier lancement, après la carte"
+          - "L'utilisateur peut accepter ou reporter"
+          - "L'acceptation déclenche le micro-parcours D5.3"
+          - "Le report ne déclenche pas de rappel ni de réapparition spontanée"
+          - "L'invitation n'apparaît plus aux lancements ultérieurs"
+          - "Le micro-parcours reste accessible plus tard depuis le catalogue des parcours"
+
+      enjeux_transversaux:
+          accessibilite: >-
+              L'invitation doit être lisible et navigable au clavier et aux
+              lecteurs d'écran. Elle doit être facilement refusable, y compris
+              par un utilisateur qui n'a aucune envie de lire son contenu —
+              l'option de report doit être atteignable sans effort.
+          performance: >-
+              L'invitation doit apparaître sans freiner la carte ni
+              retarder l'exploration libre.
+          vie_privee: "Pas d'enjeu spécifique — aucune donnée collectée."
+
+      questions_ouvertes:
+          - "Délai entre l'apparition de la carte et l'apparition de l'invitation — à arbitrer (cf. D5.1)"
+          - "Comportement si l'utilisateur ferme l'app sans avoir tranché : invitation re-proposée au lancement suivant ou considérée comme reportée ?"
+          - "Le tag exact du parcours dans le catalogue (cf. D3) — formulation au palier 8"
+
+      priorite: "important"
+
+      personas_principaux:
+          - kenji
+          - pere_lyonnais
+          - mme_dupont
+          - mme_martin
+
+      dependances:
+          - "D5.1 (premier lancement — déclenche l'invitation)"
+          - "D5.3 (micro-parcours — démarré en cas d'acceptation)"
+          - "D3 (catalogue des parcours — accueille le micro-parcours pour accès ultérieur)"
+
+    # ===========================================================================
+    - id: D5.3
+      nom: "Micro-parcours découverte"
+
+      raison_d_etre: >-
+          Donner à l'utilisateur qui accepte l'invitation une vraie expérience
+          d'HistoLyon — pas un tutoriel sur des écrans factices. Le
+          micro-parcours est un VRAI parcours, avec du VRAI contenu :
+          l'apprentissage des mécanismes (slider, aperçu d'un pin,
+          consultation, audio) se fait par le faire, sur des pins réels et
+          narratifs. À la sortie, l'utilisateur a non seulement compris l'app
+          mais aussi vécu un moment d'émerveillement — donc compris l'essence,
+          pas juste l'interface.
+
+      comportement: >-
+          Le micro-parcours conduit l'utilisateur à travers trois pins
+          sélectionnés pour leur qualité narrative et leur capacité à révéler
+          les mécanismes principaux de l'app au fil du parcours (navigation
+          cartographique, slider, aperçu et consultation d'un pin, audio).
+          Le contenu présenté est du vrai contenu HistoLyon, pas un placeholder
+          pédagogique. L'utilisateur peut interrompre le micro-parcours à
+          tout moment ; à l'issue (réelle ou anticipée), il revient à la
+          carte, libre d'explorer. Si le micro-parcours est mené à terme,
+          l'utilisateur en sort avec une compréhension acquise par la
+          pratique — aucune indication ponctuelle (D5.4) n'est plus nécessaire.
+
+      regles_fonctionnelles:
+          - "Trois pins traversés, choisis pour la qualité narrative et la mise en lumière naturelle des mécanismes principaux"
+          - "Contenu réel HistoLyon (pas de contenu factice à but pédagogique)"
+          - "Apprentissage par flow : aucune instruction explicite imposée, les mécanismes se découvrent en les utilisant"
+          - "L'utilisateur peut passer à tout moment, à toute étape du parcours"
+          - "Une sortie anticipée ramène à la carte sans pénalité ni reproche"
+          - "Achever le micro-parcours rend l'indication ponctuelle D5.4 inutile (apprentissage déjà fait)"
+          - "Le parcours reste un cas particulier de D3 (parcours) — il en hérite des comportements de base"
+
+      capabilites:
+          - "Dérouler un micro-parcours de trois pins avec contenu réel"
+          - "Permettre la navigation libre pendant le micro-parcours (la carte reste manipulable)"
+          - "Permettre à l'utilisateur de passer le micro-parcours à toute étape"
+          - "Marquer le micro-parcours comme achevé pour conditionner D5.4"
+          - "Ramener l'utilisateur à la carte à la fin (réelle ou anticipée) du micro-parcours"
+
+      ce_qu_on_ne_fait_pas:
+          - "Pas de contenu factice ou pédagogique inventé pour les besoins de l'apprentissage"
+          - "Pas d'instructions explicites obligatoires en surimpression"
+          - "Pas d'enchaînement bloquant qui empêcherait de sortir du parcours"
+          - "Pas de pénalité ni de reproche pour une sortie anticipée"
+          - "Pas de re-proposition automatique après une sortie anticipée"
+
+      criteres_de_reussite:
+          - "Atteint le test_litmus de Kenji (compréhension du mécanisme du slider sans tutoriel ni texte)"
+          - "L'utilisateur qui termine le micro-parcours sait utiliser les mécanismes principaux sans avoir lu d'instruction"
+          - "Le contenu rencontré pendant le parcours produit au moins un moment d'émerveillement (sourire, surprise, frisson — cf. essence § principe émerveillement)"
+          - "Un utilisateur qui passe en cours de route revient à la carte sans frustration"
+
+      definition_of_done:
+          - "Trois pins existent, sélectionnés et validés pour le micro-parcours, avec leur contenu narratif"
+          - "Le micro-parcours peut être déclenché depuis l'invitation D5.2 et depuis le catalogue des parcours (D3)"
+          - "L'utilisateur peut passer à tout moment et revenir à la carte"
+          - "L'achèvement du micro-parcours est mémorisé pour conditionner D5.4"
+          - "Le micro-parcours expose les mécanismes principaux par le faire, sans instruction imposée"
+
+      enjeux_transversaux:
+          accessibilite: >-
+              L'option de passer doit être atteignable sans effort à toute
+              étape. Le contenu narratif doit être accessible (lisibilité,
+              alternative audio si pertinente, navigation lecteur d'écran).
+              Le micro-parcours étant souvent le PREMIER contact, son
+              accessibilité conditionne toute l'expérience qui suit.
+          performance: >-
+              Les transitions entre les trois pins doivent rester fluides ;
+              toute saccade dans ce premier moment marquerait durablement la
+              perception du produit.
+          vie_privee: >-
+              Le suivi de l'achèvement du micro-parcours est strictement
+              local (pas de transmission), cohérent avec D6 (profil et
+              données personnelles).
+
+      questions_ouvertes:
+          - "Quels trois pins exacts ? — à arbitrer avec la lead/historienne sur des critères de représentativité narrative et de couverture des mécanismes"
+          - "Le micro-parcours ouvre-t-il les permissions GPS pour bénéficier des notifications de proximité du parcours, ou reste-t-il sur un mode 'consultation' sans GPS ? — à arbitrer (cohérent avec D5.5)"
+          - "Comportement si l'utilisateur passe à mi-parcours puis re-déclenche le micro-parcours plus tard : reprise à l'étape ou redémarrage ?"
+
+      priorite: "important"
+
+      personas_principaux:
+          - kenji
+          - pere_lyonnais
+          - mme_dupont
+          - mme_martin
+
+      dependances:
+          - "D5.2 (invitation — point d'entrée principal)"
+          - "D3 (parcours — le micro-parcours est un cas particulier de parcours)"
+          - "D2 (pins et contenu — les trois pins traversés sont du contenu réel)"
+          - "D5.4 (l'achèvement conditionne le déclenchement de l'indication ponctuelle)"
+
+    # ===========================================================================
+    - id: D5.4
+      nom: "Indication ponctuelle au premier usage du slider"
+
+      raison_d_etre: >-
+          Couvrir le seul point qui peut bloquer l'utilisateur qui a refusé
+          l'invitation : le slider d'époques (D1.2). Tous les autres
+          mécanismes de l'app relèvent de patterns mobiles standards qu'un
+          utilisateur courant reconnaît. Le slider, lui, est le geste
+          signature — donc inhabituel. Sans micro-parcours, une indication
+          ponctuelle suffit à débloquer la découverte sans rompre la promesse
+          de zéro friction.
+
+      comportement: >-
+          Lorsque l'utilisateur a reporté l'invitation au micro-parcours
+          (D5.2) ou que celle-ci n'a pas été tranchée, et qu'il découvre la
+          carte sans avoir suivi le micro-parcours, une indication ponctuelle
+          attire son attention sur le slider d'époques au premier moment
+          pertinent. Cette indication est légère et momentanée : elle se
+          dissipe dès que l'utilisateur interagit avec le slider, qu'il
+          l'écarte explicitement, ou qu'un délai s'écoule. Elle ne se
+          redéclenche pas à chaque session : une fois rencontrée, elle ne
+          revient plus. L'utilisateur qui a achevé le micro-parcours
+          (D5.3) ne voit pas cette indication — l'apprentissage a déjà été
+          fait par le faire.
+
+      regles_fonctionnelles:
+          - "L'indication ne porte que sur le slider d'époques (D1.2) — aucun autre élément"
+          - "Elle ne se déclenche que si l'utilisateur n'a pas achevé le micro-parcours D5.3"
+          - "Elle est ponctuelle : présentée une seule fois, pas à chaque session"
+          - "Elle se dissipe dès l'interaction avec le slider, ou sur action explicite, ou après un délai d'attention raisonnable"
+          - "Elle ne bloque pas l'interaction avec la carte ni avec le slider"
+          - "Elle reste sobre — pas une fenêtre modale, pas un parcours guidé"
+
+      capabilites:
+          - "Détecter qu'aucun apprentissage du slider n'a été fait (ni via D5.3, ni via interaction directe)"
+          - "Présenter une indication ponctuelle attirant l'attention sur le slider"
+          - "Faire disparaître l'indication à l'interaction, sur action explicite ou après un délai"
+          - "Mémoriser que l'indication a été présentée pour ne plus la redéclencher"
+
+      ce_qu_on_ne_fait_pas:
+          - "Pas d'indications multiples sur d'autres éléments (pins, recherche, etc. — ils relèvent de patterns standards)"
+          - "Pas de répétition à chaque session"
+          - "Pas de blocage de l'interaction par l'indication"
+          - "Pas de tutoriel guidé étape par étape"
+          - "Pas d'indication si l'utilisateur a achevé le micro-parcours D5.3"
+
+      criteres_de_reussite:
+          - "Atteint le test_litmus de Kenji (compréhension du slider sans tutoriel et même sans français)"
+          - "L'utilisateur qui a refusé l'invitation découvre quand même le slider sans frustration ni recherche active"
+          - "L'indication n'est jamais perçue comme intrusive ou paternaliste"
+
+      definition_of_done:
+          - "Une indication ponctuelle se déclenche au premier moment pertinent si l'utilisateur n'a pas achevé le micro-parcours"
+          - "Elle disparaît à l'interaction avec le slider, sur action explicite, ou après un délai"
+          - "Elle ne se déclenche qu'une seule fois sur la durée de vie de l'app pour un utilisateur donné"
+          - "Elle ne se déclenche pas pour un utilisateur qui a achevé le micro-parcours"
+          - "Elle ne porte que sur le slider, jamais sur d'autres éléments d'interface"
+
+      enjeux_transversaux:
+          accessibilite: >-
+              L'indication doit être perceptible sans être inaccessible aux
+              utilisateurs avec lecteur d'écran ou navigation au clavier. Sa
+              disparition doit être tout aussi accessible (un utilisateur ne
+              doit pas se retrouver bloqué à essayer de la fermer).
+          performance: >-
+              L'apparition et la disparition de l'indication doivent être
+              immédiates et ne pas dégrader la fluidité de la carte ni du
+              slider.
+          vie_privee: >-
+              La trace 'indication présentée' est strictement locale, cohérente
+              avec D6 (profil et données personnelles).
+
+      questions_ouvertes:
+          - "Définition précise du 'moment pertinent' où l'indication apparaît (immédiatement, après quelques secondes d'inactivité, à la première manipulation de la carte ?) — à arbitrer"
+          - "Délai exact d'auto-dissipation — à arbitrer (chiffre au palier 16, pas ici)"
+          - "Comportement si l'utilisateur ferme l'app pendant que l'indication est visible : considérée comme présentée ou re-déclenchable une fois ?"
+
+      priorite: "important"
+
+      personas_principaux:
+          - kenji
+          - pere_lyonnais
+
+      dependances:
+          - "D1.2 (slider d'époques — élément cible de l'indication)"
+          - "D5.2 (invitation — un report active le scénario d'indication)"
+          - "D5.3 (micro-parcours — un achèvement désactive l'indication)"
+
+    # ===========================================================================
+    - id: D5.5
+      nom: "Permissions juste-à-temps"
+
+      raison_d_etre: >-
+          Honorer le refus de l'essence "Toute friction au lancement" tout
+          en permettant aux fonctionnalités qui nécessitent une autorisation
+          système (géolocalisation, notifications, micro, caméra) de
+          fonctionner pleinement. Demander toutes les permissions au
+          lancement reviendrait à imposer un mur de friction immédiate ;
+          ne jamais les demander reviendrait à priver les fonctionnalités
+          concernées de leur ressort. La solution adoptée — la demande
+          juste-à-temps — est un comportement TRANSVERSE qui s'applique
+          partout dans l'app et dont CE SOUS-DOMAINE EST LA RÉFÉRENCE
+          CANONIQUE.
+
+      comportement: >-
+          Aucune permission système n'est demandée au lancement de l'app.
+          Chaque permission est demandée uniquement au moment où la
+          fonctionnalité qui en dépend est sollicitée par l'utilisateur ou
+          activée par lui. Avant le déclenchement de la demande système,
+          l'app peut expliquer brièvement à quoi sert la permission, pour
+          que la décision se prenne en conscience. Si l'utilisateur refuse,
+          la fonctionnalité concernée reste indisponible mais le reste de
+          l'app continue à fonctionner sans dégradation, sans pénalité, et
+          sans rappel insistant. Une ré-activation reste toujours possible
+          ultérieurement — soit par une nouvelle sollicitation contextuelle
+          de la fonctionnalité, soit en passant par les paramètres système
+          du téléphone, vers lesquels l'app peut orienter l'utilisateur.
+          Chaque permission est demandée séparément, au moment où elle
+          sert sa propre fonctionnalité — jamais en bloc.
+
+      regles_fonctionnelles:
+          - "Aucune permission système demandée au lancement"
+          - "Chaque permission est demandée séparément, jamais en bloc"
+          - "La demande survient au moment où la fonctionnalité concernée est sollicitée, pas avant"
+          - "Avant la demande système, l'app peut expliquer à quoi sert la permission (sans en faire une étape obligatoire artificielle)"
+          - "Le refus est accepté sans drame : la fonctionnalité concernée est inaccessible, le reste de l'app fonctionne"
+          - "Aucun rappel insistant après refus"
+          - "Une ré-activation est possible : nouvelle sollicitation contextuelle ou orientation vers les paramètres système"
+          - "Le statut de chaque permission est connu de l'app pour qu'elle adapte le comportement des fonctionnalités concernées"
+
+      capabilites:
+          - "Demander une permission système au moment où elle est nécessaire"
+          - "Expliquer fonctionnellement à quoi sert une permission avant la demande système"
+          - "Continuer à fonctionner pleinement sur les fonctionnalités non concernées en cas de refus"
+          - "Orienter l'utilisateur vers les paramètres système pour ré-activer une permission précédemment refusée"
+          - "Adapter le comportement d'une fonctionnalité selon l'état de la permission qui la conditionne"
+          - "Déclencher cette mécanique pour chaque permission séparément"
+
+      ce_qu_on_ne_fait_pas:
+          - "Pas de demande de permissions au lancement"
+          - "Pas de demande de plusieurs permissions en bloc"
+          - "Pas de blocage de l'app entière en cas de refus d'une permission"
+          - "Pas de rappel insistant après un refus"
+          - "Pas de demande spéculative (avant que la fonctionnalité soit sollicitée)"
+          - "Pas de message culpabilisant en cas de refus"
+
+      criteres_de_reussite:
+          - "Atteint le test_litmus du père lyonnais (zéro friction au lancement)"
+          - "Atteint le test_litmus de Kenji (premier lancement à l'hôtel sans friction, en japonais)"
+          - "L'utilisateur qui refuse une permission ne se sent pas pénalisé ; il sait qu'il pourra revenir dessus plus tard sans difficulté"
+          - "L'utilisateur qui accepte une permission le fait en sachant à quoi elle sert (pas d'acceptation aveugle)"
+
+      definition_of_done:
+          - "Aucune permission n'est demandée au lancement de l'app"
+          - "Chaque permission concernée par les autres domaines (GPS pour D1, notifications pour D4, micro éventuellement pour D7, caméra pour D8) suit le pattern juste-à-temps"
+          - "Une explication fonctionnelle peut précéder chaque demande système"
+          - "Le refus d'une permission ne dégrade pas l'expérience sur les autres fonctionnalités"
+          - "L'utilisateur peut ré-activer une permission ultérieurement par re-sollicitation ou via les paramètres système"
+          - "Chaque demande est indépendante, jamais groupée avec une autre"
+
+      enjeux_transversaux:
+          accessibilite: >-
+              L'explication précédant la demande système doit être lisible
+              et accessible (lecteur d'écran, contraste). L'orientation vers
+              les paramètres système pour ré-activer une permission doit être
+              atteignable simplement, y compris pour un utilisateur qui ne
+              sait pas où chercher dans son téléphone.
+          performance: >-
+              La demande de permission ne doit pas survenir avec délai
+              perceptible après le déclenchement de la fonctionnalité — sinon
+              le lien entre l'action et la demande devient flou.
+          vie_privee: >-
+              Critique : c'est exactement le sujet de ce sous-domaine.
+              Demander juste-à-temps avec une explication claire est une
+              pratique de respect de la vie privée — l'utilisateur sait à
+              quoi il consent et pourquoi. Aucune donnée issue d'une
+              permission n'est utilisée pour autre chose que la fonctionnalité
+              qui en dépend (cohérent avec D6 — données personnelles strictement
+              locales par défaut).
+
+      questions_ouvertes:
+          - "L'explication précédant la demande système est-elle systématique ou réservée aux permissions sensibles (caméra, micro) ? — à arbitrer"
+          - "Politique de re-sollicitation après refus : combien de temps avant qu'un nouveau prompt puisse être proposé en contexte ? — à arbitrer"
+          - "Comportement sur certains systèmes où une permission une fois refusée ne peut plus être re-demandée par l'app (cas iOS / Android selon l'OS) — à acter avec les devs Flutter"
+
+      priorite: "important"
+
+      personas_principaux:
+          - kenji
+          - pere_lyonnais
+          - mme_dupont
+          - mme_martin
+
+      dependances:
+          - "D5.1 (l'absence de demande au lancement est cohérente avec ce sous-domaine)"
+
+      comportements_transverses_referenced:
+          - "Permissions juste-à-temps — CE SOUS-DOMAINE EST LA RÉFÉRENCE CANONIQUE de ce comportement (cf. 00-index.yaml § 6). Réutilisé par D1.1 (GPS), D4.2 et D4.3 (notifications), D7 (potentiellement micro), D8.3 (caméra AR)"
+
+# -----------------------------------------------------------------------------
+# Persona-check du domaine D5
+# -----------------------------------------------------------------------------
+persona_check:
+    kenji:
+        pertinence: "Très élevée — premier contact à l'hôtel, sans français, sans préparation"
+        scenarios_passes:
+            - scenario: "Premier lancement à l'hôtel, comprendre l'app sans tutoriel et sans aide en français"
+              reponse: "Couvert par D5.1 (arrivée directe sur la carte) + D5.3 (apprentissage par flow sur du vrai contenu, sans instruction écrite). En cas de refus de l'invitation, D5.4 prend le relais sur le seul élément non intuitif (le slider)."
+            - scenario: "Aucun mur d'inscription, aucune permission demandée d'emblée"
+              reponse: "Couvert par D5.1 et D5.5 — c'est exactement la promesse"
+            - scenario: "Apprendre à utiliser le slider sans tutoriel"
+              reponse: "Couvert par D5.3 (apprentissage par flow) ou D5.4 (indication ponctuelle si refus de D5.2)"
+        questions_levees:
+            - "Choix exact des trois pins du micro-parcours — devra fonctionner pour un utilisateur non francophone (palier 8 + lead/historienne)"
+
+    mme_dupont:
+        pertinence: "Élevée — utilise l'app pour préparer sa sortie scolaire ; veut un onboarding rapide pour elle ET pour les parents accompagnateurs"
+        scenarios_passes:
+            - scenario: "Préparer une sortie sans batailler avec un onboarding lourd"
+              reponse: "Couvert par D5.1 (zéro friction) ; le micro-parcours D5.3 est optionnel et se passe à tout moment"
+            - scenario: "Parent accompagnateur ouvre l'app le jour J sans formation et sait quoi faire en 30 secondes"
+              reponse: "Couvert par D5.1 (carte directe) + D5.4 (indication sur le slider si nécessaire). Le parent n'est PAS forcé de faire le micro-parcours — il peut suivre directement le parcours partagé par Mme Dupont (cf. D11)."
+        questions_levees:
+            - "Comportement de D5.2 sur un appareil qui reçoit un lien de parcours (D11) au tout premier lancement : faut-il proposer l'invitation ou enchaîner directement sur le parcours reçu ? — à arbitrer (probable : pas d'invitation si un parcours est explicitement déclenché par lien)"
+
+    mme_martin:
+        pertinence: "Moyenne — ouvre l'app pour préparer son cours ; usage canapé, peu de besoin d'apprentissage initial mais doit pouvoir entrer sans friction"
+        scenarios_passes:
+            - scenario: "Entrée propre dans l'app pour préparer un cours, sans tutoriel imposé"
+              reponse: "Couvert par D5.1. Le micro-parcours D5.3 peut l'intéresser comme premier survol du contenu, sans obligation."
+            - scenario: "Pas de notifs pendant la projection en classe"
+              reponse: "Cohérent avec D5.5 (les notifications ne sont pas demandées au lancement, et restent désactivées si elle ne les a pas activées). Détail de la gestion fine en D4."
+        questions_levees: []
+
+    pere_lyonnais:
+        pertinence: "Très élevée — drapeau rouge identifié dans persona : 'Onboarding obligatoire avant la première utilisation'. Le persona quitte si friction."
+        scenarios_passes:
+            - scenario: "Aucune friction au lancement, sinon il quitte"
+              reponse: "Couvert par D5.1 (carte directe) et D5.5 (zéro permission au lancement). L'invitation D5.2 est refusable sans pénalité."
+            - scenario: "Mode 'Surprenez-moi' pas activé par défaut"
+              reponse: "Cohérent avec D5.5 — la permission notifications n'est pas demandée au lancement, et le mode reste opt-in (cf. D4)."
+        questions_levees: []
+
+    anais_back_office:
+        pertinence: "Nulle — domaine côté grand public, pas de surface back-office concernée par l'onboarding mobile"
+        scenarios_passes: []
+        questions_levees: []

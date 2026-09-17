@@ -1,0 +1,733 @@
+# =============================================================================
+# Palier 3 — Fonctionnalités — INDEX
+# =============================================================================
+# Ce fichier est l'entrée du palier 3. Il pose le cadre commun à TOUS les
+# fichiers de domaine présents dans ce dossier :
+#   1. le rôle du palier (ce qu'il livre, ce qu'il ne livre pas)
+#   2. les principes de découpage
+#   3. la liste des 11 domaines avec leur résumé court
+#   4. le FORMAT IMPOSÉ pour chaque fiche de sous-domaine
+#   5. les comportements transverses (à définir une fois, référencer ailleurs)
+#   6. la priorisation globale (cœur / important / si le temps)
+#   7. l'articulation avec les paliers ultérieurs
+#
+# Lecture obligatoire avant d'attaquer un fichier de domaine.
+# Lecture obligatoire pour tout sous-agent délégué sur un domaine D4-D11.
+# =============================================================================
+
+document:
+  type: palier_fonctionnalites_index
+  numero: 3
+  date: "2026-04-30"
+  audience:
+    - "Tout agent (humain ou IA) qui rédige un fichier de domaine"
+    - "Sous-agents délégués sur les domaines D4-D11"
+    - "Reviewer qui vérifiera l'ensemble en Phase 3"
+  role: >-
+    Index et cadre commun du palier 3. Tous les fichiers de domaine de ce
+    dossier suivent strictement le format défini ici et n'introduisent pas
+    de décisions structurantes hors de ce cadre.
+  format: yaml
+  prerequis_de_lecture:
+    - "design/conception/01-essence.yaml — palier 1 (essence)"
+    - "design/conception/02-personas.yaml — palier 2 (personas)"
+# -----------------------------------------------------------------------------
+# 1. Rôle du palier 3 — fonctionnel pur
+# -----------------------------------------------------------------------------
+role_du_palier:
+    ce_qu_il_livre:
+        - "Inventaire structuré et exhaustif de CE QUE L'APP SAIT FAIRE, par domaine"
+        - "Pour chaque sous-domaine : raison d'être, comportement (ce qui se passe pour l'utilisateur), règles fonctionnelles, capabilités, anti-périmètre fonctionnel"
+        - "Pour chaque sous-domaine : critères de réussite UX (s'appuyant sur les test_litmus du palier 2) et definition_of_done fonctionnel"
+        - "Enjeux transversaux NOMMÉS (a11y, i18n, perf, vie privée) sans chiffres techniques"
+        - "Dépendances entre sous-domaines (qui dépend de qui)"
+        - "Pointeurs vers les paliers ultérieurs qui détailleront chaque aspect"
+
+    ce_qu_il_ne_livre_pas: |
+        Le palier 3 ne livre RIEN concernant les niveaux suivants. Voir § 2
+        anti_perimetre_strict pour les détails par niveau et les
+        reformulations attendues.
+
+        En résumé :
+        - Pas d'écran, pas de mise en page, pas de UI nommée → palier 7
+        - Pas de schéma de données, pas de modèle → palier 4
+        - Pas de flow utilisateur détaillé → palier 6
+        - Pas de spec de composant UI → palier 10
+        - Pas d'animation ni de timing précis → palier 11
+        - Pas de token visuel (couleur, opacité, taille, durée) → palier 12
+        - Pas de microcopy ni de texte exact → palier 8
+        - Pas d'icône spécifique → palier 13
+        - Pas de mesure technique chiffrée (fps, ms, px) → palier 16
+
+    pourquoi_la_purete: >-
+        Inclure dans le palier 3 des éléments qui relèvent d'un palier en aval
+        n'est pas un gain de temps — c'est une contamination qui (a) lie
+        prématurément des décisions sans la matière pour les arbitrer (par exemple
+        décider 'couleur par catégorie' avant d'avoir analysé le daltonisme,
+        le contraste à projection, la cohabitation avec les couleurs d'époque),
+        (b) crée des incohérences ultérieures, (c) bride la liberté de
+        conception des paliers suivants. Voir intention § 5.7.
+
+# -----------------------------------------------------------------------------
+# 2. Anti-périmètre strict (LECTURE OBLIGATOIRE)
+# -----------------------------------------------------------------------------
+# Cette section est la SPÉCIFICITÉ MAJEURE de cette refonte (v1.0). Elle
+# liste, par type d'élément, ce qui ne doit PAS apparaître dans un fichier
+# du palier 3, et la reformulation attendue.
+#
+# Les rédacteurs et tout rédacteur DOIVENT relire cette section avant de
+# rédiger le moindre sous-domaine, et la consulter en cas de doute.
+anti_perimetre_strict:
+    filtre_de_lecture_du_brief: >-
+        Le brief produit (`archives/_bmad-output/product-brief.md`) MÊLE les
+        niveaux : il parle d'écrans, de couleurs, d'animations, de composants,
+        de mesures techniques. C'est NORMAL — c'est un document de
+        brainstorming, pas une spec. En lisant le brief, IDENTIFIE et IGNORE
+        les éléments qui ne relèvent pas du fonctionnel pur. Reformule en
+        extrayant l'intention fonctionnelle.
+
+    bavures_par_niveau:
+        - niveau: "palier 7 — écrans"
+          types_d_elements:
+              - "Bottom sheet, FAB, modale, sheet, drawer, panel"
+              - "Scroll vertical / horizontal, carrousel, liste, grille"
+              - "Sticky en haut / en bas, header, footer, sidebar"
+              - "Position spatiale (en haut, en bas, à droite)"
+              - "Mise en page, structure d'écran"
+          reformulations_attendues:
+              - "AU LIEU DE 'bottom sheet remonte du bas' → DIRE 'aperçu rapide qui laisse l'écran principal visible'"
+              - "AU LIEU DE 'FAB en bas à droite' → DIRE 'point d'accès permanent à l'action de création'"
+              - "AU LIEU DE 'scroll vertical avec hero en haut' → DIRE 'consultation continue avec une mise en condition visuelle initiale'"
+              - "AU LIEU DE 'carrousel horizontal' → DIRE 'mise en avant éditoriale de quelques parcours signature'"
+
+        - niveau: "palier 9 — cartographie / palier 12 — tokens"
+          types_d_elements:
+              - "Couleurs par catégorie / par époque"
+              - "Tons (sépia, N&B, chauds, parchemin, terracotta)"
+              - "Opacité chiffrée (25%, 50%, 100%)"
+              - "Palette, hex, RGB"
+          reformulations_attendues:
+              - "AU LIEU DE 'pin avec couleur par catégorie' → DIRE 'pin visuellement distinguable selon sa catégorie'"
+              - "AU LIEU DE 'opacité 25% pour les pins hors parcours' → DIRE 'pins hors parcours visuellement atténués'"
+              - "AU LIEU DE 'filtre sépia pour l'Antiquité' → DIRE 'apparence visuelle de la carte propre à chaque époque'"
+
+        - niveau: "palier 10 — composants"
+          types_d_elements:
+              - "Composant Slider, composant Carte, composant Pin, composant Chips, composant BottomSheet"
+              - "Spécification d'un composant UI nommé"
+          reformulations_attendues:
+              - "AU LIEU DE 'composant Slider d'époques' → DIRE 'mécanisme de navigation temporelle' (le composant viendra au palier 10)"
+              - "Ne PAS lister 'composant X' dans pointe_vers — dire 'spécification du mécanisme d'interaction X (palier 10)' s'il faut"
+
+        - niveau: "palier 11 — interactions et motion"
+          types_d_elements:
+              - "Animation chorégraphiée, easing, courbe de transition"
+              - "Snap, drag-and-drop, swipe (en tant que terme technique)"
+              - "Vibration, feedback haptique"
+              - "Durée précise d'animation (1s, 800ms, 500ms)"
+          reformulations_attendues:
+              - "AU LIEU DE 'snap au relâchement' → DIRE 'calage automatique à la fin du geste'"
+              - "AU LIEU DE 'transition fluide en 800ms' → DIRE 'transition perçue comme continue'"
+              - "AU LIEU DE 'drag-and-drop pour réordonner' → DIRE 'l'utilisateur peut réordonner les étapes par manipulation directe'"
+
+        - niveau: "palier 12 — tokens"
+          types_d_elements:
+              - "Mesures de cible tactile (44px, 48dp)"
+              - "fps cible (60fps, 120fps)"
+              - "Latences chiffrées (< 500ms, < 100ms, < 16ms)"
+              - "Spacing, radius, shadow"
+          reformulations_attendues:
+              - "AU LIEU DE '60fps maintenus' → DIRE 'ressenti de fluidité non négociable' (puis nommer en enjeux_transversaux performance)"
+              - "AU LIEU DE 'cible tactile ≥ 44px' → DIRE 'cible tactile généreuse' + enjeu a11y nommé"
+              - "AU LIEU DE 'snap < 100ms' → DIRE 'calage perçu comme instantané'"
+
+        - niveau: "palier 13 — icônes"
+          types_d_elements:
+              - "Icône plume, sceau, loupe, badge empilé"
+              - "Pictogramme spécifique"
+          reformulations_attendues:
+              - "AU LIEU DE 'badge plume pour Officiel' → DIRE 'marque visible signalant un parcours officiel'"
+              - "AU LIEU DE 'icône loupe' → DIRE 'point d'accès à la recherche'"
+
+        - niveau: "palier 8 — contenu et microcopy"
+          types_d_elements:
+              - "Texte exact d'un bouton, d'un toast, d'un titre"
+              - "Phrases de microcopy entre guillemets"
+              - "Formulations spécifiques ('Découvrez Lyon', 'C'est parti', 'Surprenez-moi')"
+          reformulations_attendues:
+              - "AU LIEU DE 'pop-in : Envie de découvrir Lyon en 5 min ? → C'est parti / Plus tard' → DIRE 'invitation sobre à un micro-parcours, avec choix d'accepter ou de reporter'"
+              - "AU LIEU DE 'toast Vous semblez vous éloigner' → DIRE 'message discret signalant l'éloignement du tracé'"
+
+        - niveau: "palier 16 — validation / quality plan"
+          types_d_elements:
+              - "Test technique précis"
+              - "Critère de qualité chiffré"
+              - "Indicateur de performance avec valeur"
+          reformulations_attendues:
+              - "Garder dans le DoD du palier 3 : critères FONCTIONNELS uniquement (ex. 'le calage est effectué', 'le contenu est rechargé')"
+              - "Sortir du DoD : critères TECHNIQUES (ex. 'en moins de 500ms', '60fps') — ils iront dans le quality plan / palier 16"
+
+    cas_legitime_de_mention_de_l_aval: >-
+        Mentionner un palier en aval RESTE possible quand : (a) on cite un
+        comportement transverse (ex. 'mode plein écran défini en D2.5'), (b)
+        on liste dans pointe_vers ce qui sera détaillé ailleurs (ex. 'palier 7
+        décrira la position du point d'accès à la recherche'). Mais on ne
+        DÉCIDE pas le détail à la place du palier en aval — on lui passe la
+        main avec l'intention fonctionnelle.
+
+    gestes_primitifs_admis: >-
+        Le terme "tap" est admis comme geste primitif dans les fiches du
+        palier 3, au même titre que "clic" sur le web — c'est une primitive
+        d'interaction commune et neutre. À l'inverse, "drag-and-drop",
+        "swipe", "pinch" sont des gestes plus typés UI : préférer
+        "manipulation directe", "balayage", "rapprochement de doigts". La
+        règle générale : si le geste est primitif et neutre, on l'admet ;
+        s'il est typé d'une plateforme ou d'un composant, on reformule.
+
+    test_de_purete: >-
+        Avant de valider une fiche de sous-domaine, se demander : si demain
+        la conception décide de remplacer toutes les couleurs par des icônes
+        de forme distincte, est-ce que ma fiche reste valide ? Si oui, c'est
+        bon. Si non, c'est qu'elle a contaminé un palier en aval.
+
+# -----------------------------------------------------------------------------
+# 3. Principes de découpage
+# -----------------------------------------------------------------------------
+principes_de_decoupage:
+    - id: par_domaine_pas_par_ecran
+      regle: >-
+          On découpe par domaine fonctionnel (ce que l'app sait faire), pas
+          par écran (où ça se passe). Un écran peut couvrir plusieurs
+          domaines ; un domaine peut traverser plusieurs écrans.
+
+    - id: domaines_de_taille_inegale_assumee
+      regle: >-
+          Les domaines n'ont pas la même profondeur. Certains ont 7-10
+          sous-domaines, d'autres 1-3. C'est le reflet de la réalité
+          fonctionnelle, pas un défaut.
+
+    - id: comportements_transverses_definis_une_fois
+      regle: >-
+          Certains comportements traversent plusieurs domaines. On les
+          DÉFINIT UNE SEULE FOIS dans leur domaine principal et on
+          RÉFÉRENCE ailleurs. Voir § 6 comportements_transverses.
+
+    - id: anti_perimetre_obligatoire
+      regle: >-
+          Chaque sous-domaine DOIT avoir une section ce_qu_on_ne_fait_pas
+          non vide, RESTREINTE au fonctionnel (pas 'pas de bouton +' qui
+          est déjà du visuel — plutôt 'pas de progression par paliers').
+
+    - id: questions_ouvertes_remontees
+      regle: >-
+          Toute incertitude qui dépend d'une décision ultérieure (équipe,
+          historienne, dev, palier en aval) est listée explicitement dans
+          le sous-domaine concerné, sous questions_ouvertes. On n'invente
+          pas.
+
+    - id: persona_check_obligatoire
+      regle: >-
+          À la fin de chaque fichier de domaine, une section persona_check
+          passe les personas concernés via la grille du palier 2. Pas un
+          'oui à tout' — une vraie passe.
+
+# -----------------------------------------------------------------------------
+# 4. Liste des 11 domaines
+# -----------------------------------------------------------------------------
+# Inchangée par rapport à la v0.3. Le découpage en domaines est solide ;
+# c'est la pureté de leur contenu qui était le problème.
+domaines:
+    grand_public:
+        - id: D1
+          nom: "Carte et exploration temporelle"
+          fichier: "01-carte-exploration-temporelle.yaml"
+          resume: >-
+              La carte de Lyon comme écran d'accueil, navigation temporelle par
+              slider, recherche, et adaptation visuelle de la carte selon
+              l'époque sélectionnée.
+          priorite: coeur
+
+        - id: D2
+          nom: "Pins et contenu d'un lieu"
+          fichier: "02-pins-et-contenu.yaml"
+          resume: >-
+              Marquage des lieux qui ont du contenu, distinction entre lieux
+              selon catégorie et époques disponibles, déploiement progressif
+              du contenu (aperçu rapide → contenu approfondi → contenus
+              complexes entrelacés → engagement post-narratif).
+          priorite: coeur
+
+        - id: D3
+          nom: "Parcours"
+          fichier: "03-parcours.yaml"
+          resume: >-
+              Parcours éditoriaux, communautaires et personnels. Catalogue,
+              consultation, lancement, déroulement, mode canapé, création,
+              partage, fin et célébration, edge cases.
+          priorite: important
+
+        - id: D4
+          nom: "Notifications de proximité"
+          fichier: "04-notifications-proximite.yaml"
+          resume: >-
+              Trois modes au choix de l'utilisateur : balade libre par défaut,
+              Surprenez-moi opt-in, En parcours limité au parcours actif.
+          priorite: important
+
+        - id: D5
+          nom: "Onboarding et premier lancement"
+          fichier: "05-onboarding.yaml"
+          resume: >-
+              Arrivée directe sans friction, invitation sobre à un
+              micro-parcours, apprentissage par flow, indication ponctuelle
+              sur les éléments non intuitifs, demande de permissions
+              juste-à-temps.
+          priorite: important
+
+        - id: D6
+          nom: "Profil et données personnelles"
+          fichier: "06-profil.yaml"
+          resume: >-
+              App fonctionnelle sans compte (tout local). Favoris, historique,
+              paramètres. Compte optionnel pour publication parcours et
+              synchronisation multi-appareils.
+          priorite: important
+
+        - id: D7
+          nom: "Audio et narration"
+          fichier: "07-audio-narration.yaml"
+          resume: >-
+              Lecture audio narrée avec mise en évidence du texte courant,
+              musique d'époque tissée dans le récit, lecture pouvant continuer
+              en arrière-plan pour mains libres en marche.
+          priorite: important
+
+        - id: D8
+          nom: "3D et réalité augmentée"
+          fichier: "08-3d-ar.yaml"
+          resume: >-
+              Reconstitutions historiques accessibles depuis les pins concernés,
+              consultation immersive et superposition AR. Au minimum un
+              bâtiment reconstruit sur la durée du projet.
+          priorite: si_le_temps
+
+        - id: D9
+          nom: "Communauté"
+          fichier: "09-communaute.yaml"
+          resume: >-
+              Commentaires sur les pins, soumissions de pins par utilisateurs,
+              retours sur parcours communautaires, signalements. Modération
+              exécutée en back-office (renvoi D10).
+          priorite: si_le_temps
+
+    back_office:
+        - id: D10
+          nom: "Production de contenu"
+          fichier: "10-production-contenu.yaml"
+          resume: >-
+              Templates structurés (phase 1 — D10.1 priorité COEUR en exception
+              du domaine), workflow de validation scientifique, gestion des
+              sources, CMS web (phase 2), modération communautaire.
+          priorite: si_le_temps
+          exception: "D10.1 (Templates structurés) est en priorité COEUR — sans templates, l'app est vide"
+
+    hors_app:
+        - id: D11
+          nom: "Surfaces hors-app"
+          fichier: "11-surfaces-hors-app.yaml"
+          resume: >-
+              Lien universel ouvrant l'app si installée ou la version web
+              sinon, version web responsive en lecture seule, code visuel
+              pour partage non-numérique, image partageable de fin de
+              parcours, déclenchement du partage natif du système.
+          priorite: important
+
+# -----------------------------------------------------------------------------
+# 5. Format imposé pour une fiche de sous-domaine
+# -----------------------------------------------------------------------------
+# Format STRICT à respecter. Toute déviation doit être justifiée et tracée
+# dans le statut du fichier concerné.
+format_des_fiches:
+    exemple_canonique_purifié: |
+        # Cet exemple est PURIFIÉ — il ne contient AUCUNE bavure d'aval.
+        # Comparer avec la version v0.3 archivée dans _old-v1/00-index.yaml
+        # pour voir les différences.
+
+        - id: D1.2
+          nom: "Slider d'époques"
+
+          raison_d_etre: >-                     # POURQUOI — sens fonctionnel
+            Permettre à l'utilisateur de naviguer dans le temps de manière
+            continue, sans avoir à choisir entre des options listées. Sert
+            directement le principe d'émerveillement (la transition est un
+            moment de plaisir) et la sérendipité (le mécanisme invite à
+            découvrir une époque qu'on n'aurait pas cherchée).
+
+          comportement: >-                      # CE QUI SE PASSE pour l'utilisateur
+            L'utilisateur peut naviguer entre les époques par un geste
+            continu. Pendant le geste, l'apparence de la carte évolue
+            progressivement pour refléter la période en cours de sélection,
+            et l'utilisateur a un retour visible sur la période courante.
+            À la fin du geste, l'époque est calée automatiquement sur
+            l'époque fixe la plus proche, et le contenu pertinent (pins) se
+            recharge en fonction de cette époque finale.
+
+          regles_fonctionnelles:                # Contraintes dures fonctionnelles
+            - "L'apparence de la carte évolue en continu pendant le geste"
+            - "Les pins ne se rechargent qu'à la fin du geste (pas pendant)"
+            - "Sur la période la plus récente, tous les pins de toutes les époques sont accessibles (vue cumulée)"
+            - "Le slider peut être positionné automatiquement par un parcours en cours, sans bloquer la navigation manuelle de l'utilisateur"
+            - "Le nombre d'époques est fini et figé  (à acter avec la lead/historienne)"
+
+          capabilites:                          # CE QUE L'APP SAIT FAIRE (verbal, infinitif)
+            - "Permettre la navigation continue entre époques"
+            - "Adapter l'apparence de la carte au fil de la navigation"
+            - "Caler la période sélectionnée à la fin de l'interaction"
+            - "Donner un retour visible sur la période en cours de sélection"
+            - "Synchroniser le rechargement des pins avec la fin du geste"
+            - "Permettre le positionnement automatique par un parcours en cours"
+
+          ce_qu_on_ne_fait_pas:                 # ANTI-PÉRIMÈTRE FONCTIONNEL
+            - "Pas de navigation par paliers manuels (la fluidité fait partie de l'expérience)"
+            - "Pas de blocage de la navigation manuelle quand un parcours est en cours"
+            - "Pas de chargement de pins pendant le geste (uniquement à la fin)"
+
+          criteres_de_reussite:                 # UX / DESIGN — s'appuie sur test_litmus
+            - "Atteint le test_litmus de Mme Martin (défilement entre 3 époques en classe sans rupture visible)"
+            - "Atteint le test_litmus de Kenji (compréhension du mécanisme sans tutoriel ni texte)"
+            - "Le passage entre époques est ressenti comme un voyage temporel, pas comme un changement d'écran"
+
+          definition_of_done:                   # CRITÈRES FONCTIONNELS UNIQUEMENT
+            - "L'utilisateur peut activer une navigation continue entre les époques"
+            - "À la fin du geste, l'époque sélectionnée est calée et le contenu pertinent est chargé"
+            - "La période en cours de sélection est lisible pendant le geste"
+            - "Sur la période la plus récente, tous les pins de toutes les époques restent accessibles"
+            - "Un parcours en cours peut positionner le slider automatiquement, et l'utilisateur peut toujours le déplacer manuellement"
+
+          enjeux_transversaux:                  # NOMMER sans CHIFFRER
+            accessibilite: >-
+              Critique pour Mme Martin (projection en classe — la lisibilité
+              de la période et de la transition est essentielle, y compris
+              depuis le fond de la classe). Critique aussi pour utilisateurs
+              en situation de déficience motrice (alternative à
+              l'interaction gestuelle continue à anticiper). Critères
+              chiffrés en palier 16.
+            performance: >-
+              Critique : la fluidité du geste fait partie de l'expérience
+              (ressenti d'émerveillement non négociable). Le rechargement
+              en fin de geste ne doit pas être perçu comme une rupture.
+              Critères chiffrés en palier 16.
+            vie_privee: "Pas d'enjeu spécifique sur ce sous-domaine."
+
+          questions_ouvertes:
+            - "Bornes exactes des ~10 époques — à valider avec la lead/historienne"
+            - "Comportement de l'auto-positionnement par un parcours quand l'utilisateur manipule activement le slider (priorité utilisateur ou parcours ?) — à arbitrer"
+
+          priorite: "coeur"                     # coeur | important | si_le_temps
+
+          personas_principaux:
+            - kenji
+            - mme_martin
+            - pere_lyonnais
+
+          dependances:
+            - "D1.1 (carte de base — surface d'accueil du slider)"
+            - "D1.3 (apparence visuelle de la carte par époque — pilotée par le slider)"
+
+          comportements_transverses_referenced: []
+
+    champs_obligatoires:
+        - id
+        - nom
+        - raison_d_etre
+        - comportement
+        - regles_fonctionnelles
+        - capabilites
+        - ce_qu_on_ne_fait_pas
+        - criteres_de_reussite
+        - definition_of_done
+        - enjeux_transversaux
+        - priorite
+        - personas_principaux
+
+    champs_optionnels_recommandes:
+        - questions_ouvertes
+        - dependances
+        - comportements_transverses_referenced
+
+    changement_par_rapport_à_la_v0_3:
+        - "criteres_de_reussite passé d'optionnel-recommandé à obligatoire (s'est révélé toujours utile)"
+        - "definition_of_done : plus de sous-groupes 'fonctionnel/performance/qualite/accessibilite/i18n'. C'est une LISTE PLATE de critères FONCTIONNELS uniquement"
+        - "enjeux_transversaux ajouté en obligatoire : nomme les enjeux a11y / perf / vie privée sans chiffres techniques (i18n retiré, c'est un transversal global de intention.yaml § 7)"
+        - "pointe_vers RETIRÉ du format de fiche (risque de pré-orienter les paliers en aval). La § 8 articulation_avec_les_paliers_suivants de cet index donne la vue globale, suffisante."
+
+    trois_sections_pour_trois_publics:
+        capabilites:
+            perspective: "Ce que l'app SAIT faire"
+            forme: "Liste verbale, descriptive, présent ou infinitif"
+        criteres_de_reussite:
+            perspective: "Ce qui fait que c'est BON, ressenti utilisateur"
+            forme: "Liste expérientielle, s'appuie sur les test_litmus du palier 2"
+        definition_of_done:
+            perspective: "Ce qui permet de considérer la fonctionnalité LIVRÉE FONCTIONNELLEMENT"
+            forme: "Liste plate de critères fonctionnels vérifiables — PAS de chiffres techniques"
+            les_chiffres_vont_ou: "Au palier 16 (validation) ou dans le quality plan, pas ici"
+
+    enjeux_transversaux_modus_operandi:
+        quoi: >-
+            Trois dimensions transversales (a11y, perf, vie privée) sont
+            NOMMÉES dans chaque sous-domaine quand pertinentes : on indique
+            qu'il y a un enjeu, on le caractérise qualitativement, mais on
+            ne le chiffre pas. L'i18n est exclue de cette section — c'est
+            un transversal global déjà traité dans intention.yaml § 7, le
+            rappeler à chaque sous-domaine encombre sans valeur.
+        pourquoi: >-
+            Garder la trace de l'enjeu sans contaminer le palier 3 avec des
+            décisions techniques (qui doivent s'appuyer sur tout le palier
+            pour être cohérentes — ex. choisir une cible tactile dépend de
+            la densité d'éléments à l'écran, qui dépend du palier 7).
+        quand_pas_d_enjeu: >-
+            Si une dimension n'a pas d'enjeu spécifique sur le sous-domaine,
+            écrire : "Pas d'enjeu spécifique." Ne pas omettre le champ.
+        cas_i18n_specifique: >-
+            Exception : si un sous-domaine porte un enjeu i18n VRAIMENT
+            spécifique (ex. besoin CJK pour Kenji sur certains contenus),
+            l'inscrire dans une note ad-hoc du sous-domaine — pas dans
+            enjeux_transversaux.
+
+    regles_de_redaction:
+        - "Pas de description d'écran ni de UI nommée — relire § 2 anti_perimetre_strict"
+        - "Pas de chiffre technique dans le DoD — ils vont au palier 16"
+        - "Verbes d'action à l'infinitif dans capabilites"
+        - "comportement = paragraphe narratif (pas une liste)"
+        - "regles_fonctionnelles = liste de bullets courts, fonctionnels"
+        - "Si en doute sur un cas, mettre dans questions_ouvertes plutôt qu'inventer"
+        - "Avant validation : appliquer le test_de_purete (§ 2)"
+
+    structure_d_un_fichier_de_domaine: |
+        # Chaque fichier de domaine (01-... à 11-...) suit cette structure :
+
+        document:                          # métadonnées
+          type: palier_fonctionnalites_domaine
+          domaine_id: D1
+          ...
+
+        raison_d_etre_du_domaine: >-      # POURQUOI ce domaine globalement
+          Lien à l'essence et aux personas qu'il sert.
+
+        sous_domaines:                     # liste, format ci-dessus
+          - id: D1.1
+            ...
+          - id: D1.2
+            ...
+
+        persona_check:                     # passe explicite via grille palier 2
+          kenji: ...
+          mme_dupont: ...
+          mme_martin: ...
+          pere_lyonnais: ...
+          anais_back_office: ...
+
+        statut:
+          version_courante: ...
+          changelog: ...
+
+# -----------------------------------------------------------------------------
+# 6. Comportements transverses
+# -----------------------------------------------------------------------------
+# Comportements qui traversent plusieurs domaines. Définis canoniquement à un
+# seul endroit et référencés ailleurs via le champ
+# comportements_transverses_referenced.
+#
+# IMPORTANT (refonte v1.0) : ces définitions sont maintenant FONCTIONNELLES
+# UNIQUEMENT — pas de description d'UI, pas de mesure technique.
+comportements_transverses:
+    - nom: "Mode présentation sans chrome"
+      defini_dans: "D2.5 (consultation approfondie d'un pin)"
+      description_courte: >-
+          L'app peut basculer dans un mode où tout chrome non-essentiel est
+          masqué, pour permettre une consultation immersive ou une
+          projection (ex. Mme Martin en classe). Le retour en mode normal
+          reste accessible. La forme exacte de ce mode (quelles surfaces
+          sont masquées, comment activer le retour) sera détaillée en
+          palier 7.
+      reference_depuis:
+          - "D3.6 (mode canapé — promu pour la projection en classe)"
+          - "D1.1 (carte projetable — à acter)"
+          - "D8.2 (consultation 3D)"
+
+    - nom: "Géolocalisation"
+      defini_dans: "D1.1 (carte de base)"
+      description_courte: >-
+          L'app peut détecter la position de l'utilisateur quand il l'a
+          autorisé, pour adapter le centrage de la carte et déclencher
+          certains comportements de proximité.
+      reference_depuis:
+          - "D3.4, D3.5 (parcours)"
+          - "D4.2, D4.3 (notifications de proximité)"
+          - "D8.3 (AR ancrée sur place)"
+
+    - nom: "Lecture audio en arrière-plan"
+      defini_dans: "D7 (audio et narration)"
+      description_courte: >-
+          L'audio peut continuer à se jouer même si l'utilisateur navigue
+          ailleurs dans l'app ou ferme la consultation en cours. Permet
+          les mains libres en marche.
+      reference_depuis:
+          - "D2.5 (consultation approfondie)"
+          - "D3.5 (vivre un parcours)"
+
+    - nom: "Mode hors-ligne"
+      defini_dans: "D1.1 (carte de base — référence canonique)"
+      description_courte: >-
+          L'app fonctionne sans connexion sur le contenu téléchargé.
+          Étendue exacte (carte, audio, parcours préchargé…) à trancher
+          avec les devs Flutter.
+      reference_depuis:
+          - "D3.4 (parcours préchargé)"
+          - "D7 (audio préchargé)"
+
+    - nom: "Partage natif système"
+      defini_dans: "D11 (surfaces hors-app)"
+      description_courte: >-
+          L'app peut déclencher le mécanisme natif de partage du système
+          (le système propose les destinations possibles : messageries,
+          mail, Airdrop, etc.). C'est cette mécanique qui est mutualisée,
+          pas une UI maison.
+      reference_depuis:
+          - "D2.4, D2.5 (depuis les consultations de pin)"
+          - "D3.3 (fiche parcours)"
+          - "D3.8, D3.9 (partage et fin de parcours)"
+
+    - nom: "Permissions juste-à-temps"
+      defini_dans: "D5.5 (onboarding — référence canonique)"
+      description_courte: >-
+          Chaque permission système (géoloc, notifs, micro, caméra) est
+          demandée AU MOMENT où elle sert, pas en bloc au lancement.
+          Refus accepté sans drame, ré-activation possible depuis les
+          paramètres système.
+      reference_depuis:
+          - "D1.1 (géoloc)"
+          - "D4.2, D4.3 (notifs)"
+          - "D7 (potentiellement micro)"
+          - "D8.3 (caméra AR)"
+
+# -----------------------------------------------------------------------------
+# 7. Priorisation globale
+# -----------------------------------------------------------------------------
+priorisation_globale:
+    coeur:
+        description: >-
+            Sans ces domaines (ou sous-domaines), l'app n'a pas lieu d'être.
+        domaines:
+            - "D1 Carte et exploration temporelle"
+            - "D2 Pins et contenu d'un lieu"
+            - "D10.1 Templates de contenu structurés (sous-domaine cœur ; le reste de D10 est si_le_temps)"
+
+    important:
+        description: >-
+            Domaines essentiels au produit final mais qu'on peut ajouter par
+            vagues une fois le cœur stable.
+        domaines:
+            - "D3 Parcours"
+            - "D4 Notifications de proximité"
+            - "D5 Onboarding et premier lancement"
+            - "D6 Profil et données personnelles"
+            - "D7 Audio et narration"
+            - "D11 Surfaces hors-app"
+
+    si_le_temps:
+        description: >-
+            Domaines marqués 'si le temps le permet' dans le brief. Planifiés
+            et conçus, mais pas bloquants pour la démonstration.
+        domaines:
+            - "D8 3D et réalité augmentée (au minimum 1 bâtiment)"
+            - "D9 Communauté"
+            - "D10 (sauf D10.1 cœur) Production de contenu (workflow formel, CMS, modération formelle)"
+
+# -----------------------------------------------------------------------------
+# 8. Articulation avec les paliers ultérieurs
+# -----------------------------------------------------------------------------
+# Cette section précise QUOI le palier 3 passe à chaque palier en aval.
+# Elle est aussi un GARDE-FOU : si on se surprend à décrire en détail ce
+# que telle ligne ci-dessous décrit, c'est qu'on dépasse le périmètre.
+articulation_avec_les_paliers_suivants:
+    - palier: 4
+      nom: donnees_et_contrats
+      le_palier_3_lui_passe: >-
+          L'inventaire des entités fonctionnelles à modéliser et leurs
+          relations conceptuelles (un pin appartient à 1 catégorie et ≥1
+          périodes, etc.). Pas de schéma, pas de type technique — juste
+          l'intention de modélisation.
+
+    - palier: 5
+      nom: architecture_information
+      le_palier_3_lui_passe: >-
+          La hiérarchie fonctionnelle des écrans à venir, les modes de
+          présentation suggérés (consultation rapide vs consultation
+          approfondie, surface persistante vs ponctuelle), les règles de
+          navigation entre domaines.
+
+    - palier: 6
+      nom: flows
+      le_palier_3_lui_passe: >-
+          Les comportements de chaque sous-domaine et leurs dépendances —
+          base pour dérouler les flows utilisateur complets.
+
+    - palier: 7
+      nom: ecrans
+      le_palier_3_lui_passe: >-
+          L'inventaire des surfaces fonctionnelles à concrétiser en écrans,
+          avec leurs états et comportements. Toute spécification d'écran,
+          de mise en page, de UI nommée commence ici.
+
+    - palier: 8
+      nom: contenu_et_microcopy
+      le_palier_3_lui_passe: >-
+          Les surfaces de production de contenu (D10), les capabilités de
+          narration (D2, D7), les modes de notification (D4) — autant
+          d'endroits où il faudra produire du texte. Toute microcopy exacte
+          ('C'est parti', 'Surprenez-moi', etc.) commence ici.
+
+    - palier: 9
+      nom: cartographie
+      le_palier_3_lui_passe: >-
+          Les attentes fonctionnelles sur la carte (D1) : modes visuels par
+          époque, distinction des pins par catégorie et par état, styles
+          de tracé parcours. Toute décision sur les couleurs, formes,
+          icônes des pins commence ici.
+
+    - palier: 10
+      nom: composants
+      le_palier_3_lui_passe: >-
+          L'inventaire des comportements UI à transformer en composants
+          réutilisables. Toute spécification de composant nommé commence
+          ici.
+
+    - palier: 11
+      nom: interactions_et_motion
+      le_palier_3_lui_passe: >-
+          Les transitions et animations mentionnées dans les comportements
+          (calage à la fin du geste, recadrage carte, transitions
+          d'époque). Toute durée, courbe, vibration précise commence ici.
+
+    - palier: 12
+      nom: tokens
+      le_palier_3_lui_passe: >-
+          Les enjeux transversaux nommés (a11y, perf) qui demanderont des
+          valeurs chiffrées (cibles tactiles, contrastes, durées). Toute
+          valeur chiffrée commence ici.
+
+    - palier: 13
+      nom: icones
+      le_palier_3_lui_passe: >-
+          Les usages fonctionnels qui nécessiteront une icône (catégories
+          de pins, contrôles audio, statuts de parcours, paramètres). Toute
+          icône spécifique commence ici.
+
+    - palier: 16
+      nom: validation
+      le_palier_3_lui_passe: >-
+          Tous les criteres_de_reussite et definition_of_done des
+          sous-domaines, qui alimenteront le DoD design global. Toute
+          mesure technique chiffrée (fps, ms, px) commence ici.

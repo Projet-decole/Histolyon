@@ -1,0 +1,766 @@
+# =============================================================================
+# Palier 2 — Personas
+# =============================================================================
+# Ce fichier livre les personas du projet et la grille de validation
+# associée. Deux familles :
+#   (a) Personas grand public — 4 figures qui utilisent l'app mobile en
+#       consommation de contenu (inscrites dans les 4 axes du palier 1)
+#   (b) Personas back-office — 1 figure principale (+ rôles complémentaires)
+#       qui produit le contenu, sur une autre surface (templates puis CMS),
+#       hors axes du palier 1
+#
+# À partir d'ici, chaque palier ultérieur doit être 'persona-checked' avant
+# validation : on confronte la conception aux personas concernés via des
+# scénarios concrets, et on tranche.
+#
+# Ce que vise ce fichier : que chaque agent (humain ou IA) puisse, en moins
+# de 30 secondes face à une décision de conception, savoir si elle 'passe'
+# pour les personas concernés et où elle coince le cas échéant.
+#
+# Prérequis : avoir lu design/conception/01-essence.yaml (en particulier
+# le § pour_qui qui pose les 4 axes de tension).
+# =============================================================================
+
+document:
+    type: palier_personas
+    numero: 2
+    audience:
+        - "Tout agent qui rédige ou valide un palier ultérieur"
+        - "Auteurs de contenu (lead historienne, dev IA, rédacteurs)"
+        - "Jury — preuve que le travail sur les utilisateurs a été fait jusqu'au bout"
+    role: >-
+        Source d'incarnation humaine du produit. Là où l'essence (palier 1)
+        pose le territoire en axes abstraits, ce palier nomme et donne un
+        visage aux figures qui parcourent ce territoire — 4 personas grand
+        public côté usage et 1 persona principal côté production. Tout palier
+        suivant s'y réfère pour valider que la conception fonctionne pour de
+        vrais humains, pas pour le développeur qui la code.
+    format: yaml
+
+# -----------------------------------------------------------------------------
+# 1. Rôle des personas — à quoi ils servent, à quoi ils ne servent pas
+# -----------------------------------------------------------------------------
+# Important pour ne pas se tromper d'usage. Les personas, en startup, servent
+# souvent à du ciblage commercial ou à de la segmentation marketing. Ici, on
+# n'a pas de marché. Le rôle est différent.
+role_des_personas:
+    deux_familles:
+        grand_public: >-
+            4 personas qui utilisent l'app mobile en consommation de contenu.
+            Inscrits dans les 4 axes du palier 1 (visiteur ↔ habitant, terrain
+            ↔ canapé, seul ↔ encadré, préparé ↔ spontané).
+        back_office: >-
+            1 persona principal (+ rôles complémentaires) qui produit le contenu
+            sur une autre surface (templates structurés en phase 1, CMS en phase
+            2 si le temps le permet). Hors axes du palier 1 — sa propre logique,
+            ses propres moments de vérité.
+
+    ce_qu_ils_sont:
+        - boussole_humaine: >-
+              Quand on hésite sur une décision, on se demande : 'Kenji
+              comprendrait-il ?', 'Mme Dupont pourrait-elle l'utiliser jeudi en
+              sortie ?', 'Mme Martin pourrait-elle projeter ça en classe sans
+              honte ?', 'le père lyonnais sourirait-il ?', 'Anaïs pourrait-elle
+              saisir un pin sans batailler avec l'outil ?'.
+        - grille_de_validation: >-
+              Outil de revue obligatoire en fin de palier. Voir
+              § grille_de_scenarios_proxy plus bas pour le format.
+        - antidote_a_l_egocentrisme_du_concepteur: >-
+              L'erreur classique du concepteur : 'ça marche pour moi, donc ça
+              marche'. Les personas sont là pour rappeler que le concepteur n'est
+              pas l'utilisateur — qu'il s'agisse d'un utilisateur grand public
+              ou d'un utilisateur back-office.
+
+    ce_qu_ils_ne_sont_pas:
+        - "Une segmentation marketing (on n'a pas de marché à conquérir)"
+        - "Une cible commerciale exclusive (l'app est ouverte à tous)"
+        - "Une projection démographique exhaustive de la population utilisatrice"
+        - "Des fiches client pour personnaliser l'expérience (on ne fait pas de personnalisation par persona dans l'app)"
+
+# -----------------------------------------------------------------------------
+# 2. Principes d'emploi — comment on les utilise en pratique
+# -----------------------------------------------------------------------------
+# Lire et oublier les personas, c'est très facile. Cette section pose les
+# règles concrètes pour qu'ils soient utilisés à chaque palier, pas juste
+# rangés sur l'étagère. Ces principes valent pour les deux familles
+# (grand public et back-office).
+principes_d_emploi:
+    - id: persona_check_obligatoire
+      regle: >-
+          À la fin de chaque palier de conception, l'auteur passe explicitement
+          les personas concernés par le palier. Pas un 'oui à tout' — un check
+          par persona pertinent, avec une ligne de réponse documentée dans le
+          palier concerné.
+      note_sur_la_pertinence: >-
+          Tous les personas ne sont pas pertinents pour tous les paliers. Le
+          palier 13 (admin) concerne d'abord les personas back-office. Le
+          palier 7 (écrans mobiles) concerne d'abord les personas grand
+          public. Le palier 8 (contenu) concerne les deux.
+      forme_dans_le_palier: >-
+          Section 'persona_check' obligatoire en fin de chaque YAML de palier
+          à partir du palier 3.
+
+    - id: appui_sur_la_grille
+      regle: >-
+          Le persona-check s'appuie sur la grille_de_scenarios_proxy (§ 7).
+          Pas besoin de réinventer les questions à chaque fois — la grille
+          est l'outil, on la passe.
+
+    - id: cas_hors_personas
+      regle: >-
+          Si une décision ne se laisse pas trancher avec les personas existants
+          (cas qui tombe à côté), on s'appuie sur le persona le plus proche
+          et on documente l'arbitrage spécifique. On ne crée pas de nouveau
+          persona pour un cas marginal.
+
+    - id: conflit_entre_personas
+      regle: >-
+          Quand une décision satisfait un persona mais en frustre un autre
+          (cas fréquent), on tranche en revenant aux principes essentiels du
+          palier 1 (sérendipité / historicité / émerveillement) et on
+          documente le compromis. Aucun persona n'a de priorité absolue par
+          défaut.
+
+    - id: pas_de_modification_des_personas_a_la_legere
+      regle: >-
+          Les personas sont stables. Modifier un persona en cours de projet
+          pour 'l'adapter' à une décision déjà prise est une dérive
+          d'ingénieur — on doit reprendre la décision, pas le persona.
+
+# -----------------------------------------------------------------------------
+# 3. Personas grand public — les 4 utilisateurs de l'app mobile
+# -----------------------------------------------------------------------------
+# Ordre : Kenji, Mme Dupont, Mme Martin, le père lyonnais. Suit l'ordre du
+# brief, pas un ordre de priorité. Tous égaux en poids.
+#
+# Format : fiche enrichie pour chaque persona, avec les éléments d'identité
+# (qui sert la crédibilité jury), la motivation centrale, le rapport à
+# l'histoire, les axes incarnés, les moments de vérité, les frustrations et
+# drapeaux rouges, et un test litmus pour décision rapide.
+personas_grand_public:
+    # ---------------------------------------------------------------------------
+    - id: kenji
+
+      identite:
+          nom_complet: "Kenji Tanaka"
+          age: 22
+          genre: masculin
+          photo:
+              description_visuelle: >-
+                  Étudiant japonais de 22 ans, look décontracté (sweat, sac à dos
+                  léger), casque audio autour du cou, smartphone à la main. Cadré
+                  en pied ou plan américain devant un monument lyonnais (Place
+                  Bellecour, traboule, Fourvière). Lumière chaude, ambiance fin
+                  d'après-midi.
+              fichier: "TBD — à produire (générer ou sourcer)"
+          profil_court: >-
+              Étudiant japonais en première année universitaire à Tokyo. Premier
+              voyage en France dans le cadre d'un circuit multi-villes (Paris,
+              Lyon, Marseille) sur 12 jours. Voyage seul, budget étudiant,
+              passe 2 jours à Lyon recommandé par l'office du tourisme.
+          citation: >-
+              "Si je rentre au Japon sans avoir compris pourquoi Lyon est Lyon,
+              j'ai juste fait du tourisme."
+
+      contexte_d_usage:
+          point_d_entree: "Recommandation de l'office du tourisme à son arrivée"
+          contexte_typique: >-
+              Marche seul dans le Vieux Lyon ou la Croix-Rousse, casque sur les
+              oreilles, smartphone à la main. Alterne entre exploration libre et
+              consultation de l'app. Soir à l'hôtel pour préparer le lendemain.
+
+      motivation_centrale: >-
+          Comprendre la culture française à travers Lyon. Pas l'histoire pour
+          l'histoire — l'histoire comme contexte d'immersion culturelle, comme
+          réponse à 'pourquoi cette ville est comme ça ?'.
+
+      rapport_a_l_histoire: >-
+          Outil de compréhension culturelle, pas passion personnelle. Veut
+          comprendre vite, contextualiser ce qu'il voit, repartir avec des
+          anecdotes à raconter.
+
+      axes_du_palier_1_qu_il_incarne:
+          - axe: "visiteur ↔ habitant"
+            position: "visiteur (extrême)"
+          - axe: "terrain ↔ canapé"
+            position: "majoritairement terrain, un peu canapé (préparation à l'hôtel)"
+          - axe: "seul ↔ encadré"
+            position: "seul"
+          - axe: "préparé ↔ spontané"
+            position: "mixte — préparation rapide la veille, spontanéité dans la journée"
+
+      moments_de_verite:
+          - "Premier lancement à l'hôtel : il doit comprendre l'app sans tutoriel et sans aide en français"
+          - "Marche dans le Vieux Lyon avec le casque : l'audio doit lui permettre de garder les yeux sur la ville"
+          - "Découverte d'une anecdote : il veut la partager sur Instagram en 10 secondes"
+          - "Soir à l'hôtel : il prépare son itinéraire du lendemain hors-ligne (pas de data garantie)"
+
+      frustrations_a_eviter:
+          - "Devoir lire de longues explications en français pour comprendre une fonctionnalité"
+          - "Ne pas pouvoir activer l'audio en marchant (= ne plus pouvoir regarder Lyon)"
+          - "Devoir créer un compte pour partager"
+          - "Découvrir au milieu de Bellecour que tout est tombé parce qu'il n'a plus de data"
+
+      drapeaux_rouges:
+          - "Microcopy en français uniquement"
+          - "Polices sans support CJK (impossible si version japonaise)"
+          - "Tutoriel obligatoire au lancement"
+          - "Partage social qui produit un lien moche au lieu d'une image"
+
+      test_litmus:
+          - "Quand Kenji ouvre l'app pour la première fois en japonais, comprend-il quoi faire en moins de 60 secondes sans tutoriel ?"
+          - "Quand Kenji marche avec son casque, peut-il vivre 80% de l'expérience sans regarder son écran ?"
+
+    # ---------------------------------------------------------------------------
+    - id: mme_dupont
+
+      identite:
+          nom_complet: "Claire Dupont"
+          age: 38
+          genre: féminin
+          photo:
+              description_visuelle: >-
+                  Enseignante de 38 ans, tenue confortable et professionnelle
+                  (chemisier, pantalon), smartphone à la main, sifflet ou badge
+                  autour du cou. En extérieur, dans une rue du Vieux Lyon, deux
+                  ou trois enfants en arrière-plan flou. Regard à la fois attentif
+                  (groupe à surveiller) et engagé (tournée vers son téléphone).
+              fichier: "TBD — à produire (générer ou sourcer)"
+          profil_court: >-
+              Maîtresse de classe CM1-CM2 en école primaire à Villeurbanne. Une
+              sortie scolaire par an dans le Vieux Lyon avec ses 28 élèves
+              répartis en 5-6 groupes encadrés par des parents accompagnateurs
+              (souvent peu à l'aise avec le numérique).
+          citation: >-
+              "Je veux que les enfants comprennent que Lyon a une histoire, sans
+              passer toutes mes soirées à préparer la sortie."
+
+      contexte_d_usage:
+          point_d_entree: "Recommandation par une collègue, ou par l'inspection académique"
+          contexte_typique: >-
+              Préparation un dimanche soir chez elle, parcours envoyé aux parents
+              le mercredi par mail/WhatsApp. Le jour J, dans le Vieux Lyon avec
+              son groupe principal, en surveillant à distance les autres groupes.
+
+      motivation_centrale: >-
+          Construire un outil pédagogique ludique qu'elle peut déléguer à des
+          parents non-enseignants, tout en gardant la cohérence pédagogique de
+          la sortie. Que ses 28 élèves repartent avec quelque chose de réel.
+
+      rapport_a_l_histoire: >-
+          Vecteur pédagogique. L'histoire pour faire passer du contenu et de
+          la curiosité aux enfants. Ce qui compte n'est pas la profondeur
+          historique mais la mémorabilité narrative pour des CM1-CM2.
+
+      axes_du_palier_1_qu_il_incarne:
+          - axe: "visiteur ↔ habitant"
+            position: "habitante (région lyonnaise)"
+          - axe: "terrain ↔ canapé"
+            position: "les deux — préparation au canapé, exécution sur le terrain"
+          - axe: "seul ↔ encadré"
+            position: "encadré (groupe scolaire)"
+          - axe: "préparé ↔ spontané"
+            position: "très préparé"
+
+      moments_de_verite:
+          - "Préparation un dimanche soir : créer un parcours en moins de 30 minutes"
+          - "Envoi du parcours aux 6 parents : un lien qui s'ouvre proprement, sans qu'ils aient à créer un compte"
+          - "Le jour J, parent qui ouvre le lien à 9h : il doit savoir quoi faire en 30 secondes"
+          - "Quiz fin de parcours pour les enfants : adapté à des CM1-CM2"
+
+      frustrations_a_eviter:
+          - "Création de parcours qui prend plus d'une heure"
+          - "Parents qui doivent créer un compte pour ouvrir le lien"
+          - "Contenu d'un pin manifestement trop adulte ou trop dense pour des enfants"
+          - "Parents perdus le jour J, qui appellent toutes les 10 minutes"
+
+      drapeaux_rouges:
+          - "Création de parcours qui demande de comprendre une UI complexe"
+          - "Pas de mode 'sans GPS' pour les parents en intérieur ou rues étroites"
+          - "Texte des pins qui suppose un vocabulaire d'adulte"
+          - "Pas de partage par lien simple (uniquement code, app installée requise, etc.)"
+
+      test_litmus:
+          - "Quand Mme Dupont prépare un parcours du Vieux Lyon un dimanche soir, peut-elle finir en moins de 30 minutes ?"
+          - "Quand un parent accompagnateur ouvre le lien le jour J sans formation, sait-il quoi faire en 30 secondes ?"
+
+    # ---------------------------------------------------------------------------
+    - id: mme_martin
+
+      identite:
+          nom_complet: "Hélène Martin"
+          age: 42
+          genre: féminin
+          photo:
+              description_visuelle: >-
+                  Enseignante de 42 ans, tenue sobre et soignée, debout devant un
+                  tableau interactif sur lequel la carte d'HistoLyon est projetée.
+                  Salle de classe en arrière-plan, élèves de dos partiellement
+                  visibles. Un stylet ou pointeur à la main, regard tourné vers la
+                  carte ou vers les élèves. Lumière de classe (néon froid),
+                  contrastée par les tons chauds de l'app au tableau.
+              fichier: "TBD — à produire (générer ou sourcer)"
+          profil_court: >-
+              Professeure d'histoire-géographie en collège à Lyon, enseigne
+              en 4e. Utilise l'app projetée au tableau interactif ou sur les
+              tablettes des élèves comme support de cours. Pas en sortie —
+              en classe, à l'intérieur.
+          citation: >-
+              "Je veux leur faire toucher du doigt que Lyon a deux mille ans,
+              pas leur réciter des dates au tableau."
+
+      contexte_d_usage:
+          point_d_entree: "Découverte par recherche pédagogique ou recommandation collègue"
+          contexte_typique: >-
+              En classe, devant 28 collégiens, pendant une séquence d'histoire
+              sur l'urbanisation française au XIXe ou la Résistance lyonnaise.
+              Manipule l'app au tableau, fait commenter aux élèves, projette
+              des archives.
+
+      motivation_centrale: >-
+          Rendre vivant un cours d'histoire en projetant une carte qui change
+          avec le temps. Donner de l'épaisseur à des dates en montrant les
+          lieux, les archives, les visages. Susciter l'envie d'apprendre.
+
+      rapport_a_l_histoire: >-
+          Cœur de métier. L'historicité (rigueur, sources, fiabilité) est
+          non-négociable — elle ne projettera pas en classe quelque chose
+          d'imprécis ou d'invérifiable. C'est en incarnant ce persona que
+          les piliers de l'app ont émergé en brainstorming.
+
+      axes_du_palier_1_qu_il_incarne:
+          - axe: "visiteur ↔ habitant"
+            position: "habitante"
+          - axe: "terrain ↔ canapé"
+            position: "canapé (en classe, jamais en extérieur)"
+          - axe: "seul ↔ encadré"
+            position: "encadré (groupe classe sous sa responsabilité)"
+          - axe: "préparé ↔ spontané"
+            position: "très préparé (cours bâti à l'avance)"
+
+      moments_de_verite:
+          - "Projection au tableau : le mode plein écran masque tout chrome (tab bar, bandeaux, mini-player)"
+          - "Défilement entre 3 époques en 30 secondes pour montrer une évolution : slider fluide et lisible depuis le fond de la classe"
+          - "Citation d'archives en cours : sources clairement visibles et crédibles"
+          - "Préparation d'un cours : trouver vite les pins sur un sujet (ex : Canuts, Résistance) et les organiser"
+
+      frustrations_a_eviter:
+          - "Devoir cacher la tab bar avec sa main pour projeter"
+          - "Sources d'archives invisibles ou douteuses (perte de crédibilité devant les élèves)"
+          - "Mode canapé dégradé qui afficherait 'vous n'êtes pas à Lyon' (alors qu'elle EST à Lyon, mais en classe)"
+          - "Animations gadgets qui distraient ses élèves"
+
+      drapeaux_rouges:
+          - "Pas de mode plein écran propre"
+          - "Sources non affichées ou non vérifiables"
+          - "Ton trop ludique au point de devenir infantile"
+          - "Notifications qui surgissent pendant la projection"
+
+      test_litmus:
+          - "Quand Mme Martin projette l'app au tableau, le mode plein écran offre-t-il une vue propre, sans chrome, professionnelle ?"
+          - "Quand Mme Martin cite une archive, la source est-elle visible et crédible aux yeux d'un collègue qui regarderait par-dessus son épaule ?"
+
+    # ---------------------------------------------------------------------------
+    - id: pere_lyonnais
+
+      identite:
+          nom_complet: "Marc Dubois"
+          age: 41
+          genre: masculin
+          photo:
+              description_visuelle: >-
+                  Homme de 41 ans, tenue décontractée week-end (jean, sweat ou
+                  veste légère), cheveux courts. Marche dans une rue typiquement
+                  lyonnaise (pentes de la Croix-Rousse, ruelle du Vieux Lyon, ou
+                  quai de Saône) avec deux enfants (8 et 11 ans environ) un peu
+                  devant lui. Regard tourné vers son téléphone qui vient de
+                  vibrer. Ambiance dimanche après-midi.
+              fichier: "TBD — à produire (générer ou sourcer)"
+          profil_court: >-
+              Lyonnais de souche, né à Lyon, vit dans le 4e (Croix-Rousse).
+              Père de deux enfants. Sortie dominicale dans son propre quartier
+              ou dans un quartier voisin pour une balade familiale sans plan
+              précis. Connaît Lyon de l'extérieur, mais pas son histoire fine.
+          citation: >-
+              "Je passe devant ce mur depuis vingt ans. C'est quoi ce médaillon ?"
+
+      contexte_d_usage:
+          point_d_entree: "Découverte par bouche-à-oreille ou article presse locale"
+          contexte_typique: >-
+              Balade dominicale dans son quartier ou un autre quartier de Lyon
+              avec ses enfants. Marche lente, conversations en famille, app
+              en arrière-plan. Mode 'Surprenez-moi' activé.
+
+      motivation_centrale: >-
+          Redécouvrir des rues qu'il croit connaître par cœur. Trouver des
+          anecdotes à raconter à ses enfants ou à des amis. Pas un objectif
+          d'apprentissage — un plaisir gratuit.
+
+      rapport_a_l_histoire: >-
+          Curiosité du quotidien. L'histoire comme révélation de ce qui était
+          sous ses yeux sans qu'il le voie. Pas de motivation académique,
+          pas de préparation, pas de profondeur cherchée — juste le frisson
+          de la découverte.
+
+      axes_du_palier_1_qu_il_incarne:
+          - axe: "visiteur ↔ habitant"
+            position: "habitant (extrême)"
+          - axe: "terrain ↔ canapé"
+            position: "terrain"
+          - axe: "seul ↔ encadré"
+            position: "intermédiaire (avec ses enfants, peu d'encadrement)"
+          - axe: "préparé ↔ spontané"
+            position: "spontané (extrême — pas de préparation)"
+
+      moments_de_verite:
+          - "Marche pendant 5 minutes dans son quartier : reçoit-il une anecdote au bon moment, sans avoir rien demandé ?"
+          - "Reçoit une anecdote courte : peut-il la lire avant que ses enfants ne le tirent par la manche"
+          - "Découvre un fait surprenant : retrouve-t-il facilement le pin le soir pour le raconter à un ami"
+          - "Veut couper les notifs un jour précis : peut-il en 2 taps, sans menu enfoui"
+
+      frustrations_a_eviter:
+          - "Devoir préparer ou planifier pour utiliser l'app"
+          - "Notifs qui surgissent quand il ne veut pas (sentiment d'intrusion)"
+          - "Anecdote qui demande 5 minutes de lecture (il n'a pas le temps)"
+          - "App qui le pousse à faire un parcours alors qu'il veut juste flâner"
+
+      drapeaux_rouges:
+          - "Onboarding obligatoire avant la première utilisation"
+          - "Mode 'Surprenez-moi' activé par défaut sans son consentement"
+          - "Contenu trop long sans teaser court visible immédiatement"
+          - "Ton qui présuppose un visiteur ('Découvrez Lyon !')"
+
+      test_litmus:
+          - "Quand le père marche 5 minutes dans son quartier en mode 'Surprenez-moi', reçoit-il une anecdote au bon moment ?"
+          - "Quand il veut couper les notifs aujourd'hui, peut-il le faire en 2 taps depuis l'écran principal ?"
+
+# -----------------------------------------------------------------------------
+# 4. Personas back-office — la production du contenu
+# -----------------------------------------------------------------------------
+# L'admin / éditeur de contenu n'utilise pas l'app mobile au sens où les 4
+# personas grand public l'utilisent. Il opère sur une surface différente
+# (templates structurés en phase 1, CMS web en phase 2 si le temps le permet)
+# avec une posture inverse : il PRODUIT le contenu que les autres CONSOMMENT.
+# Sort donc des axes du palier 1 — qui décrivent l'usage mobile public.
+# Mais a son rôle, ses moments de vérité, ses frustrations propres.
+#
+# Une figure principale (Anaïs) en fiche complète. Quelques rôles
+# complémentaires (valideur scientifique, modérateur communauté) en mention
+# courte — soit assurés par la même personne au début, soit planifiés pour
+# des phases ultérieures.
+personas_back_office:
+    figure_principale:
+        - id: editeur_de_contenu
+
+          identite:
+              nom_complet: "Anaïs Lefèvre"
+              age: 25
+              genre: féminin
+              photo:
+                  description_visuelle: >-
+                      Femme de 25 ans, look étudiant soigné (chemise, lunettes
+                      éventuelles), à son bureau devant un écran, archives ou livres
+                      ouverts à côté. Regard concentré. Lumière chaude de bibliothèque
+                      ou de bureau de travail.
+                  fichier: "TBD — à produire (générer ou sourcer)"
+              profil_court: >-
+                  Étudiante en Master 2 Histoire (spécialité histoire urbaine ou
+                  patrimoine), en charge de la production de contenu HistoLyon
+                  au sein de l'équipe projet. Première vraie expérience d'écriture
+                  destinée à un public large. Travaille sur templates structurés
+                  en phase 1, basculera sur un CMS web en phase 2 si le temps le
+                  permet.
+              citation: >-
+                  "Je veux que chaque pin soit irréprochable côté histoire, mais
+                  qu'il se lise comme un récit, pas comme une fiche."
+
+          contexte_d_usage:
+              surface_principale: >-
+                  étape ultérieure : templates spreadsheet structurés (titre, catégorie,
+                  époque, GPS, texte narratif, médias, sources, etc.).
+                  étape ultérieure (si le temps) : CMS web avec interface dédiée.
+              contexte_typique: >-
+                  À son bureau, écran principal sur les templates / le CMS, écran
+                  secondaire ou livres ouverts sur les sources. Sessions longues
+                  (2-4 h) de production-vérification-saisie.
+
+          motivation_centrale: >-
+              Produire un contenu qui tient la double exigence : rigueur
+              scientifique (pas une approximation, pas une invention) et ton
+              conteur (pas une fiche encyclopédique). Faire vivre l'histoire
+              qu'elle a apprise, pas la réciter.
+
+          rapport_a_son_role: >-
+              Métier en construction. Cherche à faire reconnaître la rigueur de
+              son travail tout en assumant le ton narratif. La double contrainte
+              est sa fierté, pas sa galère — à condition que les outils ne
+              l'épuisent pas.
+
+          surfaces_qu_il_touche:
+              - "Templates de contenu (palier 8 — contenu_et_microcopy)"
+              - "Workflow de validation scientifique avant publication"
+              - "Nomenclature des fichiers médias (images, audio, archives)"
+              - "Interface CMS web si phase 2 atteinte (palier 13)"
+              - "Modération éventuelle de pins soumis par utilisateurs (palier 14, communauté planifiée si le temps)"
+
+          moments_de_verite:
+              - "Première saisie d'un pin dans un template : guide-t-il sans la brider ?"
+              - "Vérification d'une source : peut-elle tracer chaque affirmation rapidement ?"
+              - "Soumission au valideur scientifique : workflow clair, sans changer d'outil ?"
+              - "Reprise d'un pin existant pour correction : modification simple, version antérieure préservée ?"
+              - "Prévisualisation avant publication : voit-elle exactement ce que verra l'utilisateur final ?"
+
+          frustrations_a_eviter:
+              - "Templates rigides qui empêchent la nuance narrative"
+              - "Champs obligatoires aberrants (forcer une époque sur un pin de patrimoine vivant qui traverse plusieurs siècles)"
+              - "Pas de prévisualisation de ce que verra l'utilisateur final"
+              - "Workflow de validation flou (qui valide quoi, dans quel ordre)"
+              - "Pas de gestion de versions (impossible de revenir sur une rédaction antérieure)"
+
+          drapeaux_rouges:
+              - "Templates qui dictent le ton (au lieu de cadrer la structure)"
+              - "Sources stockées comme champ libre 'commentaire' au lieu d'un système traçable"
+              - "Pas de distinction brouillon / publié"
+              - "Modifications qui se propagent en prod sans relecture"
+
+          test_litmus:
+              - "Quand Anaïs saisit un nouveau pin moyen (sources déjà collectées), peut-elle le faire en moins de 30 minutes ?"
+              - "Quand un valideur scientifique relit son pin avant publication, peut-il le faire dans le même outil sans changer de contexte ?"
+              - "Quand Anaïs prévisualise un pin avant publication, voit-elle exactement ce que verra l'utilisateur final ?"
+
+    roles_complementaires:
+        pourquoi_pas_des_fiches_completes: >-
+            Ces rôles existent et comptent, mais soit ils sont assurés par la
+            même personne qu'Anaïs en début de projet (faute de ressource), soit
+            ils sont planifiés pour des phases ultérieures. Une fiche complète
+            serait artificielle. On les nomme pour qu'on les anticipe dans les
+            paliers concernés (palier 13 admin, palier 14 communauté).
+
+        roles:
+            - id: valideur_scientifique
+              qui: >-
+                  Personne qui relit un pin avant publication pour vérifier la
+                  rigueur historique. Peut être l'institution (archives, mairie)
+                  en partenariat, ou un membre senior de l'équipe. Au début du
+                  projet, peut être Anaïs elle-même (auto-validation) faute de
+                  ressource — à acter dans le quality plan.
+              ce_qu_il_attend_du_produit:
+                  - "Lecture du pin tel qu'il sera vu par l'utilisateur"
+                  - "Accès rapide aux sources citées"
+                  - "Possibilité d'annoter ou de commenter sans modifier directement"
+                  - "Workflow de validation tracé (qui a validé quoi, quand)"
+
+            - id: moderateur_communaute
+              qui: >-
+                  Personne qui modère les soumissions et commentaires utilisateurs
+                  quand les fonctionnalités communautaires seront ouvertes (palier 14,
+                  planifié si le temps). Peut être confondu avec l'éditeur ou être
+                  un rôle dédié plus tard.
+              ce_qu_il_attend_du_produit:
+                  - "File de modération avec priorisation (signalements en tête)"
+                  - "Décisions tracées (publié, refusé, demandé en correction)"
+                  - "Templates de réponses pour cas standards"
+                  - "Pas de surcharge — la modération doit être tenable avec peu de temps"
+              statut: "Réservé pour palier 14 communauté (si le temps le permet)"
+
+# -----------------------------------------------------------------------------
+# 5. Acteurs hors-personas — l'institution
+# -----------------------------------------------------------------------------
+# L'institution (archives départementales, mairie, office du tourisme) n'est
+# pas un persona utilisateur — elle n'utilise pas l'app au sens où les 4
+# personas grand public ou Anaïs back-office l'utilisent. Mais elle a une
+# influence forte sur le produit, et il serait malhonnête de la passer sous
+# silence dans ce palier.
+#
+# À ne pas confondre avec Anaïs (back-office) : Anaïs PRODUIT le contenu
+# au sein du projet. L'institution NOURRIT le projet de l'extérieur (sources,
+# validation scientifique partenaire, recommandation).
+acteurs_hors_personas:
+    - id: institution
+      nom: "L'institution lyonnaise du patrimoine"
+
+      profil_court: >-
+          Acteur écosystème : responsables d'archives départementales, chargés
+          de mission patrimoine en mairie, office du tourisme. Personnes
+          individuelles passionnées d'histoire lyonnaise, dans leurs fonctions
+          institutionnelles.
+
+      pourquoi_pas_un_persona: >-
+          Ne sert pas le produit en tant qu'utilisateur principal. Son rôle
+          est en amont (fournir et valider le contenu) et en aval (recommander
+          l'app). Une fiche persona complète serait artificielle — l'institution
+          n'a pas de moments de vérité à elle dans l'app.
+
+      role_triple:
+          - fournisseur_de_contenu: >-
+                Archives, photos, documents, validation scientifique. Sans elle,
+                le contenu n'est pas crédible.
+          - utilisateur_passionne: >-
+                Les individus de l'institution sont aussi des lyonnais passionnés
+                d'histoire. Ils utilisent l'app comme habitants curieux — donc
+                ils tombent sous le persona du père lyonnais ou voisin.
+          - promoteur: >-
+                Office du tourisme recommande l'app à Kenji. Mairie communique
+                dessus. Sans cette promotion institutionnelle, l'app reste invisible.
+
+      pourquoi_elle_compte_pour_la_conception:
+          - "Le principe d'historicité (palier 1) ne se tient que parce qu'elle valide les sources"
+          - "Le point d'entrée de Kenji passe par elle (recommandation OT)"
+          - "Toute décision contenu doit pouvoir être présentée à elle sans honte"
+
+      ce_qu_on_lui_doit_dans_le_produit:
+          - "Sources visibles et traçables sur chaque pin (pas une fonctionnalité avancée — un dû)"
+          - "Crédits clairs (qui a fourni quoi)"
+          - "Possibilité de signaler une erreur ou apporter une correction (on n'a pas de CMS au début, mais un canal doit exister)"
+          - "Pas de contenu inventé qui pourrait l'embarrasser si elle promeut l'app"
+
+# -----------------------------------------------------------------------------
+# 6. Couverture des axes — matrice personas grand public × axes du palier 1
+# -----------------------------------------------------------------------------
+# Permet de vérifier d'un coup d'œil que les 4 axes du palier 1 sont bien
+# couverts par les 4 personas grand public, et où chacun se positionne.
+#
+# Note : cette matrice ne concerne PAS Anaïs (back-office), qui opère sur
+# une surface différente et n'entre pas dans ces axes (cf. § 4 ouverture).
+couverture_des_axes:
+    matrice:
+        - axe: "visiteur ↔ habitant"
+          kenji: visiteur
+          mme_dupont: habitante
+          mme_martin: habitante
+          pere_lyonnais: habitant
+          remarque: >-
+              Couverture asymétrique : 1 visiteur, 3 habitants. Justifié — Lyon
+              est une ville régionale, pas une capitale internationale. Kenji
+              suffit à incarner la dimension visiteur.
+
+        - axe: "terrain ↔ canapé"
+          kenji: "terrain (avec préparation à l'hôtel)"
+          mme_dupont: "les deux (préparation canapé, exécution terrain)"
+          mme_martin: "canapé (en classe)"
+          pere_lyonnais: "terrain"
+          remarque: >-
+              Couverture complète. Mme Martin est le seul persona purement
+              canapé : elle valide à elle seule que ce mode soit traité en
+              citoyen de première classe.
+
+        - axe: "seul ↔ encadré"
+          kenji: seul
+          mme_dupont: "encadré (groupe scolaire)"
+          mme_martin: "encadré (groupe classe)"
+          pere_lyonnais: "intermédiaire (avec enfants, peu d'encadrement)"
+          remarque: >-
+              Couverture complète. À noter : 'encadré' couvre deux contextes
+              différents (sortie scolaire vs classe), à ne pas confondre.
+
+        - axe: "préparé ↔ spontané"
+          kenji: "mixte"
+          mme_dupont: "très préparé"
+          mme_martin: "très préparé"
+          pere_lyonnais: "spontané"
+          remarque: >-
+              Couverture complète. Kenji est l'intermédiaire — il prépare la
+              veille, mais explore en spontanéité dans la journée.
+
+    lecture_de_la_matrice: >-
+        Chaque axe est couvert par au moins un persona à chaque extrémité.
+        Aucun axe n'a un 'trou' qui forcerait à inventer un cinquième persona
+        grand public. Si une décision future ne se laisse trancher avec aucun
+        de ces 4, c'est un signal qu'on est probablement hors essence (cf.
+        § principes d'emploi, règle 'cas hors personas').
+
+# -----------------------------------------------------------------------------
+# 7. Grille de scénarios proxy — l'outil de validation
+# -----------------------------------------------------------------------------
+# Cette grille est l'outil opérationnel du persona-check. À chaque palier,
+# on passe les scénarios qui s'appliquent et on documente les réponses
+# dans le palier concerné. Pas tous les scénarios à chaque palier —
+# seulement ceux pertinents à la décision.
+#
+# Deux blocs : scénarios grand public (4 personas mobile) et scénarios
+# back-office (Anaïs). Les rôles complémentaires (valideur, modérateur)
+# n'ont pas de bloc dédié — leurs scénarios apparaîtront dans le palier 13
+# (admin) et le palier 14 (communauté) le moment venu.
+grille_de_scenarios_proxy:
+    format_d_un_scenario: >-
+        Une question concrète, ancrée dans un contexte précis, qui appelle
+        une réponse binaire (oui/non) ou nuancée. Format type : 'Quand
+        <persona> fait <action> dans <contexte>, est-ce que <chose à
+        vérifier> ?'.
+
+    scenarios_grand_public:
+        kenji:
+            - "Quand Kenji ouvre l'app pour la première fois à l'hôtel un soir, comprend-il en moins de 60 secondes comment fonctionne le slider d'époques, sans tutoriel et en japonais ?"
+            - "Quand Kenji marche dans le Vieux Lyon avec son casque, peut-il vivre 80% de l'expérience sans avoir à regarder son écran toutes les 30 secondes ?"
+            - "Quand Kenji veut partager une découverte sur Instagram, le partage produit-il en 10 secondes une image jolie et lisible, sans qu'il ait besoin de comprendre une UI française ?"
+            - "Quand Kenji n'a plus de data au milieu de Bellecour, peut-il continuer son parcours préchargé hors-ligne ?"
+
+        mme_dupont:
+            - "Quand Mme Dupont prépare un parcours dans le Vieux Lyon un dimanche soir, peut-elle finir en moins de 30 minutes et l'envoyer aux 6 parents accompagnateurs ?"
+            - "Quand un parent accompagnateur ouvre le lien le jour J sans formation, sait-il quoi faire en moins de 30 secondes — sans créer de compte, sans tutoriel ?"
+            - "Quand un parent sort du parcours parce qu'un enfant fatigue, l'app le ramène-t-elle proprement ou le perd-elle dans une nav cassée ?"
+            - "Quand Mme Dupont consulte le contenu d'un pin qu'elle veut faire lire à des CM1-CM2, est-il adapté ou faut-il qu'elle reformule ?"
+
+        mme_martin:
+            - "Quand Mme Martin projette l'app au tableau pour un cours sur 1793, le mode plein écran masque-t-il proprement la tab bar et tout le chrome non pédagogique ?"
+            - "Quand Mme Martin défile entre 3 époques en 30 secondes pour montrer une évolution, le slider est-il assez fluide et lisible depuis le fond de la classe ?"
+            - "Quand Mme Martin cite une archive en cours, la source est-elle visible et crédible aux yeux d'un collègue qui regarderait par-dessus son épaule ?"
+            - "Quand Mme Martin utilise le mode canapé en classe, le ton de l'app est-il professionnel (pas de message 'vous n'êtes pas à Lyon, mode dégradé') ?"
+
+        pere_lyonnais:
+            - "Quand le père marche 5 minutes dans son quartier en mode 'Surprenez-moi', reçoit-il une anecdote au bon moment et au bon format (court, lisible en 30 secondes) ?"
+            - "Quand le père découvre un fait fou et veut le retrouver le soir pour le raconter à un ami, le retrouve-t-il facilement dans son historique ?"
+            - "Quand le père ne veut PAS de notifs ce dimanche, peut-il les couper en moins de 2 taps depuis l'écran principal ?"
+            - "Quand le père reçoit une anecdote, le ton lui parle-t-il en tant qu'habitant (pas de 'Découvrez Lyon !' qui sonne tourisme) ?"
+
+    scenarios_back_office:
+        editeur_de_contenu:
+            - "Quand Anaïs saisit un nouveau pin moyen (sources déjà collectées), peut-elle le faire en moins de 30 minutes sans batailler avec le template ?"
+            - "Quand Anaïs hésite entre deux formulations narratives, le template lui montre-t-il une prévisualisation lisible (telle qu'elle sera vue par l'utilisateur final) ?"
+            - "Quand Anaïs corrige un pin déjà publié, la modification est-elle tracée et la version antérieure récupérable ?"
+            - "Quand Anaïs soumet un pin à un valideur scientifique, le valideur peut-il relire et annoter dans la même surface, sans changer d'outil ?"
+            - "Quand Anaïs tombe sur un pin de patrimoine vivant (ex : Fête des Lumières) qui traverse plusieurs siècles, le template accepte-t-il la nuance multi-époques sans la forcer à mentir ?"
+
+    comment_l_utiliser_dans_un_palier:
+        etape_1: "Identifier les scénarios pertinents à la décision en cours"
+        etape_2: "Y répondre explicitement, oui/non/nuancé, avec une ligne d'explication"
+        etape_3: "Si une réponse est 'non', identifier la cause et corriger la décision (ou la documenter comme arbitrage assumé)"
+        etape_4: "Conserver la trace des réponses dans le palier concerné, sous une section 'persona_check'"
+
+# -----------------------------------------------------------------------------
+# 8. Portée et limites — boussole, pas filtre
+# -----------------------------------------------------------------------------
+# Section nuancée. Les personas servent à valider la conception, pas à
+# autoriser ou refuser des utilisateurs. L'app est ouverte à tout le monde —
+# ces figures sont simplement notre outil de référence pour trancher.
+portee_et_limites:
+    ce_que_les_personas_sont:
+        - "Une boussole pour valider la conception"
+        - "Un outil pour sortir le concepteur de son point de vue"
+        - "Un cadre représentatif des principaux usages identifiés"
+
+    ce_que_les_personas_ne_sont_pas:
+        - "Un filtre qui définirait qui peut ou ne peut pas utiliser l'app"
+        - "Une liste exclusive d'utilisateurs autorisés"
+        - "Un tableau démographique de la population utilisatrice réelle"
+
+    posture_face_aux_utilisateurs_hors_personas: >-
+        L'app est ouverte à tout le monde. Si un utilisateur réel ne tombe sous
+        aucun des personas, il est tout aussi bienvenu que les autres. La
+        conception est validée vis-à-vis de ces figures, mais sa qualité ne
+        se réduit pas à elles : un utilisateur hors-personas trouvera dans
+        l'app la même rigueur de conception, le même soin, le même respect.
+
+    comment_traiter_un_cas_qui_tombe_a_cote: >-
+        Si une décision concerne un usage qui ne se laisse pas trancher avec
+        les personas existants, on s'appuie sur le persona le plus proche pour
+        raisonner par analogie, et on documente l'arbitrage spécifique dans
+        le palier concerné. On ne crée pas de nouveau persona ad-hoc — la
+        rigueur du palier 2 est d'avoir choisi des figures représentatives,
+        pas d'en inventer pour chaque cas marginal.
+
+    rappel_de_l_essence: >-
+        Les personas ne contredisent pas l'essence (palier 1) qui pose un
+        territoire utilisateur ouvert. Ils ne sont qu'une grille
+        opérationnelle pour vérifier que la conception fonctionne pour des
+        humains identifiés, pas pour le concepteur lui-même.

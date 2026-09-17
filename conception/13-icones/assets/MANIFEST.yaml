@@ -1,0 +1,176 @@
+# =============================================================================
+# Palier 13 — MANIFEST des assets SVG
+# =============================================================================
+# Inventaire des 60 fichiers SVG cibles. Statut mis à jour par les rédacteurs
+# étape ultérieure au fur et à mesure de la production. Référence amont : fiches YAML
+# du dossier parent (00-index, 01-charte-graphique, 02-icones-categories,
+# 03-icones-ui-fonctionnelles, 04-icones-back-office).
+# =============================================================================
+
+document:
+  type: palier_icones_assets_manifest
+  numero: 13
+  fichier: "assets/MANIFEST.yaml"
+  version: "0.1"
+  date: "2026-05-07"
+  format: yaml
+  audience:
+    - "rédacteurs étape ultérieure — production SVG"
+    - "évolution future"
+
+specifications_techniques_communes:
+  description: "Toutes les icônes respectent ces conventions (charte 01)."
+  attributs_svg:
+    xmlns: "http://www.w3.org/2000/svg"
+    viewBox: "0 0 24 24"
+    fill: "none"
+    stroke: "currentColor"
+    stroke_width_standard: "1.5"   # 24×24 LG / MD / SM (versions standard)
+    stroke_width_xs_dedie: "2"     # 14×14 dédiés (cf. categories/14/, décision D10)
+    stroke_linecap: "round"
+    stroke_linejoin: "round"
+  squelette: |
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+         fill="none" stroke="currentColor" stroke-width="1.5"
+         stroke-linecap="round" stroke-linejoin="round">
+      <!-- éléments path / circle / rect / line / polyline propres à l'icône -->
+    </svg>
+  contraintes_qualite:
+    - "Tracés alignés sur la grille pixel (coordonnées entières si possible, .5 sinon)"
+    - "Path compact (peu de points d'ancrage si possible)"
+    - "Aucun fill, aucun gradient, aucun filtre, aucun mask"
+    - "Pas d'attribut class ni id sur les éléments graphiques (currentColor + structure pure)"
+
+# -----------------------------------------------------------------------------
+# 1. categories/ — 11 SVG 24×24 (catégories Pin standard)
+# -----------------------------------------------------------------------------
+categories:
+  taille_de_rendu_principale: "MD 20px (chip catégorie en aperçu rapide M2)"
+  source_yaml: "13-icones/02-icones-categories.yaml"
+  icones:
+    - { id: ICON-CAT-CLASSIQUE,           chemin: "categories/classique.svg",          concept: "bâtiment classique : toit triangulaire (fronton) reposant sur 4 colonnes verticales, base horizontale", statut: a_produire }
+    - { id: ICON-CAT-ANECDOTE,            chemin: "categories/anecdote.svg",           concept: "trois étincelles à 4 branches asymétriques (1 grande centrale + 2 petites de part et d'autre)", statut: a_produire }
+    - { id: ICON-CAT-MUSEE-INSTITUTION,   chemin: "categories/musee-institution.svg",  concept: "bâtiment urbain rectangulaire à 2 étages, fenêtres alignées (4-6 fenêtres)", statut: a_produire }
+    - { id: ICON-CAT-PERSONNE,            chemin: "categories/personne.svg",           concept: "silhouette humaine simple : tête circulaire au-dessus + buste arrondi (épaules)", statut: a_produire }
+    - { id: ICON-CAT-EVENEMENT,           chemin: "categories/evenement.svg",          concept: "éclair en zigzag : trait brisé en Z étiré de haut en bas", statut: a_produire }
+    - { id: ICON-CAT-LIEU-DISPARU,        chemin: "categories/lieu-disparu.svg",       concept: "monument classique (cohérent ICON-CAT-CLASSIQUE) traversé par une diagonale (haut-droite vers bas-gauche)", statut: a_produire, note: "lucide:landmark-off — peut nécessiter draft custom si Lucide ne le contient pas, conformer à ICON-CAT-CLASSIQUE + diagonale" }
+    - { id: ICON-CAT-VIE-QUOTIDIENNE,     chemin: "categories/vie-quotidienne.svg",    concept: "deux silhouettes humaines partiellement superposées (épaule gauche du second masque l'épaule droite du premier)", statut: a_produire }
+    - { id: ICON-CAT-ARCHITECTURE,        chemin: "categories/architecture.svg",       concept: "arche semi-circulaire reposant sur deux pieds-droits verticaux (forme de porte voûtée)", statut: produit, note: "CUSTOM — archway n'existe pas Lucide. Forme simple à dessiner." }
+    - { id: ICON-CAT-NATURE-GEOGRAPHIE,   chemin: "categories/nature-geographie.svg",  concept: "trois lignes ondulées horizontales évoquant des vagues, légèrement décalées verticalement", statut: a_produire }
+    - { id: ICON-CAT-PATRIMOINE-VIVANT,   chemin: "categories/patrimoine-vivant.svg",  concept: "deux mains se serrant (poignée de main horizontale) avec un cœur posé entre/au-dessus", statut: a_produire }
+    - { id: ICON-CAT-GASTRONOMIE,         chemin: "categories/gastronomie.svg",        concept: "fourchette à gauche (manche vertical + 3-4 dents) + couteau à droite (manche vertical + lame), parallèles", statut: a_produire }
+
+# -----------------------------------------------------------------------------
+# 2. categories/14/ — 11 SVG 14×14 dédiés (XS optical correction D10)
+# -----------------------------------------------------------------------------
+categories_xs:
+  taille_de_rendu: "XS 14px (icône intérieure du Pin sur la carte)"
+  source_yaml: "13-icones/02-icones-categories.yaml + 01-charte-graphique.yaml § 4"
+  specifications_xs:
+    stroke_width: "2"   # épaissi pour compenser le sub-pixel à 14px
+    simplification_tracee: "Retirer les détails non essentiels — typiquement supprimer 1-2 traits internes par icône pour respirer à 14px"
+  icones:
+    - { id: ICON-CAT-CLASSIQUE-XS,          chemin: "categories/14/classique.svg",          concept: "bâtiment classique simplifié : fronton triangulaire + 2 colonnes (pas 4) + base", statut: reporte_palier_16 }
+    - { id: ICON-CAT-ANECDOTE-XS,           chemin: "categories/14/anecdote.svg",           concept: "deux étincelles (pas 3) — 1 grande + 1 petite", statut: reporte_palier_16 }
+    - { id: ICON-CAT-MUSEE-INSTITUTION-XS,  chemin: "categories/14/musee-institution.svg",  concept: "bâtiment 1 étage simplifié, 2 fenêtres", statut: reporte_palier_16 }
+    - { id: ICON-CAT-PERSONNE-XS,           chemin: "categories/14/personne.svg",           concept: "silhouette humaine inchangée (déjà simple)", statut: reporte_palier_16 }
+    - { id: ICON-CAT-EVENEMENT-XS,          chemin: "categories/14/evenement.svg",          concept: "éclair simplifié — 2 segments au lieu de plus", statut: reporte_palier_16 }
+    - { id: ICON-CAT-LIEU-DISPARU-XS,       chemin: "categories/14/lieu-disparu.svg",       concept: "ICON-CAT-CLASSIQUE-XS + diagonale franche traversant. STROKE 2 critique pour la diagonale.", statut: reporte_palier_16, note: "Optical correction CRITIQUE pour cette icône (D10 et S3 relecture)" }
+    - { id: ICON-CAT-VIE-QUOTIDIENNE-XS,    chemin: "categories/14/vie-quotidienne.svg",    concept: "2 silhouettes simplifiées, légère superposition", statut: reporte_palier_16 }
+    - { id: ICON-CAT-ARCHITECTURE-XS,       chemin: "categories/14/architecture.svg",       concept: "arche simplifiée (pas de double trait inutile)", statut: reporte_palier_16, note: "Custom XS — cohérent avec ICON-CAT-ARCHITECTURE 24×24" }
+    - { id: ICON-CAT-NATURE-GEOGRAPHIE-XS,  chemin: "categories/14/nature-geographie.svg",  concept: "deux lignes ondulées (pas 3)", statut: reporte_palier_16 }
+    - { id: ICON-CAT-PATRIMOINE-VIVANT-XS,  chemin: "categories/14/patrimoine-vivant.svg",  concept: "version simplifiée — peut être juste 2 mains avec cœur, sans détails de doigts", statut: reporte_palier_16 }
+    - { id: ICON-CAT-GASTRONOMIE-XS,        chemin: "categories/14/gastronomie.svg",        concept: "fourchette + couteau simplifiés (manches simples, lame simple, fourche 3 dents)", statut: reporte_palier_16 }
+
+# -----------------------------------------------------------------------------
+# 3. ui/ — 29 SVG icônes UI fonctionnelles
+# -----------------------------------------------------------------------------
+ui:
+  taille_de_rendu_principale: "LG 24px (standard) ou MD 20px (compact)"
+  source_yaml: "13-icones/03-icones-ui-fonctionnelles.yaml"
+  icones:
+    # Navigation
+    - { id: ICON-UI-RETOUR,               chemin: "ui/navigation-retour.svg",     concept: "flèche pointant à gauche : trait horizontal + chevron < à l'extrémité gauche", statut: a_produire }
+    - { id: ICON-UI-FERMETURE,            chemin: "ui/fermeture.svg",             concept: "croix X : 2 diagonales se croisant au centre", statut: a_produire }
+    - { id: ICON-UI-CREATION-FAB,         chemin: "ui/creation-fab.svg",          concept: "croix mathématique + : trait horizontal centré + trait vertical centré", statut: a_produire }
+    # Audio
+    - { id: ICON-UI-PLAY,                 chemin: "ui/audio-play.svg",            concept: "triangle pointant à droite (3 sommets : haut-gauche, bas-gauche, milieu-droite)", statut: a_produire }
+    - { id: ICON-UI-PAUSE,                chemin: "ui/audio-pause.svg",           concept: "deux barres verticales parallèles (rectangles minces)", statut: a_produire }
+    # Saisie
+    - { id: ICON-UI-CALENDRIER,           chemin: "ui/saisie-calendrier.svg",     concept: "rectangle avec en haut 2 petits traits verticaux (anneaux du calendrier mural) + ligne horizontale en haut séparant l'en-tête + grille à l'intérieur (optionnelle, simplifiable)", statut: a_produire }
+    - { id: ICON-UI-LIEU,                 chemin: "ui/saisie-lieu.svg",           concept: "map-pin : forme goutte d'eau pointant en bas + cercle creux à l'intérieur", statut: a_produire }
+    # États inline
+    - { id: ICON-UI-ERREUR,               chemin: "ui/etat-erreur.svg",           concept: "cercle simple + à l'intérieur : un trait vertical (haut) puis un point (bas) — point d'exclamation", statut: a_produire }
+    - { id: ICON-UI-SUCCES,               chemin: "ui/etat-succes.svg",           concept: "cercle simple + à l'intérieur : coche en forme de V incliné (descend court, monte long)", statut: a_produire, note: "Mutualisé avec ICON-ADMIN-VALIDER (back-office référence ce même fichier)" }
+    - { id: ICON-UI-INFO,                 chemin: "ui/etat-info.svg",             concept: "cercle simple + à l'intérieur : lettre i minuscule (petit point en haut + trait vertical en dessous)", statut: a_produire }
+    # Actions communes
+    - { id: ICON-UI-FAVORI,               chemin: "ui/controle-favori.svg",       concept: "cœur outlined : deux courbes en haut formant les lobes + pointe en bas", statut: a_produire }
+    - { id: ICON-UI-PARTAGE,              chemin: "ui/controle-partage.svg",      concept: "trois cercles (1 à gauche centrée + 2 à droite haut/bas) reliés par 2 lignes", statut: a_produire }
+    - { id: ICON-UI-SIGNALEMENT,          chemin: "ui/controle-signalement.svg",  concept: "drapeau : mât vertical à gauche + triangle/quadrilatère pointant à droite", statut: a_produire }
+    - { id: ICON-UI-RECHERCHE,            chemin: "ui/recherche.svg",             concept: "loupe : cercle (lentille) en haut-gauche + manche diagonal partant en bas-droite", statut: a_produire }
+    - { id: ICON-UI-FILTRE,               chemin: "ui/filtre.svg",                concept: "trois lignes horizontales superposées avec curseurs (cercles) à des positions différentes", statut: a_produire }
+    - { id: ICON-UI-CHECK,                chemin: "ui/validation-check.svg",      concept: "coche seule (sans cercle) : V incliné (descend court à gauche, monte long à droite)", statut: a_produire }
+    # Sélecteur section
+    - { id: ICON-UI-SECTION-CARTE,        chemin: "ui/section-carte.svg",         concept: "carte pliée en 3 panneaux verticaux (lignes verticales internes) avec contour simple", statut: a_produire }
+    - { id: ICON-UI-SECTION-PARCOURS,     chemin: "ui/section-parcours.svg",      concept: "tracé routier sinueux + 2-3 marqueurs ronds le long du tracé", statut: a_produire }
+    - { id: ICON-UI-SECTION-PROFIL,       chemin: "ui/section-profil.svg",        concept: "silhouette humaine (tête + buste) à l'intérieur d'un cercle externe (englobant)", statut: a_produire }
+    # Réseau / système
+    - { id: ICON-UI-OFFLINE,              chemin: "ui/etat-offline.svg",          concept: "wifi (3 arcs concentriques + point en bas) traversé par diagonale (haut-droite vers bas-gauche)", statut: a_produire }
+    - { id: ICON-UI-CHARGEMENT,           chemin: "ui/etat-chargement.svg",       concept: "cercle pointillé partiel (cercle ouvert avec arcs séparés) — convention loader", statut: a_produire }
+    # Liens / méta
+    - { id: ICON-UI-LIEN-EXTERNE,         chemin: "ui/lien-externe.svg",          concept: "carré (haut-droite ouvert) + flèche diagonale partant de l'intérieur vers haut-droite, traversant la rupture", statut: a_produire }
+    - { id: ICON-UI-ANONYMAT,             chemin: "ui/anonymat.svg",              concept: "silhouette humaine simple (cohérente ICON-CAT-PERSONNE) + petit X en superposition (haut-droite ou centre)", statut: a_produire }
+    - { id: ICON-UI-PROVENANCE-EDITORIAL, chemin: "ui/provenance-editorial.svg",  concept: "badge en forme de losange/octogone aux contours arrondis + coche à l'intérieur", statut: a_produire }
+    - { id: ICON-UI-PROVENANCE-COMMUNAUTAIRE, chemin: "ui/provenance-communautaire.svg", concept: "deux silhouettes humaines (cohérent ICON-CAT-VIE-QUOTIDIENNE)", statut: a_produire }
+    - { id: ICON-UI-VERIFICATION-EN-COURS, chemin: "ui/verification-en-cours.svg", concept: "horloge simple : cercle + 2 aiguilles (verticale + horizontale type 12h-3h)", statut: a_produire }
+    # Cartographie
+    - { id: ICON-UI-COUCHE,               chemin: "ui/couche-cartographique.svg", concept: "trois losanges/parallélogrammes superposés évoquant des couches empilées en perspective", statut: a_produire }
+    # Modes
+    - { id: ICON-UI-MODE-SURPRENEZ-MOI,   chemin: "ui/mode-surprenez-moi.svg",    concept: "dé carré en perspective avec 5 points : 4 aux coins + 1 au centre (face d'un dé à 5)", statut: a_produire }
+    - { id: ICON-UI-MODE-PRESENTATION,    chemin: "ui/mode-presentation.svg",     concept: "écran (rectangle horizontal) + à l'intérieur petit triangle de lecture (play) au centre", statut: a_produire }
+
+# -----------------------------------------------------------------------------
+# 4. back-office/ — 9 SVG (ICON-ADMIN-VALIDER mutualisé avec ICON-UI-SUCCES)
+# -----------------------------------------------------------------------------
+back_office:
+  taille_de_rendu_principale: "LG 24px"
+  source_yaml: "13-icones/04-icones-back-office.yaml"
+  note_mutualisation: "ICON-ADMIN-VALIDER référence assets/ui/etat-succes.svg (PAS de fichier propre)."
+  icones:
+    - { id: ICON-ADMIN-REJETER,                 chemin: "back-office/rejeter.svg",                  concept: "cercle + croix X à l'intérieur (cohérent contraste avec ICON-UI-SUCCES qui a le check)", statut: a_produire }
+    - { id: ICON-ADMIN-MODERER,                 chemin: "back-office/moderation.svg",               concept: "bouclier (forme écu) + coche à l'intérieur", statut: a_produire }
+    - { id: ICON-ADMIN-VALIDATION-SCIENTIFIQUE, chemin: "back-office/validation-scientifique.svg",  concept: "livre ouvert (deux pages écartées formant un V évasé) + coche superposée sur la page de droite ou au centre", statut: a_produire }
+    - { id: ICON-ADMIN-PROMOUVOIR,              chemin: "back-office/promouvoir.svg",               concept: "cercle + flèche pointant vers le haut à l'intérieur", statut: a_produire }
+    - { id: ICON-ADMIN-RETIRER,                 chemin: "back-office/retirer.svg",                  concept: "boîte d'archive : couvercle horizontal en haut + corps rectangulaire + petite poignée centrale (creux ou fente)", statut: a_produire }
+    - { id: ICON-ADMIN-REOUVRIR,                chemin: "back-office/reouvrir.svg",                 concept: "boîte d'archive (cohérent retirer.svg) + flèche de retour vers le haut sortant du couvercle", statut: a_produire }
+    - { id: ICON-ADMIN-TABLEAU-BORD,            chemin: "back-office/tableau-bord.svg",             concept: "grille de 4 blocs rectangulaires (2×2, ou 1 grand + 2 petits + 1 horizontal) — convention layout-dashboard", statut: a_produire }
+    - { id: ICON-ADMIN-CATALOGUE,               chemin: "back-office/catalogue.svg",                concept: "trois lignes horizontales (puces) avec petits ronds/tirets à gauche de chaque ligne — convention liste à puces", statut: a_produire }
+    - { id: ICON-ADMIN-PREVISUALISATION,        chemin: "back-office/previsualisation.svg",         concept: "œil : forme amande/œil + cercle (iris) à l'intérieur + petit point central (pupille)", statut: a_produire }
+
+# -----------------------------------------------------------------------------
+# 5. Récapitulatif
+# -----------------------------------------------------------------------------
+recapitulatif:
+  total_svg_a_produire: 60
+  par_dossier:
+    categories: 11
+    categories_14: 11
+    ui: 29
+    back-office: 9
+  mutualisations:
+    - "ICON-UI-SUCCES = ICON-ADMIN-VALIDER → un seul SVG à assets/ui/etat-succes.svg"
+  attribution: "Voir README.md — SVG dessinés originalement par HistoLyon en cohérence stylistique avec Lucide (ISC license)."
+
+# -----------------------------------------------------------------------------
+# 6. Statut global étape ultérieure
+# -----------------------------------------------------------------------------
+statut_phase_3:
+  date_lancement: "2026-05-07"
+  sous_agents_planifies: 5
+  repartition:
+    A: "categories/ (11 SVG)"
+    B: "categories/14/ (11 SVG XS dédiés stroke 2)"
+    C: "ui/ partie 1 (15 SVG : navigation + audio + saisie + états + actions)"
+    D: "ui/ partie 2 (14 SVG : check + sections + réseau + liens + cartographie + modes)"
+    E: "back-office/ (9 SVG)"
+  validation_finale_attendue: "Échantillon visuel à présenter à l'utilisateur (les 11 catégories ouvertes en viewer)"

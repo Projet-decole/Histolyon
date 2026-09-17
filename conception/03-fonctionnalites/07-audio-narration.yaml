@@ -1,0 +1,585 @@
+# =============================================================================
+# Palier 3 — Domaine D7 — Audio et narration
+# =============================================================================
+# La couche audio / narration de l'app : lecture audio du récit, mise en
+# évidence du texte courant pendant la lecture, musique d'époque tissée dans
+# le récit, lecture qui peut continuer en arrière-plan, et présence
+# persistante des contrôles audio pendant la consultation.
+#
+# Ce domaine est l'autre moitié de l'expérience pour Kenji (mains libres en
+# marche — son moment de vérité majeur, test_litmus n°2 : 'vivre 80% de
+# l'expérience sans regarder son écran'). Il porte aussi un enjeu a11y
+# critique : l'audio est une ALTERNATIVE à la lecture, l'équivalence stricte
+# texte/audio doit être tenue dans les deux sens.
+#
+# Ce domaine est la RÉFÉRENCE CANONIQUE de "Lecture audio en arrière-plan"
+# (D7.4), comportement transverse référencé depuis D2.5 (consultation
+# approfondie d'un pin) et D3.5 (vivre un parcours).
+# =============================================================================
+
+document:
+    type: palier_fonctionnalites_domaine
+    domaine_id: D7
+    numero: 3
+    audience:
+        - "Tout agent qui rédige un palier en aval (4 à 16)"
+        - "Devs Flutter (cahier des charges fonctionnel pour la couche audio)"
+        - "Dev IA (pipeline audio — TTS vs voix humaine, à arbitrer)"
+        - "Lead historienne (ton de la narration audio)"
+    role: >-
+        Décrire fonctionnellement la couche audio et narration : lecture du récit,
+        mise en évidence du texte courant à la lecture, musique tissée dans le
+        récit, lecture en arrière-plan (canonique), présence persistante des
+        contrôles audio. Sans cette couche, l'expérience n'est plus accessible
+        en marche (Kenji), n'a plus d'équivalent audio (a11y), et perd la moitié
+        de sa puissance évocatrice (musique d'époque).
+    format: yaml
+    prerequis_de_lecture:
+        - "design/conception/intention.yaml — § 5.7 separation_des_responsabilites_entre_paliers"
+        - "design/conception/01-essence.yaml"
+        - "design/conception/02-personas.yaml"
+        - "design/conception/03-fonctionnalites/00-index.yaml — § 2 anti_perimetre_strict est OBLIGATOIRE"
+        - "design/conception/03-fonctionnalites/01-carte-exploration-temporelle.yaml — pilote / modèle"
+
+# -----------------------------------------------------------------------------
+# Raison d'être du domaine
+# -----------------------------------------------------------------------------
+raison_d_etre_du_domaine: >-
+    L'audio est la moitié manquante du conteur. Sans lui, HistoLyon est un
+    livre qu'on lit ; avec lui, c'est un conteur qui se penche à l'oreille
+    (cf. essence § promesse). Trois rôles indissociables :
+
+    (1) Permettre l'usage MAINS LIBRES en marche — c'est le moment de vérité
+    majeur de Kenji (test_litmus n°2 : vivre 80% de l'expérience sans
+    regarder l'écran) et un confort fort pour le père lyonnais en balade.
+
+    (2) Offrir une ALTERNATIVE à la lecture — enjeu a11y critique : un
+    utilisateur en situation de déficience visuelle, ou simplement qui ne
+    veut pas lire, doit accéder à la même expérience par l'audio. Et
+    réciproquement, un utilisateur sans son doit accéder par le texte.
+
+    (3) Tisser de la MUSIQUE D'ÉPOQUE dans le récit — sert directement le
+    principe d'émerveillement (essence § principes_essentiels). La musique
+    d'époque est ce qui fait basculer la consultation d'un fait raconté à
+    un moment vécu.
+
+    Ce domaine sert principalement Kenji (mains libres en marche), Mme
+    Martin (projection en classe — l'audio peut être diffusé aux élèves),
+    le père lyonnais (anecdote pendant la balade), et tout utilisateur
+    ayant un besoin a11y audio.
+
+# -----------------------------------------------------------------------------
+# Sous-domaines
+# -----------------------------------------------------------------------------
+sous_domaines:
+    # ===========================================================================
+    - id: D7.1
+      nom: "Lecture audio de la narration"
+
+      raison_d_etre: >-
+          Permettre à l'utilisateur d'écouter le récit d'un pin ou d'un parcours
+          au lieu (ou en complément) de le lire. C'est ce qui rend l'app
+          utilisable en marche, en classe, ou par un utilisateur qui préfère
+          écouter. Sans cette capacité, l'audio n'existe pas dans l'app.
+
+      comportement: >-
+          L'utilisateur peut lancer la lecture audio du récit narratif d'un pin
+          ou d'une étape de parcours. Il dispose de contrôles de lecture
+          (démarrer, mettre en pause, reprendre, naviguer dans la durée du
+          récit). La lecture peut être ralentie ou accélérée. L'audio est
+          synchronisé avec le récit textuel — quand la lecture progresse, on
+          sait où l'on en est dans le texte (cf. D7.2). L'audio est disponible
+          pour tout contenu narratif principal d'un pin ; sa génération exacte
+          (TTS ou voix humaine) reste une décision ouverte de l'équipe.
+
+      regles_fonctionnelles:
+          - "L'audio porte sur le récit narratif principal du pin ou de l'étape (équivalence stricte avec le texte)"
+          - "L'utilisateur peut démarrer, mettre en pause, reprendre, et naviguer dans la durée du récit"
+          - "La vitesse de lecture peut être ajustée"
+          - "La lecture est disponible pour tout contenu narratif accessible en lecture"
+          - "Le démarrage de l'audio est explicite (initiative de l'utilisateur), jamais imposé"
+          - "L'audio peut être préchargé pour fonctionner hors-ligne sur le contenu téléchargé (cf. comportement transverse Mode hors-ligne)"
+
+      capabilites:
+          - "Démarrer la lecture audio du récit"
+          - "Mettre en pause et reprendre la lecture"
+          - "Naviguer à un point précis de la durée du récit"
+          - "Ajuster la vitesse de lecture"
+          - "Préparer l'audio pour usage hors-ligne sur le contenu téléchargé"
+          - "Fournir une équivalence audio fidèle au texte narratif"
+
+      ce_qu_on_ne_fait_pas:
+          - "Pas de lancement automatique au tap sur un pin (l'utilisateur déclenche)"
+          - "Pas d'audio sur des éléments hors récit principal (microcopy UI, légendes, etc.)"
+          - "Pas de divergence entre texte et audio (audio = équivalence stricte du récit)"
+          - "Pas de plusieurs voix simultanées (une seule narration à un instant donné)"
+
+      criteres_de_reussite:
+          - "Atteint le test_litmus de Kenji n°2 : il peut écouter le récit d'un pin en marchant, sans avoir à regarder son écran"
+          - "Un utilisateur en situation de déficience visuelle peut accéder au récit complet par l'audio, sans contenu manquant par rapport à la version texte"
+          - "Le démarrage de la lecture est ressenti comme immédiat, sans attente perçue"
+
+      definition_of_done:
+          - "L'utilisateur peut démarrer la lecture audio d'un récit"
+          - "L'utilisateur peut mettre en pause, reprendre, et naviguer dans la durée"
+          - "L'utilisateur peut ajuster la vitesse de lecture"
+          - "L'audio couvre l'intégralité du récit narratif principal du pin ou de l'étape"
+          - "L'audio fonctionne hors-ligne sur le contenu téléchargé"
+          - "Aucun audio ne se déclenche sans action de l'utilisateur"
+
+      enjeux_transversaux:
+          accessibilite: >-
+              Critique : l'audio est l'ALTERNATIVE à la lecture pour les
+              utilisateurs en situation de déficience visuelle. L'équivalence
+              avec le texte doit être stricte (rien ne manque dans l'audio par
+              rapport au texte). Réciproquement, l'audio doit pouvoir être
+              intégralement accédé sous forme texte (pas d'information
+              seulement audio). Les contrôles de lecture doivent être
+              accessibles aux lecteurs d'écran et navigables au clavier.
+          performance: >-
+              Critique pour Kenji en marche : le démarrage doit être ressenti
+              comme immédiat. La continuité de la lecture ne doit pas être
+              rompue par une saccade ou une coupure perçue.
+          vie_privee: >-
+              Si la solution retenue passe par un service tiers (TTS cloud
+              notamment), tracer ce que l'app envoie et ce qui reste local. La
+              décision TTS / voix humaine a un impact direct ici (cf.
+              questions_ouvertes).
+
+      questions_ouvertes:
+          - "TTS (synthèse vocale IA) ou voix humaine ? — décision majeure en attente, à arbitrer avec dev IA et lead historienne (cf. brief § 16). Impact sur le ton, la qualité, le coût de production, le multilinguisme, et la vie privée."
+          - "Si TTS : moteur (local / cloud), capacité multilingue (Kenji)"
+          - "Si voix humaine : couverture (tous les pins ? les éditoriaux uniquement ?), traduction (tous les pins en japonais ? sous-ensemble ?)"
+          - "Quel comportement quand l'utilisateur quitte l'app système (appel entrant, autre app) — reprise automatique ou manuelle ?"
+
+      priorite: "important"
+
+      personas_principaux:
+          - kenji
+          - mme_martin
+          - pere_lyonnais
+
+      dependances:
+          - "D2.5 (consultation approfondie d'un pin — surface principale d'écoute)"
+          - "D3.5 (vivre un parcours — écoute en marche entre étapes)"
+          - "D7.2 (mise en évidence du texte courant — synchronisation pilotée par la lecture audio)"
+
+      comportements_transverses_referenced:
+          - "Mode hors-ligne (canonique D1.1) — l'audio est préchargeable"
+          - "Permissions juste-à-temps (canonique D5.5) — applicable seulement si une fonctionnalité audio nécessite un micro (cf. recherche vocale en D1.4 questions_ouvertes), aucune permission requise pour la simple lecture"
+
+    # ===========================================================================
+    - id: D7.2
+      nom: "Mise en évidence du texte courant à la lecture audio"
+
+      raison_d_etre: >-
+          Quand l'audio se joue, l'utilisateur qui regarde l'écran doit savoir
+          où il en est dans le récit. Sans cette mise en évidence, le texte et
+          l'audio sont deux flux parallèles déconnectés. Avec elle, ils se
+          renforcent : l'utilisateur peut suivre des yeux, ou reprendre la
+          lecture visuelle exactement là où l'audio en est. Sert directement
+          l'a11y (utilisateurs en situation de déficience auditive partielle
+          qui veulent suivre les deux), et l'usage hybride (Kenji qui écoute
+          mais regarde de temps en temps).
+
+      comportement: >-
+          Pendant la lecture audio, le passage du récit en cours de lecture est
+          visuellement mis en évidence dans le texte affiché. Au fil de la
+          lecture, la mise en évidence avance et reflète où en est l'audio. Si
+          l'utilisateur met en pause, la mise en évidence reste sur le passage
+          en cours. Si l'utilisateur navigue à un autre point de la durée
+          audio, la mise en évidence se cale sur le passage correspondant.
+          Réciproquement, l'utilisateur peut désigner un passage du texte pour
+          y caler la lecture audio.
+
+      regles_fonctionnelles:
+          - "La mise en évidence est synchronisée à la position courante de l'audio"
+          - "La mise en évidence avance avec la lecture, au rythme de l'audio"
+          - "La mise en évidence reste visible même quand la lecture est en pause"
+          - "Naviguer dans la durée audio repositionne la mise en évidence"
+          - "Désigner un passage du texte cale la lecture audio à ce passage"
+          - "La mise en évidence ne masque pas la lisibilité du texte"
+
+      capabilites:
+          - "Mettre en évidence le passage du récit en cours de lecture"
+          - "Faire avancer la mise en évidence au rythme de l'audio"
+          - "Caler la mise en évidence sur la position audio en cas de navigation"
+          - "Caler la lecture audio sur un passage texte désigné par l'utilisateur"
+          - "Maintenir la lisibilité du texte sous la mise en évidence"
+
+      ce_qu_on_ne_fait_pas:
+          - "Pas de défilement imposé du texte (l'utilisateur garde la main sur ce qu'il regarde)"
+          - "Pas de mise en évidence sans audio en cours (sinon c'est juste de la décoration)"
+          - "Pas de décrochage durable entre l'audio et la mise en évidence"
+          - "Pas de mise en évidence si chargée qu'elle masque le texte"
+
+      criteres_de_reussite:
+          - "Un utilisateur qui regarde l'écran pendant la lecture sait à tout moment où l'audio en est dans le récit"
+          - "Un utilisateur qui met en pause peut reprendre la lecture visuelle exactement où l'audio s'est arrêté"
+          - "Un utilisateur en situation de déficience auditive partielle peut suivre l'audio en lisant en parallèle"
+
+      definition_of_done:
+          - "Pendant la lecture audio, le passage en cours est mis en évidence dans le texte"
+          - "La mise en évidence avance avec la progression audio"
+          - "La mise en évidence reste sur le passage en cours quand la lecture est en pause"
+          - "Naviguer dans la durée audio repositionne la mise en évidence"
+          - "Désigner un passage texte cale la lecture audio à ce passage"
+
+      enjeux_transversaux:
+          accessibilite: >-
+              Critique : sert les utilisateurs en situation de déficience
+              auditive partielle (suivi conjoint texte+audio) et les
+              utilisateurs en situation de déficience visuelle (la mise en
+              évidence aide à reprendre le fil). Le contraste de la mise en
+              évidence doit rester suffisant pour tous, y compris Mme Martin
+              en projection.
+          performance: >-
+              Critique : tout décrochage durable entre l'audio et la mise en
+              évidence rompt l'illusion d'unité texte/audio. Le ressenti de
+              synchronisation est non négociable.
+          vie_privee: "Pas d'enjeu spécifique."
+
+      questions_ouvertes:
+          - "Granularité de la mise en évidence (mot, phrase, paragraphe) — à arbitrer en palier 7 / palier 11"
+          - "Comportement pendant les passages musicaux du récit (cf. D7.3) — la mise en évidence se met en pause sur le texte, ou continue ?"
+
+      priorite: "important"
+
+      personas_principaux:
+          - kenji
+          - mme_martin
+
+      dependances:
+          - "D7.1 (lecture audio — fournit la position courante)"
+          - "D2.5 (consultation approfondie — surface où le texte est affiché)"
+
+    # ===========================================================================
+    - id: D7.3
+      nom: "Musique d'époque tissée dans le récit"
+
+      raison_d_etre: >-
+          La musique d'époque fait basculer la consultation d'un fait raconté
+          à un moment vécu. Une narration sur les Canuts qui s'accompagne
+          brièvement d'un fragment musical du XIXe siècle ouvre une porte
+          sensorielle que le texte seul ne peut pas ouvrir. Sert directement
+          le principe d'émerveillement (essence § principes_essentiels) et
+          complète le ton conteur (musique = mise en condition narrative,
+          pas illustration sonore décorative).
+
+      comportement: >-
+          À certains moments contextuellement choisis dans le récit narratif
+          d'un pin, un fragment musical d'époque accompagne brièvement la
+          narration. La musique est tissée dans le récit (elle s'inscrit dans
+          le flux narratif) plutôt que diffusée en boucle de fond. Sa
+          présence reste discrète : elle accompagne la voix sans la couvrir,
+          et n'occupe pas tout le récit. L'utilisateur peut couper la
+          musique d'époque sans couper la narration.
+
+      regles_fonctionnelles:
+          - "La musique d'époque est inscrite par moments dans le récit, pas en fond continu"
+          - "La musique correspond à l'époque du contenu raconté"
+          - "La musique reste discrète quand elle accompagne la narration parlée"
+          - "L'utilisateur peut couper la musique sans couper la narration"
+          - "Toute musique utilisée doit être sourcée et libre de droits ou autorisée"
+
+      capabilites:
+          - "Tisser un fragment musical d'époque à un moment donné du récit"
+          - "Adapter le volume de la musique relativement à la narration"
+          - "Permettre à l'utilisateur de couper la musique indépendamment de la narration"
+          - "Associer la musique à la période historique racontée"
+
+      ce_qu_on_ne_fait_pas:
+          - "Pas de musique de fond continue tout au long du récit"
+          - "Pas de musique qui couvre la narration parlée"
+          - "Pas de musique non sourcée ou non vérifiée historiquement"
+          - "Pas de bibliothèque musicale navigable indépendamment du récit"
+
+      criteres_de_reussite:
+          - "Le père lyonnais ressent un frisson quand la musique d'époque arrive sur une anecdote de son quartier"
+          - "Mme Martin peut diffuser un récit avec sa musique en classe sans craindre que le sonore éclipse le contenu"
+          - "Un utilisateur qui ne souhaite pas de musique peut la couper sans rien perdre de la narration"
+
+      definition_of_done:
+          - "Au moins certains pins ont des fragments musicaux d'époque associés à des moments du récit"
+          - "La musique accompagne la narration sans la couvrir"
+          - "L'utilisateur peut couper la musique indépendamment de la narration"
+          - "Chaque musique utilisée est tracée (source, droits)"
+
+      enjeux_transversaux:
+          accessibilite: >-
+              La musique ne doit jamais empêcher la compréhension de la
+              narration. Pour les utilisateurs sensibles au sonore (TSA,
+              hyperacousie), la coupure indépendante est essentielle.
+          performance: >-
+              Le tissage de la musique dans le récit ne doit pas créer de
+              rupture perçue dans la lecture audio.
+          vie_privee: "Pas d'enjeu spécifique."
+
+      questions_ouvertes:
+          - "Sourcing des musiques d'époque — à négocier avec institution / lead historienne (libre de droits, autorisations)"
+          - "Couverture (tous les pins ? les éditoriaux uniquement ?) — à arbitrer selon le temps et les ressources"
+          - "Articulation avec les passages musicaux et la mise en évidence du texte (D7.2) — comportement à acter"
+
+      priorite: "important"
+
+      personas_principaux:
+          - pere_lyonnais
+          - mme_martin
+          - kenji
+
+      dependances:
+          - "D7.1 (lecture audio — surface qui porte la musique)"
+          - "D2.5 (consultation approfondie d'un pin — moment où le récit avec musique se vit)"
+
+    # ===========================================================================
+    - id: D7.4
+      nom: "Lecture audio en arrière-plan"
+
+      raison_d_etre: >-
+          Permettre à l'audio de continuer pendant que l'utilisateur fait autre
+          chose : naviguer ailleurs dans l'app, fermer la consultation en
+          cours, verrouiller son téléphone, le ranger dans la poche pour
+          marcher. Sans ce comportement, l'écoute en marche est impossible —
+          Kenji devrait garder la consultation ouverte à l'écran en
+          permanence, ce qui contredit son moment de vérité (test_litmus
+          n°2). Avec ce comportement, l'audio devient un compagnon de
+          marche, pas un bouton à maintenir.
+
+          Ce sous-domaine est la RÉFÉRENCE CANONIQUE du comportement
+          transverse "Lecture audio en arrière-plan" (cf. 00-index § 6).
+          Référencé depuis D2.5 (consultation approfondie) et D3.5 (vivre
+          un parcours).
+
+      comportement: >-
+          Une fois la lecture audio démarrée, elle peut continuer alors que
+          l'utilisateur quitte la consultation où elle a été lancée : il peut
+          revenir à la carte, ouvrir un autre pin, naviguer dans un parcours,
+          ou même fermer l'app au sens habituel (la mettre en arrière-plan
+          système, verrouiller le téléphone). L'audio continue jusqu'à la fin
+          du récit ou jusqu'à ce que l'utilisateur le mette en pause. Les
+          contrôles de lecture restent accessibles depuis le système (centre
+          de contrôle / écran verrouillé natif) et depuis l'app (cf. D7.5).
+          Le retour à la consultation d'origine reste possible à tout
+          moment. Si une autre source audio prend la priorité (appel
+          entrant, autre app audio), la lecture se met en pause et peut
+          reprendre une fois la priorité levée.
+
+      regles_fonctionnelles:
+          - "L'audio peut continuer alors que l'utilisateur quitte la surface où il a été lancé"
+          - "L'audio peut continuer alors que l'utilisateur navigue ailleurs dans l'app"
+          - "L'audio peut continuer alors que l'app est mise en arrière-plan système"
+          - "L'audio peut continuer alors que le téléphone est verrouillé"
+          - "Les contrôles de lecture restent accessibles depuis le système (notif persistante / centre de contrôle / écran verrouillé natif)"
+          - "Une priorité audio externe (appel, autre app) met la lecture en pause"
+          - "Le retour à la consultation d'origine reste accessible tant que la lecture est en cours"
+          - "À la fin du récit, la lecture s'arrête naturellement et libère les ressources audio"
+
+      capabilites:
+          - "Continuer la lecture audio quand l'utilisateur navigue ailleurs dans l'app"
+          - "Continuer la lecture audio quand l'app passe en arrière-plan système"
+          - "Continuer la lecture audio quand le téléphone est verrouillé"
+          - "Exposer les contrôles de lecture aux mécanismes natifs du système"
+          - "Mettre en pause à l'arrivée d'une priorité audio externe"
+          - "Reprendre après pause externe (selon politique à arbitrer)"
+          - "Permettre le retour à la consultation d'origine de la lecture"
+
+      ce_qu_on_ne_fait_pas:
+          - "Pas de coupure forcée de l'audio quand l'utilisateur change d'écran dans l'app"
+          - "Pas de coupure forcée de l'audio quand le téléphone se verrouille"
+          - "Pas de continuation de la lecture sans aucun moyen de la contrôler ou de l'arrêter"
+          - "Pas de poursuite de la lecture après la fin naturelle du récit (l'audio s'arrête)"
+
+      criteres_de_reussite:
+          - "Atteint le test_litmus de Kenji n°2 : il marche dans le Vieux Lyon, casque sur les oreilles, téléphone dans la poche, et l'audio continue"
+          - "Le père lyonnais lance l'audio d'une anecdote, range son téléphone et finit l'écoute en marchant avec ses enfants"
+          - "Un utilisateur peut interrompre la lecture sans rouvrir l'app, depuis les contrôles natifs du système"
+          - "À la fin du récit, l'audio ne reste pas en zombie en arrière-plan"
+
+      definition_of_done:
+          - "L'audio continue quand l'utilisateur navigue ailleurs dans l'app"
+          - "L'audio continue quand l'app est en arrière-plan système"
+          - "L'audio continue quand le téléphone est verrouillé"
+          - "Les contrôles de lecture sont accessibles depuis les mécanismes natifs du système"
+          - "Une priorité audio externe met la lecture en pause"
+          - "Le retour à la consultation d'origine de la lecture est accessible tant que la lecture est en cours"
+          - "À la fin du récit, la lecture s'arrête et les ressources sont libérées"
+
+      enjeux_transversaux:
+          accessibilite: >-
+              Critique : l'écoute en arrière-plan EST l'a11y motrice et
+              visuelle (un utilisateur n'a pas à manipuler son téléphone pour
+              écouter). Les contrôles natifs système sont eux-mêmes
+              accessibles (Voice Control, lecteurs d'écran natifs).
+          performance: >-
+              Critique : la lecture en arrière-plan ne doit pas drainer la
+              batterie de façon disproportionnée. La continuité ne doit pas
+              être coupée par une saccade lors d'un changement de surface
+              dans l'app.
+          vie_privee: >-
+              Une lecture en cours est visible dans les contrôles natifs du
+              système (titre potentiellement affiché sur l'écran verrouillé).
+              Identifier le récit en cours sans révéler de contenu sensible
+              au-delà du nom du pin.
+
+      questions_ouvertes:
+          - "Politique de reprise après priorité audio externe (reprise automatique ou manuelle) — à arbitrer"
+          - "Quelles métadonnées exposer dans les contrôles natifs du système (titre du pin, durée, image) — à acter en palier 7 / palier 8"
+          - "Comportement quand l'utilisateur démarre un autre récit pendant qu'un précédent joue (remplacement immédiat ? confirmation ?) — à arbitrer"
+
+      priorite: "important"
+
+      personas_principaux:
+          - kenji
+          - pere_lyonnais
+
+      dependances:
+          - "D7.1 (lecture audio — c'est cette lecture qui peut continuer en arrière-plan)"
+          - "D7.5 (présence persistante des contrôles audio — accès aux contrôles depuis l'app pendant la lecture en arrière-plan)"
+
+      comportements_transverses_referenced:
+          - "Lecture audio en arrière-plan — CE SOUS-DOMAINE EST LA RÉFÉRENCE CANONIQUE du comportement transverse (cf. 00-index § 6). Référencé depuis D2.5 (consultation approfondie) et D3.5 (vivre un parcours)."
+
+    # ===========================================================================
+    - id: D7.5
+      nom: "Présence persistante des contrôles audio pendant la consultation"
+
+      raison_d_etre: >-
+          Quand un audio est en cours de lecture, l'utilisateur doit pouvoir
+          reprendre la main sur la lecture (mettre en pause, reprendre,
+          arrêter, revenir à la source) à tout moment, sans avoir à retrouver
+          la consultation où l'audio a été lancé. Sans cette présence
+          persistante, l'utilisateur qui a navigué ailleurs perd l'accès à
+          ses contrôles audio, ce qui annule le bénéfice de l'écoute en
+          arrière-plan (D7.4). Avec elle, l'audio devient une présence
+          continue maîtrisée, pas une boîte noire.
+
+      comportement: >-
+          Tant qu'un audio est en cours de lecture, les contrôles audio
+          restent accessibles à l'utilisateur dans l'app, indépendamment de
+          la surface qu'il consulte. Ces contrôles permettent au minimum de
+          mettre en pause, reprendre, et arrêter la lecture, et de retourner
+          à la consultation d'origine. Quand la lecture est arrêtée ou
+          terminée, cette présence disparaît. Les contrôles natifs système
+          (cf. D7.4) restent un accès complémentaire, pas une substitution.
+
+      regles_fonctionnelles:
+          - "Les contrôles audio sont accessibles dans l'app tant qu'une lecture est en cours"
+          - "Au minimum : mise en pause, reprise, arrêt, retour à la consultation d'origine"
+          - "La présence des contrôles disparaît quand la lecture est arrêtée ou terminée"
+          - "Cette présence ne masque pas le contenu principal de la surface en cours"
+          - "L'accès aux contrôles est cohérent quelle que soit la surface (carte, parcours, profil, etc.)"
+          - "Les contrôles natifs système sont un accès complémentaire, pas substitutif"
+
+      capabilites:
+          - "Maintenir un point d'accès aux contrôles audio dans l'app pendant toute lecture en cours"
+          - "Permettre la mise en pause, la reprise, l'arrêt depuis ce point d'accès"
+          - "Permettre le retour à la consultation d'origine de la lecture"
+          - "Faire disparaître ce point d'accès à la fin de la lecture"
+          - "Coexister avec d'autres surfaces persistantes (cf. surface persistante du parcours en cours D3.5)"
+
+      ce_qu_on_ne_fait_pas:
+          - "Pas de présence des contrôles audio sans lecture en cours (pas de chrome inutile)"
+          - "Pas de masquage du contenu principal de la surface consultée"
+          - "Pas de duplication des fonctions des contrôles natifs système (présence app = accès rapide, pas concurrent)"
+
+      criteres_de_reussite:
+          - "Kenji marche, l'audio joue, il regarde la carte : il peut mettre en pause sans rouvrir le pin d'origine"
+          - "Le père lyonnais a lancé une anecdote, change d'avis, et peut l'arrêter en deux gestes sans devoir se rappeler d'où il l'avait lancée"
+          - "Quand l'audio se termine, l'utilisateur n'a pas une présence audio résiduelle qui encombre l'écran"
+
+      definition_of_done:
+          - "Tant qu'une lecture audio est en cours, des contrôles audio sont accessibles dans l'app"
+          - "Ces contrôles couvrent au minimum mise en pause, reprise, arrêt, retour à la consultation d'origine"
+          - "Cette présence disparaît à l'arrêt ou à la fin de la lecture"
+          - "Cette présence cohabite avec les autres surfaces persistantes de l'app sans concurrence"
+
+      enjeux_transversaux:
+          accessibilite: >-
+              Les contrôles audio persistants doivent être accessibles aux
+              lecteurs d'écran et navigables au clavier. Leur position et
+              leur taille doivent permettre une activation facile en marche
+              (cible tactile généreuse pour Kenji).
+          performance: >-
+              Critique : la présence persistante ne doit pas dégrader le
+              ressenti de fluidité de la surface principale.
+          vie_privee: >-
+              Si un titre ou un visuel est exposé dans les contrôles
+              persistants, ne pas révéler de contenu sensible au-delà de ce
+              que l'utilisateur a explicitement ouvert.
+
+      questions_ouvertes:
+          - "Cohabitation avec la surface persistante du parcours (D3.5) quand un parcours est en cours ET un audio joue : surfaces unifiées ou empilées ? — à arbitrer en palier 7"
+          - "Comportement quand l'utilisateur démarre une nouvelle lecture audio depuis un autre pin pendant qu'une lecture précédente est en cours — à arbitrer (cf. D7.4 questions_ouvertes)"
+
+      priorite: "important"
+
+      personas_principaux:
+          - kenji
+          - pere_lyonnais
+          - mme_martin
+
+      dependances:
+          - "D7.1 (lecture audio — la présence n'existe que pendant une lecture)"
+          - "D7.4 (lecture en arrière-plan — la présence persistante en est le complément quand l'utilisateur navigue dans l'app)"
+          - "D3.5 (vivre un parcours — cohabitation avec la surface persistante du parcours en cours)"
+
+# -----------------------------------------------------------------------------
+# Persona-check du domaine D7
+# -----------------------------------------------------------------------------
+persona_check:
+    kenji:
+        pertinence: "Très élevée — l'audio est son moment de vérité majeur (test_litmus n°2 : 80% de l'expérience sans regarder l'écran)"
+        scenarios_passes:
+            - scenario: "Marche dans le Vieux Lyon avec son casque, écoute le récit d'un pin sans regarder son écran"
+              reponse: "Couvert par D7.1 (lecture du récit) + D7.4 (continuation en arrière-plan) + D7.5 (contrôles persistants pour pause/reprise sans rouvrir le pin)"
+            - scenario: "Téléphone verrouillé dans la poche, l'audio continue"
+              reponse: "Couvert par D7.4 (référence canonique de l'arrière-plan) — contrôles natifs système exposés"
+            - scenario: "Un appel arrive pendant la lecture"
+              reponse: "Couvert par D7.4 (priorité audio externe = pause). Politique de reprise à arbitrer (question ouverte D7.4)"
+            - scenario: "Lecture en japonais"
+              reponse: "Dépend de la décision TTS / voix humaine (D7.1 question ouverte). Si voix humaine, couverture multilingue à acter ; si TTS, capacité multilingue à acter"
+        questions_levees:
+            - "TTS vs voix humaine : impact direct sur la couverture multilingue pour Kenji"
+            - "Politique de reprise après appel : reprise automatique ou manuelle ?"
+
+    mme_dupont:
+        pertinence: "Faible — son contexte (sortie scolaire, parents accompagnateurs) ne place pas l'audio en moment de vérité majeur"
+        scenarios_passes:
+            - scenario: "Un parent accompagnateur lance l'audio sur un pin pour un enfant"
+              reponse: "Couvert par D7.1 (lecture explicite à l'initiative de l'utilisateur). Le ton et la durée du récit doivent rester adaptés (relève du palier 8 contenu, pas D7)"
+        questions_levees:
+            - "Adaptation enfants du contenu narratif (palier 8) — pas D7"
+
+    mme_martin:
+        pertinence: "Élevée — l'audio peut être diffusé en classe, et la mise en évidence du texte sert l'usage projeté"
+        scenarios_passes:
+            - scenario: "Diffusion d'un récit en classe avec mise en évidence du texte projeté"
+              reponse: "Couvert par D7.1 + D7.2 (mise en évidence). Lisibilité de la mise en évidence en projection à valider en palier 9 / palier 12"
+            - scenario: "Musique d'époque tissée dans un récit sur les Canuts"
+              reponse: "Couvert par D7.3. La possibilité de couper la musique sans couper la narration permet à Mme Martin d'ajuster selon le sonore de sa classe"
+            - scenario: "Sources audio crédibles aux yeux d'un collègue"
+              reponse: "Sourcing des musiques tracé (D7.3 regle). Pour la voix narrative, la décision TTS / voix humaine (D7.1) impacte directement la crédibilité — TTS médiocre risque de dégrader l'historicité ressentie"
+        questions_levees:
+            - "Lisibilité de la mise en évidence en projection (à valider plus tard)"
+            - "Qualité perçue de la voix narrative (TTS / humaine) — enjeu d'historicité ressentie"
+
+    pere_lyonnais:
+        pertinence: "Élevée — écoute pendant la balade dominicale en mode mains libres"
+        scenarios_passes:
+            - scenario: "Reçoit une anecdote courte, écoute en marchant avec ses enfants"
+              reponse: "Couvert par D7.1 + D7.4 (arrière-plan)"
+            - scenario: "Veut couper la musique d'époque qui dérange ses enfants"
+              reponse: "Couvert par D7.3 (coupure indépendante de la musique)"
+            - scenario: "Range son téléphone, l'audio continue"
+              reponse: "Couvert par D7.4 (téléphone verrouillé)"
+        questions_levees: []
+
+    anais_back_office:
+        pertinence: "Faible — domaine côté grand public, mais l'audio dépend du contenu produit"
+        scenarios_passes:
+            - scenario: "Production des fragments musicaux d'époque (sourcing, droits)"
+              reponse: "Renvoi vers D10 (production de contenu) — workflow à détailler en palier 13. Question ouverte D7.3 (sourcing) à acter avec elle et l'institution"
+            - scenario: "Choix TTS vs voix humaine — impact sur le pipeline de contenu d'Anaïs"
+              reponse: "Décision majeure en attente (D7.1 question ouverte) — à arbitrer avec dev IA et lead historienne. Si voix humaine, Anaïs ou un tiers enregistre ; si TTS, Anaïs valide la sortie générée"
+        questions_levees:
+            - "TTS vs voix humaine : impact direct sur le workflow de production d'Anaïs"

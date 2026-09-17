@@ -1,0 +1,57 @@
+# =============================================================================
+# E-TRANSVERSES-MESSAGE-EPHEMERE — Message éphémère (template M9)
+# =============================================================================
+# TEMPLATE GÉNÉRIQUE pour tout retour utilisateur transitoire et non bloquant
+# (confirmation d'une action, signalement d'éloignement, mise en attente de
+# modération, erreur réseau gracieuse, etc. — exemples palier 8). Cette
+# fiche décrit le PATRON ; les instances ne sont pas modélisées comme des
+# écrans à part — elles diffèrent par la microcopy (palier 8) et par la
+# durée d'affichage (palier 11).
+# =============================================================================
+
+document:
+  type: palier_ecrans_fiche
+  format: yaml
+
+ecran:
+  id: E-TRANSVERSES-MESSAGE-EPHEMERE
+  nom: "Message éphémère (template M9)"
+
+  mode: P5.M9
+  surface_parente: "transverse"
+
+  raison_d_etre: >-
+    Donner un retour utilisateur LISIBLE mais non intrusif — confirmer
+    qu'une action est prise, signaler un événement contextuel, présenter
+    une information transitoire. Pas un canal promotionnel, pas un canal
+    décoratif (P5.M9 propriétés + essence § ce_qu_on_refuse).
+
+  composition:
+    - zone: "zone message"
+      role: "court texte qui dit ce qui s'est passé ou ce qui se passe (microcopy palier 8) — une seule idée par message, jamais d'invitation à action obligatoire"
+
+    - zone: "(facultatif) point d'accès secondaire"
+      role: "rare — uniquement si un retour immédiat est utile à proposer (ex. 'annuler' juste après une suppression réversible) ; à arbitrer en palier 8 par instance"
+
+  etats:
+    nominal_visible: "Message affiché sur la surface courante ; la surface reste pleinement utilisable (P5.M9 non bloquant)"
+    transition_remplacement: "Un nouveau message survient pendant qu'un précédent est encore affiché ; le précédent cède la place au suivant (P5.C6 file simple)"
+    disparition_par_delai: "Le délai d'affichage est écoulé ; le message disparaît seul (durée précise palier 11)"
+    disparition_par_action: "Si un point d'accès secondaire existe et que l'utilisateur l'active, le message disparaît immédiatement après exécution"
+    sommeil_visuel_m4: "P5.C2 — en mode présentation, les messages éphémères sont supprimés ou différés (à arbitrer palier 7 fin / 11) ; les rendre invisibles ne doit pas dégrader l'information critique"
+
+  elements_interactifs:
+    - "Aucune interaction obligatoire — c'est un message non bloquant"
+    - "(facultatif, par instance) tap sur le point d'accès secondaire si présent → exécute l'action proposée"
+    - "(éventuellement) geste de balayage pour faire disparaître plus vite — à arbitrer palier 7 fin / palier 10"
+
+  flows_actifs: []   # transverse, déclenché par tout flow palier 6 qui émet un retour utilisateur
+                     # (cluster 06 lien copié, G2/G3/G4/G5 modération en cours, D3.5 éloignement, D7 fin de lecture, etc.)
+
+  surfaces_imbriquees: []   # M9 ne s'imbrique rien
+
+  questions_ouvertes:
+    - "Inventaire exhaustif des instances qui émettent un message éphémère — à consolider en palier 7 fin pour cohérence des microcopy (palier 8)"
+    - "Politique de rétention quand plusieurs messages successifs arrivent rapidement (file simple P5.C6, mais combien de temps minimum chacun reste-t-il visible ?) — palier 11"
+    - "Distinction fonctionnelle entre M9 'confirmation discrète' (lien copié) et M9 'alerte gracieuse' (éloignement du tracé) — même template ou variantes ? — palier 8 / 10"
+    - "Comportement en M4 mode présentation : suppression totale ou affichage minimal critique (ex. erreur de lecture audio en immersion) ? — palier 7 fin"

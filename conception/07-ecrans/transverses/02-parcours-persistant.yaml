@@ -1,0 +1,76 @@
+# =============================================================================
+# E-TRANSVERSES-PARCOURS-PERSISTANT — Surface persistante de parcours en cours (P2)
+# =============================================================================
+# Surface réduite et persistante (P5.M5, P5.P2) qui survit à la navigation
+# entre surfaces top-level dès qu'un Parcours est lancé. Indique l'étape
+# courante et la progression, permet de revenir d'un geste à l'étape en
+# cours, et propose une fermeture explicite qui ouvre un dialogue d'abandon.
+# =============================================================================
+
+document:
+  type: palier_ecrans_fiche
+  format: yaml
+
+ecran:
+  id: E-TRANSVERSES-PARCOURS-PERSISTANT
+  nom: "Surface persistante de parcours en cours (P2)"
+
+  mode: P5.M5
+  surface_parente: "transverse"
+
+  raison_d_etre: >-
+    Empêcher l'utilisateur de PERDRE le fil d'un Parcours engagé quand il
+    bascule sur une autre surface (ex. consulter un Pin tangentiel sur la
+    Carte, vérifier un favori sur Profil). Sert le scénario de Mme Dupont
+    en sortie scolaire (le parent accompagnateur passe à la Carte sans
+    perdre le Parcours) et celui de Kenji en mode terrain (revenir à
+    l'étape courante d'un geste).
+
+  composition:
+    - zone: "identité du Parcours en cours"
+      role: "rappelle de quel Parcours il s'agit et de la provenance (éditorial / communautaire / personnel)"
+      entites_affichees: [Parcours]
+
+    - zone: "indicateur de progression"
+      role: "étape courante (numéro et titre court) et progression (étapes complétées / restantes) — dérivé de l'Historique de visite (cluster 03)"
+      entites_affichees: [Étape, "Historique de visite"]
+
+    - zone: "indicateur de mode du Parcours"
+      role: "signale si le Parcours est en mode terrain (C5) ou canapé (C6) ; pertinent pour C2 mode présentation"
+
+    - zone: "point d'accès retour à l'étape courante"
+      role: "tap sur la surface → retour à E-PARCOURS-EN-COURS-TERRAIN ou E-PARCOURS-EN-COURS-CANAPE selon le mode"
+
+    - zone: "action de fermeture explicite"
+      role: "ouvre E-TRANSVERSES-DIALOGUE-CONFIRMATION (M8) pour confirmer l'abandon — l'utilisateur ne quitte pas par accident (P5.P2 propriétés + flow C7)"
+
+  etats:
+    nominal_terrain: "Parcours en cours en mode terrain, surface visible sur S1, S2, S3 et leurs sous-surfaces"
+    nominal_canape: "Parcours en cours en mode canapé, surface visible idem"
+    transition_etape: "Le passage à l'étape suivante (validé par C5 terrain ou C6 canapé) met à jour la progression sans masquer la surface"
+    sommeil_visuel_m4: "P5.C2 — l'app est en mode présentation (M4), la surface est masquée visuellement mais le Parcours reste en cours ; un retour à un mode standard la fait réapparaître"
+    coexistence_avec_p1: "P5.C1 — une lecture audio est active simultanément ; les deux surfaces persistantes coexistent, articulation visuelle palier 7 fin / palier 10"
+    coexistence_avec_p3: "Bandeau offline actif simultanément ; le Parcours continue à fonctionner sur le contenu préchargé (cluster 02)"
+    fin_naturelle: "L'utilisateur a complété la dernière étape ; la surface persistante cède sa place à E-PARCOURS-FIN-CELEBRATION puis disparaît"
+    abandon_confirme: "L'utilisateur a confirmé l'abandon via M8 ; la surface disparaît, l'historique est mis à jour (cluster 02 abandon)"
+    eloignement_du_trace: "En mode terrain, l'utilisateur s'éloigne du tracé ; un message éphémère M9 peut être émis (D3.5) ; la surface persistante reste visible"
+
+  elements_interactifs:
+    - "Tap sur la surface → retour à E-PARCOURS-EN-COURS-TERRAIN ou E-PARCOURS-EN-COURS-CANAPE"
+    - "Action de fermeture explicite → ouvre E-TRANSVERSES-DIALOGUE-CONFIRMATION pour abandon (C7)"
+    - "(facultatif) action explicite de saut d'étape → ouvre E-PARCOURS-SAUT-ETAPE (C8) — à confirmer en palier 7 fin"
+
+  flows_actifs:
+    - C5   # Parcours en cours, mode terrain
+    - C6   # Parcours en cours, mode canapé
+    - C7   # Abandon de Parcours (déclenché depuis l'action de fermeture)
+    - C8   # Saut d'étape (potentiellement accessible depuis ici)
+    - C9   # Fin de Parcours et célébration
+
+  surfaces_imbriquees:
+    - E-TRANSVERSES-DIALOGUE-CONFIRMATION   # M8 d'abandon (C7)
+
+  questions_ouvertes:
+    - "Le saut d'étape (C8) est-il accessible directement depuis P2 ou seulement depuis E-PARCOURS-EN-COURS-TERRAIN/CANAPE ? — palier 7 fin"
+    - "Comportement en cas de Parcours en pause volontaire (cluster 02 statut 'en cours' ≠ 'pause') — la pause est-elle modélisée ou seul l'abandon est explicite ?"
+    - "Représentation visuelle de la progression (compteur, jauge, suite de pastilles) — palier 9 / 10"

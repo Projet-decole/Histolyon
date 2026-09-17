@@ -1,0 +1,99 @@
+# =============================================================================
+# E-PROFIL-CREATION-COMPTE — Création d'un Compte
+# =============================================================================
+# Surface ponctuelle (P5.S3 en P5.M6) de création d'un Compte. Demande le
+# minimum requis par cluster 03 : pseudonyme, représentation graphique, email
+# d'authentification, secret. PAS d'identité civile (I1). Atterrissage soit
+# par geste explicite depuis E-PROFIL-PRINCIPAL/E-PROFIL-PARAMETRES, soit par
+# redirection depuis C13 / G2 / G3 / G4 / G6 quand un Compte est requis pour
+# publier — dans ce cas, retour automatique vers le flow appelant après
+# création.
+# =============================================================================
+
+document:
+  type: palier_ecrans_fiche
+  format: yaml
+
+ecran:
+  id: E-PROFIL-CREATION-COMPTE
+  nom: "Création d'un Compte"
+
+  mode: P5.M6
+  surface_parente: P5.S3
+
+  raison_d_etre: >-
+    Permet à l'utilisateur de créer un Compte au moment où l'un des deux
+    usages qui le justifient se présente : publier une contribution
+    communautaire ou synchroniser entre appareils. Surface dépouillée et
+    non promotionnelle (cohérence essence § ce_qu_on_refuse — pas de mur
+    d'inscription). Le Compte créé n'active PAS la sync par défaut (cf. D6
+    étape 5).
+
+  composition:
+    - zone: "saisie pseudonyme"
+      role: "demande un pseudonyme non vide et unique parmi les Comptes actifs ; vérification de disponibilité à la volée ; suggestion en cas de collision"
+      entites_affichees: [Compte]
+
+    - zone: "sélection représentation graphique"
+      role: "demande une représentation graphique (avatar) — format exact (catalogue éditorial / photo libre / avatar généré) à arbitrer palier 7/13 ; au palier 7 on garantit que la zone existe"
+      entites_affichees: [Compte]
+
+    - zone: "saisie email d'authentification"
+      role: "demande une adresse électronique non vide, unique parmi les Comptes actifs ; usage strict authentification + récupération (cluster 03)"
+      entites_affichees: [Compte]
+
+    - zone: "saisie secret d'authentification"
+      role: "demande un secret selon la méthode retenue (mot de passe / lien magique — méthode_authentification, cluster 03) ; détails palier 8/16"
+      entites_affichees: [Compte]
+
+    - zone: "tiers d'authentification optionnel"
+      role: "si méthode_authentification = tiers_optionnel, expose les tiers offerts ; JAMAIS imposé (essence) ; pseudonyme et représentation graphique restent demandés indépendamment du tiers"
+
+    - zone: "accès politique de confidentialité"
+      role: "lien vers la politique (texte accessible) ; pas de case cochée par défaut (cf. D6 étape 3)"
+
+    - zone: "point d'accès 'J'ai déjà un compte'"
+      role: "bascule vers E-PROFIL-CONNEXION-COMPTE (D7)"
+
+    - zone: "point d'accès origine du flow"
+      role: "rappel discret de l'action qui a appelé la création (publier un Pin, un Commentaire, un Retour, un Parcours, une Soumission, un Signalement) si redirection depuis C13/G2/G3/G4/G6 ; absent si entrée volontaire depuis D1/D5"
+
+  etats:
+    nominal_saisie: "Formulaire vierge ou en cours de saisie ; vérifications à la volée"
+    pseudonyme_disponible: "Vérification renvoie disponibilité ; indication visuelle discrète (palier 7)"
+    pseudonyme_indisponible: "Pseudonyme déjà pris parmi les Comptes actifs (cluster 03 contrainte d'unicité) ; retour gracieux dans le formulaire avec indication ; suggestion possible (palier 7/8)"
+    pseudonyme_en_retention: "Pseudonyme verrouillé en rétention résiduelle (Compte récemment supprimé) — message dédié distinct de pseudonyme_indisponible (palier 8) ; recommandation : traiter comme indisponible côté UX"
+    email_collision: "Email déjà associé à un Compte existant ; retour gracieux indiquant la collision sans divulguer l'existence (cohérence I1 et sécurité — D6 cas particulier) ; proposition de basculer vers E-PROFIL-CONNEXION-COMPTE"
+    chargement_validation: "Échange serveur en cours après validation"
+    succes: "Compte créé, rattachement enregistré, message éphémère P5.M9 ; redirection automatique vers le flow appelant si applicable, ou retour à D1/D5"
+    email_verification_attendue: "Compte créé en état 'actif' ; email de vérification envoyé selon politique retenue ; l'usage immédiat n'est pas bloqué (D6 bifurcation, à arbitrer sécu)"
+    erreur_reseau_pendant_echange: "Coupure pendant la validation ; message gracieux, possibilité de retenter ; le formulaire conserve les valeurs saisies (P5.N7)"
+    erreur_reseau_avant_validation: "Coupure pendant la saisie ; valeurs préservées ; message éphémère P5.M9 signale la perte de connexion ; la validation reste indisponible jusqu'au retour de la connexion"
+    annulation: "L'utilisateur ferme la surface ponctuelle sans valider ; aucun Compte créé ; retour à la surface appelante (D1/D5 ou flow C13/G2/G3/G4/G6 qui se termine en sortie alternative 'Compte non créé')"
+
+  elements_interactifs:
+    - "Saisie / édition de chaque champ"
+    - "Vérification de disponibilité du pseudonyme à la volée"
+    - "Sélection / changement de la représentation graphique"
+    - "Validation du formulaire → échange serveur → création"
+    - "Tap sur 'J'ai déjà un compte' → bascule vers E-PROFIL-CONNEXION-COMPTE"
+    - "Tap sur la politique de confidentialité → ouverture sous-vue P5.M3 dédiée (depuis paramètres ou navigation interne)"
+    - "Tap sur un tiers d'authentification optionnel (si offert) → flux tiers ; pseudonyme + représentation toujours demandés au retour"
+    - "Annulation / fermeture (P5.N5 — annulation implicite si la surface se ferme sans validation)"
+
+  flows_actifs:
+    - D6   # Création d'un Compte
+
+  surfaces_imbriquees:
+    - E-PROFIL-CONNEXION-COMPTE         # bascule via 'J'ai déjà un compte'
+    - E-TRANSVERSES-MESSAGE-EPHEMERE    # confirmation succès, perte connexion
+    - E-TRANSVERSES-BANDEAU-OFFLINE
+
+  entites_affichees: [Profil, Compte]
+
+  questions_ouvertes:
+    - "Méthode d'authentification finale (email + mot de passe / lien magique / tiers optionnel) — cluster 03 D6.5 et D6 question ouverte"
+    - "Vérification d'email obligatoire pour usage immédiat ou différable ? — sécu"
+    - "Redirection automatique post-création quand atterrissage depuis C13/G2/G3/G4/G6 : message éphémère explicite ou retour silencieux ? — palier 7/8"
+    - "Tension I6 vs sauvegardes système OS (D6 question ouverte) : un Profil restauré sans Compte qui crée un nouveau Compte ; quelle articulation avec un Compte de même email pré-existant ? — devs Flutter"
+    - "Affichage du contexte 'pourquoi un compte est demandé' selon l'origine (publier un Pin / un Commentaire / etc.) : message ciblé ou message générique ? — palier 8"

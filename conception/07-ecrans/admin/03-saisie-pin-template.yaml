@@ -1,0 +1,97 @@
+# =============================================================================
+# E-ADMIN-SAISIE-PIN-TEMPLATE — Saisie d'un Pin éditorial via Template
+# =============================================================================
+# Surface de saisie d'un Pin éditorial à partir du Template actif (cluster 05).
+# Couvre la création d'un nouveau brouillon, la reprise d'un brouillon existant,
+# l'amendement d'un Pin retiré ou en demande_complément. Inclut les champs
+# requis du Pin (titre, Catégorie, Époques, contenu narratif, Sources, Médias).
+# Bascule explicite vers en_revue à la fin de la saisie (entrée du flow H2).
+# =============================================================================
+
+document:
+  type: palier_ecrans_fiche
+  format: yaml
+
+ecran:
+  id: E-ADMIN-SAISIE-PIN-TEMPLATE
+  nom: "Saisie d'un Pin éditorial via Template"
+
+  mode: "back-office"
+  surface_parente: "back-office"
+
+  raison_d_etre: >-
+    Donner à Anaïs un cadre de saisie qui reflète fidèlement le Template actif
+    (cluster 05) et garantit la présence des attributs requis avant bascule en
+    en_revue : exactement 1 Catégorie, ≥ 1 Époque, contenu narratif rempli,
+    ≥ 1 Source structurée. C'est ICI que l'invariant I4 (Sources obligatoires)
+    et I8 (multi-époques admis) se matérialisent au niveau de la saisie.
+
+  composition:
+    - zone: "champs identité du Pin"
+      role: "saisie du titre, sélection de la Catégorie (catalogue ouvert I7), sélection de ≥ 1 Époque(s) (multi-sélection I8), localisation optionnelle (I9)"
+      entites_affichees: [Pin, Catégorie, Époque]
+
+    - zone: "rédaction du contenu narratif"
+      role: "saisie de la structure teaser + narration + post-narratif (cluster 01) ; les libellés exacts et l'ergonomie relèvent du palier 13"
+      entites_affichees: [Pin]
+
+    - zone: "rattachement des Sources"
+      role: "ajout, retrait, réutilisation de Sources structurées (type + référence + crédit obligatoire) ; au moins 1 Source pour pouvoir basculer en en_revue (I4)"
+      entites_affichees: [Source]
+
+    - zone: "rattachement des Médias"
+      role: "ajout, retrait des Médias optionnels (image, archive, audio_narration, audio_ambiance, élément_interactif) avec crédit obligatoire ; vérification que les fichiers sont accessibles"
+      entites_affichees: [Média]
+
+    - zone: "métadonnées éditoriales"
+      role: "Badge optionnel, Pins liés optionnels, Modèles 3D optionnels, Fragments musicaux optionnels"
+      entites_affichees: [Badge, Pin, "Modèle 3D", "Fragment musical"]
+
+    - zone: "notes éditoriales du Template (lecture seule)"
+      role: "guides de ton et longueurs indicatives portés par le Template (cluster 05) ; jamais contraignants — c'est un guide, pas une règle"
+      entites_affichees: [Template]
+
+    - zone: "validation de cohérence et bascule"
+      role: "vérification que les champs requis sont remplis (≥ 1 Source, ≥ 1 Époque, Catégorie, contenu narratif), bascule explicite brouillon → en_revue (entrée H2)"
+
+    - zone: "audit — Traces existantes"
+      role: "si le Pin a déjà été en validation (Pin amendé après demande_complément ou refusé, ou Pin réouvert après retrait), affichage des Traces de validation antérieures pour contexte"
+      entites_affichees: ["Trace de validation"]
+
+  etats:
+    nominal_charge_nouveau_brouillon: "Tous les champs vides, version de Template enregistrée pour audit, sauvegarde armée"
+    nominal_charge_reprise_brouillon: "Champs pré-remplis avec le contenu existant, suite de la saisie"
+    nominal_charge_amendement: "Pin issu d'une demande_complément ou retrait — Traces antérieures consultables en zone audit, motif de la dernière Trace mis en évidence"
+    sauvegarde_en_cours: "Sauvegarde automatique ou explicite en cours ; édition reste possible"
+    pret_pour_bascule: "Tous les champs requis sont remplis ; la bascule en_revue est activable"
+    bloque_pour_bascule: "Au moins un champ requis manque (ex. aucune Source, aucune Époque) ; la bascule est refusée avec signal explicite (instanciation I4)"
+    media_casse: "Un Média rattaché est introuvable ou cassé — la bascule en en_revue est bloquée tant que le Média n'est pas remplacé ou retiré (cf. H1 cas particulier D10.3)"
+    template_deprecie: "Le Pin a été ouvert sous une version dépréciée du Template — invitation à migrer vers la version active (cf. H1 cas particulier)"
+    erreur_sauvegarde: "Échec de la sauvegarde ; le contenu local reste éditable, message d'erreur invite à réessayer"
+    permission_insuffisante: "L'utilisateur n'a pas le rôle éditeur — accès en lecture seule"
+
+  elements_interactifs:
+    - "Saisie et édition de chaque champ du Template"
+    - "Sélection d'une Catégorie depuis le catalogue ouvert"
+    - "Multi-sélection d'Époques"
+    - "Saisie ou suppression de la localisation (Pin sans localisation autorisé pour patrimoine vivant immatériel, I9)"
+    - "Rédaction du contenu narratif (teaser, narration, post-narratif)"
+    - "Ajout, retrait, réutilisation d'une Source"
+    - "Ajout, retrait d'un Média avec saisie de crédit"
+    - "Sauvegarde explicite du brouillon (et auto-save, palier 13)"
+    - "Bascule explicite brouillon → en_revue (entrée H2)"
+    - "Abandon de la saisie (le brouillon survit)"
+    - "Consultation d'une Trace de validation antérieure (si amendement)"
+
+  flows_actifs:
+    - H1
+
+  surfaces_imbriquees:
+    - E-ADMIN-CATALOGUE-PINS  # retour
+    - E-ADMIN-VALIDATION-SCIENTIFIQUE  # après bascule en en_revue
+
+  questions_ouvertes:
+    - "Saisie en un seul écran dense vs assistant multi-étapes (équivalent du wizard côté communautaire E-COMMUNAUTE-SOUMISSION-PIN) — relève du palier 13"
+    - "Politique exacte de sauvegarde automatique (périodicité, indicateurs de sauvegarde) — palier 13"
+    - "Possibilité de prévisualiser le rendu grand public depuis cet écran (test_litmus n°3 d'Anaïs) ou réservé à E-ADMIN-VALIDATION-SCIENTIFIQUE — palier 13"
+    - "Ajout en ligne d'une nouvelle Catégorie ou Époque depuis cette surface (catalogues ouverts I7) ou redirection vers un écran admin dédié — palier 13"

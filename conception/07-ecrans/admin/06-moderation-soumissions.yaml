@@ -1,0 +1,104 @@
+# =============================================================================
+# E-ADMIN-MODERATION-SOUMISSIONS — File des soumissions communautaires
+# =============================================================================
+# File de modération des Pins et Parcours de provenance communautaire en
+# en_revue. Pour les Pins communautaires : la modération conjugue vérification
+# scientifique des Sources et modération communautaire — UNE SEULE Trace de
+# modération est créée (décision 2026-05-05, cluster 04 v0.3). Couvre le flow H4.
+# =============================================================================
+
+document:
+  type: palier_ecrans_fiche
+  format: yaml
+
+ecran:
+  id: E-ADMIN-MODERATION-SOUMISSIONS
+  nom: "File de modération des soumissions communautaires (Pin / Parcours)"
+
+  mode: "back-office"
+  surface_parente: "back-office"
+
+  raison_d_etre: >-
+    Donner au modérateur (qui peut cumuler le rôle de validateur scientifique,
+    cf. cluster 05 + 04) une file unifiée pour traiter les soumissions
+    communautaires : Pins en en_revue (auteur communautaire, Sources à
+    vérifier) et Parcours communautaires récemment publiés avec marque
+    distinctive. Pour les Pins, c'est l'unique lieu d'audit (TRACE UNIQUE) —
+    pas de duplication avec une Trace de validation parallèle.
+
+  composition:
+    - zone: "file des soumissions"
+      role: "liste des Pins communautaires en en_revue et des Parcours communautaires avec marque distinctive non levée ; tri par ancienneté ou priorité (signalements en tête)"
+      entites_affichees: [Pin, Parcours]
+
+    - zone: "filtres"
+      role: "filtre par type (Pin / Parcours), par auteur communautaire (pseudonyme), par Catégorie, par Époque, par état de signalement"
+
+    - zone: "prévisualisation conforme grand public"
+      role: "affiche la soumission telle qu'elle est ou sera vue côté grand public ; pour le Pin, rendu en P5.M3 ; pour le Parcours, rendu de la fiche détail (E-PARCOURS-FICHE-DETAIL) avec étapes"
+      entites_affichees: [Pin, Parcours, Étape, Catégorie, Époque, Média]
+
+    - zone: "Sources structurées (cas Pin)"
+      role: "pour un Pin communautaire, panneau dédié affichant chaque Source (type, référence, crédit, lien) pour vérification scientifique ; instanciation de I4 dans le contexte communautaire"
+      entites_affichees: [Source]
+
+    - zone: "auteur de la soumission"
+      role: "pseudonyme de l'auteur communautaire, historique synthétique de ses soumissions précédentes (utile pour repérer les contributeurs récurrents fiables, cf. H4 question ouverte)"
+      entites_affichees: [Compte, Pin, Parcours]
+
+    - zone: "Signalements éventuels"
+      role: "si la soumission a fait l'objet d'un Signalement (rare en en_revue mais possible), le motif et la précision_libre sont visibles ; identité du signaleur strictement non exposée (I5)"
+      entites_affichees: [Signalement]
+
+    - zone: "audit — Traces antérieures"
+      role: "historique des Traces de modération précédentes sur cette soumission (ex. demande_complément puis re-soumission)"
+      entites_affichees: ["Trace de modération"]
+
+    - zone: "panneau de décision (cas Pin communautaire)"
+      role: "trois décisions : validé_sources_vérifiées, demande_complément, retiré_sources_insuffisantes ; motif obligatoire pour les décisions négatives ; UNE SEULE Trace de modération créée (pas de Trace de validation parallèle)"
+
+    - zone: "panneau de décision (cas Parcours communautaire)"
+      role: "trois décisions : publié (validé, marque distinctive levée), demande de correction (Parcours reste publié avec marque le temps de correction), refusé (Parcours retiré) ; Trace de modération créée"
+
+  etats:
+    nominal_charge: "File chargée, soumission ouverte en prévisualisation, Sources visibles si applicable"
+    file_vide: "Aucune soumission en attente — message gracieux"
+    pin_communautaire_en_examen: "Pin communautaire ouvert ; vérification des Sources et de la cohérence historique en cours"
+    parcours_communautaire_en_examen: "Parcours communautaire ouvert ; vérification de la cohérence d'itinéraire et des Étapes en cours"
+    decision_pin_validee: "Pin communautaire validé_sources_vérifiées : transition validé → publié, marque distinctive levée, Trace de modération créée"
+    decision_pin_complement: "Pin retourne en brouillon côté auteur (accessible depuis son E-COMMUNAUTE-SUIVI-SOUMISSIONS) ; Trace négative créée avec motif"
+    decision_pin_retire: "Pin retiré pour sources insuffisantes ; Trace négative créée ; auteur notifié"
+    decision_parcours_publie: "Parcours validé, marque distinctive levée, Trace de modération créée"
+    decision_parcours_correction: "Parcours reste publié avec marque distinctive le temps de correction par l'auteur ; Trace créée avec motif"
+    decision_parcours_refuse: "Parcours passe en retiré, Trace négative créée, auteur notifié"
+    parcours_reference_pin_communautaire_en_cours: "Cas particulier H4 — le Parcours référence un Pin communautaire encore en vérification ; les marques distinctives coexistent (cf. C13)"
+    parcours_pins_editoriaux: "Cas particulier H4 — le Parcours enchaîne des Pins éditoriaux déjà validés ; modération porte sur la cohérence d'itinéraire seule"
+    auteur_supprime_compte: "L'auteur a supprimé son Compte entre-temps ; la soumission reste à modérer (pseudonyme conservé) ; aucune notification possible si refusée"
+    candidate_promotion: "Le modérateur identifie la soumission comme candidate à promotion éditoriale (hors périmètre de cet écran) — relais vers E-ADMIN-PROMOTION-COMMUNAUTAIRE après publication"
+    chargement: "File ou prévisualisation en cours de chargement"
+    erreur_chargement: "Impossible de charger la soumission ou ses Sources ; nouvelle tentative possible"
+    permission_insuffisante: "L'utilisateur n'a pas les rôles requis (modérateur ET validateur sur Pin communautaire selon politique D10.5)"
+
+  elements_interactifs:
+    - "Application et combinaison de filtres"
+    - "Sélection d'une soumission dans la file"
+    - "Lecture de la prévisualisation conforme grand public"
+    - "Consultation des Sources (cas Pin), des étapes (cas Parcours)"
+    - "Consultation des Traces antérieures et des Signalements éventuels"
+    - "Saisie du motif de décision (obligatoire pour décisions négatives)"
+    - "Tranchage de la décision (validé_sources_vérifiées / demande_complément / retiré_sources_insuffisantes pour Pin ; publié / correction / refusé pour Parcours) → création de la Trace de modération immuable"
+    - "Marquage de la soumission comme candidate à promotion (hors flow H4, prépare H5)"
+    - "Navigation vers la soumission suivante dans la file"
+
+  flows_actifs:
+    - H4
+
+  surfaces_imbriquees:
+    - E-ADMIN-ACCUEIL  # retour
+    - E-ADMIN-PROMOTION-COMMUNAUTAIRE  # si la soumission, une fois publiée, est candidate à promotion (relais H5)
+
+  questions_ouvertes:
+    - "Promotion communautaire → éditorial pour les PARCOURS (analogue à I10 pour Pin) — actuellement non couverte par H5 ni par cet écran (cf. H4 question ouverte) — cluster 02 + palier 13"
+    - "Politique pour les soumissions répétées d'un même auteur communautaire (acceptation tacite après N validations ?) — D10.5 + palier 13"
+    - "Cumul des rôles modérateur + validateur scientifique sur Pin communautaire : un seul acteur (rapide) ou deux acteurs distincts (rigueur) ? — cluster 04 question ouverte, palier 13"
+    - "Affichage côté écran d'une Trace de validation parallèle si décision éditoriale ultérieure de complément (cf. H4 cas particulier 'soumission candidate à promotion') — palier 13"

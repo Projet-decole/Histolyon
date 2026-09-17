@@ -1,0 +1,583 @@
+# =============================================================================
+# Palier 12 — Tokens visuels statiques — INDEX
+# =============================================================================
+# Le palier 12 livre les TOKENS VISUELS STATIQUES de l'app : couleurs,
+# typographies, spacing, radius, ombres, opacités constantes. Tout ce qui
+# A L'AIR DE quelque chose de constant — par opposition au palier 11 qui
+# pose tout ce qui BOUGE / TRANSITIONNE / INTERPOLE / ATTEND / VIBRE.
+#
+# Recadré le 2026-05-07 — l'anticipation d'éclatement du 2026-05-06 est
+# LEVÉE. La part 'mappings paramétriques' (slider→axes carte, modulations
+# contextuelles Pin) a été remontée au palier 11 reformulé v2. Le palier 12
+# redevient un palier classique de tokens statiques. Voir
+# design/conception/intention.yaml § 11 retours_d_experience entrée 2026-05-07.
+#
+# Frontière opérationnelle avec le palier 11 :
+#   - Toute valeur INDEXÉE PAR UN ÉTAT DYNAMIQUE → palier 11
+#   - Toute valeur CONSTANTE → palier 12
+# =============================================================================
+
+document:
+  type: palier_tokens_visuels_statiques_index
+  numero: 12
+  version: "0.1"
+  date: "2026-05-07"
+  audience:
+    - "Tout agent qui rédige les fichiers de contenu 01-04"
+    - "relecture"
+    - "Auteurs des paliers 13 (icônes), 15 (Figma), 16 (validation)"
+  role: >-
+    Index, anti-périmètre par palier aval, vocabulaire (chiffré admis),
+    typologie 4 familles (couleurs, typographies, espace-et-forme,
+    opacités constantes), articulation 9/10/11/13/15/16, persona check
+    global, format de fiche par famille, décisions structurelles initiales.
+  format: yaml
+  prerequis_de_lecture:
+    - "design/conception/intention.yaml — § paliers num=12 (recadré 2026-05-07), § 11 retours_d_experience entrée 2026-05-07"
+    - "design/conception/01-essence.yaml — métaphore racine (livre vivant), triptyque sérendipité/historicité/émerveillement"
+    - "design/conception/02-personas.yaml — Mme Martin contraste projection, Kenji symbolise étranger"
+    - "design/conception/09-cartographie/00-index.yaml — décisions D1 (catégories par icône, pas couleur), D3 (provenance par couleur Pin/tracé), D5 (vérification par contour), D6 (badge Officiel abandonné), D7 (pas d'accent Époque dans l'UI)"
+    - "design/conception/09-cartographie/02-pins.yaml — couleurs provenance qualifiées, contour de vérification"
+    - "design/conception/09-cartographie/03-parcours-traces.yaml — couleurs tracé cohérentes avec Pin"
+    - "design/conception/10-composants/00-index.yaml — § 9 composants pivots (button-primary, libelle-texte, icone, libelle-bouton, chip-categorie) qui consomment les tokens"
+    - "design/conception/11-reponse-parametrique/00-index.yaml — § 2 frontière 11/12 (règle + exemples)"
+    - "archives/_bmad-output/design/da-charte.md — base de référence à RETRAITER avec esprit critique (beaucoup de valeurs invalidées par les décisions palier 9)"
+
+# -----------------------------------------------------------------------------
+# 1. Rôle du palier 12 — tokens visuels statiques
+# -----------------------------------------------------------------------------
+role:
+
+  ce_qu_il_livre:
+    - "Palette de couleurs de marque (terracotta primaire, parchemin fond, encre brune texte, etc.)"
+    - "Couleurs fonctionnelles (succès, erreur, info)"
+    - "Couleurs Pin éditorial / communautaire RÉIFIÉES depuis palier 9 D3 (teinte chaude affirmée + teinte neutre — valeurs hex précises)"
+    - "Couleur du contour de vérification RÉIFIÉE depuis palier 9 D5"
+    - "3 fontes latin (titre éditorial / corps narratif / interface) avec rôles distincts"
+    - "Échelle typographique (12 tokens display-xl à ui-xs avec font/size/weight/line-height)"
+    - "Échelle de spacing (multiples de 4)"
+    - "Catalogue de radius (none, sm, md, lg, pill)"
+    - "Catalogue d'ombres (sm, md, lg)"
+    - "Opacités constantes (backdrop, séparateurs, désactivé, texte secondaire/tertiaire)"
+    - "Contrastes a11y déclarés pour paires critiques (Pin sur Carte aux ancres Époque, texte sur fond, etc.)"
+
+  ce_qu_il_ne_livre_pas:
+    - "Durées, courbes, haptiques, mappings paramétriques — palier 11"
+    - "Valeurs aux ancres Époque palier 9 D8 (5 axes × 10 ancres) — palier 11 (structure) + palier 15 (calibrage visuel)"
+    - "Modulations contextuelles Pin (opacité hors-parcours, halo étape courante, etc.) — palier 11"
+    - "Mapping Catégorie → icône concrète, style graphique des icônes — palier 13"
+    - "Couleurs catégories (palier 9 D1 : pas de couleur catégorie, icône suffit)"
+    - "Couleurs accent par Époque (palier 9 D7 : pas d'accent Époque dans l'UI)"
+    - "Microcopy exacte — palier 8 (fait)"
+    - "Noms Tailwind / classes CSS / variables Figma — relèvent de l'implémentation et du palier 15"
+    - "Cibles tactiles chiffrées (≥ 44px) — palier 16"
+    - "Seuils de contraste WCAG eux-mêmes (AA, AAA) — palier 16. Le palier 12 DÉCLARE les ratios calculés ; le palier 16 valide qu'ils satisfont les seuils."
+
+  pourquoi_un_palier_dedie: >-
+    Sans le palier 12, les couleurs et typographies seraient improvisées
+    à l'implémentation, ou éparpillées dans les fichiers d'écrans
+    (palier 7) et de composants (palier 10). La cohérence visuelle de
+    l'app (un seul terracotta, une seule échelle typographique) exige
+    un endroit dédié où les valeurs constantes sont posées une fois
+    et référencées partout.
+
+  raison_du_recadrage_2026_05_07: >-
+    Le palier 12 'tokens' du 2026-05-06 anticipait un éclatement en
+    deux : tokens primitifs (valeurs nues) ET mappings paramétriques
+    (fonctions slider→axes, contexte→modulation). Le 2026-05-07,
+    cette part 'mappings paramétriques' est REMONTÉE au palier 11
+    reformulé v2 ('réponse paramétrique aux changements d'état').
+    Le palier 12 redevient un palier classique de tokens visuels
+    statiques. Anticipation d'éclatement LEVÉE.
+
+# -----------------------------------------------------------------------------
+# 2. Périmètre et anti-périmètre strict
+# -----------------------------------------------------------------------------
+perimetre:
+
+  inclus:
+    - "Palette de couleurs constantes (marque, fonctionnelles, Pin/tracé palier 9 réifié, contour vérification)"
+    - "Typographies (3 fontes + 12 tokens d'échelle)"
+    - "Spacing en échelle (multiples de 4)"
+    - "Radius (5 niveaux)"
+    - "Ombres (3 niveaux)"
+    - "Opacités constantes du système"
+    - "Contrastes a11y CALCULÉS pour paires critiques (déclaration de ratios)"
+
+  exclus:
+    - "Valeurs dynamiques (palier 11)"
+    - "Couleurs catégories (palier 9 D1 invalide)"
+    - "Couleurs accent Époque (palier 9 D7 invalide)"
+    - "Icônes (palier 13)"
+    - "Microcopy (palier 8)"
+    - "Implémentation (Tailwind, CSS, Figma variables)"
+    - "Cibles tactiles, seuils a11y (palier 16)"
+
+  test_de_purete: |
+    Trois tests à passer fiche par fiche :
+
+    (1) STATIQUE VS DYNAMIQUE — la valeur posée dépend-elle d'un état
+        dynamique de l'app (slider, contexte parcours, déjà-visité,
+        mode offline, mode présentation) ? Si oui : palier 11. Si non :
+        palier 12.
+
+    (2) SOURCE-AGNOSTIQUE — si demain on bascule de Mapbox à MapLibre,
+        de Flutter à du natif, le token reste-t-il valide ? Hex et
+        spacing en pixels sont cross-plateforme — c'est OK.
+
+    (3) NE RÉINVENTE PAS LES DÉCISIONS PALIER 9 — chaque couleur Pin /
+        tracé / contour ici est-elle alignée avec les décisions D1, D3,
+        D5, D6, D7 du palier 9 ? Aucune couleur catégorie. Aucune
+        couleur accent Époque. Provenance par teinte chaude vs neutre.
+
+  frontiere_palier_11:
+    rappel_regle: >-
+      Toute valeur INDEXÉE PAR UN ÉTAT DYNAMIQUE → palier 11. Toute
+      valeur CONSTANTE → palier 12. Voir palier 11 00-index.yaml § 2
+      frontiere_palier_12 pour les exemples opérationnels.
+    cas_a_verifier_specifiquement_au_palier_12:
+      - "Couleur du tracé Parcours communautaire — CONSTANTE → palier 12 (la couleur ne dépend pas d'un état dynamique, juste de la provenance qui est une propriété stable du Parcours)"
+      - "Opacité du backdrop M6/M8 — CONSTANTE → palier 12"
+      - "Couleur du texte sur fond parchemin — CONSTANTE → palier 12"
+      - "Opacité d'un Pin hors-parcours — DYNAMIQUE (indexée par contexte_parcours) → palier 11 (déjà posée fichier 04 MAP-CONTEXTE-PARCOURS-VERS-PIN)"
+
+  anti_perimetre_par_palier_aval:
+
+    palier_8:
+      titre: "Contenu et microcopy"
+      pas_au_palier_12:
+        - "Texte exact entre guillemets"
+      ce_que_le_palier_12_dit:
+        - "Token typographique utilisé pour ce texte (ex. body-lg, ui-md)"
+
+    palier_9:
+      titre: "Cartographie"
+      respect_des_decisions:
+        - "D1 : aucune couleur catégorie (les 11 couleurs catégories archivées sont IGNORÉES)"
+        - "D3 : provenance Pin = teinte chaude affirmée (éditorial) + teinte neutre (communautaire) — RÉIFIÉ ici en hex"
+        - "D5 : contour de vérification distinctif (pointillé recommandé) — RÉIFIÉ ici en couleur + nature"
+        - "D6 : badge 'Officiel' à plume ABANDONNÉ — pas de couleur or pour ce badge"
+        - "D7 : pas de couleur accent par Époque dans l'UI (les 10 couleurs accent archivées sont IGNORÉES)"
+
+    palier_11:
+      titre: "Réponse paramétrique"
+      pas_au_palier_12:
+        - "Durées (DUR-X), courbes (CRV-Y), haptiques (HAP-Z) — fichier 11/01 et 11/02"
+        - "Mappings paramétriques (slider→axes, contexte→Pin, etc.) — fichier 11/04"
+        - "Modulations contextuelles (opacité Pin hors-parcours, halo étape courante) — fichier 11/04"
+
+    palier_13:
+      titre: "Icônes"
+      pas_au_palier_12:
+        - "Mapping Catégorie → icône concrète"
+        - "Style graphique des icônes (Lucide, monoline, etc.)"
+      ce_que_le_palier_12_dit:
+        - "Couleur de l'icône selon contexte (sur fond clair, sur fond sombre, en état actif/inactif)"
+
+    palier_15:
+      titre: "Construction Figma"
+      pas_au_palier_12:
+        - "Variables Figma, styles Figma, mappings tokens → variables"
+      relation: >-
+        Le palier 15 INSTANCIE les tokens du palier 12 en variables Figma
+        (couleurs, typographies, spacing). Le palier 12 fixe les valeurs ;
+        le palier 15 fixe les noms et les organisations Figma.
+
+    palier_16:
+      titre: "Validation"
+      pas_au_palier_12:
+        - "Seuils WCAG (AA = 4.5:1 normal, 3:1 large ; AAA = 7:1)"
+        - "Cibles tactiles chiffrées (≥ 44px)"
+        - "Tests proxy-personas effectifs"
+      relation: >-
+        Le palier 12 DÉCLARE les ratios de contraste pour les paires
+        critiques (ex. Pin éditorial sur fond Carte à l'Antiquité,
+        texte principal sur parchemin). Le palier 16 VALIDE que ces
+        ratios satisfont les seuils WCAG. Si une valeur du palier 12
+        ne passe pas, elle est ajustée ici.
+
+# -----------------------------------------------------------------------------
+# 3. Typologie 4 familles
+# -----------------------------------------------------------------------------
+typologie_des_familles:
+
+  - famille: COLOR
+    nom: "Couleurs"
+    description: >-
+      Tokens chromatiques constants. Chaque token a un id, une valeur
+      hex (ou rgba), une famille (marque / fonctionnelle / palier 9
+      réifié), et une déclaration de ratios de contraste pour les
+      paires critiques.
+    fichier: "01-couleurs.yaml"
+    sous_familles:
+      - "Marque (terracotta primaire, parchemin, encre brune…)"
+      - "Fonctionnelles (succès, erreur, info)"
+      - "Palier 9 réifié (Pin éditorial, Pin communautaire, contour vérification)"
+      - "Surfaces neutres (backdrop, séparateur — quand c'est une couleur, pas une opacité)"
+    exemples_attendus:
+      - "TOK-COLOR-PRIMARY (terracotta principal)"
+      - "TOK-COLOR-PIN-EDITORIAL"
+      - "TOK-COLOR-PIN-COMMUNAUTAIRE"
+      - "TOK-COLOR-CONTOUR-VERIFICATION"
+      - "TOK-COLOR-FONCTIONNEL-SUCCES / ERREUR / INFO"
+      - "TOK-COLOR-FOND-PRINCIPAL (parchemin)"
+      - "TOK-COLOR-TEXTE-PRINCIPAL (encre brune)"
+
+  - famille: TYPO
+    nom: "Typographies"
+    description: >-
+      Trois fontes latin (titre éditorial, corps narratif, interface) +
+      échelle de 12 tokens (display-xl à ui-xs) avec font / size /
+      weight / line-height. Note d'évolution sur les langues à police
+      non latine.
+    fichier: "02-typographies.yaml"
+    exemples_attendus:
+      - "TOK-TYPO-DISPLAY-XL / DISPLAY-LG / DISPLAY-MD / DISPLAY-SM"
+      - "TOK-TYPO-BODY-LG / BODY-MD / BODY-SM / BODY-EMPHASIS"
+      - "TOK-TYPO-UI-LG / UI-MD / UI-SM / UI-XS"
+
+  - famille: SPACE_FORM
+    nom: "Espace et forme"
+    description: >-
+      Échelle de spacing (multiples de 4 : 4 / 8 / 12 / 16 / 24 / 32 /
+      48), radius (5 niveaux : none / sm / md / lg / pill), ombres
+      (3 niveaux : sm / md / lg avec couleur encre brune et alpha).
+    fichier: "03-espace-et-forme.yaml"
+    exemples_attendus:
+      - "TOK-SPACE-XS (4) / SM (8) / MD (12) / LG (16) / XL (24) / XXL (32) / XXXL (48) — 7 tokens, multiples de 4"
+      - "TOK-RADIUS-NONE (0) / SM (4) / MD (8) / LG (12) / PILL (9999)"
+      - "TOK-SHADOW-SM / MD / LG"
+
+  - famille: OPACITY
+    nom: "Opacités constantes"
+    description: >-
+      Opacités constantes du système. Distinct des modulations
+      dynamiques palier 11 (Pin hors-parcours, déjà-visité, mode
+      offline) qui sont indexées par état dynamique.
+    fichier: "04-opacites-constantes.yaml"
+    exemples_attendus:
+      - "TOK-OPACITY-BACKDROP-M6 (overlay surfaces ponctuelles)"
+      - "TOK-OPACITY-BACKDROP-M8 (overlay dialogues bloquants — plus opaque)"
+      - "TOK-OPACITY-DESACTIVE (état disabled des composants)"
+      - "TOK-OPACITY-SEPARATEUR (filets de séparation)"
+
+# -----------------------------------------------------------------------------
+# 4. Découpage en 4 fichiers de contenu
+# -----------------------------------------------------------------------------
+fichiers:
+
+  - id: "01"
+    nom: "Couleurs"
+    fichier: "01-couleurs.yaml"
+    cible_volume_estime: "~350-450 lignes"
+    role: >-
+      Palette de marque + fonctionnelles + palier 9 réifié + surfaces
+      neutres. Déclaration des ratios de contraste pour les paires
+      critiques. Conformité daltonisme pour Pin éditorial vs
+      communautaire (palier 9 D3 attente : 'deux teintes choisies au
+      palier 12 doivent rester distinguables').
+    pilote: true
+    note: "PILOTE — calibre le format chiffré qualifié et la déclaration des contrastes."
+
+  - id: "02"
+    nom: "Typographies"
+    fichier: "02-typographies.yaml"
+    cible_volume_estime: "~250-350 lignes"
+    role: >-
+      Trois fontes latin + 12 tokens d'échelle. Note d'évolution sur
+      les langues à police non latine (alternative à trouver si
+      traduction future requiert un autre script).
+
+  - id: "03"
+    nom: "Espace et forme"
+    fichier: "03-espace-et-forme.yaml"
+    cible_volume_estime: "~150-250 lignes"
+    role: "Spacing échelle 4-48, radius 5 niveaux, ombres 3 niveaux."
+
+  - id: "04"
+    nom: "Opacités constantes"
+    fichier: "04-opacites-constantes.yaml"
+    cible_volume_estime: "~100-150 lignes"
+    role: >-
+      Opacités constantes du système. Frontière nette avec palier 11
+      (modulations dynamiques) explicitée par renvoi.
+
+fichiers_total_estime: "~850-1200 lignes pour le palier 12 — plus court que palier 11 (3231 l) et palier 9 (1240 l). Justifié par la nature 'valeurs + nomenclature' du palier."
+
+# -----------------------------------------------------------------------------
+# 5. Format des fiches — adapté à la famille du token
+# -----------------------------------------------------------------------------
+format_des_fiches:
+
+  charpente_d_esprit_commune:
+    - "id (préfixé selon famille : TOK-COLOR-X, TOK-TYPO-X, TOK-SPACE-X, TOK-RADIUS-X, TOK-SHADOW-X, TOK-OPACITY-X)"
+    - "nom (court, qualifié)"
+    - "description fonctionnelle (à quoi ça sert)"
+    - "valeur (chiffrée précise — hex / px / multiplicateur / cubic-bezier non — c'est palier 11)"
+    - "usages (composants/états/écrans qui la consomment, références palier 10 par id)"
+    - "notes a11y / contraste si pertinent"
+
+  format_COLOR:
+    structure: |
+      - id: TOK-COLOR-PIN-EDITORIAL
+        nom: "Couleur Pin éditorial"
+        description: "Teinte chaude affirmée signalant la provenance éditoriale (palier 9 D3)"
+        hex: "#B85220"
+        rgba_alternative: "rgba(184, 82, 32, 1)"
+        famille: palier_9_reifie
+        usages:
+          - "comp-pin (palier 10 fonctionnels:49) variant provenance=editorial"
+          - "comp-trace-parcours (palier 10 fonctionnels) variant provenance=editorial"
+        contrastes_declares:
+          sur_fond_principal_TOK-COLOR-FOND-PRINCIPAL: 4.8   # ratio calculé
+          sur_fond_carte_aujourd_hui:                  4.6   # estimé sur fond moderne neutre
+          sur_fond_carte_antiquite_indicatif:          3.9   # palier 16 valide après calibrage palier 15
+        questions_ouvertes: []
+        # Notes : si un ratio < 4.5 (seuil WCAG AA texte normal) ou < 3.0
+        # (large), à reconsidérer. Le palier 12 DÉCLARE, le palier 16 VALIDE.
+
+  format_TYPO:
+    structure: |
+      - id: TOK-TYPO-DISPLAY-LG
+        nom: "Display large (titre éditorial)"
+        font: "Playfair Display"
+        size_px: 26
+        weight: 700
+        line_height_relatif: 1.25
+        description: "Titre principal d'écran narratif (Pin hero, fiche Parcours)"
+        usages:
+          - "comp-image-hero slot titre (palier 10 atomes)"
+          - "Première ligne d'un M3 consultation approfondie"
+        questions_ouvertes: []
+
+  format_SPACE_FORM:
+    structure: |
+      - id: TOK-SPACE-MD
+        nom: "Spacing moyen"
+        valeur_px: 16
+        description: "Spacing par défaut entre éléments d'une carte ou d'un item de liste"
+        usages_typiques:
+          - "Padding interne d'une card"
+          - "Gap entre titre et description dans un item"
+
+  format_OPACITY:
+    structure: |
+      - id: TOK-OPACITY-BACKDROP-M6
+        nom: "Opacité backdrop surface ponctuelle M6"
+        valeur: 0.4
+        description: "Backdrop léger qui assombrit la surface principale derrière un M6 sans la masquer"
+        usages:
+          - "comp-surface-ponctuelle-recherche (palier 10 shell)"
+          - "comp-surface-ponctuelle-filtres-couches"
+          - "comp-surface-ponctuelle-saut-etape"
+        # PAS d'opacité indexée par état dynamique ici — voir palier 11 fichier 04
+
+  vocabulaire_chiffre_admis:
+    - "hex (#RRGGBB), rgba(r, g, b, a)"
+    - "px (sizes typographiques, spacing, radius)"
+    - "multiplicateur (line-height relatif, par ex. 1.65)"
+    - "weight typographique (entier 100-900, ex. 400 / 500 / 600 / 700)"
+    - "alpha 0.0–1.0 (opacités)"
+    - "ratio de contraste (X:1 ou X.X — décimaux)"
+
+  vocabulaire_a_eviter:
+    - "Noms de classes Tailwind / Bootstrap / Material"
+    - "Noms de variables Figma (var(--...) ou {colors.primary.500})"
+    - "rem / em (relatifs au html — relèvent de l'implémentation)"
+    - "Durées (ms), courbes (cubic-bezier) — palier 11"
+    - "Mention d'animations ou transitions — palier 11"
+    - "Noms d'icônes concrètes — palier 13"
+
+# -----------------------------------------------------------------------------
+# 6. Articulation avec les paliers en aval
+# -----------------------------------------------------------------------------
+articulation_paliers_aval:
+
+  - palier: 13
+    nom: icones
+    transmission: >-
+      Le palier 13 fixe le mapping Catégorie → icône concrète et le
+      style graphique. Il consomme du palier 12 les couleurs d'icône
+      (sur fond clair, sur fond sombre, état actif/inactif).
+
+  - palier: 14
+    nom: surfaces_hors_app
+    transmission: >-
+      Page web, QR code, story partageable consomment les tokens du
+      palier 12 pour leur rendu (typographie, palette de marque).
+
+  - palier: 15
+    nom: construction_figma
+    transmission: >-
+      Le palier 15 instancie les tokens en variables Figma. Le palier
+      12 ne nomme PAS les variables Figma — c'est l'intégrateur qui
+      mappe (ex. TOK-COLOR-PRIMARY → variable Figma 'colors/brand/primary').
+      Le palier 15 calibre aussi les 50 valeurs aux ancres Époque
+      (palier 11 fichier 04 MAP-SLIDER-VERS-AXES-CARTE) — distinctes
+      des tokens statiques palier 12.
+
+  - palier: 16
+    nom: validation
+    transmission: >-
+      Le palier 16 VALIDE les ratios de contraste déclarés au palier 12
+      contre les seuils WCAG (AA pour l'instant minimum, AAA souhaité pour
+      texte principal). Validation aussi sur daltonisme (palier 9 D3
+      a posé l'exigence : Pin éditorial vs communautaire restent
+      distinguables). Tests proxy-personas (Mme Martin projection
+      classe : contrastes vus depuis le fond de la salle).
+
+# -----------------------------------------------------------------------------
+# 7. Conventions de référencement
+# -----------------------------------------------------------------------------
+conventions:
+  couleurs: "TOK-COLOR-X (TOK-COLOR-PRIMARY, TOK-COLOR-PIN-EDITORIAL, etc.)"
+  typographies: "TOK-TYPO-X (TOK-TYPO-DISPLAY-LG, TOK-TYPO-BODY-MD, etc.)"
+  spacing: "TOK-SPACE-X (TOK-SPACE-XS à TOK-SPACE-XXL)"
+  radius: "TOK-RADIUS-X (TOK-RADIUS-NONE / SM / MD / LG / PILL)"
+  ombres: "TOK-SHADOW-X (TOK-SHADOW-SM / MD / LG)"
+  opacites: "TOK-OPACITY-X (TOK-OPACITY-BACKDROP-M6, TOK-OPACITY-DESACTIVE, etc.)"
+  composants_palier_10: "Référence par id (comp-XXX) + ligne du composant (ex. palier 10 fonctionnels:49)"
+  modes_palier_5: "M2, S1, P1 sans préfixe (cohérent palier 11 conventions)"
+  decisions_palier_9: "D1, D3, D5, D6, D7 sans préfixe (contexte palier 12 sur cartographie évident)"
+
+# -----------------------------------------------------------------------------
+# 8. Persona check global
+# -----------------------------------------------------------------------------
+persona_check_global:
+
+  kenji:
+    impact: ÉLEVÉ
+    note: >-
+      Kenji symbolise les utilisateurs étrangers de l'app. Le palier 12
+      doit acter une note d'évolution dans 02-typographies : si l'app
+      est traduite dans une langue à police non latine (japonais,
+      chinois, coréen, arabe, hébreu, thaï, etc.), une alternative
+      typographique sera trouvée. PAS dans le scope — palier 8
+      06-i18n a déjà tranché stratégie 3 langues fr/en/ja avec UI
+      traduite et contenu en français. La fonte latine actuelle
+      (Inter notamment) reste affichée pour la microcopy traduite ;
+      les caractères japonais éventuels seront rendus par fallback
+      système OS (Apple Hiragino, Android Noto Sans CJK natif) sans
+      que le palier 12 ait à les imposer.
+
+  mme_dupont:
+    impact: moyen
+    note: >-
+      Création de Parcours sur smartphone moyen — les contrastes
+      texte/fond doivent rester confortables en plein soleil
+      (extérieur). À VALIDER palier 16.
+
+  mme_martin:
+    impact: MAJEUR
+    note: >-
+      Test_litmus 'projection en classe, lecture depuis le fond' :
+      les contrastes texte/fond et Pin/Carte doivent rester
+      perceptibles à distance. Le palier 12 vise WCAG AA minimum
+      sur les paires critiques (déclaré ici, validé palier 16). En
+      mode présentation M4, les chromes disparaissent — donc les
+      contrastes du contenu narratif principal (TOK-TYPO-BODY-LG sur
+      fond image hero ou parchemin) sont les plus sollicités.
+
+  pere_lyonnais:
+    impact: moyen
+    note: >-
+      Flânerie en extérieur — luminosité variable. Mêmes contraintes
+      que Mme Dupont. La palette terracotta/parchemin évoque pour
+      lui Lyon (cohérent essence § triptyque historicité).
+
+  anais_back_office:
+    impact: ÉLEVÉ
+    note: >-
+      Le back-office desktop consomme l'ensemble des tokens du palier
+      12. Tableaux de modération, formulaires de saisie Pin admin,
+      catalogues — tous utilisent la palette marque + typo + spacing.
+      Drapeau rouge persona 'pas de prévisualisation' reste un sujet
+      du palier 13 admin, pas du palier 12.
+
+# -----------------------------------------------------------------------------
+# 9. Décisions structurelles prises
+# -----------------------------------------------------------------------------
+decisions_structurelles_prises:
+
+  - id: D1
+    decision: "Découpage en 4 fichiers (couleurs, typographies, espace-et-forme, opacités constantes)"
+    pourquoi: "4 familles de tokens distinctes, chacune avec son format de fiche."
+
+  - id: D2
+    decision: "Méthode allégée façon palier 5/9/11 — pas de production parallèle"
+    pourquoi: "Système interconnecté (les couleurs Pin doivent passer le contraste a11y, qui dépend du fond Carte palier 11). Rédaction séquentielle 01→02→03→04."
+
+  - id: D3
+    decision: "Couleurs catégories ABANDONNÉES (palier 9 D1)"
+    pourquoi: >-
+      Le palier 9 D1 a tranché : catégories signalées par icône
+      seule (auto-suffisant pour daltonisme), pas par couleur. Les
+      11 couleurs catégories de la charte DA archivée sont
+      IGNORÉES actuellement.
+
+  - id: D4
+    decision: "Couleurs accent par Époque ABANDONNÉES (palier 9 D7)"
+    pourquoi: >-
+      Le palier 9 D7 a tranché : pas de couleur accent par Époque
+      dans l'UI. L'Époque se lit via le slider + le filtre
+      paramétrique du fond carte (palier 11 04 MAP-SLIDER-VERS-AXES-CARTE).
+      Les 10 couleurs accent par Époque de la charte DA archivée
+      sont IGNORÉES actuellement.
+
+  - id: D5
+    decision: "Provenance Pin/tracé encodée par DEUX teintes : chaude (éditorial) + neutre (communautaire) — palier 9 D3 réifié"
+    pourquoi: >-
+      Cohérent avec la décision palier 9 D3. Les deux teintes
+      doivent rester distinguables même en daltonisme — vérification
+      au palier 16. Valeurs hex précises dans 01-couleurs.yaml.
+
+  - id: D6
+    decision: "Contour de vérification = pointillé en couleur encre brune secondaire (palier 9 D5 réifié, suggestion non normative palier 9 retenue)"
+    pourquoi: >-
+      Cohérent avec la décision palier 9 D5. Pointillé = convention
+      culturelle 'provisoire / en cours'. Couleur en cohérence avec
+      la palette texte (encre brune secondaire) plutôt qu'une teinte
+      tierce.
+
+  - id: D7
+    decision: "Fond chip catégorie = fond neutre uniforme (pas de fond couleur catégorie 12%)"
+    pourquoi: >-
+      Cohérent avec D3 (palier 9 D1). Les chips catégorie distinguent
+      par icône + libellé, pas par fond coloré. La proposition
+      'fond couleur catégorie 12% sur parchemin' de la charte DA
+      archivée est IGNORÉE.
+
+  - id: D8
+    decision: "Pas de fonte spécifique par langue. Fontes latin (Playfair / Lora / Inter) actuellement."
+    pourquoi: >-
+      Décision utilisateur 2026-05-07. Kenji symbolise les utilisateurs
+      étrangers — pas une exigence d'imposer une fonte japonaise.
+      Le palier 8 06-i18n a tranché stratégie 3 langues fr/en/ja avec
+      UI traduite + contenu en français. Les caractères japonais
+      éventuels (microcopy UI traduite) sont rendus par fallback
+      système OS sans imposition du palier 12. Note d'évolution
+      tracée dans 02-typographies : si traduction future dans
+      langue à police non latine, alternative à trouver.
+
+  - id: D9
+    decision: "Échelle de spacing en MULTIPLES DE 4 (4 / 8 / 12 / 16 / 24 / 32 / 48)"
+    pourquoi: >-
+      Convention UX standard (Material Design, 4dp grid ; Apple HIG,
+      8pt grid). Multiples de 4 garantissent l'alignement pixel-perfect
+      sur tous les devices et la cohérence visuelle entre composants.
+
+  - id: D10
+    decision: "Anticipation d'éclatement palier 12 LEVÉE (recadrage 2026-05-07)"
+    pourquoi: >-
+      L'anticipation 2026-05-06 (tokens primitifs vs mappings paramétriques)
+      est devenue obsolète après le repositionnement du palier 11
+      qui a absorbé la part 'mappings paramétriques'. Le palier 12
+      est désormais un palier classique de tokens visuels statiques.
+
+  - id: D11
+    decision: "Contrastes a11y DÉCLARÉS dans 01-couleurs (ratios calculés pour paires critiques) ; le palier 16 VALIDE contre les seuils WCAG"
+    pourquoi: >-
+      Sépare la responsabilité : le palier 12 pose les valeurs et
+      mesure les ratios. Le palier 16 fixe les seuils acceptables
+      (AA / AAA) et valide. Si un ratio insuffisant : ajustement
+      au palier 12, pas réécriture du palier 16.

@@ -1,0 +1,91 @@
+# =============================================================================
+# E-ADMIN-MODERATION-COMMUNAUTAIRE — File de modération des Commentaires et Retours
+# =============================================================================
+# File de modération unifiée pour les Commentaires (sur Pin) et les Retours de
+# parcours (sur Parcours communautaire) en état en_attente. 3 types de décision :
+# publié, refusé (avec motif), masqué (déjà publié + signalement honoré). Crée
+# une Trace de modération immuable (cluster 04). Couvre le flow H3.
+# =============================================================================
+
+document:
+  type: palier_ecrans_fiche
+  format: yaml
+
+ecran:
+  id: E-ADMIN-MODERATION-COMMUNAUTAIRE
+  nom: "File de modération des Commentaires et Retours"
+
+  mode: "back-office"
+  surface_parente: "back-office"
+
+  raison_d_etre: >-
+    Donner au modérateur (Anaïs au démarrage, rôle dédié plus tard) une file
+    unifiée pour traiter les contributions communautaires hors soumissions :
+    Commentaires sur les Pins et Retours sur les Parcours communautaires. La
+    décision est tracée dans une Trace de modération immuable (cluster 04),
+    et l'auteur est notifié sans humiliation pour les refus (D9.1).
+
+  composition:
+    - zone: "file unifiée"
+      role: "liste des Commentaires et Retours en en_attente ; tri par ancienneté par défaut ; priorisation des contributions ayant fait l'objet d'un signalement (D10.5)"
+      entites_affichees: [Commentaire, "Retour de parcours"]
+
+    - zone: "filtres"
+      role: "filtre par type (Commentaire / Retour), par état de signalement, par auteur (pseudonyme), par Pin ou Parcours cible"
+
+    - zone: "contexte de la cible"
+      role: "pour un Commentaire : affiche le Pin cible et son contenu_narratif ; pour un Retour : affiche le Parcours communautaire cible, son auteur, ses étapes synthétiques"
+      entites_affichees: [Pin, Parcours, Commentaire, "Retour de parcours"]
+
+    - zone: "contenu de la contribution"
+      role: "texte du Commentaire ou du Retour (avec évaluation pour Retour), pseudonyme de l'auteur (jamais identité civile, I1), horodatages"
+      entites_affichees: [Commentaire, "Retour de parcours", Compte]
+
+    - zone: "Signalements éventuels sur la cible"
+      role: "si la cible (publié, candidate au masquage) a fait l'objet d'un Signalement, le motif et la précision_libre du signaleur sont visibles ; l'identité du signaleur reste strictement non exposée (I5)"
+      entites_affichees: [Signalement]
+
+    - zone: "audit — Traces antérieures"
+      role: "historique des Traces de modération précédentes sur cette cible (ex. publié puis masqué après signalement honoré) ; immutabilité préservée"
+      entites_affichees: ["Trace de modération"]
+
+    - zone: "panneau de décision"
+      role: "publié / refusé (motif obligatoire) pour cible en en_attente ; masqué / démasqué pour cible déjà publié ; réponses-types disponibles pour les cas récurrents (D10.5)"
+
+  etats:
+    nominal_charge: "File chargée, contributions consultables, panneau de décision actif"
+    file_vide: "Aucune contribution en attente — message gracieux"
+    contribution_en_examen: "Une contribution est ouverte dans le panneau de modération, pas encore tranchée"
+    decision_prise_publie: "Décision publié enregistrée, Trace immuable créée, contribution devient visible publiquement"
+    decision_prise_refuse: "Décision refusé enregistrée avec motif obligatoire, Trace immuable créée, auteur notifié sans humiliation (D9.1)"
+    decision_prise_masque: "Décision masqué sur cible déjà publiée (signalement honoré ou décision éditoriale), Trace immuable créée, contribution n'est plus visible publiquement mais reste tracée"
+    decision_prise_demasque: "Décision démasqué (correction, levée), Trace immuable créée, contribution redevient visible"
+    cible_pin_retire_entretemps: "La cible est un Commentaire dont le Pin a été retiré entre-temps (cf. H6) — le modérateur peut publier ou refuser ; les deux sont valides (cf. H3 cas particulier)"
+    cible_auteur_supprime: "L'auteur de la contribution a supprimé son Compte entre-temps — la contribution reste à modérer, pseudonyme conservé pour audit (cf. cluster 04 + 03)"
+    contribution_priorisee_par_signalement: "Cible en tête de file car signalée massivement"
+    chargement: "File en cours de chargement"
+    erreur_chargement: "Impossible de charger la file ; nouvelle tentative possible"
+    permission_insuffisante: "L'utilisateur n'a pas le rôle modérateur — accès refusé ou en lecture seule"
+
+  elements_interactifs:
+    - "Application et combinaison de filtres"
+    - "Sélection d'une contribution dans la file"
+    - "Lecture du contexte (Pin / Parcours cible)"
+    - "Consultation des Signalements et Traces antérieures"
+    - "Saisie du motif de décision (obligatoire pour refusé / masqué)"
+    - "Application d'une réponse-type pour cas récurrent"
+    - "Tranchage de la décision (publié / refusé / masqué / démasqué) → création de la Trace de modération immuable et transition de statut de la cible"
+    - "Navigation vers la contribution suivante dans la file"
+
+  flows_actifs:
+    - H3
+
+  surfaces_imbriquees:
+    - E-ADMIN-ACCUEIL  # retour
+    # Pas d'imbrication avec les écrans grand public ; le modérateur consulte le Pin / Parcours cible en contexte mais sans naviguer dans l'app utilisateur
+
+  questions_ouvertes:
+    - "Mode de modération a priori vs a posteriori (D10.5) : impacte la visibilité de l'état en_attente ; le présent écran supporte les deux mais la priorisation diffère — palier 13"
+    - "Réouverture d'une cible refusée (refusé → en_attente sur correction de l'auteur) : non modélisée ici (cf. H3 question ouverte) — à arbitrer en cluster 04 + palier 13"
+    - "Édition substantielle d'une cible publiée redéclenchant un cycle de modération : politique D10.5 (cluster 04 question ouverte)"
+    - "Délai-cible de traitement (objectif d'opérabilité 'quelques minutes par jour' D10.5) — palier 16"

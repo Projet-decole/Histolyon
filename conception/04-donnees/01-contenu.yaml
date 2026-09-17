@@ -1,0 +1,562 @@
+# =============================================================================
+# Palier 4 — Cluster 01 — Contenu
+# =============================================================================
+# Cluster pilote du palier 4. Contient le Pin (cœur métier de l'app) et
+# toutes les entités support qui le qualifient : Catégorie et Époque
+# (catalogues ouverts), Source (documentation historique obligatoire),
+# Média (images, archives, audios, etc.), Badge (marques distinctives),
+# et les contenus secondaires (Modèle 3D, Fragment musical, Couche
+# cartographique).
+#
+# Sert d'exemple canonique de format pour les autres clusters  .
+# =============================================================================
+
+document:
+    type: palier_donnees_cluster
+    cluster_id: C1
+    nom: "Contenu"
+    format: yaml
+
+raison_d_etre_du_cluster: >-
+    Sans Pin, l'app n'a rien à raconter. Sans Sources, le récit n'est
+    pas crédible (principe d'historicité). Sans Catégorie ni Époque, on
+    ne peut ni filtrer ni naviguer dans le temps. Sans Média, le récit
+    est plat. Ce cluster pose les briques que toutes les autres entités
+    référencent.
+
+# -----------------------------------------------------------------------------
+# Entités
+# -----------------------------------------------------------------------------
+entites:
+    # ---------------------------------------------------------------------------
+    - id: pin
+      nom: "Pin"
+
+      raison_d_etre: >-
+          Unité atomique de contenu géolocalisé. Un Pin porte un titre,
+          un récit, des sources, des médias, et marque (en général) un
+          lieu sur la carte. C'est par les Pins que l'app raconte au
+          passage de l'utilisateur.
+
+      attributs:
+          obligatoires:
+              - nom: identifiant
+                nature: "identifiant lisible et stable"
+                note: "lisibilité utile pour les Liens universels (cluster 06)"
+
+              - nom: titre
+                nature: "texte court"
+                contrainte: "non vide"
+
+              - nom: provenance
+                nature: "valeur parmi un ensemble"
+                valeurs: [éditorial, communautaire]
+                note: "promotion communautaire → éditorial possible (cf. I10)"
+
+              - nom: catégorie
+                nature: "référence à Catégorie"
+                contrainte: "exactement 1"
+
+              - nom: époques
+                nature: "ensemble de références à Époque"
+                contrainte: "≥ 1 (multi-époques admis, cf. I8)"
+
+              - nom: contenu_narratif
+                nature: "texte structuré (teaser + narration + post-narratif)"
+                note: "structure interne détaillée en palier 8 contenu"
+
+              - nom: sources
+                nature: "ensemble de références à Source"
+                contrainte: "≥ 1 pour atteindre l'état validé (cf. I4)"
+
+              - nom: statut
+                nature: "valeur parmi un ensemble (cycle de vie)"
+                valeurs: "voir cycle_de_vie ci-dessous"
+
+          optionnels:
+              - nom: localisation
+                nature: "coordonnées géographiques"
+                note: "absence légitime pour patrimoine vivant immatériel (cf. I9)"
+
+              - nom: médias
+                nature: "ensemble de références à Média"
+
+              - nom: pins_liés
+                nature: "ensemble de références à Pin"
+                note: "renvois éditoriaux entre pins thématiquement proches"
+
+              - nom: badge
+                nature: "référence à Badge"
+
+              - nom: modèles_3d
+                nature: "ensemble de références à Modèle 3D"
+
+              - nom: fragments_musicaux
+                nature: "ensemble de références à Fragment musical"
+                note: "musique d'époque tissée dans la narration audio (D7.3)"
+
+              - nom: auteur_communautaire
+                nature: "référence à Compte (pseudonyme)"
+                note: "présent si provenance = communautaire ; reste tracé en crédit après promotion éditoriale (cf. I10)"
+
+      relations:
+          - "appartient à exactement 1 Catégorie"
+          - "associé à ≥ 1 Époques (n-n)"
+          - "contient 0..n Médias (un Média appartient à exactement 1 Pin)"
+          - "référence ≥ 1 Sources à validation (n-n, une Source peut être citée par plusieurs Pins)"
+          - "peut référencer 0..n autres Pins (pins_liés, n-n)"
+          - "peut être référencé par 0..n Étapes de Parcours (cluster 02)"
+          - "peut recevoir 0..n Commentaires (cluster 04)"
+          - "peut être favorisé par 0..n Profils (cluster 03)"
+          - "peut être cible de 0..n Signalements (cluster 04)"
+
+      cycle_de_vie:
+          etats: [brouillon, en_revue, validé, publié, retiré]
+          transitions:
+              - "brouillon → en_revue (auteur soumet pour validation)"
+              - "en_revue → brouillon (validateur demande complément)"
+              - "en_revue → validé (validateur approuve les sources)"
+              - "validé → publié (mise en ligne)"
+              - "publié → retiré (signalement honoré ou décision éditoriale)"
+              - "retiré → publié (réouverture après correction)"
+          visibilite_selon_provenance:
+              editorial: >-
+                  Visibilité publique à partir de l'état publié uniquement.
+                  Les états brouillon, en_revue, validé restent côté équipe
+                  de production.
+              communautaire: >-
+                  Visibilité publique dès l'état en_revue, AVEC une marque
+                  distinctive indiquant que les sources sont en cours de
+                  vérification (cf. I3). Bascule en validé quand la
+                  modération a confirmé. La marque distinctive est retirée
+                  à publié.
+
+      invariants:
+          - "Un Pin atteignant validé a au moins une Source (instanciation locale de I4)"
+          - "Un Pin sans localisation existe mais ne s'affiche pas sur la Carte (instanciation locale de I9)"
+          - "Un Pin de provenance communautaire a un auteur_communautaire renseigné ; un Pin éditorial n'en a pas"
+          - "Lors d'une promotion communautaire → éditorial, l'attribut auteur_communautaire est CONSERVÉ pour traçage du crédit (cf. I10)"
+
+      invariants_transversaux_referenced: [I1, I2, I3, I4, I8, I9, I10]
+
+      questions_ouvertes:
+          - "Modification de la Catégorie après publication : autorisée avec audit, ou interdite (retrait + nouveau Pin) ?"
+          - "Cycle de vie 'retiré' : conservation des Sources et Médias, ou archivage profond ?"
+          - "Workflow exact de promotion communautaire → éditorial (qui décide, dans quel outil) — relève du palier 13 admin"
+          - "Pins sans localisation : strictement réservé au patrimoine vivant immatériel, ou ouvert à d'autres cas ?"
+
+    # ---------------------------------------------------------------------------
+    - id: categorie
+      nom: "Catégorie"
+
+      raison_d_etre: >-
+          Classe les Pins selon leur nature thématique (anecdote, lieu
+          disparu, patrimoine vivant, etc.) pour permettre filtrage,
+          navigation et différenciation visuelle sur la carte. Catalogue
+          ouvert : l'équipe éditoriale peut ajouter de nouvelles
+          Catégories à mesure que le contenu mûrit.
+
+      attributs:
+          obligatoires:
+              - nom: identifiant
+                nature: "identifiant lisible et stable (slug, ex. anecdote, lieu-disparu)"
+
+              - nom: libellé
+                nature: "texte court"
+                contrainte: "non vide"
+
+              - nom: ordre
+                nature: "compteur"
+                note: "détermine l'ordre d'affichage dans les filtres et menus de saisie"
+
+          optionnels:
+              - nom: description
+                nature: "texte court"
+                note: "explicite le sens de la catégorie pour Anaïs et le jury"
+
+      relations:
+          - "référencée par 0..n Pins (relation inverse de pin.catégorie)"
+
+      invariants:
+          - "Un identifiant de Catégorie est unique et stable (jamais réattribué après suppression — qui n'arrive pas, cf. I7)"
+
+      invariants_transversaux_referenced: [I7]
+
+      questions_ouvertes:
+          - "Liste initiale des catégories à fixer avec la lead/historienne (le brief produit en suggère 11 — à valider et possiblement enrichir)"
+
+    # ---------------------------------------------------------------------------
+    - id: epoque
+      nom: "Époque"
+
+      raison_d_etre: >-
+          Position un Pin (ou un Parcours, ou un Modèle 3D, ou un Fragment
+          musical) dans le temps long de Lyon, et alimente le slider
+          d'époque qui est le mécanisme central de navigation temporelle.
+          Catalogue ouvert : l'équipe peut ajouter de nouvelles Époques
+          si une période manque ou doit être affinée.
+
+      attributs:
+          obligatoires:
+              - nom: identifiant
+                nature: "identifiant lisible et stable (slug, ex. moyen-age, xixe-siecle)"
+
+              - nom: libellé
+                nature: "texte court"
+                note: "le palier 8 décide les libellés finaux affichés"
+
+              - nom: borne_début
+                nature: "année ou expression de période"
+
+              - nom: borne_fin
+                nature: "année ou expression de période"
+
+              - nom: ordre
+                nature: "compteur"
+                note: "ordre chronologique sur le slider"
+
+      relations:
+          - "référencée par 0..n Pins (n-n via pin.époques)"
+          - "référencée par 0..n Parcours (n-n, cluster 02)"
+          - "référencée par 0..n Modèles 3D (un Modèle 3D appartient à exactement 1 Époque)"
+          - "référencée par 0..n Fragments musicaux (un Fragment musical appartient à exactement 1 Époque)"
+
+      invariants:
+          - "Bornes cohérentes : borne_début ≤ borne_fin"
+          - "Recouvrements admis entre Époques (un même Pin peut tomber dans plusieurs Époques par ses dates ; sa rattache reste explicite via pin.époques)"
+
+      invariants_transversaux_referenced: [I7, I8]
+
+      questions_ouvertes:
+          - "Liste initiale des époques (~10 dans le brief D1.2) et leurs bornes exactes — à valider avec la lead/historienne"
+          - "Granularité du libellé (siècle, période nommée, plage d'années) — sera fixée par le palier 8"
+
+    # ---------------------------------------------------------------------------
+    - id: source
+      nom: "Source"
+
+      raison_d_etre: >-
+          Documente factuellement chaque affirmation des Pins et des
+          Modèles 3D. Sans Source, pas de validation possible (cf. I4) —
+          c'est l'engagement central d'historicité qui se matérialise ici.
+
+      attributs:
+          obligatoires:
+              - nom: identifiant
+                nature: "identifiant lisible et stable"
+
+              - nom: type
+                nature: "valeur parmi un ensemble"
+                valeurs:
+                    [livre, archive, article, entretien, photo, page_web, autre]
+
+              - nom: référence
+                nature: "texte structuré dépendant du type"
+                note: "pour livre = ISBN ou citation bibliographique ; pour archive = cote ; pour entretien = nom et date ; etc."
+
+              - nom: crédit
+                nature: "texte court"
+                note: "organisme ou personne à qui revient la propriété intellectuelle"
+
+          optionnels:
+              - nom: lien
+                nature: "URL ou identifiant externe"
+                note: "présent si la source est consultable en ligne"
+
+              - nom: description
+                nature: "texte court"
+                note: "contexte, justification du choix de cette source"
+
+      relations:
+          - "référencée par 1..n Pins (n-n — une Source peut être citée par plusieurs Pins)"
+          - "référencée par 0..n Modèles 3D (n-n — la fidélité d'une reconstitution est documentée)"
+
+      invariants:
+          - "Une Source citée par un Pin publié ne peut pas être supprimée (orphelinage interdit)"
+          - "Crédit obligatoire (engagement de respect des droits d'auteur)"
+
+      invariants_transversaux_referenced: [I4]
+
+      questions_ouvertes:
+          - "Format précis de référence par type — relève des templates de saisie (palier 13)"
+          - "Workflow d'ajout d'une Source par un contributeur communautaire (validable comme un Pin, ou doit s'appuyer uniquement sur des Sources éditoriales préexistantes ?) — à arbitrer"
+
+    # ---------------------------------------------------------------------------
+    - id: media
+      nom: "Média"
+
+      raison_d_etre: >-
+          Donne de la matière sensorielle aux Pins : images d'archives,
+          photos contemporaines, narration audio, ambiances sonores,
+          éléments interactifs (puzzle, énigme). Sans média, le récit
+          reste textuel — avec, il devient incarné.
+
+      attributs:
+          obligatoires:
+              - nom: identifiant
+                nature: "identifiant lisible et stable"
+
+              - nom: type
+                nature: "valeur parmi un ensemble"
+                valeurs:
+                    - image
+                    - archive_colorisée
+                    - archive_brute
+                    - audio_narration
+                    - audio_ambiance
+                    - élément_interactif
+                note: "élément_interactif regroupe puzzle, énigme, avant/après, frise mini, citation historique, 'le saviez-vous' — la sous-typologie sera fixée par le palier 8 contenu si besoin"
+
+              - nom: crédit
+                nature: "texte court"
+                note: "organisme ou personne — engagement de respect des droits d'auteur"
+
+          optionnels:
+              - nom: légende
+                nature: "texte court"
+
+              - nom: description
+                nature: "texte court"
+                note: "contexte historique, date de la pièce, etc."
+
+      relations:
+          - "appartient à exactement 1 Pin (cf. arbitrage H — n-1)"
+
+      invariants:
+          - "Crédit obligatoire (droits d'auteur)"
+          - "Un Média ne peut pas exister hors d'un Pin parent (suppression du Pin → suppression des Médias rattachés, sauf retiré qui conserve)"
+
+      questions_ouvertes:
+          - "Réutilisation cross-pin : si un même cliché illustre deux Pins, faut-il deux Médias distincts ou autoriser le partage (n-n) ? — pour l'instant n-1, à reconsidérer si cas concrets émergent"
+          - "Sous-typologie des éléments interactifs (puzzle, énigme, etc.) : entité dédiée par sous-type, ou attribut de Média ? — à arbitrer en palier 8"
+
+    # ---------------------------------------------------------------------------
+    - id: badge
+      nom: "Badge"
+
+      raison_d_etre: >-
+          Signale visuellement qu'un Pin ou un Parcours a un statut
+          particulier (officiel, en avant-première, partenaire
+          institutionnel, etc.). Catalogue contrôlé par l'équipe :
+          pas de saisie libre, ni par Anaïs, ni par les contributeurs
+          communautaires.
+
+      attributs:
+          obligatoires:
+              - nom: identifiant
+                nature: "identifiant lisible et stable (slug, ex. officiel, avant-premiere)"
+
+              - nom: libellé
+                nature: "texte court"
+
+              - nom: description
+                nature: "texte court"
+                note: "explique les critères d'attribution (qui peut le donner, à quel objet, dans quel contexte)"
+
+      relations:
+          - "attaché à 0..n Pins"
+          - "attaché à 0..n Parcours (cluster 02)"
+
+      invariants:
+          - "Catalogue fermé (créable uniquement par décision éditoriale)"
+          - "Un Pin ou Parcours porte au plus 1 Badge (à arbitrer si plusieurs deviennent utiles)"
+
+      questions_ouvertes:
+          - "Liste initiale des badges à fixer (le brief mentionne notamment 'officiel' et 'en avant-première')"
+          - "Multi-badge sur un même objet : utile ou source de confusion ? — à arbitrer"
+
+    # ---------------------------------------------------------------------------
+    - id: modele_3d
+      nom: "Modèle 3D"
+
+      raison_d_etre: >-
+          Reconstitution historique d'un bâtiment, d'un monument ou d'un
+          objet, consultable en immersif et superposable en réalité
+          augmentée à l'emplacement réel. Au moins un Modèle 3D livré
+          sur la durée du projet (D8 priorité 'si le temps').
+
+      attributs:
+          obligatoires:
+              - nom: identifiant
+                nature: "identifiant lisible et stable"
+
+              - nom: titre
+                nature: "texte court"
+                note: "ex. 'Forum romain de Lugdunum, IIe siècle'"
+
+              - nom: époque_recréée
+                nature: "référence à Époque"
+                contrainte: "exactement 1"
+
+              - nom: sources
+                nature: "ensemble de références à Source"
+                contrainte: "≥ 1 (la fidélité d'une reconstitution doit être justifiée)"
+
+          optionnels:
+              - nom: ancrage_géographique
+                nature: "coordonnées géographiques (latitude, longitude, altitude)"
+                note: "présent si superposition AR au lieu réel ; absent si consultation 3D décontextualisée"
+
+              - nom: description
+                nature: "texte court"
+                note: "présentation, contexte historique"
+
+              - nom: pin_associé
+                nature: "référence à Pin"
+                note: "présent si le Modèle 3D enrichit un Pin existant"
+
+      relations:
+          - "associé à 0..1 Pin"
+          - "appartient à exactement 1 Époque"
+          - "référence ≥ 1 Sources"
+
+      invariants:
+          - "Sources obligatoires (engagement d'historicité, analogue à I4 pour Pin)"
+          - "Un Modèle 3D peut exister sans Pin parent (consultation depuis un index dédié de reconstitutions)"
+
+      questions_ouvertes:
+          - "Si un Modèle 3D est rattaché à un Pin, son cycle de vie suit-il celui du Pin ou est-il indépendant ?"
+          - "Format technique du modèle (glTF, USDZ, etc.) — relève de l'implémentation"
+
+    # ---------------------------------------------------------------------------
+    - id: fragment_musical
+      nom: "Fragment musical"
+
+      raison_d_etre: >-
+          Donne au récit une couleur sonore d'époque (musique, ambiance)
+          tissée dans la narration audio (D7.3). Distinct de la narration
+          audio elle-même, qui est un Média rattaché à un Pin.
+
+      attributs:
+          obligatoires:
+              - nom: identifiant
+                nature: "identifiant lisible et stable"
+
+              - nom: titre
+                nature: "texte court"
+                note: "ex. 'Ronde des canuts, fin XIXe'"
+
+              - nom: époque
+                nature: "référence à Époque"
+                contrainte: "exactement 1"
+
+              - nom: crédit
+                nature: "texte court"
+                note: "compositeur, interprète, droits"
+
+          optionnels:
+              - nom: description
+                nature: "texte court"
+                note: "contexte musicologique"
+
+      relations:
+          - "appartient à exactement 1 Époque"
+          - "peut être référencé par 0..n Pins (via pin.fragments_musicaux)"
+
+      invariants:
+          - "Crédit obligatoire (droits d'auteur ; pour création originale ou domaine public, le crédit l'indique)"
+
+      questions_ouvertes:
+          - "Provenance des fragments (création originale par un membre de l'équipe, samples du domaine public, licence) — décision équipe"
+
+    # ---------------------------------------------------------------------------
+    - id: couche_cartographique
+      nom: "Couche cartographique"
+
+      raison_d_etre: >-
+          Permet à l'utilisateur de filtrer la carte par grand thème
+          (patrimoine vivant, bâtiments historiques, événements passés,
+          etc.). Une couche regroupe un sous-ensemble de Pins selon un
+          critère éditorial.
+
+      attributs:
+          obligatoires:
+              - nom: identifiant
+                nature: "identifiant lisible et stable (slug)"
+
+              - nom: libellé
+                nature: "texte court"
+
+              - nom: ordre
+                nature: "compteur"
+                note: "ordre dans la liste de couches affichables"
+
+          optionnels:
+              - nom: description
+                nature: "texte court"
+
+              - nom: critère_d_appartenance
+                nature: "expression métier"
+                note: "ex. 'tous les Pins de catégorie patrimoine-vivant', ou 'sélection éditoriale ad hoc'"
+
+      relations:
+          - "couvre 0..n Pins (la règle d'appartenance dépend de critère_d_appartenance)"
+
+      invariants:
+          - "Catalogue contrôlé par l'équipe éditoriale (pas de couche créée par un contributeur communautaire)"
+
+      questions_ouvertes:
+          - "Mode d'appartenance Pin → Couche : par règle automatique (selon catégorie), par sélection éditoriale explicite, ou les deux (mixte) ? — à arbitrer en palier 9 cartographie"
+
+# -----------------------------------------------------------------------------
+# Persona check
+# -----------------------------------------------------------------------------
+# Le palier 4 a peu de prise sur le ressenti utilisateur direct, mais beaucoup
+# sur ce qui est POSSIBLE. La passe ci-dessous interroge cet impact-là.
+persona_check:
+    kenji:
+        impact: "indirect"
+        note: >-
+            La structure du contenu_narratif (teaser + narration +
+            post-narratif) prépare le palier 8 à dériver des versions
+            versionnables par locale (Kenji lit en japonais). Aucun
+            attribut de ce cluster ne fixe la langue, ce qui laisse le
+            palier 8 libre. OK.
+
+    mme_dupont:
+        impact: "indirect"
+        note: >-
+            Les Catégories et Époques (catalogues ouverts) permettent à
+            Mme Dupont de sélectionner des Pins adaptés à des CM1-CM2.
+            La modélisation ne contraint pas la sélection. OK.
+
+    mme_martin:
+        impact: "direct via I4"
+        note: >-
+            L'invariant I4 (Sources obligatoires pour validé) garantit
+            que tout Pin projetable en classe affiche des sources
+            crédibles — c'est exactement ce qu'elle attend. La
+            structure de Source (type + référence + crédit) permet un
+            affichage net. OK.
+
+    pere_lyonnais:
+        impact: "indirect"
+        note: >-
+            Catalogues ouverts permettent l'enrichissement progressif
+            (anecdotes, patrimoine vivant). La modélisation Multi-Époques
+            (I8) accommode le patrimoine vivant qui traverse les siècles
+            — cas typique de quartier de Croix-Rousse. OK.
+
+    anais_back_office:
+        impact: "MAJEUR"
+        note: >-
+            C'est ce cluster qui fixe TOUT ce qu'Anaïs aura à saisir.
+            Le format des templates (palier 13) dérivera directement
+            des attributs ici. Points de vigilance :
+              - Sources obligatoires (I4) doit être supportable côté
+                ergonomie : Anaïs doit pouvoir saisir des Sources
+                rapidement et les réutiliser entre Pins (n-n).
+              - Catégorie et Époque (catalogues ouverts) doivent
+                permettre à Anaïs ou à un éditeur de proposer une
+                nouvelle entrée si besoin — workflow à clarifier en
+                palier 13.
+              - Multi-époques (I8) accommode les pins de patrimoine
+                vivant qui auraient été frustrants à forcer sur une
+                seule époque (frustration nommée dans son persona).
+              - Pas d'identité civile collectée (I1) : Anaïs n'a pas
+                de champ 'nom de l'auteur' à remplir pour les Pins
+                éditoriaux — c'est l'équipe qui est implicitement
+                créditée.
+            Reste ouvert : prévisualisation et gestion de versions
+            (frustrations explicites de son persona) — relèvent du
+            palier 13 admin, pas du palier 4.

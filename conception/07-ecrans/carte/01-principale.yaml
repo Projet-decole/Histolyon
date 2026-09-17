@@ -1,0 +1,97 @@
+# =============================================================================
+# E-CARTE-PRINCIPALE — Carte d'accueil
+# =============================================================================
+# Surface principale d'accueil de l'app (P5.S1 en P5.M1). C'est l'écran que
+# l'utilisateur voit au lancement, et celui sur lequel il revient à chaque
+# fois qu'il sort d'une consultation. Sert d'ancre pour l'exploration libre
+# et pour l'accueil des entrées externes (Lien universel, notification).
+# =============================================================================
+
+document:
+  type: palier_ecrans_fiche
+  format: yaml
+
+ecran:
+  id: E-CARTE-PRINCIPALE
+  nom: "Carte d'accueil"
+
+  mode: P5.M1
+  surface_parente: P5.S1
+
+  raison_d_etre: >-
+    Surface centrale de l'app. Donne accès à la carte temporelle, au
+    slider d'époque, à la recherche, aux Pins géolocalisés, aux Couches
+    cartographiques. C'est ICI que la sérendipité arrive — l'utilisateur
+    passe et le lieu déclenche.
+
+  composition:
+    - zone: "vue cartographique"
+      role: "affichage de la carte avec les Pins de l'Époque sélectionnée et selon les Couches cartographiques actives ; pan, zoom, recadrage gérés ici"
+      entites_affichees: [Pin, "Couche cartographique", Époque]
+
+    - zone: "navigateur temporel"
+      role: "permet de sélectionner une Époque parmi le catalogue ouvert (I7) ; pendant le geste, l'apparence de la Carte transitionne progressivement ; le calage se fait à la fin du geste"
+      entites_affichees: [Époque]
+
+    - zone: "point d'accès recherche"
+      role: "ouvre la surface ponctuelle E-CARTE-RECHERCHE (flow A4)"
+
+    - zone: "point d'accès couches cartographiques"
+      role: "ouvre la surface ponctuelle E-CARTE-FILTRES-COUCHES (flow A3)"
+
+    - zone: "point d'accès mode notification"
+      role: "ouvre l'activation/désactivation du mode Surprenez-moi (flow A5)"
+
+    - zone: "point d'accès localisation"
+      role: "recadre la Carte sur la position de l'utilisateur si la permission de géolocalisation est accordée ; déclenche A6 sinon"
+
+  etats:
+    nominal_charge: "Carte chargée, Pins de l'Époque courante visibles, navigateur temporel positionné sur l'Époque par défaut"
+    chargement_initial: "Tuiles cartographiques en cours de chargement ; le navigateur temporel et les points d'accès restent disponibles"
+    vide_a_l_epoque: "L'Époque sélectionnée n'a aucun Pin localisé visible — message gracieux invitant à explorer une autre Époque ou à élargir l'emprise (cf. cluster 01 I9 Pin sans localisation)"
+    offline_avec_cache: "Connexion réseau indisponible ; tuiles préchargées affichées dans leur emprise ; bandeau persistant E-TRANSVERSES-BANDEAU-OFFLINE visible ; recherche limitée au contenu local"
+    offline_sans_cache: "Aucune tuile préchargée disponible ; surface dégradée avec invitation gracieuse à se reconnecter ; les points d'accès restent fonctionnels (recherche dans les Pins préchargés, paramètres)"
+    permission_geoloc_refusee: "Le point d'accès localisation est désactivé ou propose la réactivation depuis les paramètres système ; toute autre fonctionnalité reste pleinement disponible"
+    premier_lancement: "Carte affichée immédiatement (pas de tutoriel imposé) ; l'invitation au micro-parcours découverte (flow A2) est armée et peut s'afficher au premier moment pertinent ; l'indication ponctuelle d'onboarding sur le slider d'époque (D5.4) est armée pour le premier passage"
+    parcours_en_cours: "Surface persistante E-TRANSVERSES-PARCOURS-PERSISTANT (P2) visible en superposition ; la Carte continue d'être manipulable normalement ; en mode terrain, le tracé du Parcours et l'étape courante sont surfaçés sur la Carte"
+    audio_en_cours: "Surface persistante E-TRANSVERSES-AUDIO-PERSISTANT (P1) visible en superposition ; aucun effet sur la Carte autre que la coexistence (P5.C1)"
+    mode_presentation_active: "Surfaces persistantes (P1, P2, P3) en sommeil visuel (P5.C2) ; chrome minimal — seul un point de retour discret subsiste"
+
+  elements_interactifs:
+    - "Pan et zoom sur la vue cartographique"
+    - "Tap sur un Pin → flow B1 (Aperçu rapide d'un Pin) — surface E-CARTE-APERCU-PIN s'imbrique"
+    - "Manipulation du navigateur temporel → flow A3 (sélection d'Époque)"
+    - "Tap sur le point d'accès recherche → ouverture E-CARTE-RECHERCHE (P5.M6)"
+    - "Tap sur le point d'accès couches → ouverture E-CARTE-FILTRES-COUCHES (P5.M6)"
+    - "Tap sur le point d'accès mode notification → flow A5 (Activation Surprenez-moi)"
+    - "Tap sur le point d'accès localisation → recadrage si géoloc accordée, sinon flow A6"
+    - "Bascule vers une autre surface top-level (P5.S2 Parcours ou P5.S3 Profil) via le sélecteur de section principale (P5.N2 — saut latéral)"
+
+  flows_actifs:
+    - A1   # Premier lancement (atterrissage par défaut ici)
+    - A2   # Invitation micro-parcours (armée, déclenchée depuis ici)
+    - A3   # Navigation cartographique et sélection d'Époque
+    - A4   # Recherche (point d'accès)
+    - A5   # Activation Surprenez-moi (point d'accès)
+    - A6   # Demande de permission juste-à-temps (depuis le point d'accès localisation)
+    - B1   # Aperçu rapide d'un Pin (déclenché au tap)
+    - E1   # Notification de proximité (Surprenez-moi) atterrit ici
+    - F5   # Réception d'un Lien universel ciblant un Pin (atterrit en B2 mais avec Carte derrière)
+
+  surfaces_imbriquees:
+    - E-CARTE-APERCU-PIN              # M2 imbriqué au tap d'un Pin
+    - E-CARTE-RECHERCHE               # M6 imbriqué via point d'accès recherche
+    - E-CARTE-FILTRES-COUCHES         # M6 imbriqué via point d'accès couches
+    - E-CARTE-ALERTE-PROXIMITE        # M7 surgit en mode Surprenez-moi
+    - E-TRANSVERSES-DIALOGUE-CONFIRMATION   # M8 si abandon parcours, etc.
+    - E-TRANSVERSES-MESSAGE-EPHEMERE  # M9 récurrent (lien copié, éloignement, etc.)
+    - E-TRANSVERSES-AUDIO-PERSISTANT  # P1 si audio en cours
+    - E-TRANSVERSES-PARCOURS-PERSISTANT  # P2 si parcours en cours
+    - E-TRANSVERSES-BANDEAU-OFFLINE   # P3 si mode hors-ligne actif
+    - E-TRANSVERSES-DIALOGUE-PERMISSION  # M8 transverse pour A6
+    - E-TRANSVERSES-INDICATION-ONBOARDING  # M9 sur slider d'époque (D5.4)
+
+  questions_ouvertes:
+    - "Comportement précis du navigateur temporel quand un Parcours en cours pilote l'Époque (cf. C5 question ouverte) — manipulation manuelle prioritaire ou pilotage automatique ?"
+    - "Choix exact du point d'ancrage par défaut au tout premier lancement (Bellecour, Vieux Lyon, vue large métropole ?) — relève palier 9/10 ou décision éditoriale"
+    - "Forme exacte du point d'accès localisation : icône permanente, fly-in selon contexte, intégré au navigateur temporel ? — palier 10"

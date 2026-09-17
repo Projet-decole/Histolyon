@@ -1,0 +1,351 @@
+# =============================================================================
+# Palier 8 — 03-template-parcours — Structure narrative du Template Parcours
+# =============================================================================
+# Affine la matière narrative qui peuple un Parcours (cluster 02) selon les
+# trois provenances (éditorial / communautaire / personnel). Ne traite que
+# les contenus PORTÉS par le Parcours lui-même : titre, descriptions courte
+# et longue, introductions d'étape (au début d'une étape, pas entre deux),
+# tonalité de célébration de fin.
+#
+# La narration pleine d'un Pin (référencé par chaque Étape) relève du fichier
+# 02-template-pin. Le Parcours ne réplique JAMAIS le récit du Pin (cluster 02
+# raison_d_etre de l'Étape) — il met en séquence et tisse un liant.
+# =============================================================================
+
+document:
+  type: palier_contenu_template_parcours
+  version: "0.1"
+  date: "2026-05-05"
+  format: yaml
+
+# -----------------------------------------------------------------------------
+# 1. Périmètre
+# -----------------------------------------------------------------------------
+perimetre:
+
+  inclus:
+    - "Titre du Parcours"
+    - "Description courte (catalogue, E-PARCOURS-PRINCIPAL)"
+    - "Description longue (fiche détail, teaser_narratif du cluster 02)"
+    - "Introduction d'étape optionnelle (cluster 02, attribut introduction_d_étape)"
+    - "Tonalité de célébration de fin (cluster 02 conclusion_narrative + récapitulatif honnête de E-PARCOURS-FIN-CELEBRATION)"
+    - "Spécificités de voix par provenance"
+    - "Cas particuliers (vérification I3, partage privé F2, retiré)"
+
+  exclus:
+    - "Narration pleine d'un Pin référencé — voir 02-template-pin"
+    - "Transitions narratives ENTRE étapes consécutives (cluster 02, réservées éditorial) — non traitées ici, relève de la matière pin-séquentielle"
+    - "Microcopy actions de la fiche — voir 04-microcopy-grand-public"
+    - "Microcopy back-office de création — voir 05-microcopy-admin"
+    - "i18n — voir 06-i18n"
+    - "Composants UI, longueurs en caractères, image d'ouverture — paliers 10, 12, 16"
+
+  test_de_purete: "Si demain on remplace les écrans de fiche parcours, est-ce que les patterns narratifs ici tiennent ? Si oui, c'est bon."
+
+# -----------------------------------------------------------------------------
+# 2. Structure générale d'un Parcours
+# -----------------------------------------------------------------------------
+structure_generale:
+
+  vue_d_ensemble: >-
+    Un Parcours n'est pas un agrégat de Pins. C'est un fil qui choisit ses
+    pins, les ordonne et leur donne une tonalité commune. Quatre couches
+    propres au Parcours : titre, description courte (accroche en
+    catalogue), description longue (promesse étendue en fiche détail),
+    introduction au début de chaque étape (optionnelle). À la fin, une
+    tonalité de célébration reconnaît l'achèvement (PT6) ou la complétion
+    partielle (PT7). Pour les éditoriaux, une conclusion narrative écrite
+    à l'avance soutient cette tonalité ; pour les autres provenances, la
+    voix de l'app prend le relais sans rien forcer.
+
+  pourquoi_cette_structure: >-
+    Trois moments servis sans surcharge : décision de démarrer (titre +
+    description courte), compréhension approfondie (description longue),
+    mise en condition d'étape (introduction optionnelle). Pas de fiche
+    technique, pas de description redondante avec les Pins.
+
+  differences_selon_provenance:
+    editorial: "Toutes les couches rédigées par l'équipe éditoriale. Voix du récit pleine. Conclusion narrative OBLIGATOIRE pour publier (cluster 02 invariant)."
+    communautaire: "L'auteur écrit toutes les couches. L'app accueille sa voix telle quelle — elle CADRE (longueurs, présence des champs requis), elle NE REFORMULE PAS."
+    personnel: "L'auteur écrit pour lui-même. Le titre suffit. Tout le reste est optionnel. L'app n'évalue pas, ne signale rien comme « manquant »."
+
+# -----------------------------------------------------------------------------
+# 3. Titre et description courte
+# -----------------------------------------------------------------------------
+titre_et_description_courte:
+
+  titre:
+    role: "Promesse en quelques mots. Ce qui distingue CE parcours d'un autre sur la même thématique. Lisible en catalogue, en favoris, en partage."
+    voix:
+      editorial: "voix du récit, posée et précise"
+      communautaire: "voix de l'auteur (avec son pseudonyme en signature)"
+      personnel: "voix de l'utilisateur, libre"
+    longueur: "haïku à phrase courte"
+    pattern: "Annoncer un angle ou un fil, pas une zone géographique sèche. « Le Vieux Lyon » est un quartier ; « Sept traboules pour comprendre les Canuts » est un parcours."
+    on_evite: "le pédagogisme (« Découvrir le Vieux Lyon ») et l'emphase touristique (« Au cœur du magnifique Vieux Lyon »)"
+
+  description_courte:
+    role: "Accroche affichée à côté du titre dans le catalogue et les listes. Donne envie d'ouvrir la fiche, sans tout dire ni promettre faussement."
+    voix:
+      editorial: "voix du récit, le conteur de l'app"
+      communautaire: "voix de l'auteur — l'app ne reformule pas"
+      personnel: "voix de l'utilisateur, libre"
+    longueur: "phrase à phrase longue (pas un paragraphe)"
+    pattern: "Un angle, un fil conducteur, une promesse de ce que le parcours fait VIVRE. On ne liste pas les étapes — la liste est dans la fiche."
+    on_evite:
+      - "l'énumération des lieux (« Bellecour, Saint-Jean, la rue du Bœuf… »)"
+      - "les métadonnées en prose (« 2h, 7 étapes ») — déjà à côté"
+      - "les superlatifs (« incontournable », « unique », « magique »)"
+
+  exemples_canoniques:
+    - contexte: "(exemple — palier 8) Parcours éditorial, fil thématique Canuts"
+      titre: "Sept traboules pour comprendre les Canuts"
+      description_courte: >-
+        Tu marches dans un quartier dont la pierre raconte un travail
+        précis — celui de la soie, et celui des hommes qui la portaient
+        sous la pluie.
+      note: "Titre qui annonce le fil ; description qui dit ce que la marche révèle, sans énumérer."
+
+    - contexte: "(exemple — palier 8) Parcours communautaire, voix d'auteur préservée"
+      titre: "Mes coins préférés en flânant la Croix-Rousse"
+      description_courte: >-
+        Je vous emmène là où je passe le dimanche matin. Pas du grand
+        patrimoine, plutôt des détails qu'on remarque quand on traîne un
+        peu.
+      note: "Voix de l'auteur (« je », « vous ») — l'app ne reformule pas. Le ton moins posé est ASSUMÉ."
+
+# -----------------------------------------------------------------------------
+# 4. Description longue (fiche détail)
+# -----------------------------------------------------------------------------
+description_longue:
+
+  role: "Présenter le parcours en profondeur dans la zone en-tête narratif de E-PARCOURS-FICHE-DETAIL (correspond au teaser_narratif du cluster 02). Donne la promesse étendue — atmosphère, fil conducteur, durée vécue, contraintes éventuelles — pour décider en connaissance de cause."
+
+  voix:
+    editorial: "voix du récit, posée, conteuse"
+    communautaire: "voix de l'auteur — affichée telle quelle"
+    personnel: "voix de l'utilisateur — typiquement absente ou très brève"
+
+  longueur: "paragraphe à récit court — assez pour tisser, pas assez pour fatiguer"
+
+  pattern: "Tisser ce qui rend ce parcours UN parcours. Évoquer l'atmosphère, le fil qui lie les étapes, mention sobre des éléments concrets (durée vécue, terrain). Pas une fiche technique — elle est dans la zone métadonnées juste à côté."
+
+  on_evite:
+    - "Reprendre le contenu des Pins (« À la première étape, vous verrez Bellecour... ») — la liste est en dessous"
+    - "Les listes à puces déguisées en paragraphes"
+    - "Les promesses émotionnelles (« vous serez bouleversé »)"
+    - "Les mises en garde anxiogènes — une mention sobre suffit"
+
+  exemple_canonique:
+    - contexte: "(exemple — palier 8) Parcours éditorial, description tissée"
+      texte: >-
+        Au XIXe siècle, les canuts portaient leurs pièces de soie de leur
+        atelier au marchand sans jamais les exposer à la pluie. Pour cela,
+        ils traversaient des immeubles entiers, par des passages que les
+        Lyonnais appellent traboules. Tu vas en parcourir sept, dans un
+        ordre qui suit ce que faisait un canut au cours d'une journée. La
+        marche est tranquille, l'attention est tout. Certaines traboules
+        sont fermées le dimanche : on te le dira en temps voulu.
+      note: >-
+        Tisse le fil (geste du canut), donne l'atmosphère (l'attention
+        plutôt que la marche), prévient sobrement d'une contrainte
+        (fermetures), sans devenir une fiche.
+
+    - contexte: "(exemple — palier 8) Parcours communautaire, voix de l'auteur cadrée mais préservée"
+      texte: >-
+        Je vis sur la Croix-Rousse depuis quinze ans et le dimanche matin,
+        j'ai mes habitudes. Ce parcours, c'est en gros mon trajet du
+        marché à la Soierie vivante, avec quelques détours que je fais
+        quand j'ai le temps. Rien d'exceptionnel, mais je trouve qu'on
+        comprend mieux le quartier en passant par là.
+      note: >-
+        L'app n'a pas réécrit en voix du récit. Le « je », l'humilité de
+        la promesse sont ceux de l'auteur. Cadrée par sa longueur, pas
+        par son ton.
+
+# -----------------------------------------------------------------------------
+# 5. Introduction d'étape (optionnelle)
+# -----------------------------------------------------------------------------
+# Cluster 02 distingue : introduction_d_étape (au début d'une étape) vs
+# transitions_narratives (entre deux étapes, hors périmètre).
+introduction_d_etape:
+
+  role: "Petite voix conteuse qui prépare la lecture du Pin dans le fil narratif, au moment où l'utilisateur arrive à l'étape. NE DUPLIQUE JAMAIS le contenu du Pin (cluster 02) — annonce ce qui change, crée une attente, lie au précédent et au suivant."
+
+  voix:
+    editorial: "voix du récit, tutoiement narratif"
+    communautaire: "voix de l'auteur — typiquement plus brève"
+    personnel: "absent par défaut ; autorisé si l'auteur en sent le besoin"
+
+  longueur: "phrase à court paragraphe"
+
+  pattern: "Annoncer ce qui change (de lieu, d'époque, d'angle), créer une attente sans dire ce que le Pin va raconter (sinon l'effet est cassé). Orienter le regard vers ce qui importe à l'arrivée."
+
+  quand_l_ecrire:
+    - "Quand le passage change vraiment quelque chose (époque, quartier, ton, échelle)"
+    - "Quand on veut orienter l'attention sur un détail précis avant l'entrée dans le Pin"
+    - "Quand le Pin est dense et qu'une mise en condition aide"
+
+  quand_l_omettre:
+    - "Quand l'étape est dans la continuité directe de la précédente — l'introduction sonnerait redondante"
+    - "Quand le Pin a déjà un teaser fort qui suffit"
+    - "Quand on n'a rien d'utile à dire — le silence vaut mieux qu'une formule vide"
+
+  exemples_canoniques:
+    - contexte: "(exemple — palier 8) Introduction éditoriale, bascule d'atmosphère, étape 4/7 parcours Canuts"
+      texte: >-
+        Tu sors de la cour intérieure et tu retombes dans la rue. Le bruit
+        revient, mais ce n'est plus le même Lyon. Regarde au-dessus des
+        portes — les fenêtres très hautes, c'est là que les canuts
+        travaillaient à la lumière du jour.
+      note: >-
+        Annonce un changement (silence → bruit), oriente le regard,
+        prépare le Pin sans le raconter.
+
+    - contexte: "(exemple — palier 8) Introduction communautaire, étape 3/5"
+      texte: >-
+        Là je vous emmène voir un détail que la plupart des gens ratent.
+        Faut prendre la petite ruelle à gauche, c'est mal indiqué.
+      note: >-
+        Voix de l'auteur (oralité « faut prendre »), brève. L'app ne
+        reformule pas. Promesse concrète et modeste.
+
+# -----------------------------------------------------------------------------
+# 6. Tonalité de célébration de fin
+# -----------------------------------------------------------------------------
+# Cœur critique du fichier (PT7 du pilote, test_litmus Mme Dupont).
+# Sert E-PARCOURS-FIN-CELEBRATION (ouverture + conclusion narrative +
+# récapitulatif honnête).
+celebration_de_fin:
+
+  role: >-
+    Reconnaître l'achèvement par un moment dédié — pas un simple message
+    de fin. Que le parcours ait été complété intégralement ou en partie,
+    l'expérience vécue compte et la célébration reste pleine.
+
+  voix: "voix du récit (l'app raconte la fin) ; pour les éditoriaux, voix de l'auteur via la conclusion_narrative formelle"
+
+  longueur: "paragraphe ; le récapitulatif factuel (étapes, durée, époques) est porté par la mise en page, pas par le texte narratif"
+
+  pattern_PT6_PT7: >-
+    PT6 (reconnaissance de fin) et PT7 (tonalité partielle non-
+    culpabilisante) sont indissociables ici. La célébration ne change pas
+    de nature selon que le parcours est complet à 100% ou à 60% — elle
+    reconnaît ce qui a été vécu, dit honnêtement ce qui n'a pas été
+    parcouru, et laisse une porte ouverte sans la transformer en
+    injonction.
+
+  honnetete_sur_les_etapes_sautees:
+    principe_critique: >-
+      Le test_litmus Mme Dupont (sortie scolaire, deux étapes sautées
+      faute de temps) tranche tout : aucun message qui blesse
+      l'enseignante ou les enfants. Pas de reproche, pas de comparaison
+      à un idéal, pas de « 3/5 » posé comme un problème. Mais aussi pas
+      de mensonge généreux : on dit qu'il y a deux étapes non parcourues,
+      sobrement, parce que c'est vrai.
+    formules_qui_marchent:
+      - "« Tu as parcouru X étapes sur Y. »"
+      - "« Le reste t'attend quand tu voudras. »"
+      - "« Deux étapes sont restées de côté pour cette fois. »"
+    formules_a_proscrire:
+      - "« Vous n'avez pas terminé le parcours » (reproche)"
+      - "« Parcours incomplet » (l'incomplet posé comme défaut)"
+      - "« Encore X étapes à faire ! » (injonction enthousiaste)"
+      - "« 3/5 ⚠️ » (gamification dévalorisante)"
+      - "« Ce n'est pas grave » (paternalisme — il n'y avait pas de grief à effacer)"
+
+  trois_voix_qui_co_existent:
+    voix_du_recit_constante: >-
+      L'app ouvre la célébration avec une phrase qui reconnaît
+      l'achèvement, dans la voix du récit. Présente quel que soit le
+      type de parcours.
+    conclusion_narrative_de_l_auteur: >-
+      Pour les éditoriaux, la conclusion_narrative écrite à l'avance
+      (cluster 02, OBLIGATOIRE pour publier en éditorial) prend le
+      relais. Pour les communautaires, l'auteur peut en avoir écrit
+      une ; sinon, l'app n'invente rien — elle laisse l'ouverture porter
+      seule. Pour les personnels, pas de conclusion d'auteur.
+    recapitulatif_factuel: >-
+      Étapes, durée, époques traversées, badges éventuels. La mise en
+      page le porte ; le texte narratif ne le reformule pas.
+
+  exemples_canoniques:
+
+    - contexte: "(exemple — palier 8) Parcours éditorial complété intégralement"
+      type_de_completion: "100%"
+      ouverture_voix_du_recit: >-
+        Tu as parcouru les sept traboules. Voici ce qu'on a vu ensemble.
+      conclusion_narrative_auteur: >-
+        Quand tu remarqueras une porte cochère un peu plus haute que les
+        autres, ou une fenêtre étirée sur deux étages, tu sauras. La soie
+        a quitté Lyon, mais elle a laissé son geste dans la pierre.
+      note: >-
+        Ouverture sobre (PT6). Conclusion qui prolonge le fil —
+        l'utilisateur emporte quelque chose, sans flatterie ni emphase.
+
+    - contexte: "(exemple — palier 8) Parcours éditorial partiel — test_litmus Mme Dupont sortie scolaire"
+      type_de_completion: "5 étapes sur 7 (deux sautées par contrainte de temps)"
+      ouverture_voix_du_recit: >-
+        Tu as parcouru cinq des sept traboules. Le Vieux Lyon t'attend
+        pour les deux dernières — un autre dimanche, ou jamais, c'est
+        comme tu veux.
+      conclusion_narrative_auteur: >-
+        Ce que tu as vu aujourd'hui suffit déjà à comprendre comment on
+        portait la soie. Le reste, ce sont les nuances — elles ne
+        s'éteignent pas si tu attends.
+      note_critique: >-
+        Test_litmus Mme Dupont : la phrase fonctionne pour sa classe.
+        Pas de reproche. Pas de minimisation (« cinq sur sept » est
+        honnête). La porte ouverte (« un autre dimanche, ou jamais »)
+        désamorce l'injonction. La conclusion d'auteur affirme que ce
+        qui a été vu vaut pour soi-même — l'incomplétion n'est pas un
+        trou à combler.
+
+# -----------------------------------------------------------------------------
+# 7. Spécificités par provenance
+# -----------------------------------------------------------------------------
+specificites_par_provenance:
+
+  parcours_editorial:
+    voix: "voix du récit pure — le conteur de l'app"
+    auteur_affiche: "signature_éditoriale collective (cluster 02 + I1) — jamais d'identité civile"
+    couches_obligatoires: ["titre", "description courte", "description longue", "conclusion_narrative"]
+    couches_optionnelles: ["introduction d'étape (par étape)"]
+    note: "Matière la plus dense et la plus cadrée. Anaïs et la lead historienne portent la rigueur narrative."
+
+  parcours_communautaire:
+    voix: "voix de l'auteur — avec son pseudonyme, son ton propre"
+    auteur_affiche: "pseudonyme du Compte (cluster 02 + I1)"
+    couches_obligatoires: ["titre", "description courte", "description longue"]
+    couches_optionnelles: ["introduction d'étape", "conclusion_narrative"]
+    posture_de_l_app: "L'app NE REFORMULE PAS la voix de l'auteur. Elle CADRE (longueurs, présence des champs requis, modération a posteriori) ; elle n'ÉDITORIALISE pas. La diversité des voix est un signal de vitalité, pas un défaut à corriger. Le contraste avec la voix éditoriale est lisible — cohérent avec la marque « communautaire » (cluster 02, I3)."
+
+  parcours_personnel:
+    voix: "voix de l'utilisateur — libre"
+    auteur_affiche: "Profil local — jamais visible aux autres sauf partage F2"
+    couches_obligatoires: ["titre"]
+    couches_optionnelles: ["description courte", "description longue", "introduction d'étape", "conclusion_narrative"]
+    posture_de_l_app: "Pas de cadre éditorial (cluster 02 — strictement local). L'app n'évalue pas, ne signale rien comme manquant, n'invite pas à compléter. La célébration de fin utilise la voix du récit pour l'ouverture, sans conclusion d'auteur."
+
+# -----------------------------------------------------------------------------
+# 8. Cas particuliers
+# -----------------------------------------------------------------------------
+cas_particuliers:
+
+  parcours_communautaire_en_verification:
+    contexte: "Instanciation de I3 — un parcours communautaire publié peut être en cours de vérification (E-PARCOURS-FICHE-DETAIL, état parcours_communautaire_en_verification). La marque distinctive est visible sur la fiche."
+    tonalite: "Constat sobre, pas suspicion. Le parcours reste consultable et lançable. Voix de l'app (vouvoiement), explique sans inviter à se méfier de l'auteur. Pattern PT2 (alerte gracieuse) + P5 (annoncer avant d'agir)."
+    exemple: "« (exemple — palier 8) Ce parcours est en cours de vérification. Vous pouvez le consulter ; certains éléments peuvent encore évoluer. »"
+
+  parcours_personnel_partage_par_capability_F2:
+    contexte: "Capability F2 — un parcours personnel partagé par lien direct sans publication au catalogue. Le destinataire le voit en lecture seule (E-PARCOURS-FICHE-DETAIL, état parcours_personnel_consulte_par_destinataire)."
+    marque_visible: "Oui — marque distinctive « parcours partagé en privé », distincte de la marque communautaire publique. Forme exacte renvoyée à 03-fiche-detail.yaml questions_ouvertes. Voix de l'app, sobre."
+    exemple: "« (exemple — palier 8) Ce parcours vous a été partagé en privé. Il n'apparaît pas dans le catalogue public. »"
+    note: "Le destinataire ne doit pas confondre avec un parcours communautaire public. La distinction protège l'auteur personnel et signale la nature du lien."
+
+  parcours_retire_ou_indisponible:
+    contexte: "E-PARCOURS-FICHE-DETAIL état parcours_retire_ou_supprime ; E-PARCOURS-FIN-CELEBRATION état parcours_retire_entre_temps."
+    tonalite: "PT5 refus gracieux — constat sans drame, pas de jugement sur l'auteur ni sur la cause, alternative proposée. Si l'utilisateur a vécu le parcours avant retrait, la célébration a quand même lieu : l'expérience vécue compte indépendamment du statut actuel."
+    exemples:
+      - "(exemple — palier 8) « Ce parcours n'est plus disponible. Retour au catalogue. »"
+      - "(exemple — palier 8) Célébration malgré retrait : « Tu as parcouru les cinq étapes. Ce parcours n'est plus partagé publiquement, mais ce que tu as vu reste. »"

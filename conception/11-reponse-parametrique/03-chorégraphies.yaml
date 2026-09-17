@@ -1,0 +1,572 @@
+# =============================================================================
+# Palier 11 — 03 Chorégraphies
+# =============================================================================
+# Graphes d'orchestration séquencés. Chaque chorégraphie est un assemblage
+# d'étapes ordonnées qui combinent des acteurs (composants palier 10), des
+# durées (DUR-X de 01), des courbes (CRV-Y de 01), et optionnellement des
+# haptiques (HAP-Z de 02).
+#
+# Une chorégraphie répond à une question : QUE SE PASSE-T-IL quand
+# l'utilisateur (ou le système) déclenche tel changement d'état ? Avec
+# quel ordre ? Avec quels acteurs concurrents ? Avec quel feedback haptique ?
+#
+# 18 chorégraphies couvrent l'ensemble du système. Format compact ; certaines
+# fiches mutualisent ouverture/fermeture comme réciproques. Les chorégraphies
+# pivot (CHO-CALAGE-EPOQUE, CHO-LANCEMENT-PARCOURS, CHO-OUVERTURE-M3) sont
+# détaillées plus largement.
+# =============================================================================
+
+document:
+  type: palier_reponse_parametrique_choregraphies
+  numero: 11
+  fichier: "03-chorégraphies.yaml"
+  version: "0.1"
+  date: "2026-05-07"
+  format: yaml
+  prerequis_de_lecture:
+    - "design/conception/11-reponse-parametrique/00-index.yaml — § 5 format CHO"
+    - "design/conception/11-reponse-parametrique/01-durees-et-courbes.yaml — DUR-X et CRV-Y référencés massivement"
+    - "design/conception/11-reponse-parametrique/02-haptique-et-feedback-non-visuel.yaml — HAP-X référencés ponctuellement"
+    - "design/conception/05-architecture-info.yaml — modes M1-M9, surfaces P1-P3, règles N1-N7 et C1-C6"
+    - "design/conception/10-composants/04-shell.yaml — templates de mode et surfaces persistantes"
+    - "design/conception/10-composants/03-fonctionnels.yaml — composants pivot (Pin, Carte, Slider, Parcours)"
+
+raison_d_etre: >-
+  Sans chorégraphies explicites, chaque transition serait improvisée à
+  l'implémentation — l'aperçu rapide M2 surgirait avant que le Pin
+  n'ait basculé en selected, le slider d'Époque calerait sans haptique,
+  les surfaces persistantes apparaîtraient simultanément à un dialogue
+  bloquant. La rigueur du palier est de poser, pour chaque transition
+  significative, l'ORDRE des acteurs et la cohabitation avec le reste.
+
+# -----------------------------------------------------------------------------
+# Légende du format de fiche
+# -----------------------------------------------------------------------------
+# Chaque CHO a la structure :
+#   - id
+#   - nom (court)
+#   - declencheur (source + contexte)
+#   - acteurs (composants palier 10 impliqués)
+#   - graphe_etapes : liste d'étapes
+#       - etape : numéro
+#       - t_debut_ms : t relatif au déclenchement (0 = simultané au déclenchement,
+#                      "+200" = 200ms après le déclenchement, "fin_etape_X" = à
+#                      la fin de l'étape X)
+#       - acteur
+#       - action
+#       - duree_ref / courbe_ref : référence DUR-X / CRV-Y (fichier 01)
+#       - haptique_ref : référence HAP-X (fichier 02), optionnel
+#       - condition : optionnelle
+#   - reciproque : id de la chorégraphie inverse + différences notables
+#   - couplage_etat_partage : références ETAT-XXX (palier 10 § 4)
+#   - cohabitation : règles de coexistence avec les surfaces persistantes
+#                    et autres surfaces actives
+#   - questions_ouvertes : restantes après étape ultérieure
+#
+# Toutes les chorégraphies respectent par défaut la politique
+# prefers-reduced-motion documentée fichier 01 § 4.
+
+# =============================================================================
+# A. Templates de mode — apparition/disparition des surfaces M2-M9
+# =============================================================================
+choregraphies_templates_de_mode:
+
+  - id: CHO-OUVERTURE-M2
+    nom: "Ouverture aperçu rapide depuis tap pin"
+    declencheur:
+      source: "tap sur comp-pin (palier 10 fonctionnels:49) sur la Carte"
+      contexte: "S1 Carte reste visible derrière (P5.C3)"
+    acteurs:
+      - "comp-pin (palier 10 fonctionnels)"
+      - "comp-apercu-rapide-pin (palier 10 shell:121)"
+      - "comp-carte (recadrage léger)"
+    graphe_etapes:
+      - { etape: 1, t_debut_ms: 0,   acteur: comp-pin,                 action: "transition default → selected",                 duree_ref: DUR-COURT,    courbe_ref: CRV-EASE-OUT, haptique_ref: HAP-LEGER }
+      - { etape: 2, t_debut_ms: 0,   acteur: comp-apercu-rapide-pin,   action: "apparition (slide-up + fade-in)",               duree_ref: DUR-STANDARD, courbe_ref: CRV-EASE-OUT }
+      - { etape: 3, t_debut_ms: 100, acteur: comp-carte,               action: "recadrage léger centrant le Pin si nécessaire", duree_ref: DUR-STANDARD, courbe_ref: CRV-EASE-OUT, condition: "Pin proche du bord visible" }
+    reciproque:
+      id: CHO-FERMETURE-M2
+      nom: "Fermeture aperçu rapide"
+      declencheur: "tap-hors (PI-TAP-HORS) ou geste de fermeture explicite"
+      differences:
+        - "Étape 1 inversée — comp-pin: selected → default (DUR-COURT, CRV-EASE-IN, pas d'haptique)"
+        - "Étape 2 inversée — comp-apercu-rapide-pin: disparition slide-down + fade-out (DUR-STANDARD, CRV-EASE-IN)"
+        - "Étape 3 absente (pas de re-recadrage)"
+    couplage_etat_partage: []
+    cohabitation:
+      - "P1 et P2 restent visibles, l'aperçu se superpose sans masquer (cf. palier 10 shell:160)"
+    questions_ouvertes: []
+
+  - id: CHO-OUVERTURE-M3
+    nom: "Consultation approfondie ouverte depuis aperçu M2 (ou cible directe)"
+    declencheur:
+      source: "tap sur comp-button-primary slot 'cta_approfondir' de comp-apercu-rapide-pin (flow B2)"
+      contexte_alternative: "lien universel reçu (P5.E2) atterrit directement en M3"
+    acteurs:
+      - "comp-apercu-rapide-pin (M2 sortant)"
+      - "comp-layout-consultation-pin-approfondie (M3 entrant)"
+      - "comp-carte (passe en sommeil visuel)"
+      - "comp-selecteur-section-principale (reste visible)"
+    graphe_etapes:
+      - { etape: 1, t_debut_ms: 0,   acteur: comp-apercu-rapide-pin,                action: "fade-out + slide-down (sortie aperçu)",  duree_ref: DUR-COURT, courbe_ref: CRV-EASE-IN, haptique_ref: HAP-LEGER }
+      - { etape: 2, t_debut_ms: 50,  acteur: comp-layout-consultation-pin-approfondie, action: "apparition slide-up depuis le bas", duree_ref: DUR-LONG,  courbe_ref: CRV-EASE-OUT }
+      - { etape: 3, t_debut_ms: 50,  acteur: comp-carte,                            action: "atténuation visuelle (passe en sommeil derrière le M3)", duree_ref: DUR-LONG, courbe_ref: CRV-EASE-OUT }
+    reciproque:
+      id: CHO-FERMETURE-M3
+      nom: "Retour depuis consultation approfondie"
+      declencheur: "tap sur comp-button-back (intention close N1)"
+      differences:
+        - "Slide-down du M3, slide-up du M2 d'origine (s'il existait), réveil de la Carte"
+        - "Si pas de M2 d'origine (cible directe via E2), le retour mène directement à S1 Carte (P5.E2 fallback)"
+        - "Durée DUR-LONG → DUR-STANDARD au retour (sortie plus rapide que l'entrée — convention UX)"
+    couplage_etat_partage: []
+    cohabitation:
+      - "P1 et P2 restent visibles si actifs"
+      - "Si CHO-OUVERTURE-M3 enclenche un audio (tap play), CHO-APPARITION-P1 s'enchaîne ; voir cohabitation P1"
+
+  - id: CHO-ENTREE-M4
+    nom: "Entrée mode présentation"
+    declencheur:
+      source: "tap sur cible explicite 'mode présentation' depuis M3 (consultation approfondie)"
+      contexte: "déclenché par Mme Martin pour projeter en classe, ou Kenji pour immersion"
+    acteurs:
+      - "comp-layout-consultation-pin-approfondie (chrome de M3 sortant)"
+      - "comp-selecteur-section-principale (en sommeil)"
+      - "comp-surface-persistante-audio (P1 si actif)"
+      - "comp-surface-persistante-parcours (P2 si actif)"
+      - "comp-bandeau-information-offline (P3 si actif)"
+    graphe_etapes:
+      - { etape: 1, t_debut_ms: 0, acteur: "tous chromes M3 + sélecteur S1/S2/S3", action: "fade-out + scale-down 0.95", duree_ref: DUR-LONG, courbe_ref: CRV-EASE-IN-OUT }
+      - { etape: 2, t_debut_ms: 0, acteur: "P1 + P2 + P3 (si actifs)",            action: "fade-out vers sommeil visuel (état préservé, cf. P5.C2)", duree_ref: DUR-LONG, courbe_ref: CRV-EASE-IN-OUT }
+      - { etape: 3, t_debut_ms: "fin_etape_1", acteur: "contenu narratif M3", action: "scale-up 1.0 + plein écran sans chrome", duree_ref: DUR-COURT, courbe_ref: CRV-EASE-OUT }
+    reciproque:
+      id: CHO-SORTIE-M4
+      nom: "Sortie mode présentation"
+      declencheur: "tap sur point de retour discret (intention close N4)"
+      differences:
+        - "Réveil chrome + sélecteur (DUR-LONG, CRV-EASE-OUT)"
+        - "Réveil P1/P2/P3 si actifs (DUR-STANDARD, CRV-EASE-OUT) — voir CHO-REVEIL-PERSISTANTES-APRES-M4"
+        - "Aucun haptique en M4 — politique fichier 02 § 5"
+    couplage_etat_partage:
+      - { etat: ETAT-AUDIO-EN-COURS,    role: "P1 mis en sommeil mais audio continue" }
+      - { etat: ETAT-PARCOURS-EN-COURS, role: "P2 mis en sommeil mais parcours continue" }
+      - { etat: ETAT-CONNEXION-RESEAU,  role: "P3 mis en sommeil mais condition offline préservée" }
+    cohabitation:
+      - "TOUS haptiques inhibés en M4 (politique fichier 02 § 5)"
+      - "Toute alerte M7 entrante en M4 est SUPPRIMÉE silencieusement (à acter palier 16 — peut être différé : la queue M7 serait reprise à la sortie M4)"
+    questions_ouvertes:
+      - "Alertes M7 en M4 : suppression silencieuse ou queue reprise à la sortie ? À reconsidérer palier 16 sur retour utilisateur."
+
+  - id: CHO-OUVERTURE-M6
+    nom: "Surface ponctuelle (recherche / filtres / lancement / saut-étape)"
+    declencheur:
+      source: "tap sur point d'accès dédié (loupe pour recherche, chip filtres, bouton lancement, etc.)"
+      contexte: "selon contexte, surface principale visible derrière (M6 non-bloquant) ou backdrop léger"
+    acteurs:
+      - "surface M6 cible (comp-surface-ponctuelle-* palier 10 shell)"
+      - "backdrop léger (slot du shell)"
+    graphe_etapes:
+      - { etape: 1, t_debut_ms: 0, acteur: backdrop,                         action: "fade-in opacité de 0 à constante palier 12", duree_ref: DUR-STANDARD, courbe_ref: CRV-EASE-OUT }
+      - { etape: 2, t_debut_ms: 0, acteur: "surface M6",                     action: "apparition slide-up depuis le bas + fade-in", duree_ref: DUR-STANDARD, courbe_ref: CRV-EASE-OUT, haptique_ref: HAP-LEGER }
+    reciproque:
+      id: CHO-FERMETURE-M6
+      declencheur: "tap-hors (PI-TAP-HORS), tap sur button-fermeture-overlay, ou geste de fermeture (P5.N5)"
+      differences:
+        - "Slide-down + fade-out (DUR-STANDARD, CRV-EASE-IN)"
+        - "Pas d'haptique de fermeture"
+        - "Variante 'fermeture sur sélection résultat' (recherche, filtres) : la surface se ferme ET la sélection propage vers l'écran parent — la chorégraphie reste la même côté M6, l'effet aval relève d'une autre CHO (ex. CHO-OUVERTURE-M2 si résultat = Pin)"
+    cohabitation:
+      - "P1, P2, P3 restent visibles (M6 non-bloquant)"
+
+  - id: CHO-OUVERTURE-M7
+    nom: "Alerte de proximité (Surprenez-moi ou En parcours)"
+    declencheur:
+      source: "système — Pin éligible passe en proximité ou arrivée à étape (D4.2 / D4.3)"
+      contexte: "non bloquant — la surface courante reste pleinement utilisable"
+    acteurs:
+      - "comp-alerte-proximite (palier 10 fonctionnels:312)"
+    graphe_etapes:
+      - { etape: 1, t_debut_ms: 0, acteur: comp-alerte-proximite, action: "apparition slide-down depuis le haut + fade-in", duree_ref: DUR-STANDARD, courbe_ref: CRV-EASE-OUT, haptique_ref: HAP-FRANC }
+    reciproque:
+      id: CHO-DISMISS-M7
+      declencheur_principal: "tap sur button-fermeture-overlay slot 'rejet'"
+      declencheur_alternatif_1: "tap sur button-secondary slot 'action_accepter' → enchaîne CHO-OUVERTURE-M2 ou CHO-OUVERTURE-M3 selon cible"
+      declencheur_alternatif_2: "expiration auto-dismiss (cf. fichier 05 TMP-AUTO-DISMISS-M7)"
+      differences:
+        - "Slide-up + fade-out (DUR-COURT, CRV-EASE-IN)"
+        - "Pas d'haptique au dismiss (le dismiss tap atomique a son propre HAP-LEGER)"
+    couplage_etat_partage:
+      - { etat: ETAT-MODE-NOTIFICATION, role: "présente uniquement si Surprenez-moi ou En parcours actif" }
+      - { etat: ETAT-PERMISSIONS-SYSTEME, role: "géoloc requise" }
+    cohabitation:
+      - "C1 : coexiste avec P1 et P2 visuellement (l'alerte se place au-dessus, sans masquer la mini-bar)"
+      - "C2 : SUPPRIMÉE en M4 (aucune alerte ne perturbe la projection — cohérent CHO-ENTREE-M4)"
+      - "C5 : si dialogue M8 actif, l'alerte M7 est mise en queue jusqu'à fermeture du dialogue"
+
+  - id: CHO-OUVERTURE-M8
+    nom: "Dialogue de confirmation"
+    declencheur:
+      source: "action utilisateur à effet sensible (suppression Parcours, abandon Parcours en cours, etc.)"
+    acteurs:
+      - "comp-dialogue-confirmation (palier 10 shell)"
+      - "backdrop bloquant"
+    graphe_etapes:
+      - { etape: 1, t_debut_ms: 0, acteur: backdrop,                action: "fade-in opacité de 0 à constante palier 12", duree_ref: DUR-LONG, courbe_ref: CRV-EASE-OUT }
+      - { etape: 2, t_debut_ms: 0, acteur: comp-dialogue-confirmation, action: "apparition scale-up de 0.92 à 1.0 + fade-in", duree_ref: DUR-LONG, courbe_ref: CRV-EASE-OUT }
+    reciproque:
+      id: CHO-FERMETURE-M8
+      declencheur_confirmer: "tap button-primary slot 'issue_confirmation'"
+      declencheur_annuler: "tap button-secondary slot 'issue_annulation' (PAS de geste tap-hors — le M8 est strictement bloquant N6)"
+      differences:
+        - "Scale-down 1.0 → 0.96 + fade-out (DUR-STANDARD, CRV-EASE-IN)"
+        - "Si action confirmée à effet visuel (suppression d'un Parcours), l'effet visuel s'enchaîne après fermeture (DUR-COURT entre fin M8 et début effet)"
+        - "Pas d'haptique au dismiss simple ; HAP-NET si la confirmation déclenche succès (cf. mapping fichier 02)"
+    cohabitation:
+      - "P1, P2, P3 restent visibles mais derrière le backdrop bloquant (P5.C5 — au plus 1 M8 à la fois)"
+      - "PI-FOCUS-TRAP-DIALOGUE actif tant que le dialogue est ouvert (palier 10 § 5)"
+
+  - id: CHO-OUVERTURE-M9
+    nom: "Message éphémère"
+    declencheur:
+      source: "système ou écran (confirmation silencieuse d'action, info contextuelle)"
+    acteurs:
+      - "comp-message-ephemere (palier 10 shell)"
+    graphe_etapes:
+      - { etape: 1, t_debut_ms: 0, acteur: comp-message-ephemere, action: "apparition slide-up depuis le bas + fade-in", duree_ref: DUR-COURT, courbe_ref: CRV-EASE-OUT }
+    reciproque:
+      id: CHO-DISMISS-M9
+      declencheur_principal: "expiration auto-dismiss (TMP-AUTO-DISMISS-M9, fichier 05)"
+      declencheur_alternatif: "remplacement par un autre M9 (P5.C6 file simple)"
+      differences:
+        - "Fade-out + slide-down (DUR-COURT, CRV-EASE-IN)"
+        - "Si remplacement par autre M9 : transition cross-fade (le précédent disparaît tandis que le suivant apparaît, simultanés ; durée DUR-COURT chacun)"
+    cohabitation:
+      - "P1, P2, P3 restent visibles ; M9 se place au-dessus sans bloquer"
+      - "Pas d'haptique (politique fichier 02)"
+
+# =============================================================================
+# B. Surfaces persistantes — apparition / disparition / sommeil M4
+# =============================================================================
+choregraphies_surfaces_persistantes:
+
+  - id: CHO-APPARITION-P1
+    nom: "Apparition surface persistante audio"
+    declencheur:
+      source: "comp-lecteur-audio (palier 10 fonctionnels:339) déclenche play depuis E-PIN-CONSULTATION-APPROFONDIE"
+      contexte: "l'utilisateur quitte le M3 — P1 prend le relais"
+    acteurs:
+      - "comp-surface-persistante-audio (palier 10 shell)"
+    graphe_etapes:
+      - { etape: 1, t_debut_ms: 0, acteur: comp-surface-persistante-audio, action: "apparition slide-up depuis le bas + fade-in (qualité tactile)", duree_ref: DUR-STANDARD, courbe_ref: CRV-SPRING-DOUX }
+    reciproque:
+      id: CHO-DISPARITION-P1
+      declencheur_naturel: "fin de l'audio narratif"
+      declencheur_explicite: "tap sur action de fermeture explicite de P1 (intention close de comp-surface-persistante-audio)"
+      differences:
+        - "Slide-down + fade-out (DUR-STANDARD, CRV-EASE-IN, sans spring)"
+        - "Aucun haptique"
+    couplage_etat_partage:
+      - { etat: ETAT-AUDIO-EN-COURS, role: "présente si état actif" }
+    cohabitation:
+      - "Coexiste avec P2 (audio + parcours simultanés possibles, P5.C1) — disposition relative palier 7"
+
+  - id: CHO-APPARITION-P2
+    nom: "Apparition surface persistante parcours"
+    declencheur:
+      source: "lancement de Parcours depuis E-PARCOURS-FICHE-DETAIL — voir CHO-LANCEMENT-PARCOURS pour la chorégraphie complète"
+    acteurs:
+      - "comp-surface-persistante-parcours (palier 10 shell)"
+    graphe_etapes:
+      - { etape: 1, t_debut_ms: 0, acteur: comp-surface-persistante-parcours, action: "apparition slide-up depuis le bas + fade-in (qualité tactile)", duree_ref: DUR-STANDARD, courbe_ref: CRV-SPRING-DOUX, haptique_ref: HAP-LEGER }
+    reciproque:
+      id: CHO-DISPARITION-P2
+      declencheur_naturel: "complétion Parcours (CHO-FIN-PARCOURS)"
+      declencheur_explicite: "abandon Parcours après confirmation M8 (CHO-ABANDON-PARCOURS)"
+      differences:
+        - "Slide-down + fade-out (DUR-STANDARD, CRV-EASE-IN)"
+        - "Pas d'haptique au dismiss simple"
+    couplage_etat_partage:
+      - { etat: ETAT-PARCOURS-EN-COURS, role: "présente si état actif" }
+    cohabitation: ["Cf. CHO-APPARITION-P1"]
+
+  - id: CHO-APPARITION-P3
+    nom: "Apparition bandeau information offline"
+    declencheur:
+      source: "perte de connexion réseau (système OS)"
+    acteurs:
+      - "comp-bandeau-information-offline (palier 10 shell)"
+    graphe_etapes:
+      - { etape: 1, t_debut_ms: 0, acteur: comp-bandeau-information-offline, action: "apparition slide-down depuis le haut + fade-in", duree_ref: DUR-COURT, courbe_ref: CRV-EASE-OUT }
+    note_divergence_pattern_persistantes: >-
+      P3 utilise CRV-EASE-OUT + DUR-COURT, contrairement à P1/P2 qui
+      utilisent CRV-SPRING-DOUX + DUR-STANDARD (pattern persistantes
+      tactile). Justification : P3 est un BANDEAU SYSTÈME d'information
+      contextuelle (mode offline) — pas une surface tactile interagissable.
+      Pas de qualité tactile à signaler. Apparition rapide et sobre,
+      cohérente avec son rôle d'indicateur d'état.
+    reciproque:
+      id: CHO-DISPARITION-P3
+      declencheur: "retour de connexion réseau"
+      differences:
+        - "Slide-up + fade-out (DUR-COURT, CRV-EASE-IN)"
+    couplage_etat_partage:
+      - { etat: ETAT-CONNEXION-RESEAU, role: "présente si offline" }
+    cohabitation:
+      - "Au plus 1 instance visible ; P3 prend la priorité d'affichage en haut sur P1/P2 si tous coexistent"
+
+  - id: CHO-SOMMEIL-PERSISTANTES-EN-M4
+    nom: "Sommeil visuel des persistantes à l'entrée mode présentation"
+    declencheur: "déclenchée par CHO-ENTREE-M4 (étape 2)"
+    acteurs:
+      - "comp-surface-persistante-audio (P1 si actif)"
+      - "comp-surface-persistante-parcours (P2 si actif)"
+      - "comp-bandeau-information-offline (P3 si actif)"
+    graphe_etapes:
+      - { etape: 1, t_debut_ms: 0, acteur: "P1 + P2 + P3 (si actifs)", action: "fade-out simultané vers opacité 0", duree_ref: DUR-LONG, courbe_ref: CRV-EASE-IN-OUT }
+    reciproque:
+      id: CHO-REVEIL-PERSISTANTES-APRES-M4
+      declencheur: "déclenchée par CHO-SORTIE-M4"
+      differences:
+        - "Fade-in simultané vers opacité pleine (DUR-STANDARD, CRV-EASE-OUT)"
+        - "État applicatif préservé pendant la mise en sommeil (P5.C2)"
+    couplage_etat_partage:
+      - { etat: "tous (ETAT-AUDIO, ETAT-PARCOURS, ETAT-RESEAU)", role: "consommateur de la présence M4" }
+
+# =============================================================================
+# C. Slider d'Époque — pivot du voyage temporel
+# =============================================================================
+choregraphies_slider_epoque:
+
+  - id: CHO-CALAGE-EPOQUE
+    nom: "Calage du slider à la fin du drag manuel"
+    declencheur:
+      source: "relâchement du doigt sur comp-slider-epoque (transition pointer_up palier 10 fonctionnels § 2 machine_etats comp-slider-epoque)"
+    acteurs:
+      - "comp-slider-epoque (palier 10 fonctionnels:171)"
+      - "comp-carte (palier 10 fonctionnels:138)"
+      - "comp-pin × n (sur la Carte)"
+      - "comp-cluster-densite × n"
+      - "comp-trace-parcours (si parcours actif)"
+    graphe_etapes:
+      - { etape: 1, t_debut_ms: 0,                acteur: comp-slider-epoque, action: "snap vers Époque ancrée la plus proche (handle se positionne)", duree_ref: DUR-STANDARD, courbe_ref: CRV-EASE-OUT, haptique_ref: HAP-FRANC }
+      - { etape: 2, t_debut_ms: 0,                acteur: comp-carte,         action: "snap des 5 axes paramétriques vers valeurs ancrées (cf. fichier 04 MAP-SLIDER-VERS-AXES-CARTE)", duree_ref: DUR-STANDARD, courbe_ref: CRV-EASE-OUT }
+      - { etape: 3, t_debut_ms: "fin_etape_2",    acteur: "comp-pin × n",     action: "Pins de la nouvelle Époque rechargés et apparaissent (fade-in séquentiel par batch — pas d'animation pin par pin)", duree_ref: DUR-COURT, courbe_ref: CRV-EASE-OUT }
+      - { etape: 4, t_debut_ms: "fin_etape_3",    acteur: comp-cluster-densite, action: "recalcul des clusters selon nouvelle distribution", duree_ref: DUR-COURT, courbe_ref: CRV-EASE-OUT }
+      - { etape: 5, t_debut_ms: "fin_etape_2",    acteur: comp-trace-parcours, action: "atténuation des étapes hors Époque courante recalculée", duree_ref: DUR-COURT, courbe_ref: CRV-EASE-OUT, condition: "ETAT-PARCOURS-EN-COURS actif" }
+    couplage_etat_partage:
+      - { etat: ETAT-EPOQUE-COURANTE, role: producteur, note: "le snap fixe la valeur" }
+    cohabitation:
+      - "P1, P2, P3 restent visibles inchangés"
+      - "Cohérent palier 9 § 4 comportement_au_calage"
+    note_pendant_geste: >-
+      PENDANT le drag (avant ce snap), l'interpolation paramétrique des
+      5 axes carte est continue (DUR-CONTINU + CRV-LINEAIRE — la 'courbe'
+      est dictée par la position du doigt). Aucun Pin ne se recharge
+      pendant le geste (palier 9 § 4). Le throttle d'échantillonnage du
+      drag est défini fichier 05 TMP-THROTTLE-DRAG-SLIDER.
+    questions_ouvertes: []
+
+  - id: CHO-PILOTAGE-AUTOMATIQUE-EPOQUE
+    nom: "Slider piloté par étape de Parcours en cours"
+    declencheur:
+      source: "transition d'étape dans un Parcours en cours qui impose une Époque cible (palier 9 § 4 pilotage_automatique_par_parcours)"
+    acteurs:
+      - "comp-slider-epoque (passe de repos à pilote_automatique, palier 10 fonctionnels machine_etats)"
+      - "comp-carte"
+      - "comp-pin × n, comp-cluster-densite, comp-trace-parcours"
+    graphe_etapes:
+      - { etape: 1, t_debut_ms: 0,                acteur: comp-slider-epoque, action: "transition douce du handle vers position Époque cible", duree_ref: DUR-LONG, courbe_ref: CRV-EASE-IN-OUT }
+      - { etape: 2, t_debut_ms: 0,                acteur: comp-carte,         action: "interpolation continue des 5 axes vers ancres Époque cible (cf. MAP-SLIDER-VERS-AXES-CARTE)", duree_ref: DUR-LONG, courbe_ref: CRV-EASE-IN-OUT }
+      - { etape: 3, t_debut_ms: "fin_etape_2",    acteur: "comp-pin × n",     action: "Pins de l'Époque cible apparaissent (fade-in)", duree_ref: DUR-COURT, courbe_ref: CRV-EASE-OUT }
+    couplage_etat_partage:
+      - { etat: ETAT-EPOQUE-COURANTE,     role: producteur }
+      - { etat: ETAT-PARCOURS-EN-COURS,   role: consommateur, note: "détermine l'Époque cible" }
+    cohabitation:
+      - "Pas d'haptique en pilotage automatique (l'utilisateur n'a pas demandé) — politique fichier 02"
+      - "Si l'utilisateur touche le slider pendant le pilotage (transition pointer_down dans la machine d'état), l'interaction utilisateur PRIME : transition vers dragging, pilotage automatique annulé. À VALIDER palier 16."
+    questions_ouvertes:
+      - "Reprise du pilotage automatique à la fin d'un drag manuel utilisateur ? Probablement non (l'utilisateur est censé reprendre le contrôle). À acter palier 16."
+
+# =============================================================================
+# D. Parcours — lancement, abandon, fin
+# =============================================================================
+choregraphies_parcours:
+
+  - id: CHO-LANCEMENT-PARCOURS
+    nom: "Lancement de Parcours (terrain ou canapé)"
+    declencheur:
+      source: "tap sur comp-button-primary slot 'lancer' depuis E-PARCOURS-FICHE-DETAIL"
+    acteurs:
+      - "comp-layout-consultation-pin-approfondie (M3 fiche détail Parcours sortant)"
+      - "comp-surface-persistante-parcours (P2 entrant)"
+      - "comp-trace-parcours (apparition sur la Carte)"
+      - "comp-pin × n (variants reconfigurés selon contexte_parcours)"
+      - "comp-slider-epoque (potentiel pilotage automatique)"
+    graphe_etapes:
+      - { etape: 1, t_debut_ms: 0,                acteur: "M3 fiche Parcours", action: "fade-out + slide-down",                          duree_ref: DUR-LONG,     courbe_ref: CRV-EASE-IN, haptique_ref: HAP-LEGER }
+      - { etape: 2, t_debut_ms: 100,              acteur: "comp-pin × n",     action: "transition vers variants contextuels (fichier 04 MAP-CONTEXTE-PARCOURS-VERS-PIN) — étape courante en relief, hors-parcours atténués", duree_ref: DUR-STANDARD, courbe_ref: CRV-EASE-OUT }
+      - { etape: 3, t_debut_ms: 100,              acteur: comp-trace-parcours, action: "apparition fade-in",                            duree_ref: DUR-STANDARD, courbe_ref: CRV-EASE-OUT }
+      - { etape: 4, t_debut_ms: 200,              acteur: comp-surface-persistante-parcours, action: "voir CHO-APPARITION-P2",          duree_ref: DUR-STANDARD, courbe_ref: CRV-SPRING-DOUX }
+      - { etape: 5, t_debut_ms: "fin_etape_4",    acteur: comp-slider-epoque,  action: "pilotage automatique vers Époque de l'étape courante (variante raccourcie de CHO-PILOTAGE-AUTOMATIQUE-EPOQUE pour ne pas chaîner deux DUR-LONG dans un même graphe — cf. fichier 01 § DUR-LONG.enjeux_a11y)", duree_ref: DUR-STANDARD, courbe_ref: CRV-EASE-IN-OUT, condition: "Parcours impose une Époque cible distincte de la courante" }
+    couplage_etat_partage:
+      - { etat: ETAT-PARCOURS-EN-COURS, role: producteur, note: "création de l'état" }
+      - { etat: ETAT-MODE-NOTIFICATION, role: producteur, note: "bascule en 'En parcours' si terrain" }
+    cohabitation:
+      - "P1 si actif reste visible (audio peut continuer pendant un parcours)"
+      - "Cohérent palier 5 § coexistence C1 (P1 + P2 simultanés OK)"
+
+  - id: CHO-ABANDON-PARCOURS
+    nom: "Abandon de Parcours (avec dialogue de confirmation)"
+    declencheur:
+      source: "tap sur action de fermeture explicite de P2 → enchaîne CHO-OUVERTURE-M8 dialogue de confirmation"
+    sequence:
+      - "Étape A : CHO-OUVERTURE-M8 (dialogue : « Abandonner ce parcours ? »)"
+      - "Étape B-confirmation : si l'utilisateur confirme, CHO-FERMETURE-M8 puis chorégraphie d'effets ci-dessous"
+      - "Étape B-annulation : si l'utilisateur annule, CHO-FERMETURE-M8 simple, P2 reste visible et inchangé"
+    chorégraphie_effets_si_confirmation:
+      - { etape: 1, t_debut_ms: 0,                acteur: comp-surface-persistante-parcours, action: "voir CHO-DISPARITION-P2",       duree_ref: DUR-STANDARD, courbe_ref: CRV-EASE-IN }
+      - { etape: 2, t_debut_ms: 0,                acteur: comp-trace-parcours,               action: "fade-out",                       duree_ref: DUR-STANDARD, courbe_ref: CRV-EASE-IN }
+      - { etape: 3, t_debut_ms: 0,                acteur: "comp-pin × n",                    action: "retour aux variants 'normal' (fin des modulations contextuelles)", duree_ref: DUR-STANDARD, courbe_ref: CRV-EASE-OUT }
+      - { etape: 4, t_debut_ms: "fin_etape_1",    acteur: "système",                         action: "M9 message éphémère 'Parcours abandonné' apparaît (CHO-OUVERTURE-M9)", duree_ref: DUR-COURT, courbe_ref: CRV-EASE-OUT }
+    couplage_etat_partage:
+      - { etat: ETAT-PARCOURS-EN-COURS, role: producteur, note: "fin de l'état" }
+      - { etat: ETAT-MODE-NOTIFICATION, role: producteur, note: "retour au mode précédent (Surprenez-moi ou balade libre)" }
+
+  - id: CHO-FIN-PARCOURS
+    nom: "Complétion de Parcours (toutes étapes faites)"
+    declencheur:
+      source: "système — dernière étape du Parcours marquée complète"
+    acteurs:
+      - "comp-surface-persistante-parcours (P2 sortant)"
+      - "écran de célébration de fin (palier 7 E-PARCOURS-FIN-CELEBRATION)"
+    graphe_etapes:
+      - { etape: 1, t_debut_ms: 0,                acteur: "système",                         action: "navigation vers E-PARCOURS-FIN-CELEBRATION (M3-like)", duree_ref: DUR-LONG, courbe_ref: CRV-EASE-OUT }
+      - { etape: 2, t_debut_ms: 0,                acteur: "écran de célébration",            action: "animation cérémonielle d'aboutissement", duree_ref: DUR-AMPLE, courbe_ref: CRV-EASE-IN-OUT, haptique_ref: HAP-NET }
+      - { etape: 3, t_debut_ms: "fin_etape_2",    acteur: comp-surface-persistante-parcours, action: "voir CHO-DISPARITION-P2",         duree_ref: DUR-STANDARD, courbe_ref: CRV-EASE-IN }
+    couplage_etat_partage:
+      - { etat: ETAT-PARCOURS-EN-COURS, role: producteur, note: "fin de l'état" }
+    note_prefers_reduced_motion: >-
+      DUR-AMPLE étape 2 → DUR-STANDARD si reduce-motion actif (cf.
+      fichier 01 § 4 traitement B). Animation cérémonielle simplifiée
+      en cross-fade simple (traitement C).
+    questions_ouvertes:
+      - "Forme exacte de l'animation cérémonielle (confettis ? expansion radiale ? simple révélation de récapitulatif ?) — relève du palier 7 ou palier 11 ? Trancher en revue."
+
+# =============================================================================
+# E. Navigation transversale
+# =============================================================================
+choregraphies_navigation:
+
+  - id: CHO-SAUT-LATERAL-S1-S2-S3
+    nom: "Saut latéral entre surfaces top-level (P5.N2)"
+    declencheur:
+      source: "tap sur comp-selecteur-section-principale slot d'une autre section"
+    acteurs:
+      - "surface top-level sortante (S1 / S2 / S3)"
+      - "surface top-level entrante (S1 / S2 / S3)"
+      - "comp-selecteur-section-principale (variant section_active mis à jour)"
+    graphe_etapes:
+      - { etape: 1, t_debut_ms: 0,                acteur: "surface sortante", action: "fade-out + léger slide latéral",  duree_ref: DUR-STANDARD, courbe_ref: CRV-EASE-IN-OUT, haptique_ref: HAP-LEGER }
+      - { etape: 2, t_debut_ms: 0,                acteur: "surface entrante", action: "fade-in + léger slide latéral inverse", duree_ref: DUR-STANDARD, courbe_ref: CRV-EASE-IN-OUT }
+      - { etape: 3, t_debut_ms: 0,                acteur: comp-selecteur-section-principale, action: "transition variant section_active vers nouvelle section", duree_ref: DUR-COURT, courbe_ref: CRV-EASE-OUT }
+    cohabitation:
+      - "P1, P2, P3 restent visibles inchangés (préservation de l'état persistant — P5.N2 + P5.C1)"
+      - "La pile interne de chaque section est préservée (revenir sur S1 ramène à l'état où on l'avait laissée)"
+    questions_ouvertes:
+      - "Tap sur section ACTIVE = no-op ou scroll-to-top ? Question ouverte palier 10 — proposition par défaut : scroll-to-top de la surface principale courante (DUR-STANDARD, CRV-EASE-OUT). À acter."
+
+  - id: CHO-RETOUR-GRACIEUX
+    nom: "Retour gracieux par bouton-back ou geste système (P5.N1)"
+    declencheur:
+      source: "tap sur comp-button-back (intention close N1) ou geste système de retour (swipe back iOS, back button Android)"
+    acteurs:
+      - "surface courante (niveau N+1)"
+      - "surface parente (niveau N)"
+    graphe_etapes:
+      - { etape: 1, t_debut_ms: 0,                acteur: "surface courante", action: "sortie selon mode (fade-out + slide-down pour M3 ; slide-down + fade-out pour M2 ; fade-out simple pour M6)", duree_ref: DUR-STANDARD, courbe_ref: CRV-EASE-IN, haptique_ref: HAP-LEGER }
+      - { etape: 2, t_debut_ms: 0,                acteur: "surface parente",  action: "réveil (atténuation visuelle levée si M3 sortait, sinon rien si déjà visible)", duree_ref: DUR-STANDARD, courbe_ref: CRV-EASE-OUT }
+    cas_particulier_lien_universel:
+      description: >-
+        Si la surface a été atteinte via Lien universel (P5.E2) sans pile
+        constituée, le retour mène à la surface principale logique de la
+        cible (S1 Carte si Pin, S2 Parcours si Parcours) — pas vers le
+        navigateur ou l'expéditeur du lien.
+      chorégraphie: "Identique à CHO-RETOUR-GRACIEUX standard, la 'surface parente' est ici la surface principale logique"
+
+# -----------------------------------------------------------------------------
+# Cohabitation transversale et règles globales
+# -----------------------------------------------------------------------------
+regles_globales:
+
+  parallele_vs_sequentiel:
+    description: "Quand deux acteurs ont t_debut_ms identique, leurs animations sont strictement parallèles (lancées simultanément). Quand un t_debut_ms est positif ou 'fin_etape_X', l'étape démarre après cet instant relatif."
+    implication: >-
+      Une chorégraphie doit être pilotée par un contrôleur d'animation
+      unifié qui orchestre toutes ses étapes en cohérence — plutôt que
+      par des minuteries indépendantes qui dériveraient. La technique
+      d'implémentation précise relève de l'équipe dev.
+
+  files_de_choregraphies:
+    description: "Si une chorégraphie est déclenchée pendant qu'une autre est en cours sur le même acteur, comportement par défaut : la nouvelle annule la précédente (pas de queue)."
+    exceptions:
+      - "M9 messages éphémères : file simple de remplacement (P5.C6)"
+      - "M7 alertes en M4 : file ou suppression silencieuse (question ouverte CHO-ENTREE-M4)"
+    note: "À VALIDER au palier 16 sur cas concrets — peut nécessiter affinage."
+
+  reduce_motion_global:
+    description: "Toutes les chorégraphies ci-dessus respectent les 3 traitements A/B/C de fichier 01 § 4."
+    cas_specifique_slider: "L'interpolation paramétrique du slider d'Époque pendant le geste reste ACTIVE en reduce-motion (cf. fichier 01 § 4 cas_particulier_slider_epoque)."
+
+# -----------------------------------------------------------------------------
+# Persona check
+# -----------------------------------------------------------------------------
+persona_check:
+
+  kenji:
+    impact: ÉLEVÉ
+    note: >-
+      CHO-OUVERTURE-M2 / M3 doivent être auto-explicites (sans tutoriel).
+      Les enchaînements de chorégraphies (M2 → M3, lancement Parcours)
+      utilisent des transitions sobres CRV-EASE-OUT/IN qui ne dépendent
+      pas de la langue. CHO-OUVERTURE-M7 avec HAP-FRANC est son canal
+      principal en marche.
+
+  mme_dupont:
+    impact: moyen
+    note: >-
+      CHO-LANCEMENT-PARCOURS et CHO-OUVERTURE-M3 fluides — pas plus de
+      ~700ms cumulés. CHO-FIN-PARCOURS célébration limitée par
+      DUR-AMPLE ≤ 1 occurrence.
+
+  mme_martin:
+    impact: MAJEUR
+    note: >-
+      CHO-ENTREE-M4 met TOUS les chromes + persistantes en sommeil
+      visuel (politique fichier 02 + cohabitation ici). CHO-CALAGE-EPOQUE
+      utilise CRV-EASE-OUT (sobre), pas CRV-SPRING-NET (overshoot
+      distractif en projection — décision actée). Aucun haptique en M4.
+
+  pere_lyonnais:
+    impact: ÉLEVÉ
+    note: >-
+      CHO-OUVERTURE-M7 avec HAP-FRANC en flânerie (mode Surprenez-moi).
+      CHO-DISMISS-M7 par expiration (TMP-AUTO-DISMISS-M7 fichier 05) si
+      l'utilisateur ignore — il continue à marcher sans être bloqué.
+
+  anais_back_office:
+    impact: faible
+    note: >-
+      Le back-office n'utilise pas les chorégraphies inter-modes au
+      sens P5 (pas de M2/M3/M4). Mais CHO-OUVERTURE-M8 et CHO-OUVERTURE-M9
+      s'appliquent à comp-formulaire-saisie-pin-admin (palier 10 § 2)
+      pour la confirmation de soumission/retrait/promotion.
+
+# -----------------------------------------------------------------------------
+# Questions ouvertes (récapitulatif)
+# -----------------------------------------------------------------------------
+questions_ouvertes:
+  - "CHO-ENTREE-M4 : alertes M7 entrantes en M4 — suppression silencieuse ou queue reprise à la sortie ? À reconsidérer palier 16."
+  - "CHO-PILOTAGE-AUTOMATIQUE-EPOQUE : reprise du pilotage automatique à la fin d'un drag manuel utilisateur ? Proposition par défaut : non. À acter palier 16."
+  - "CHO-FIN-PARCOURS : forme de l'animation cérémonielle (confettis ? expansion radiale ? simple récapitulatif ?) — relève palier 7 ou palier 11 ? À acter en revue."
+  - "CHO-SAUT-LATERAL-S1-S2-S3 : tap sur section ACTIVE = no-op ou scroll-to-top ? Proposition par défaut : scroll-to-top. À acter."
+  - "Files de chorégraphies (règle globale) : comportement par défaut 'nouvelle annule précédente' à VALIDER palier 16 sur cas concrets."

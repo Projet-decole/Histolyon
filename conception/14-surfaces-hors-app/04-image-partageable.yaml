@@ -1,0 +1,227 @@
+# =============================================================================
+# Palier 14 — 04 Image partageable de fin de parcours
+# =============================================================================
+# Composition de l'image générée à la fin d'un Parcours pour partage sur les
+# réseaux sociaux. Atmosphérique, sobre, vue dans le flux Instagram d'un
+# follower de Kenji sans détonner — pas un objet marketing.
+#
+# Le palier 3 D11.4 a posé la matière fonctionnelle (générée à la demande,
+# format vertical adapté aux stories, trace stylisée du parcours, statistiques
+# discrètes, signature HistoLyon sobre, pas de partage automatique). Le
+# palier 7 partage/02-fin-parcours-image.yaml a posé l'écran d'app qui
+# présente l'image au moment de la génération. Ce fichier décrit l'OBJET
+# IMAGE lui-même — sa composition, ses ratios, ses déclinaisons.
+# =============================================================================
+
+document:
+  type: palier_surfaces_hors_app_artefact
+  artefact: image_partageable_fin_parcours
+  numero: 14
+  fichier_id: "04"
+  version: "0.2"
+  date: "2026-05-07"
+  format: yaml
+  prerequis_de_lecture:
+    - "design/conception/14-surfaces-hors-app/00-index.yaml"
+    - "design/conception/03-fonctionnalites/11-surfaces-hors-app.yaml — D11.4 (matière fonctionnelle)"
+    - "design/conception/07-ecrans/partage/02-fin-parcours-image.yaml — écran générateur côté app"
+    - "design/conception/06-flows/06-partage.yaml — F3 (partage de fin de parcours)"
+    - "design/conception/09-cartographie/03-parcours-traces.yaml — grammaire visuelle des tracés (consommée pour le tracé stylisé)"
+
+# -----------------------------------------------------------------------------
+# 1. Raison d'être
+# -----------------------------------------------------------------------------
+raison_d_etre: >-
+  Le palier 3 D11.4 dit ce que l'image FAIT (synthétiser une fin de
+  parcours, parler pour elle-même, atmosphérique, signature discrète).
+  Le palier 7 dit où dans l'app elle est prévisualisée et déclenchée.
+  Ce fichier dit comment l'image se présente une fois publiée : sa
+  mise en page, ses ratios, ses statistiques, sa signature. C'est ce
+  qu'un follower de Kenji voit défiler dans son flux Instagram —
+  sans contexte d'app autour.
+
+# -----------------------------------------------------------------------------
+# 2. Héritage palier 3 D11.4 — par référence, pas redit
+# -----------------------------------------------------------------------------
+heritage_palier_3:
+  reference: "design/conception/03-fonctionnalites/11-surfaces-hors-app.yaml § D11.4"
+  ce_qui_est_deja_pose:
+    - "Capabilités (générer à la demande, tracer le parcours, statistiques discrètes, signature, partage natif)"
+    - "Règles fonctionnelles (générée à la demande à fin de parcours, format vertical, tracé stylisé, statistiques discrètes, signature discrète, pas de partage automatique)"
+    - "Ce qu'on ne fait pas (pas de gros logo, pas de slogan, pas de tonalité marketing, pas de gamification du partage, pas de personnalisation excessive)"
+    - "Critères de réussite (test_litmus Kenji, place dans flux Instagram sans détonner, lisibilité même sans texte explicatif)"
+    - "Definition of Done D11.4"
+    - "Enjeux transversaux (texte alternatif descriptif, performance de génération, pas de localisation précise, pas d'avatar, pas de métadonnées traçantes)"
+  questions_ouvertes_d11_4_a_arbitrer_ici:
+    - "Tracé idéal (fiche du parcours) plutôt que GPS personnel — TRANCHÉE en SHA-IMG-COMPOSITION par héritage strict de l'invariant cluster 06 et de la fiche écran 07"
+    - "Statistiques précises (étapes complétées, distance, durée, époques traversées) — TRANCHÉE en SHA-IMG-COMPOSITION (sous-ensemble retenu)"
+    - "Variantes par parcours (badge associé visible) — TRANCHÉE en D-IMG-3 (pas de variantes actuellement)"
+    - "Génération depuis l'historique d'une fin de parcours passée — DÉLÉGUÉE palier 6 F3 question ouverte (pas tranchée ici)"
+
+# -----------------------------------------------------------------------------
+# 3. Décisions structurelles propres au fichier 04
+# -----------------------------------------------------------------------------
+decisions_structurelles:
+
+  - id: D-IMG-1
+    decision: "Tracé IDÉAL du parcours (fiche), JAMAIS la trajectoire GPS personnelle de l'utilisateur"
+    pourquoi: >-
+      Tranche question ouverte D11.4 et confirme la fiche écran 07 (E-PARTAGE-FIN-PARCOURS-IMAGE
+      composition zone_1). Cohérent avec invariants cluster 06 palier 4
+      (vie privée stricte, pas de métadonnées traçantes). Le tracé GPS
+      personnel exposerait l'itinéraire effectif et donc la position
+      privée — interdit. Une éventuelle bascule 'tracé GPS personnel'
+      relèverait d'un opt-in explicite à arbitrer hors scope actuel (voir
+      questions ouvertes écran 07).
+
+  - id: D-IMG-2
+    decision: "Statistiques retenues — étapes complétées, durée, distance idéale ; époques traversées NON incluses actuellement"
+    pourquoi: >-
+      Tranche question ouverte D11.4. Étapes / durée / distance suffisent
+      à raconter l'histoire du parcours sans alourdir. Les époques
+      traversées sont une information riche mais redondante avec le
+      tracé sur fond carte stylisée (le fond reflète déjà l'époque
+      visuellement — palier 9 / palier 11). Réversible si retour
+      d'usage le justifie plus tard. Distance INDIQUÉE est la distance
+      du parcours idéal, pas la distance réellement parcourue (cohérent D-IMG-1).
+
+  - id: D-IMG-3
+    decision: "Pas de variante par parcours actuellement (badge associé non inclus)"
+    pourquoi: >-
+      Tranche question ouverte D11.4. La sobriété et la cohérence
+      inter-Parcours priment actuellement. Une variante par parcours
+      (badge associé visible discrètement) ouvrirait un système de
+      déclinaisons à concevoir au cas par cas — disproportionné
+      pour l'instant. Les badges sont signalés palier 9 / palier 13 mais
+      n'apparaissent PAS dans l'image partageable actuellement. Réversible
+      plus tard.
+
+  - id: D-IMG-4
+    decision: "Ratio principal actuellement — vertical 9:16 SEUL (story Instagram / WhatsApp Status / Snapchat / TikTok)"
+    pourquoi: >-
+      D11.4 a tranché 'format vertical adapté aux stories'. Les autres
+      ratios mentionnés en discussion préliminaire (square 1:1, horizontal
+      16:9) sont écartés actuellement par souci de simplicité — un seul ratio
+      à concevoir, à valider, à exporter. Le ratio 9:16 est aussi
+      celui qui parle le plus dans les flux mobiles dominants (Instagram
+      Stories, TikTok). Réversible plus tard si retour d'usage justifie
+      des déclinaisons (Instagram Feed square, partage Twitter horizontal).
+
+  - id: D-IMG-5
+    decision: "Pas de personnalisation par utilisateur (pas d'avatar, pas de prénom)"
+    pourquoi: >-
+      Héritage strict D11.4 ce_qu_on_ne_fait_pas 'pas de personnalisation
+      excessive'. Réaffirmé ici parce que la tentation 'voici le parcours
+      complété par {prénom}' est concrète. L'image parle pour le
+      parcours, pas pour l'utilisateur — c'est précisément ce qui la
+      rend partageable sans gêne (Kenji peut la poster sans 'se mettre
+      en avant').
+
+# -----------------------------------------------------------------------------
+# 4. Fiches d'artefact
+# -----------------------------------------------------------------------------
+artefacts:
+
+  # ===========================================================================
+  - id: SHA-IMG-COMPOSITION
+    nom: "Composition de l'image partageable (ratio 9:16)"
+
+    raison_d_etre: >-
+      Définit la mise en page de l'image telle qu'elle apparaît dans
+      le flux d'un réseau social. Quatre zones du haut vers le bas,
+      pensées pour une lecture rapide en miniature (story qui défile)
+      et lisible quand elle est ouverte en plein écran.
+
+    composition_destinataire_centree:
+      orientation: "Verticale, ratio 9:16 (D-IMG-4)"
+      hierarchie_visuelle:
+
+        zone_1_titre_du_parcours:
+          role: "Titre du Parcours complété"
+          apparence: "TOK-TYPO-DISPLAY-LG palier 12, TOK-COLOR-TEXTE-PRINCIPAL ou TOK-COLOR-BLANC-NARRATIF selon le fond — alignement à gauche ou centré (cohérent dans toute la composition)"
+          position: "Haut de l'image, marges TOK-SPACE-X palier 12"
+
+        zone_2_trace_sur_carte_stylisee:
+          role: "Tracé idéal du parcours sur un fond carte stylisé"
+          contenu:
+            - "Tracé idéal du parcours (héritage D-IMG-1 — JAMAIS la trajectoire GPS)"
+            - "Marqueurs des étapes (cohérent grammaire visuelle palier 9 03-parcours-traces — héritage par référence)"
+            - "Fond carte stylisé selon l'époque dominante du Parcours (cohérent grammaire visuelle palier 9 01-fond-et-epoques)"
+          apparence: "Composition graphique fidèle au ton conteur — cohérence avec palier 9 (couches d'époque), palier 12 (palette parchemin / encre / terracotta)"
+          position: "Cœur de l'image (occupe la majorité de la surface)"
+
+        zone_3_statistiques_discretes:
+          role: "Statistiques de fin retenues (D-IMG-2)"
+          contenu:
+            - "Étapes complétées (par exemple 'X étapes')"
+            - "Durée (par exemple 'X min' ou 'Xh Ymin')"
+            - "Distance idéale (par exemple 'X km' ou 'X m')"
+          apparence: "TOK-TYPO-UI-MDpalier 12, taille modérée, alignement compact (chiffres et libellés sur une ligne ou empilés selon la place) — TOK-COLOR-TEXTE-SECONDAIRE pour le contraste discret"
+          position: "Sous le tracé, bloc compact"
+          microcopy: "Patterns palier 8 cluster 03-template-parcours section fin de parcours partagée"
+
+        zone_4_signature_histolyon:
+          role: "Signature de la marque (D11.4 'signature HistoLyon discrète')"
+          contenu: "Logo HistoLyon (référence fichier 07) en taille modérée, jamais dominante"
+          position: "Pied de l'image, marges cohérentes"
+          ce_qu_il_n_est_pas:
+            - "Pas un gros logo (héritage D11.4 strict)"
+            - "Pas un slogan ('Découvrez Lyon !', 'Téléchargez l'app !' — interdits D11.4)"
+            - "Pas le wordmark complet à pleine échelle — déclinaison sobre prévue fichier 07"
+
+    consommation_paliers_amont:
+      tokens_palier_12: "TOK-COLOR-FOND-PRINCIPAL, TOK-COLOR-PRIMARY, TOK-COLOR-TEXTE-PRINCIPAL, TOK-COLOR-TEXTE-SECONDAIRE, TOK-COLOR-BLANC-NARRATIF, TOK-TYPO-DISPLAY-LG, TOK-TYPO-UI-MD, TOK-SPACE-X"
+      grammaire_palier_9: "Couches d'époque (01-fond-et-epoques), tracés et marqueurs d'étape (03-parcours-traces), composition de la signature (héritage palier 9 — pas redéfini ici)"
+      icones_palier_13: "Pas d'icônes systématiques actuellement (héritage D-IMG-3 simplification, et D11.4 'pas de gros logo')"
+      microcopy_palier_8: "Cluster 03-template-parcours section fin de parcours partagée"
+
+  # ===========================================================================
+  - id: SHA-IMG-METADONNEES-DE-PARTAGE
+    nom: "Métadonnées qui voyagent avec l'image partagée"
+
+    raison_d_etre: >-
+      Quand l'image est partagée via le mécanisme natif système, certaines
+      métadonnées peuvent voyager avec (texte alternatif descriptif pour
+      a11y, mention contextuelle). Cette fiche pose ce qui est inclus
+      par défaut et ce qui ne l'est pas.
+
+    inclus_par_defaut:
+      - "Texte alternatif descriptif (héritage D11.4 enjeu accessibilité — pour les canaux qui le supportent)"
+    non_inclus:
+      - "Pas de localisation GPS (héritage D11.4 enjeu vie privée strict)"
+      - "Pas d'avatar de l'utilisateur (héritage D-IMG-5)"
+      - "Pas de métadonnées EXIF traçantes (lieu, appareil photo, etc.)"
+      - "Pas de tag de réseau social automatique (#histolyon, @histolyon — relève du choix utilisateur, pas de l'app)"
+
+    relation_avec_le_lien_universel:
+      delegation: "Le payload exact remis au système (image SEULE vs image + Lien universel) est posé fichier 05 — voir SHA-PAYLOAD-FIN-PARCOURS"
+
+    consommation_paliers_amont:
+      microcopy_palier_8: "Pattern de texte alternatif descriptif palier 8 cluster transverse a11y"
+
+# -----------------------------------------------------------------------------
+# 5. Personas servis
+# -----------------------------------------------------------------------------
+personas_servis:
+
+  kenji:
+    test_litmus_servi: "Partager une fin de parcours sur Instagram en quelques secondes sans avoir à composer un texte"
+    apport_du_fichier: >-
+      SHA-IMG-COMPOSITION ratio 9:16 (D-IMG-4) cible son flux Instagram
+      Stories. La composition atmosphérique et sobre (D-IMG-5 pas de
+      personnalisation, D11.4 pas de marketing) lui permet de poster
+      sans exposer son identité, et l'image parle pour le parcours
+      sans avoir besoin d'un texte d'accompagnement.
+
+  pere_lyonnais:
+    test_litmus_servi: "Partager une découverte ponctuelle pour qu'un ami aille voir aussi"
+    apport_du_fichier: >-
+      L'image atmosphérique transmet l'expérience vécue. La signature
+      discrète permet au destinataire intrigué de retrouver l'app sans
+      qu'on l'agresse de marketing.
+
+  mme_dupont:
+    impact: "indirect — son cas central est la fiche de parcours partagée (SHA-WEB-VUE-PARCOURS), pas l'image de fin"
+
+  mme_martin:
+    impact: "marginal — pas son cas d'usage"

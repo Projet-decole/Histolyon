@@ -1,0 +1,97 @@
+# =============================================================================
+# E-PARCOURS-EN-COURS-TERRAIN — Parcours en cours, mode terrain
+# =============================================================================
+# Surface de déroulé d'un Parcours actif en mode terrain (avec géoloc accordée).
+# Vit sur P5.S2 mais coexiste avec P5.S1 Carte qui affiche le tracé et la
+# position. Surface persistante E-TRANSVERSES-PARCOURS-PERSISTANT (P2) visible.
+# Les alertes d'arrivée à étape (E2, P5.M7) sont déléguées à
+# E-CARTE-ALERTE-PROXIMITE.
+# =============================================================================
+
+document:
+  type: palier_ecrans_fiche
+  format: yaml
+
+ecran:
+  id: E-PARCOURS-EN-COURS-TERRAIN
+  nom: "Parcours en cours, mode terrain"
+
+  mode: P5.M3
+  surface_parente: P5.S2
+
+  raison_d_etre: >-
+    Accompagner l'utilisateur pendant qu'il marche un Parcours sur le
+    terrain : tracé visible sur la Carte, étape courante mise en
+    évidence, progression livrée par les alertes de proximité, possibilité
+    de pause, de saut d'étape ou d'abandon. La surface elle-même montre
+    l'état du parcours et donne accès aux contrôles ; l'expérience
+    spatiale se joue sur P5.S1 Carte qui reste navigable.
+
+  composition:
+    - zone: "en-tête du parcours"
+      role: "rappel du Parcours en cours (titre, auteur, badge éventuel) et indicateur de mode terrain actif"
+      entites_affichees: [Parcours]
+
+    - zone: "progression"
+      role: "récapitulatif des étapes complétées, sautées et restantes ; compteur de progression ; durée écoulée"
+      entites_affichees: [Étape, "Historique de visite"]
+
+    - zone: "étape courante"
+      role: "Étape vers laquelle l'utilisateur se dirige : titre du Pin référencé, position dans la séquence, indication de proximité, introduction d'étape éventuelle"
+      entites_affichees: [Étape, Pin]
+
+    - zone: "liste des étapes"
+      role: "énumération ordonnée affichant l'état de chaque étape (complétée, courante, à venir, sautée) ; permet d'accéder à un aperçu d'étape sans interrompre le déroulé ; permet le saut d'étape vers E-PARCOURS-SAUT-ETAPE"
+      entites_affichees: [Étape, Pin]
+
+    - zone: "tracé sur la Carte"
+      role: "le tracé du Parcours et la position de l'utilisateur sont surfacés sur P5.S1 Carte qui reste accessible — la Carte affiche les Pins étapes numérotés ; cette zone n'est pas une zone de cet écran mais une coexistence avec P5.S1"
+      entites_affichees: [Parcours, Étape, Pin]
+
+    - zone: "contrôles de déroulé"
+      role: "regroupe la pause, la bascule vers le mode canapé, le saut d'étape, l'abandon"
+
+  etats:
+    nominal_charge: "Parcours en cours actif, étape courante identifiée, géoloc à jour, tracé visible sur la Carte"
+    chargement: "Récupération de la position et synchronisation de l'étape courante"
+    en_marche_vers_etape: "L'utilisateur progresse vers l'étape courante ; pas encore en zone de proximité"
+    proche_etape_courante: "L'utilisateur est en zone de proximité de l'étape courante ; l'alerte ponctuelle E2 a été ou va être déclenchée par E-CARTE-ALERTE-PROXIMITE (P5.M7)"
+    en_pause: "L'utilisateur a activé la pause ; aucune alerte de proximité ne se déclenche ; l'état du parcours est préservé (cf. C7)"
+    en_deviation: "L'utilisateur s'est éloigné du tracé au-delà du seuil ; un message éphémère P5.M9 a signalé ; si la déviation persiste, l'alerte E-CARTE-ALERTE-PROXIMITE peut proposer de revenir, basculer en canapé ou ignorer (C7)"
+    permission_geoloc_revoquee: "La permission a été révoquée en cours de Parcours ; bascule automatique vers E-PARCOURS-EN-COURS-CANAPE avec message éphémère P5.M9 informant l'utilisateur (cf. cas particulier C5)"
+    offline_avec_cache: "Réseau indisponible mais Parcours préchargé ; déroulé continue normalement ; bandeau P3 visible"
+    offline_sans_cache_etape_indisponible: "Une étape n'est pas téléchargée et le réseau est indisponible ; message éphémère P5.M9 au passage à cette étape ; possibilité de la sauter ou de poursuivre une fois le réseau rétabli"
+    arriere_plan: "App passée en arrière-plan ; l'état est préservé (P5.N7) ; au retour, position resynchronisée et P5.P2 toujours actif"
+    derniere_etape_completee: "L'utilisateur vient de compléter la dernière étape ; bascule vers E-PARCOURS-FIN-CELEBRATION (C9) ; P5.P2 disparaît"
+
+  elements_interactifs:
+    - "Tap sur l'étape courante ou sur un Pin de la liste → bascule vers E-PIN-CONSULTATION-APPROFONDIE (B2) du Pin de l'étape ; au retour, l'étape est marquée complétée dans l'Historique"
+    - "Tap sur le tracé ou un Pin sur la Carte → aperçu rapide ou consultation approfondie du Pin"
+    - "Tap pause → flow C7 (état pausé), P5.P2 indique la pause"
+    - "Tap reprendre (depuis l'état pausé) → reprise du déroulé"
+    - "Tap saut d'étape → flow C8, ouverture E-PARCOURS-SAUT-ETAPE (P5.M6)"
+    - "Tap bascule vers mode canapé → bascule vers E-PARCOURS-EN-COURS-CANAPE (cf. C5 → C6)"
+    - "Tap abandon → ouverture E-TRANSVERSES-DIALOGUE-CONFIRMATION (P5.M8) ; si confirmé, Parcours en état 'abandonné', P5.P2 disparaît"
+    - "Tap surface persistante P2 (E-TRANSVERSES-PARCOURS-PERSISTANT) depuis n'importe où → ramène ici"
+
+  flows_actifs:
+    - C5   # Vivre un parcours en terrain
+    - C7   # Gestion des déviations et pauses
+    - E2   # Alerte d'arrivée à étape (déléguée à E-CARTE-ALERTE-PROXIMITE)
+
+  surfaces_imbriquees:
+    - E-PIN-CONSULTATION-APPROFONDIE         # M3 quand on consulte le Pin d'une étape
+    - E-PARCOURS-SAUT-ETAPE                  # M6 quand saut d'étape
+    - E-PARCOURS-EN-COURS-CANAPE             # M3 si bascule manuelle ou perte de permission
+    - E-PARCOURS-FIN-CELEBRATION             # M3 à la complétion de la dernière étape
+    - E-CARTE-ALERTE-PROXIMITE               # M7 alertes E2 d'arrivée à étape
+    - E-TRANSVERSES-DIALOGUE-CONFIRMATION    # M8 confirmation d'abandon
+    - E-TRANSVERSES-MESSAGE-EPHEMERE         # M9 éloignement, perte réseau, étape indisponible
+    - E-TRANSVERSES-PARCOURS-PERSISTANT      # P2 toujours active pendant le déroulé
+    - E-TRANSVERSES-AUDIO-PERSISTANT         # P1 si narration audio en cours
+    - E-TRANSVERSES-BANDEAU-OFFLINE          # P3 si offline
+
+  questions_ouvertes:
+    - "Pilotage du slider d'époque par l'étape courante (cf. C5 question ouverte) — automatique au passage d'étape, ou manipulation manuelle prioritaire ?"
+    - "Comportement précis si l'utilisateur consulte un Pin hors étape pendant un parcours en cours : ce Pin doit-il marquer une étape sautée si géo-correspondant à une étape future, ou rester un détour neutre ? — cf. cluster 03 historique"
+    - "Granularité de la zone progression : afficher la durée écoulée et estimée restante, ou juste un compteur d'étapes — palier 8/10"

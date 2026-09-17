@@ -1,0 +1,425 @@
+# =============================================================================
+# Palier 6 — 06-partage — Famille F (Partage et entrées externes)
+# =============================================================================
+# Cinq flows liés à la distribution hors-app : trois flows de partage sortant
+# (F1 Pin, F2 fiche de Parcours, F3 fin de parcours avec Image partageable),
+# un flow de génération de Code visuel (F4), et un flow d'entrée externe
+# polymorphe (F5 — réception d'un Lien universel via canal externe ou scan
+# de Code visuel).
+#
+# Le partage natif système est une MÉCANIQUE déléguée à l'OS : l'app prépare
+# la donnée (Lien universel, et selon le cas Image partageable ou Code visuel)
+# puis remet la main au système. Les flows ne modélisent PAS l'écran système
+# qui s'ouvre (palier 14).
+#
+# Conventions : préfixe P5. pour palier 5 ; pré-requis non triviaux uniquement.
+# =============================================================================
+
+document:
+  type: palier_flows_cluster
+  cluster_id: "06-partage"
+  nom: "Partage et entrées externes"
+  version: "0.1"
+  date: "2026-05-05"
+  format: yaml
+
+raison_d_etre_du_cluster: >-
+  Sans surfaces hors-app, l'app reste une île. Cette famille de flows couvre
+  la SORTIE (partager un Pin, une fiche de Parcours, une fin de parcours,
+  générer un Code visuel imprimable) et l'ENTRÉE (recevoir un Lien universel
+  par canal externe, ou par scan d'un Code visuel — qui revient au même).
+  Tous ces flows respectent strictement les invariants du cluster 06
+  distribution : pas de tracking, pas d'identité d'expéditeur encodée,
+  validité couplée à la cible.
+
+# -----------------------------------------------------------------------------
+# Flows
+# -----------------------------------------------------------------------------
+flows:
+
+  # ---------------------------------------------------------------------------
+  - id: F1
+    nom: "Partage d'un Pin via partage natif système"
+
+    declencheur: "Tap sur le contrôle de partage depuis l'aperçu rapide d'un Pin (B1) ou la consultation approfondie d'un Pin (B2)"
+    acteurs: [utilisateur grand public]
+
+    deroule:
+      - etape: 1
+        action: "L'app prépare le Lien universel canonique du Pin (cluster 06 — un seul Lien par cible). Si un Lien universel existe déjà pour ce Pin, il est réutilisé tel quel ; sinon il est instancié à la volée."
+        surfaces_actives: [P5.M2, P5.M3]
+      - etape: 2
+        action: "L'app remet la main au mécanisme de partage natif du système d'exploitation, en lui transmettant le Lien universel comme donnée à partager. La surface système qui s'affiche n'est pas modélisée (palier 14 — hors-app)."
+      - etape: 3
+        action: >-
+          Le système gère seul la sélection de la destination par l'utilisateur
+          (messagerie, mail, AirDrop, copier-coller, enregistrement). L'app
+          n'intervient pas dans ce choix et ne sait pas vers quelle destination
+          le partage est envoyé.
+      - etape: 4
+        action: "Au retour du système, l'app revient exactement à l'état précédent (B1 ou B2 selon la surface d'origine)."
+
+    bifurcations:
+      - si: "L'utilisateur valide une destination dans la surface système"
+        alors: "le système gère l'envoi ; l'app revient à son état précédent (sortie normale)"
+      - si: "L'utilisateur annule le partage depuis la surface système"
+        alors: "retour à B1 ou B2 sans message d'erreur ni message éphémère"
+
+    sorties_normales:
+      - "Retour à B1 ou B2 (état préservé)"
+
+    cas_particuliers:
+      - cas: "Connexion réseau indisponible au moment du partage"
+        comportement: >-
+          Le Lien universel reste valide (il est défini canoniquement, pas
+          dépendant de la connexion). Le partage est délégué au système,
+          qui gère seul la file d'attente du canal choisi. L'app ne bloque
+          pas le partage hors-ligne.
+      - cas: "Pin de provenance communautaire en cours de vérification (marque distinctive I3)"
+        comportement: "Le Lien universel est tout de même partageable. Le destinataire qui ouvrira le lien verra la marque distinctive sur le Pin (cf. F5 et B2)."
+
+    entites_impliquees: [Pin, "Lien universel"]
+    surfaces_et_modes: [P5.M2, P5.M3]
+    references_palier_3: [D2.4, D2.5, D11.1, D11.5]
+    invariants_respectes: [I1]
+    questions_ouvertes:
+      - "Le partage d'un Pin peut-il être accompagné d'une image annexe (vignette du Pin) en plus du lien ? — relève de D11.5 question_ouverte (palier 6 ou 7)"
+
+  # ---------------------------------------------------------------------------
+  - id: F2
+    nom: "Partage d'une fiche de parcours"
+
+    declencheur: "Tap sur le contrôle de partage depuis la fiche d'un Parcours (C3)"
+    acteurs: [utilisateur grand public]
+
+    deroule:
+      - etape: 1
+        action: "L'app prépare le Lien universel canonique du Parcours (cluster 06)."
+        surfaces_actives: [P5.M3]
+      - etape: 2
+        action: "L'app remet la main au mécanisme de partage natif du système. La donnée transmise est le Lien universel du Parcours."
+      - etape: 3
+        action: "Le système présente les destinations possibles à l'utilisateur. L'app ne filtre ni ne pré-sélectionne."
+      - etape: 4
+        action: "Au retour du système, l'app revient à C3 (fiche du Parcours) dans l'état où elle l'avait laissée."
+
+    bifurcations:
+      - si: "L'utilisateur valide une destination"
+        alors: "le système gère l'envoi ; sortie normale"
+      - si: "L'utilisateur annule depuis la surface système"
+        alors: "retour à C3 sans drame"
+
+    sorties_normales:
+      - "Retour à C3"
+
+    cas_particuliers:
+      - cas: "Parcours de provenance personnelle non publié"
+        comportement: >-
+          Modèle CAPABILITY (décision utilisateur 2026-05-05) : le Lien
+          universel reste résoluble par quiconque le détient. Le Parcours
+          personnel n'apparaît PAS dans le catalogue public (C1, C2) et
+          n'est pas indexé par la recherche A4 — il reste personnel au
+          sens du listing public, mais accessible aux destinataires
+          explicites du lien. Cas typique : Mme Dupont envoie son parcours
+          scolaire aux 6 parents accompagnateurs sans rendre le parcours
+          public.
+      - cas: "Parcours communautaire en cours de vérification (marque distinctive I3)"
+        comportement: "Partage possible. Le destinataire verra la marque distinctive sur la fiche au moment de la résolution (F5 → C3)."
+      - cas: "Connexion réseau indisponible"
+        comportement: "Le partage est délégué au système ; pas de blocage côté app."
+
+    entites_impliquees: [Parcours, "Lien universel"]
+    surfaces_et_modes: [P5.M3]
+    references_palier_3: [D3.3, D11.1, D11.5]
+    invariants_respectes: [I1]
+    questions_ouvertes:
+      - "Le partage d'un Parcours inclut-il systématiquement une image annexe (visuel synthétique du Parcours) ou seulement le Lien ? — D11.5 question_ouverte"
+
+  # ---------------------------------------------------------------------------
+  - id: F3
+    nom: "Partage d'une fin de parcours (image partageable)"
+
+    declencheur: "Tap sur le contrôle de partage depuis la surface de célébration de fin de parcours (C9)"
+    acteurs: [utilisateur grand public]
+
+    pre_requis_specifiques:
+      - "Parcours en état 'complété' (C9 atteint) — y compris partiellement complété avec étapes sautées (cf. C9 cas particulier)"
+
+    deroule:
+      - etape: 1
+        action: >-
+          L'app génère (ou retrouve, si déjà générée pour cette même fin de
+          parcours — cf. cluster 06 entité Image partageable) une Image
+          partageable synthétisant la fin de parcours : tracé du parcours,
+          statistiques de fin et signature HistoLyon (composition visuelle
+          précise en palier 9 / 12).
+        surfaces_actives: [P5.M3]
+      - etape: 2
+        action: "Le Lien universel canonique du Parcours est préparé en parallèle."
+      - etape: 3
+        action: >-
+          L'app remet la main au mécanisme de partage natif du système, en
+          lui transmettant comme donnée la combinaison Image partageable
+          + Lien universel (composition exacte décidée par D11.5 — cf.
+          question ouverte).
+      - etape: 4
+        action: "Le système présente les destinations possibles (réseaux sociaux, messagerie, enregistrement). L'app n'intervient pas."
+      - etape: 5
+        action: "Au retour du système, l'app revient à C9 (surface de célébration) — ou à l'écran qui suit, si l'utilisateur a déjà fermé la célébration entre-temps."
+
+    bifurcations:
+      - si: "L'utilisateur valide une destination"
+        alors: "le système gère l'envoi ; sortie normale"
+      - si: "L'utilisateur annule depuis la surface système"
+        alors: "retour à C9 ou à la surface postérieure ; aucun message d'erreur"
+
+    sorties_normales:
+      - "Retour à C9 ou à P5.S2 (selon que l'utilisateur n'a pas encore quitté la célébration)"
+
+    cas_particuliers:
+      - cas: "Connexion réseau indisponible au moment de la génération de l'image"
+        comportement: >-
+          La génération de l'image dépend des moyens locaux : si la trace
+          du Parcours et les éléments stylistiques sont disponibles
+          localement (parcours préchargé), la génération réussit. Sinon,
+          un message éphémère P5.M9 informe que le partage sera disponible
+          à la reconnexion ; la fin de parcours reste enregistrée dans
+          l'Historique pour partage ultérieur (cf. F3 depuis l'historique
+          — question ouverte D11.4).
+      - cas: "Génération de l'image qui échoue ou prend un temps perçu trop long"
+        comportement: >-
+          Fallback sur partage du Lien universel seul (sans image), avec
+          un message éphémère P5.M9 informant qu'une trace visuelle n'a
+          pas pu être générée. Le moment de célébration n'est pas rompu
+          par une attente bloquante.
+      - cas: "Parcours retiré entre la complétion et le partage (parcours communautaire dépublié)"
+        comportement: >-
+          L'image reste générable (l'expérience vécue compte, cf. C9 cas
+          particulier). Le Lien universel partagé pointe vers une cible
+          retombée — la résolution côté destinataire (F5) sera gracieuse.
+
+    entites_impliquees: [Parcours, "Image partageable", "Lien universel", Profil]
+    surfaces_et_modes: [P5.M3, P5.M9]
+    references_palier_3: [D3.9, D11.1, D11.4, D11.5]
+    invariants_respectes: [I1, I6]
+    questions_ouvertes:
+      - "Re-partage d'une fin de parcours depuis l'Historique (parcours complété il y a X jours) : génère-t-on une nouvelle Image partageable, ou retrouve-t-on celle déjà persistée ? — D11.4 question ouverte ; relève aussi du flow C10 (Relancement)"
+      - "L'Image partageable est-elle proposée AVANT ou APRÈS la remise de main au système ? Confirmation visuelle de l'image avant partage utile (Kenji veut voir avant de poster) — palier 7"
+
+  # ---------------------------------------------------------------------------
+  - id: F4
+    nom: "Génération d'un code visuel"
+
+    declencheur: "Tap sur le contrôle de génération d'un Code visuel depuis une fiche de Pin (B2) ou une fiche de Parcours (C3)"
+    acteurs: [utilisateur grand public]
+
+    deroule:
+      - etape: 1
+        action: "L'app récupère (ou instancie) le Lien universel canonique de la cible (Pin ou Parcours)."
+        surfaces_actives: [P5.M3]
+      - etape: 2
+        action: >-
+          L'app génère un Code visuel qui encode le Lien universel (cluster 06
+          — le Code visuel ne porte pas de cible en propre, il pointe via le
+          Lien). L'apparence respecte la sobriété (pas de logo géant, pas de
+          slogan promotionnel — cf. cluster 06 invariant).
+      - etape: 3
+        action: >-
+          Le Code visuel est présenté à l'utilisateur dans une surface ponctuelle
+          (P5.M6), prêt à être partagé, enregistré ou exporté.
+        surfaces_actives: [P5.M6]
+      - etape: 4
+        action: >-
+          L'utilisateur peut déclencher un partage natif (équivalent à F1/F2
+          mais avec le Code visuel comme donnée à partager — typiquement
+          enregistrement local pour impression ultérieure) ou refermer la
+          surface ponctuelle.
+
+    bifurcations:
+      - si: "L'utilisateur déclenche le partage du Code visuel"
+        alors: "remise de main au mécanisme de partage natif système (cf. F1 étapes 2-4 appliquées au Code visuel) ; au retour, retour à P5.M6 puis à B2 ou C3"
+      - si: "L'utilisateur referme la surface ponctuelle (geste neutre, validation, annulation)"
+        alors: "retour à B2 ou C3 ; le Code visuel reste persisté côté app (cluster 06 — Code visuel persistant tant que sa cible existe)"
+
+    sorties_normales:
+      - "Retour à B2 ou C3"
+
+    cas_particuliers:
+      - cas: "Connexion réseau indisponible"
+        comportement: >-
+          La génération du Code visuel ne dépend que du Lien universel et
+          de moyens graphiques locaux. Si le Lien existait déjà, la
+          génération est purement locale ; sinon (instanciation à la volée),
+          le comportement dépend de la politique de génération du Lien
+          (cf. cluster 06 question ouverte — pré-stocké côté serveur ou
+          calculable localement).
+      - cas: "Cible retirée après génération du Code visuel"
+        comportement: >-
+          Le Code visuel continue d'exister (cluster 06 — il pointe vers le
+          Lien universel qui devient retombé). Au scan, la résolution est
+          gracieuse côté F5. Le Code n'est pas révoqué.
+      - cas: "Pin sans localisation géographique (I9)"
+        comportement: "La génération est tout de même possible — la localisation n'est pas un attribut requis pour le Lien universel."
+
+    entites_impliquees: [Pin, Parcours, "Lien universel", "Code visuel"]
+    surfaces_et_modes: [P5.M3, P5.M6]
+    references_palier_3: [D11.1, D11.3, D11.5]
+    invariants_respectes: [I1]
+    questions_ouvertes:
+      - "Le Code visuel généré est-il accompagné d'une mention textuelle imprimable du Lien universel (lisibilité au clavier, accessibilité) ? — D11.3 enjeu accessibilité, palier 8"
+      - "Une note d'instruction ('Scannez avec votre téléphone') accompagne-t-elle le code lors du partage ? — D11.3 question_ouverte, palier 8"
+
+  # ---------------------------------------------------------------------------
+  - id: F5
+    nom: "Réception d'un Lien universel"
+
+    declencheur: >-
+      Tap sur un Lien universel reçu via un canal externe (messagerie,
+      mail, navigateur, ou scan d'un Code visuel — qui ouvre un Lien
+      universel et donc retombe sur ce flow).
+    acteurs: [utilisateur grand public]
+
+    deroule:
+      - etape: 1
+        action: >-
+          Le système d'exploitation transmet à l'app le Lien universel reçu
+          (mécanisme de deep-link / universal link / app link — implémentation
+          au palier 14, hors périmètre). L'app résout le Lien : type_de_cible
+          (Pin ou Parcours) et identifiant de la cible.
+      - etape: 2
+        action: >-
+          L'app détermine si la cible existe et est accessible (Lien actif)
+          ou retombée (cible retirée / supprimée / non publiée selon le cas).
+      - etape: 3
+        action: "Selon le type_de_cible et l'état de résolution, l'app bascule vers la surface adéquate (cf. bifurcations)."
+        surfaces_actives: [P5.E2]
+
+    bifurcations:
+      - si: "type_de_cible = pin et Lien actif"
+        alors: >-
+          bascule vers B2 (Consultation approfondie d'un Pin) avec S1 Carte
+          en surface principale derrière (cf. P5.E2). Le Pin est centré sur
+          la Carte au retour de B2.
+      - si: "type_de_cible = parcours et Lien actif"
+        alors: >-
+          bascule vers C3 (Consultation de la fiche d'un Parcours) avec S2
+          Parcours en surface principale derrière. Au retour de C3, l'utilisateur
+          atterrit sur P5.S2 (cf. P5.E2 et règle de la fiche C3).
+      - si: "Lien retombé (cible retirée ou non résoluble)"
+        alors: >-
+          sortie alternative : surface de résolution gracieuse (P5.M3) avec
+          un message conteur informant que l'élément n'est plus disponible
+          (ton sobre, pas d'erreur brutale — cf. cluster 06 invariant D3).
+          Un point d'accès propose de revenir vers P5.S1 Carte ou vers le
+          catalogue P5.S2.
+
+    sorties_normales:
+      - "Bascule vers B2 (Pin)"
+      - "Bascule vers C3 (Parcours)"
+      - "Surface de résolution gracieuse + retour vers P5.S1 ou P5.S2 (Lien retombé)"
+
+    cas_particuliers:
+      - cas: "App non installée sur le terminal qui reçoit le lien"
+        comportement: >-
+          Fallback hors périmètre app : le système d'exploitation ouvre la
+          version web responsive (palier 14) sur l'élément référencé. Aucun
+          flow palier 6 ne s'exécute côté app — l'app n'est pas concernée.
+          Mention pour mémoire ; modélisation détaillée en palier 14.
+      - cas: "Premier lancement de l'app via un Lien universel (utilisateur qui n'avait jamais ouvert l'app)"
+        comportement: >-
+          L'app s'ouvre sur la cible (B2 ou C3) sans imposer le flow A1
+          (Premier lancement). L'onboarding traversant (cf. palier 5 E1)
+          peut tout de même se déclencher en surimpression non bloquante
+          (P5.M9 / P5.M7) au fil des actions suivantes. La cible reçue est
+          prioritaire sur l'introduction.
+      - cas: "Parcours personnel non publié partagé par son auteur (Mme Dupont aux parents accompagnateurs)"
+        comportement: >-
+          Modèle CAPABILITY (décision utilisateur 2026-05-05) : la
+          résolution réussit normalement → bascule vers C3. Le destinataire
+          peut consulter et lancer le parcours, sans qu'il n'apparaisse
+          dans le catalogue public. La cible reste de provenance
+          personnelle ; aucune mécanique de modération ni de marque
+          distinctive n'est appliquée — c'est un parcours privé partagé
+          entre proches.
+      - cas: "Pin sans localisation géographique (I9) reçu via Lien"
+        comportement: >-
+          Bascule vers B2 normalement. La surface principale derrière
+          reste S1 Carte mais sans pin centré (le Pin n'est pas
+          cartographique). Le retour de B2 ramène à S1 dans son état
+          initial (ou à S2 si une recherche avait amené le Pin).
+      - cas: "Pin de provenance communautaire en cours de vérification (marque distinctive I3)"
+        comportement: "Bascule vers B2 normalement. La marque distinctive est visible sur la fiche du Pin (cf. cluster 01 / B2)."
+      - cas: "App ouverte par scan d'un Code visuel"
+        comportement: >-
+          Strictement équivalent à l'ouverture du Lien universel encodé
+          (cluster 06 — le Code visuel ne porte pas de comportement en
+          propre). Le scan déclenche F5 sur le Lien encodé. Le fait que
+          l'origine soit un Code visuel (vs un canal numérique) n'est pas
+          tracé (cluster 06 invariant D1 — pas de tracking).
+
+    entites_impliquees: [Pin, Parcours, "Lien universel", "Code visuel"]
+    surfaces_et_modes: [P5.E2, P5.S1, P5.S2, P5.M3]
+    references_palier_3: [D11.1]
+    invariants_respectes: [I1, I3]
+    questions_ouvertes:
+      - "Comportement précis quand l'utilisateur a un Parcours en cours (P5.P2 active) et reçoit un Lien vers un autre Parcours : refus, dialogue P5.M8, ou consultation sans interruption ? — palier 6 ou palier 7"
+      - "Le scan d'un Code visuel passe-t-il par un point d'accès dédié dans l'app (intégré à la surface de recherche ?) ou s'appuie-t-il sur le scanner OS uniquement ? — palier 7"
+
+# -----------------------------------------------------------------------------
+# Persona check
+# -----------------------------------------------------------------------------
+persona_check:
+
+  kenji:
+    impact: "MAJEUR"
+    note: >-
+      F3 sert directement son test_litmus 'partager une fin de parcours sur
+      Instagram en quelques secondes sans avoir à composer un texte'. La
+      remise de main au mécanisme natif (D11.5) lui évite de comprendre
+      une UI française. L'Image partageable atmosphérique parle pour
+      elle-même. Le cas particulier 'fallback sur Lien seul si génération
+      échoue' évite de bloquer le moment de célébration. F5 sert aussi
+      son scénario 'recevoir un itinéraire d'un ami sans installer de
+      Compte' (cf. cas particulier 'premier lancement via Lien').
+
+  mme_dupont:
+    impact: "MAJEUR"
+    note: >-
+      F2 sert directement son scénario 'envoyer le parcours préparé aux 6
+      parents accompagnateurs'. La remise de main au système natif lui
+      laisse choisir son canal (mail, WhatsApp, AirDrop). F4 (Code visuel)
+      sert son scénario complémentaire 'feuille imprimée distribuée aux
+      parents' — code et lien fonctionnent indifféremment. La question
+      ouverte 'résolution d'un Parcours personnel non publié' la concerne
+      directement : si elle ne veut pas publier publiquement (cohérent
+      avec essence § ce_qu_on_refuse 'mur d'inscription'), il faut que
+      les parents puissent ouvrir le lien. À arbitrer en priorité.
+
+  mme_martin:
+    impact: "indirect"
+    note: >-
+      Usage marginal mais réel : F4 (Code visuel) pour afficher un code
+      en classe que les élèves scannent pour accéder à un Pin sur leur
+      tablette. La modélisation le permet sans contrainte particulière —
+      le scan tombe en F5 et résout vers la version web sur les tablettes
+      sans app (palier 14). Pas de partage social pour Mme Martin.
+
+  pere_lyonnais:
+    impact: "direct"
+    note: >-
+      F1 sert son scénario 'partager une découverte ponctuelle à un ami
+      pour qu'il aille voir aussi'. Le partage opportuniste depuis B1
+      (aperçu rapide) est cohérent avec son usage en flânerie — pas besoin
+      d'aller en consultation approfondie pour partager. F5 sert le
+      pendant : recevoir une découverte d'un ami ouvre directement la
+      fiche du Pin sans friction.
+
+  anais_back_office:
+    impact: "indirect"
+    note: >-
+      Anaïs ne génère pas elle-même de Liens universels, d'Images
+      partageables ou de Codes visuels — elle produit le contenu (Pin,
+      Parcours) qui sera ensuite partagé par les utilisateurs. Point de
+      vigilance hérité de cluster 06 : l'identifiant lisible et stable
+      d'un Pin et d'un Parcours qu'elle saisit aura une seconde vie comme
+      slug du Lien universel. À acter en palier 13 (template de saisie).

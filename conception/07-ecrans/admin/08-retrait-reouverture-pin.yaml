@@ -1,0 +1,110 @@
+# =============================================================================
+# E-ADMIN-RETRAIT-REOUVERTURE-PIN — Retrait ou réouverture d'un Pin publié
+# =============================================================================
+# Surface des transitions terminales du cycle de vie d'un Pin : publié → retiré
+# (suite signalement honoré ou décision éditoriale) ou retiré → publié
+# (correction). Pour Pins éditoriaux : Trace de validation négative ex post.
+# Pour Pins communautaires : Trace de modération. Couvre le flow H6.
+# =============================================================================
+
+document:
+  type: palier_ecrans_fiche
+  format: yaml
+
+ecran:
+  id: E-ADMIN-RETRAIT-REOUVERTURE-PIN
+  nom: "Retrait ou réouverture d'un Pin publié"
+
+  mode: "back-office"
+  surface_parente: "back-office"
+
+  raison_d_etre: >-
+    Donner à l'équipe éditoriale et de modération une surface dédiée pour
+    opérer les transitions sensibles publié → retiré et retiré → publié,
+    avec motif explicite et Trace immuable adaptée au type de Pin (Trace de
+    validation pour éditorial, Trace de modération pour communautaire). Sans
+    cet écran, le retrait éditorial et la réouverture après correction
+    seraient diffus dans le catalogue — ils méritent leur surface tracée.
+
+  composition:
+    - zone: "liste des Pins publiés à surveiller"
+      role: "Pins publiés ayant fait l'objet d'un signalement honoré récent, ou marqués par un éditeur comme candidats à retrait (erreur factuelle, source compromise, obsolescence)"
+      entites_affichees: [Pin, Signalement]
+
+    - zone: "liste des Pins retirés candidats à réouverture"
+      role: "Pins en état retiré dont la cause a pu être levée (source remplacée, contenu amendé) ; permet d'enclencher le cycle de réouverture"
+      entites_affichees: [Pin]
+
+    - zone: "filtres"
+      role: "filtre par provenance (éditorial / communautaire), par motif de retrait précédent, par ancienneté"
+
+    - zone: "prévisualisation conforme grand public (Pin candidat)"
+      role: "affiche le Pin tel qu'il est vu (cas retrait) ou tel qu'il était vu (cas réouverture) côté grand public"
+      entites_affichees: [Pin, Catégorie, Époque, Média, Source]
+
+    - zone: "Sources structurées et Médias"
+      role: "panneau dédié pour identifier la cause précise du retrait (Source compromise, Média cassé) ou pour vérifier la correction avant réouverture"
+      entites_affichees: [Source, Média]
+
+    - zone: "Signalements honorés (cas retrait communautaire)"
+      role: "si le retrait fait suite à un Signalement, motif et précision_libre du signaleur visibles ; identité du signaleur strictement non exposée (I5)"
+      entites_affichees: [Signalement]
+
+    - zone: "audit — Traces antérieures"
+      role: "historique complet des Traces de validation (cas éditorial) et / ou Traces de modération (cas communautaire) précédentes ; immutabilité préservée ; sert l'audit du retrait"
+      entites_affichees: ["Trace de validation", "Trace de modération"]
+
+    - zone: "Étapes de Parcours référençant le Pin"
+      role: "alerte si le Pin retiré est référencé par des Étapes de Parcours en cours d'utilisation côté grand public ; le palier 6 grand public gère la dégradation gracieuse (cf. C5 / C12) — l'écran SIGNALE l'impact sans le résoudre ici"
+      entites_affichees: [Étape, Parcours]
+
+    - zone: "Commentaires associés"
+      role: "rappel que les Commentaires associés au Pin restent tracés mais deviennent invisibles publiquement après retrait (cf. cluster 04)"
+      entites_affichees: [Commentaire]
+
+    - zone: "panneau de décision retrait"
+      role: "transition publié → retiré avec motif obligatoire ; pour Pin éditorial : Trace de validation négative ex post (décision = refusé, mention 'retrait éditorial' en motif) ; pour Pin communautaire : Trace de modération (décision = remédié, action_prise_sur_la_cible = cible_retirée)"
+
+    - zone: "panneau de décision réouverture"
+      role: "transition retiré → publié après nouveau cycle de validation ; par défaut le Pin retourne en brouillon (passage par E-ADMIN-SAISIE-PIN-TEMPLATE) puis en_revue puis validé via un nouveau cycle H2 (E-ADMIN-VALIDATION-SCIENTIFIQUE) ; nouvelle Trace de validation approuvé enregistrée à la conclusion"
+
+  etats:
+    nominal_charge: "Listes chargées (à surveiller / à rouvrir), prévisualisation accessible"
+    pin_publie_en_examen_retrait: "Pin publié sélectionné, motif du retrait en cours de saisie"
+    retrait_editorial_effectue: "Pin éditorial transitionne publié → retiré, Trace de validation négative ex post créée avec motif, Pin disparaît de la Carte et de la recherche grand public"
+    retrait_communautaire_effectue: "Pin communautaire transitionne publié → retiré suite à signalement honoré, Trace de modération créée (décision = remédié, action = cible_retirée), auteur notifié avec motif"
+    pin_retire_en_examen_reouverture: "Pin retiré sélectionné, correction en cours de vérification ou décision de renvoyer en cycle H1+H2"
+    reouverture_relance_h1: "Le Pin est renvoyé en brouillon vers E-ADMIN-SAISIE-PIN-TEMPLATE pour amendement"
+    reouverture_relance_h2: "Le Pin amendé est renvoyé en en_revue vers E-ADMIN-VALIDATION-SCIENTIFIQUE"
+    reouverture_effectuee: "H2 conclut par approuvé, Pin transitionne retiré → publié, nouvelle Trace de validation approuvé enregistrée, historique des Traces antérieures conservé"
+    pin_reference_etapes_actives: "Le Pin retiré ou en passe d'être retiré est référencé par des Étapes de Parcours en cours d'utilisation côté grand public — message d'alerte (sans bloquer la décision ; le palier 6 gère la dégradation gracieuse)"
+    correction_impossible: "Cas particulier H6 — la correction est impossible (erreur fondamentale non corrigeable) ; le Pin reste en retiré indéfiniment (état terminal en pratique, pas de transition vers 'supprimé hard' modélisée)"
+    chargement: "Listes ou prévisualisation en cours de chargement"
+    erreur_chargement: "Impossible de charger les éléments ; nouvelle tentative possible"
+    permission_insuffisante: "L'utilisateur n'a pas le rôle éditeur ou modérateur selon le motif (les rôles requis dépendent du type de Pin et du motif — palier 13)"
+
+  elements_interactifs:
+    - "Application et combinaison de filtres"
+    - "Sélection d'un Pin publié à retirer ou d'un Pin retiré à rouvrir"
+    - "Consultation de la prévisualisation, des Sources et Médias, des Signalements éventuels, des Traces antérieures"
+    - "Consultation des Étapes de Parcours référençant le Pin (alerte d'impact)"
+    - "Saisie du motif de retrait ou de réouverture (obligatoire)"
+    - "Déclenchement du retrait → transition + création Trace adaptée au type de Pin"
+    - "Déclenchement de la réouverture → renvoi vers E-ADMIN-SAISIE-PIN-TEMPLATE pour amendement, puis cycle H2 normal"
+
+  flows_actifs:
+    - H6
+
+  surfaces_imbriquees:
+    - E-ADMIN-ACCUEIL  # retour
+    - E-ADMIN-CATALOGUE-PINS  # source de sélection alternative
+    - E-ADMIN-SAISIE-PIN-TEMPLATE  # cycle d'amendement avant réouverture
+    - E-ADMIN-VALIDATION-SCIENTIFIQUE  # nouveau cycle H2 avant réouverture
+    - E-ADMIN-MODERATION-COMMUNAUTAIRE  # source d'un retrait communautaire après signalement honoré
+
+  questions_ouvertes:
+    - "Réouverture d'un Pin retiré : nouveau cycle H2 complet obligatoire, ou Trace approuvé directe pour les corrections mineures ? — D10.2 + palier 13"
+    - "Articulation Trace de validation négative ex post / Trace de modération pour les retraits sur Pin communautaire (cluster 04 + 05 question ouverte) — éventuel double traçage en bifurcation H6"
+    - "Conservation profonde vs archivage des Sources et Médias d'un Pin retiré — cluster 01 question ouverte"
+    - "État terminal 'supprimé' distinct de retiré (RGPD, demande explicite de l'auteur communautaire) — palier 16 + cluster 01"
+    - "Une seule surface combinée retrait + réouverture, ou deux écrans distincts ? Position retenue : un seul écran (mêmes Traces, même panneau d'audit, transitions opposées dans le même cycle de vie) — à confirmer en palier 13"

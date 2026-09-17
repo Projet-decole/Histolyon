@@ -1,0 +1,89 @@
+# =============================================================================
+# E-PROFIL-HISTORIQUE — Historique de visite
+# =============================================================================
+# Vue dédiée à l'Historique de visite (P5.S3 en P5.M3). Append-only,
+# polymorphe (Pin consulté, Étape de parcours visitée, Parcours engagé,
+# Parcours terminé, Résultat de quiz). Effacement individuel et total
+# (D4 → dialogue P5.M8). Strictement local — politique plus stricte que
+# Favoris (cluster 03 — historique jamais cloud sans consentement spécifique
+# au-delà de la sync générale).
+# =============================================================================
+
+document:
+  type: palier_ecrans_fiche
+  format: yaml
+
+ecran:
+  id: E-PROFIL-HISTORIQUE
+  nom: "Historique de visite"
+
+  mode: P5.M3
+  surface_parente: P5.S3
+
+  raison_d_etre: >-
+    Permet à l'utilisateur de retrouver un contenu consulté sans avoir eu
+    le réflexe de le marquer en Favori. Sert le moment de vérité du père
+    lyonnais (« retrouver le pin du dimanche le mardi soir ») et la
+    reprise d'un Parcours interrompu. La donnée est sensible (où l'attention
+    s'est portée dans la ville) — l'écran porte les contrôles d'effacement
+    individuel et total (cf. D4) avec sobriété.
+
+  composition:
+    - zone: "liste chronologique des entrées"
+      role: "présente les entrées chronologiquement (récents en tête) avec marquage clair du type d'événement et de la cible (Pin / Étape / Parcours)"
+      entites_affichees: ["Historique de visite", Pin, Parcours, Étape]
+
+    - zone: "filtre par type d'événement"
+      role: "permet de restreindre par consultation_pin, étape_de_parcours_visitée, parcours_engagé, parcours_terminé, résultat_quiz_post_narratif (filtrage à confirmer palier 7)"
+
+    - zone: "indicateur d'état d'enregistrement"
+      role: "signale si l'enregistrement est actif ou en pause (Profil.enregistrement_historique_actif) ; renvoie vers E-PROFIL-PARAMETRES pour réactiver"
+
+    - zone: "point d'accès effacement total"
+      role: "déclenche le flow D4 (dialogue P5.M8 puis effacement atomique sur Profil) — placement discret cohérent avec l'esprit sobre"
+
+  etats:
+    nominal_charge: "Liste chargée non vide ; enregistrement actif ; filtre opérationnel"
+    chargement: "Lecture locale en cours (rare)"
+    vide: "Aucune entrée ; message gracieux non culpabilisant rappelant que l'historique se construit à l'usage (cf. D3 cas particulier)"
+    enregistrement_desactive: "Profil.enregistrement_historique_actif = faux ; bandeau d'information signalant que l'enregistrement est en pause ; les entrées antérieures restent visibles ; renvoi possible vers E-PROFIL-PARAMETRES pour réactiver"
+    enregistrement_desactive_et_vide: "Cumul des deux états — bandeau de pause + message d'historique vide"
+    filtre_actif_resultats_vides: "Filtre dont aucune entrée ne correspond ; option de retirer le filtre"
+    cible_indisponible: "Au moins une entrée dont la cible (Pin / Parcours retiré du contenu publié) n'est plus accessible — entrée affichée avec mention neutre, ouverture désactivée ou renvoyée vers message gracieux (cohérent avec D3)"
+    offline_avec_cache: "Liste locale lisible normalement ; bandeau E-TRANSVERSES-BANDEAU-OFFLINE visible si pertinent ; ouvertures dégradées selon cache"
+    offline_sans_cache: "Liste locale lisible normalement ; ouvertures de cibles non disponibles renvoient vers message gracieux"
+    sync_active: "Si Compte rattaché ET sync 'historique' activée (D8), indicateur discret signalant la sync (palier 7) ; sans incidence sur la consultation"
+    erreur_lecture: "Échec rare ; message gracieux"
+
+  elements_interactifs:
+    - "Défilement de la liste"
+    - "Tap sur une entrée 'consultation_pin' ou 'étape_de_parcours_visitée' → bascule vers E-PIN-CONSULTATION-APPROFONDIE (B2 via D3)"
+    - "Tap sur une entrée 'parcours_engagé' → bascule vers reprise du Parcours (C10) si encore disponible, sinon E-PARCOURS-FICHE-DETAIL"
+    - "Tap sur une entrée 'parcours_terminé' → bascule vers E-PARCOURS-FICHE-DETAIL (C3)"
+    - "Tap sur une entrée 'résultat_quiz_post_narratif' → ouvre l'entrée détaillée ou renvoie vers le Pin associé (à préciser palier 7)"
+    - "Geste d'effacement individuel sur une entrée → disparition immédiate (action atomique sur l'Historique, cf. D3)"
+    - "Tap sur le point d'accès effacement total → flow D4 → E-TRANSVERSES-DIALOGUE-CONFIRMATION"
+    - "Application d'un filtre"
+    - "Tap sur le bandeau 'enregistrement en pause' → renvoie vers E-PROFIL-PARAMETRES"
+    - "Retour vers E-PROFIL-PRINCIPAL"
+
+  flows_actifs:
+    - D3   # Consultation de l'historique
+    - D4   # Effacement de l'historique (déclenchement du dialogue)
+
+  surfaces_imbriquees:
+    - E-PIN-CONSULTATION-APPROFONDIE
+    - E-PARCOURS-FICHE-DETAIL
+    - E-TRANSVERSES-DIALOGUE-CONFIRMATION   # M8 pour D4
+    - E-TRANSVERSES-MESSAGE-EPHEMERE        # confirmation effacement, etc.
+    - E-TRANSVERSES-AUDIO-PERSISTANT
+    - E-TRANSVERSES-PARCOURS-PERSISTANT
+    - E-TRANSVERSES-BANDEAU-OFFLINE
+
+  entites_affichees: ["Historique de visite", Pin, Parcours, Étape]
+
+  questions_ouvertes:
+    - "Présentation des entrées 'résultat_quiz_post_narratif' : intégrées au flux chronologique commun ou regroupées dans une sous-vue dédiée ? — cf. D3 question ouverte"
+    - "Profondeur temporelle conservée par défaut (illimité tant que pas d'effacement, ou rétention glissante) — cf. cluster 03 D6.3"
+    - "Effacement partiel par plage temporelle ou par type d'événement (D4 question ouverte) — effacement total seulement, à acter"
+    - "Affichage de la durée de consultation (attribut optionnel cluster 03) sur les vignettes : utile ou bruit ? — palier 7"

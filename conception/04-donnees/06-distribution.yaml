@@ -1,0 +1,403 @@
+# =============================================================================
+# Palier 4 — Cluster 06 — Distribution
+# =============================================================================
+# Cluster du partage hors-app. Couvre les artefacts qui sortent du téléphone
+# qui a l'app : un Lien universel pour envoyer une référence à un Pin ou un
+# Parcours par n'importe quel canal, une Image partageable de fin de parcours
+# pour les réseaux sociaux, et un Code visuel pour les supports physiques
+# (impression, panneau, affiche).
+#
+# Ces entités sont essentiellement IMMUABLES une fois créées : elles ne
+# portent pas de cycle de vie complexe, juste une existence qui suit celle
+# de la cible. Pas de tracking, pas d'identité d'expéditeur encodée.
+#
+# Ne sont PAS des entités du palier 4 :
+#   - Partage natif système (D11.5) — mécanique déléguée à l'OS
+#   - Version web responsive (D11.2) — surface hors-app, palier 14
+# Le Lien universel POINTE vers la version web quand l'app n'est pas
+# installée, mais celle-ci reste hors périmètre données.
+# =============================================================================
+
+document:
+    type: palier_donnees_cluster
+    cluster_id: C6
+    nom: "Distribution"
+    format: yaml
+
+raison_d_etre_du_cluster: >-
+    Sans surfaces hors-app, l'app reste une île. Mme Dupont ne peut pas
+    envoyer son parcours aux six parents accompagnateurs sans leur
+    imposer une installation. Kenji ne peut pas partager une fin de
+    parcours sur Instagram en quelques secondes. Le père lyonnais ne
+    peut pas envoyer une anecdote à un ami. Ce cluster pose les artefacts
+    persistants qui rendent ces moments possibles, en respectant
+    strictement deux engagements : pas de tracking marketing, pas
+    d'identité personnelle exposée.
+
+# -----------------------------------------------------------------------------
+# Invariants propres au cluster
+# -----------------------------------------------------------------------------
+# Règles qui valent pour les trois entités du cluster, posées une seule fois
+# pour ne pas les répéter dans chaque fiche. Distincts des invariants
+# transversaux I1-I10 (qui restent référencés par identifiant).
+invariants_de_cluster:
+    - id: D1
+      nom: "Pas de tracking marketing"
+      enonce: >-
+          Aucune entité de ce cluster ne porte de compteur de clics,
+          d'origine de partage, d'identifiant de campagne, ni de
+          métadonnée traçante de l'expéditeur ou du destinataire. Le
+          partage est un acte, pas une mesure. Cohérent avec D11.1, D11.4
+          et l'essence § ce_qu_on_refuse (pas de growth hack).
+
+    - id: D2
+      nom: "Pas d'identité d'expéditeur encodée"
+      enonce: >-
+          Le Lien universel, l'Image partageable et le Code visuel
+          n'encodent jamais l'identité du Profil ou du Compte qui les a
+          générés. Un destinataire qui reçoit l'artefact ne peut pas
+          remonter à l'expéditeur via l'artefact lui-même.
+
+    - id: D3
+      nom: "Validité couplée à la cible"
+      enonce: >-
+          Un artefact de distribution est valide tant que sa cible existe.
+          Si la cible est retirée (Pin retiré, Parcours dépublié), la
+          résolution de l'artefact retombe en gracieux (pas d'erreur
+          brutale ; voir cycle de vie du Lien universel).
+
+# -----------------------------------------------------------------------------
+# Entités
+# -----------------------------------------------------------------------------
+entites:
+    # ---------------------------------------------------------------------------
+    - id: lien_universel
+      nom: "Lien universel"
+
+      raison_d_etre: >-
+          Permettre d'envoyer une référence à un Pin ou à un Parcours par
+          n'importe quel canal de messagerie en un seul lien qui se
+          débrouille à l'arrivée — l'app si elle est installée, la version
+          web sinon. C'est la pierre angulaire du partage hors-app : sans
+          lui, le scénario Mme Dupont (six parents non-installés) ne tient
+          pas, et le Code visuel n'a rien à encoder.
+
+      attributs:
+          obligatoires:
+              - nom: identifiant
+                nature: "identifiant lisible et stable"
+                note: >-
+                    Court et lisible par un humain, pas une suite obscure de
+                    caractères (cf. D11.1). Réutilise idéalement l'identifiant
+                    de la cible (cf. pin.identifiant cluster 01). Le format
+                    précis du chemin relève de l'implémentation.
+
+              - nom: type_de_cible
+                nature: "valeur parmi un ensemble"
+                valeurs: [pin, parcours]
+                note: >-
+                    Modélisation polymorphe (cf. glossaire) — le type de
+                    cible est explicite. Justification : les destinations
+                    (Pin / Parcours) sont structurellement différentes ;
+                    une référence non typée brouillerait la résolution. Le
+                    champ FAVORI ou la fin de parcours ne sont PAS des
+                    cibles directes — la fin de parcours est partagée comme
+                    son Parcours d'origine, accompagné d'une Image
+                    partageable distincte.
+
+              - nom: cible
+                nature: "référence à l'entité désignée par type_de_cible"
+                contrainte: "doit pointer vers une cible existante au moment de la création"
+
+              - nom: date_de_création
+                nature: "horodatage"
+
+          optionnels: []
+
+      relations:
+          - "pointe vers exactement 1 Pin OU exactement 1 Parcours (cible polymorphe)"
+          - "peut être encodé par 0..n Codes visuels (un Code visuel encode exactement 1 Lien universel)"
+          - "peut accompagner 0..n Images partageables lors d'un partage (relation contextuelle, non persistée — voir entité Image partageable)"
+
+      cycle_de_vie:
+          etats: [actif, retombé]
+          transitions:
+              - "actif → retombé (la cible passe en retiré ou est supprimée)"
+              - "retombé → actif (la cible repasse en publié, cf. transition Pin retiré → publié)"
+          note_etat_retombé: >-
+              Un Lien universel retombé continue d'exister (pour permettre
+              la réactivation si la cible revient) mais sa résolution est
+              gracieuse côté app et version web (message conteur, pas
+              d'erreur brutale). Cohérent avec D11.1 « le retour est
+              gracieux si l'élément référencé n'existe plus ».
+
+      invariants:
+          - "Unicité : un Pin ou Parcours donné n'a qu'un seul Lien universel canonique (pas de variantes ; cf. D11.1 « un seul lien par élément référencé »)"
+          - "Le format du lien (slug, chemin) ne change jamais après création — un Lien universel partagé reste résoluble"
+          - "Aucun paramètre de tracking dans le lien (instanciation locale de D1)"
+          - "Modèle CAPABILITY pour les cibles de provenance personnelle (décision utilisateur 2026-05-05) : un Lien universel vers un Parcours personnel reste résoluble par quiconque le détient, MAIS la cible n'apparaît pas dans le catalogue public et n'est pas indexée par la recherche. Le partage privé entre proches est possible sans publication communautaire ni modération."
+
+      invariants_de_cluster_referenced: [D1, D2, D3]
+      invariants_transversaux_referenced: [I1, I6]
+
+      questions_ouvertes:
+          - "Étendue des cibles partageables au-delà de Pin / Parcours (favoris ? recherches ? Pin sans localisation ?) — relève de D11.1 et palier 6 flows"
+          - "Date de création utile au métier ou superflue ? On la garde par défaut pour l'audit minimal, à arbitrer si elle s'avère inutile"
+          - "Statistique anonyme et agrégée sur les Liens (combien de résolutions sur l'ensemble du corpus, pas par lien) : opt-in ou exclu strictement ? — à arbitrer hors de ce palier"
+
+    # ---------------------------------------------------------------------------
+    - id: image_partageable
+      nom: "Image partageable"
+
+      raison_d_etre: >-
+          Donner à une fin de Parcours une trace visuelle qui parle pour
+          elle-même sur les réseaux sociaux — atmosphérique, sobre, qui
+          trouve sa place dans un flux Instagram sans détonner. C'est
+          l'artefact qui rend la découverte transmissible (test_litmus
+          Kenji : partager en quelques secondes sans avoir à composer un
+          texte). Sans elle, la fin de parcours reste un événement intime
+          sans relais.
+
+      arbitrage_de_modelisation: >-
+          Modélisée ici comme entité PERSISTANTE (générée au moment où
+          l'utilisateur déclenche le partage, conservée pour permettre
+          éventuellement de re-partager depuis l'historique sans
+          régénérer). L'alternative — service de génération à la volée
+          sans persistence — est techniquement plus économe mais oblige
+          à régénérer à chaque partage, alourdit l'expérience si
+          l'utilisateur partage plusieurs fois, et rend impossible le
+          cas « partage depuis l'historique d'une fin de parcours
+          passée » (D11.4 question_ouverte). On modélise donc l'entité ;
+          la décision finale persistence vs à-la-volée peut être révisée
+          à l'implémentation sans casser la fiche (test_de_purete OK).
+
+      attributs:
+          obligatoires:
+              - nom: identifiant
+                nature: "identifiant lisible et stable"
+
+              - nom: parcours_cible
+                nature: "référence à Parcours"
+                contrainte: "exactement 1"
+                note: >-
+                    La cible est toujours un Parcours (l'image est une
+                    synthèse d'une fin de parcours, cf. D11.4 et D3.9).
+                    Pas d'image partageable pour un Pin isolé dans la
+                    modélisation actuelle.
+
+              - nom: profil_générateur
+                nature: "référence à Profil"
+                contrainte: "exactement 1"
+                note: >-
+                    Présent côté local pour rattacher l'image à l'historique
+                    du Profil qui l'a générée — permet de retrouver et
+                    re-partager. Aucune donnée du Profil n'est encodée DANS
+                    l'image (cf. D2). I6 garantit que cette référence reste
+                    locale tant qu'il n'y a pas de Compte.
+
+              - nom: date_de_génération
+                nature: "horodatage"
+
+              - nom: tracé_source
+                nature: "valeur parmi un ensemble"
+                valeurs: [trajectoire_idéale, trajectoire_parcourue]
+                note: >-
+                    Quel tracé apparaît sur l'image. Par défaut
+                    trajectoire_idéale (la trajectoire de la fiche du
+                    Parcours), pour ne JAMAIS exposer la trajectoire GPS
+                    personnelle de l'utilisateur (cf. D11.4 question_ouverte
+                    et enjeu vie_privée). trajectoire_parcourue est
+                    réservée à un éventuel opt-in explicite ; à arbitrer.
+
+          optionnels:
+              - nom: statistiques_synthétisées
+                nature: "ensemble de valeurs métier (étapes complétées, durée, distance, époques traversées)"
+                note: >-
+                    Quelles stats apparaissent sur l'image. Le détail des
+                    valeurs et leur formatage relèvent du palier 8 ; on
+                    note ici qu'elles existent et sont sobres (D11.4).
+
+      relations:
+          - "synthétise exactement 1 Parcours"
+          - "rattachée à exactement 1 Profil générateur (référence locale, cf. I6)"
+          - "peut accompagner 1 Lien universel lors du partage (relation contextuelle décidée par D11.5 — pas un attribut persistant)"
+
+      cycle_de_vie:
+          etats: [générée, regénérée]
+          transitions:
+              - "générée → regénérée (l'utilisateur déclenche un nouveau partage de la même fin de parcours et l'image est rafraîchie)"
+          note: >-
+              Pas de cycle complexe. La regénération produit une nouvelle
+              version de l'image (par exemple si le Parcours a évolué
+              depuis), mais ne supprime pas l'ancienne tant qu'elle vit
+              dans des messageries déjà envoyées (l'app n'a pas la main
+              dessus de toute façon — cf. D11.5 « pas de tracking »).
+
+      invariants:
+          - "L'image n'encode aucune position géographique précise de l'utilisateur ni avatar identifiant (instanciation locale de D2 et de l'enjeu vie_privée D11.4)"
+          - "Aucune métadonnée de localisation ni de session embarquée dans le fichier généré"
+          - "La signature HistoLyon présente sur l'image est sobre — pas un logo géant ni un slogan promotionnel (cohérence essence § ce_qu_on_refuse)"
+          - "Format vertical adapté aux surfaces de partage social mobile (D11.4) — la résolution exacte relève de l'implémentation"
+
+      invariants_de_cluster_referenced: [D1, D2]
+      invariants_transversaux_referenced: [I1, I6]
+
+      questions_ouvertes:
+          - "Persistence vs génération à la volée — décision à acter à l'implémentation ; la fiche reste valide dans les deux cas"
+          - "Image partageable pour un Pin (au-delà du Parcours) : utile, ou risque de dilution ? — D11.4 ne le prévoit pas explicitement, à arbitrer"
+          - "Quelles statistiques exactement (étapes, durée, distance, époques) — D11.4 question_ouverte, palier 8"
+          - "Variantes par Parcours (badge associé visible discrètement) — D11.4 question_ouverte, paliers 9 et 13"
+          - "Image regénérable depuis l'historique d'une fin de parcours passée — D11.4 question_ouverte, palier 6 flows"
+
+    # ---------------------------------------------------------------------------
+    - id: code_visuel
+      nom: "Code visuel"
+
+      raison_d_etre: >-
+          Permettre le partage non-numérique d'un Pin ou d'un Parcours
+          sur des supports physiques : feuille distribuée aux parents
+          par Mme Dupont, panneau de l'office du tourisme, affiche en
+          classe. Sans Code visuel, tout partage transite par une
+          messagerie numérique, ce qui exclut les supports physiques —
+          pourtant un canal vivant pour Mme Dupont et l'institution.
+
+      arbitrage_de_modelisation: >-
+          Le Code visuel ENCODE strictement le même Lien universel que
+          D11.1 ; le scan se comporte exactement comme l'ouverture du
+          lien (D11.3 règle_fonctionnelle). Une lecture rigoureuse
+          pourrait conclure que le Code visuel n'est PAS une entité
+          distincte mais une simple manifestation/format du Lien
+          universel (« Lien universel rendu en image scannable »). On
+          le modélise tout de même comme entité distincte parce que :
+          (a) il a un cycle de génération propre (à la demande, pour
+          impression), (b) il porte ses propres préoccupations
+          (lisibilité à l'impression, sobriété visuelle), (c) Mme Dupont
+          le manipule comme un objet (elle l'imprime, le colle), pas
+          comme une URL. La simplification reste possible si l'équipe
+          juge la distinction artificielle — voir questions_ouvertes.
+
+      attributs:
+          obligatoires:
+              - nom: identifiant
+                nature: "identifiant lisible et stable"
+
+              - nom: lien_encodé
+                nature: "référence à Lien universel"
+                contrainte: "exactement 1"
+                note: >-
+                    Le Code visuel encode TOUJOURS un Lien universel
+                    existant — il ne porte pas une cible en propre. Une
+                    modification du Lien universel sous-jacent
+                    (rétablissement après retrait par exemple) se reflète
+                    automatiquement à la résolution du scan.
+
+              - nom: date_de_génération
+                nature: "horodatage"
+
+          optionnels: []
+
+      relations:
+          - "encode exactement 1 Lien universel"
+          - "indirectement, désigne le Pin OU le Parcours visé via le Lien universel encodé"
+
+      invariants:
+          - "Le scan d'un Code visuel produit le même comportement que l'ouverture du Lien universel encodé (cohérence stricte avec D11.3)"
+          - "Aucun comportement spécifique au Code visuel qui le différencierait du Lien (pas de variante de destination, pas de paramètre traçant)"
+          - "Apparence sobre — pas de logo géant, pas de slogan, pas de variante décorative par catégorie (D11.3 ce_qu_on_ne_fait_pas)"
+          - "Reste lisible une fois imprimé en petit format ou photocopié une fois (D11.3 critères_de_réussite — la mise en œuvre exacte relève de l'implémentation)"
+
+      invariants_de_cluster_referenced: [D1, D2, D3]
+      invariants_transversaux_referenced: [I1]
+
+      questions_ouvertes:
+          - "Le Code visuel mérite-t-il d'être une entité distincte, ou doit-on le replier en attribut/format du Lien universel ? La modélisation actuelle préserve la distinction par prudence ; à reconsidérer si l'usage montre qu'elle ne porte rien de propre"
+          - "Génération à la demande ou pré-stockée côté serveur (D11.3 question_ouverte) — relève de l'implémentation"
+          - "Note d'instruction associée à l'impression (ex. 'Scannez avec votre téléphone') — relève du palier 8"
+          - "Format technique du code (QR ou variante) — relève de l'implémentation, sans impact sur la modélisation"
+
+# -----------------------------------------------------------------------------
+# Articulation avec les autres clusters
+# -----------------------------------------------------------------------------
+# Rappel rapide des liens vers les autres clusters, pour guider la lecture.
+# Les fiches détaillées de Pin et Parcours vivent ailleurs.
+articulation_clusters:
+    - cluster: "01-contenu (Pin)"
+      lien: "Lien universel cible Pin (relation polymorphe). Le Pin n'a pas d'attribut Lien universel en propre ; le Lien est rattaché ici."
+
+    - cluster: "02-parcours (Parcours)"
+      lien: "Lien universel cible Parcours (relation polymorphe). Image partageable synthétise exactement un Parcours."
+
+    - cluster: "03-utilisateur (Profil)"
+      lien: "Image partageable est rattachée localement à un Profil (cf. I6 — pas de sync cloud sans Compte)."
+
+# -----------------------------------------------------------------------------
+# Articulation avec le palier 14 (surfaces hors-app)
+# -----------------------------------------------------------------------------
+articulation_palier_14:
+    note: >-
+        Le Lien universel pointe soit vers l'app (si installée), soit
+        vers la version web responsive (D11.2). La version web n'est PAS
+        une entité de ce cluster — c'est une surface du palier 14. Le
+        Lien universel ne « connaît » pas la version web ; c'est le
+        mécanisme de résolution qui décide à l'arrivée. De même, le
+        « partage natif système » (D11.5) est une mécanique déléguée à
+        l'OS — l'app prépare la donnée (Lien universel, Image
+        partageable, Code visuel) et remet la main au système, qui
+        n'est pas modélisé ici.
+
+# -----------------------------------------------------------------------------
+# Persona check
+# -----------------------------------------------------------------------------
+persona_check:
+    kenji:
+        impact: "MAJEUR"
+        note: >-
+            Le test_litmus de Kenji (partager en quelques secondes une
+            image jolie et lisible sans comprendre une UI française) tombe
+            directement sur l'Image partageable. La modélisation préserve
+            ce moment : l'image se génère à la fin du parcours, sa
+            synthèse parle pour elle-même, aucune identité à exposer.
+            Le Lien universel court et lisible (vs code alphanumérique
+            complexe) sert aussi son scénario d'ami japonais qui reçoit
+            un itinéraire. OK.
+
+    mme_dupont:
+        impact: "MAJEUR"
+        note: >-
+            Le test_litmus de Mme Dupont (envoyer le parcours à six
+            parents qui ouvrent le lien en moins de 30 secondes le jour J,
+            sans compte) tombe directement sur le Lien universel. La
+            modélisation garantit que le Lien est court, sans
+            identification d'expéditeur, et qu'il existe canoniquement
+            (pas de variantes 'lien app' / 'lien web' à choisir).
+            Le Code visuel sert son cas d'usage feuille imprimée pour
+            les parents. OK.
+
+    pere_lyonnais:
+        impact: "direct"
+        note: >-
+            Partage opportuniste d'une découverte à un ami via Lien
+            universel sur un Pin. La modélisation ne le frustre pas — un
+            Lien existe pour chaque Pin, sans configuration, sans
+            personnalisation de l'expéditeur. OK.
+
+    mme_martin:
+        impact: "indirect"
+        note: >-
+            Pas un usage de partage social. Cas potentiel : Code visuel
+            affiché en classe pour que les élèves accèdent à un Pin sur
+            leur tablette. La modélisation le permet sans contrainte
+            supplémentaire — le Code visuel résout vers la version web
+            sur les tablettes sans app. OK.
+
+    anais_back_office:
+        impact: "indirect"
+        note: >-
+            Anaïs ne génère pas elle-même de Liens universels, d'Images
+            partageables ou de Codes visuels — ces artefacts sont
+            utilisateurs. En revanche, l'identifiant lisible et stable
+            d'un Pin (cluster 01) et d'un Parcours (cluster 02) est
+            utilisé par le Lien universel : Anaïs doit donc, à la
+            saisie, choisir un identifiant qui aura une seconde vie en
+            tant que slug de Lien. Point de vigilance pour le palier 13
+            (template de saisie). OK.

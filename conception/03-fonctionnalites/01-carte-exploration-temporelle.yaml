@@ -1,0 +1,523 @@
+# =============================================================================
+# Palier 3 — Domaine D1 — Carte et exploration temporelle
+# =============================================================================
+# La carte de Lyon est l'écran d'accueil de l'app et le socle sur lequel tout
+# repose : pins (D2), parcours (D3), notifications de proximité (D4).
+# Ce domaine décrit la carte de base, le slider d'époques, l'évolution
+# visuelle de la carte selon l'époque, la recherche, et l'extension future
+# en couches cartographiques avancées.
+#
+# Ce fichier est le PILOTE des 11 domaines du palier 3 (refonte v1.1). Il
+# sert de modèle aux 10 autres fichiers — format strict, périmètre fonctionnel
+# pur, anti-périmètre respecté (cf. 00-index § 2).
+# =============================================================================
+
+document:
+    type: palier_fonctionnalites_domaine
+    domaine_id: D1
+    numero: 3
+    audience:
+        - "Tout agent qui rédige un palier en aval (4 à 16)"
+        - "Sous-agents délégués sur D4-D11 — utiliser ce fichier comme modèle"
+        - "Devs Flutter (cahier des charges fonctionnel pour la carte)"
+    role: >-
+        Décrire fonctionnellement le socle cartographique : carte de base,
+        navigation temporelle, recherche. Tous les autres domaines s'appuient
+        sur celui-ci.
+    format: yaml
+    prerequis_de_lecture:
+        - "design/conception/intention.yaml — § 5.7 separation_des_responsabilites_entre_paliers"
+        - "design/conception/01-essence.yaml"
+        - "design/conception/02-personas.yaml"
+        - "design/conception/03-fonctionnalites/00-index.yaml — § 2 anti_perimetre_strict est OBLIGATOIRE"
+
+# -----------------------------------------------------------------------------
+# Raison d'être du domaine
+# -----------------------------------------------------------------------------
+raison_d_etre_du_domaine: >-
+    La carte temporelle est le PREMIER PILIER d'HistoLyon (cf. brief § 6).
+    Sans elle, pas de sérendipité géographique, pas de slider, pas de pins
+    contextualisés, pas de mode canapé. Elle est l'écran d'accueil parce
+    qu'elle EST l'app — l'app n'est pas une feature posée sur une carte,
+    c'est une carte qui s'enrichit.
+
+    Ce domaine sert directement les 4 personas grand public à des
+    intensités différentes : Kenji et le père lyonnais l'utilisent comme
+    surface principale (sérendipité en marche), Mme Dupont s'en sert pour
+    préparer puis exécuter une sortie, Mme Martin la projette en classe
+    pour un cours d'histoire urbaine.
+
+# -----------------------------------------------------------------------------
+# Sous-domaines
+# -----------------------------------------------------------------------------
+sous_domaines:
+    # ===========================================================================
+    - id: D1.1
+      nom: "Carte de base et géolocalisation"
+
+      raison_d_etre: >-
+          Avoir un socle d'orientation immédiat — la carte de Lyon centrée
+          Bellecour est ce que l'utilisateur voit en ouvrant l'app. Aucune
+          friction, aucun écran intermédiaire. C'est le geste fondateur du
+          principe de sérendipité (essence § principe 1) : l'app est PRÊTE
+          avant que l'utilisateur ait demandé quoi que ce soit.
+
+      comportement: >-
+          L'app s'ouvre directement sur la carte de Lyon centrée Bellecour,
+          sans écran intermédiaire. Si l'utilisateur a déjà autorisé la
+          géolocalisation lors d'une session précédente et qu'il se trouve
+          à Lyon, la carte se recentre discrètement sur sa position. Un
+          bouton "Me localiser" est disponible en permanence. À sa première
+          activation, la permission GPS est demandée par le système. S'il
+          l'active depuis l'extérieur de Lyon, un message discret indique
+          qu'il n'est pas à Lyon et la carte recentre sur Bellecour — sans
+          blocage. La carte est navigable (pan, zoom) à toutes les échelles
+          utiles ; elle reste limitée à la zone géographique de Lyon et son
+          agglomération immédiate.
+
+      regles_fonctionnelles:
+          - "Centrage initial systématique = Bellecour"
+          - "Recentrage automatique sur position utilisateur uniquement si à Lyon"
+          - "Permission GPS demandée juste-à-temps (au premier 'Me localiser'), jamais au lancement"
+          - "Refus de la permission GPS = aucun blocage, juste pas de recentrage"
+          - "Le message 'pas à Lyon' apparaît seulement si 'Me localiser' est activé hors Lyon"
+          - "Aucun message ni demande au lancement de l'app"
+          - "Navigation limitée à la zone Lyon + agglomération (pas de carte mondiale)"
+
+      capabilites:
+          - "Afficher la carte de Lyon centrée Bellecour à l'ouverture"
+          - "Recentrer sur la position utilisateur quand à Lyon"
+          - "Détecter si l'utilisateur est dans le périmètre de Lyon"
+          - "Signaler discrètement si 'Me localiser' est activé hors Lyon"
+          - "Demander la permission GPS au moment de son utilisation"
+          - "Servir de socle aux pins (D2), parcours (D3), notifications (D4)"
+          - "Permettre la navigation gestuelle dans la zone Lyon"
+
+      ce_qu_on_ne_fait_pas:
+          - "Pas de demande de permission GPS au lancement"
+          - "Pas d'écran d'accueil avant la carte"
+          - "Pas de blocage si géoloc refusée"
+          - "Pas de carte du monde — Lyon uniquement"
+          - "Pas d'enregistrement durable des positions de l'utilisateur"
+
+      criteres_de_reussite:
+          - "Le père lyonnais ouvre l'app et n'a aucune friction (zéro pop-up, zéro permission demandée — atteint test_litmus persona père)"
+          - "Kenji ouvre l'app à l'hôtel et comprend qu'il est sur Lyon en moins d'une minute (test_litmus Kenji n°1)"
+          - "L'utilisateur ne se sent jamais 'puni' par un message d'erreur ou un mode dégradé"
+
+      definition_of_done:
+          - "L'app s'ouvre directement sur la carte centrée Bellecour, sans écran intermédiaire"
+          - "Si la géoloc est autorisée et l'utilisateur à Lyon, la carte se recentre sur sa position"
+          - "Le bouton 'Me localiser' fonctionne même hors Lyon (avec message discret)"
+          - "Aucune permission n'est demandée au lancement"
+          - "La navigation gestuelle (pan, zoom) fonctionne dans la zone Lyon"
+          - "Le refus de la permission GPS n'empêche pas l'app de fonctionner"
+
+      enjeux_transversaux:
+          accessibilite: >-
+              Le bouton 'Me localiser' doit être accessible (cible tactile
+              suffisante, label vocal pour lecteurs d'écran). Le message
+              'pas à Lyon' doit être lisible et lu à voix haute.
+          performance: >-
+              Critique : la carte est la PREMIÈRE impression de l'app. Le
+              ressenti d'ouverture rapide est non négociable.
+          vie_privee: >-
+              Critique : la position de l'utilisateur n'est jamais transmise
+              à un serveur, et n'est pas stockée durablement en clair sans
+              nécessité fonctionnelle. Cohérent avec D6.3 (historique
+              strictement local).
+
+      questions_ouvertes:
+          - "Service de cartographie (Mapbox / MapLibre / OpenStreetMap / autre) — à trancher avec les devs Flutter"
+          - "Étendue exacte du mode hors-ligne (centre seul ? agglomération ?) — à trancher avec les devs Flutter"
+          - "Définition opérationnelle de 'à Lyon' (intra-muros / métropole / département) — à acter"
+          - "Limites géographiques exactes du pan — à acter"
+
+      priorite: "coeur"
+
+      personas_principaux:
+          - kenji
+          - mme_dupont
+          - mme_martin
+          - pere_lyonnais
+
+      dependances: []
+
+      comportements_transverses_referenced:
+          - "Géolocalisation — ce sous-domaine est la RÉFÉRENCE CANONIQUE de ce comportement (réutilisé en D3.4, D3.5, D4.2, D4.3)"
+          - "Mode hors-ligne — ce sous-domaine est la RÉFÉRENCE CANONIQUE de ce comportement (étendue à trancher avec les devs)"
+          - "Permissions juste-à-temps (canonique D5.5) — appliqué ici à la permission GPS"
+          - "Mode présentation sans chrome (canonique D2.5) — pour Mme Martin qui projette la carte en classe (à confirmer en palier 7 si la carte est projetable au même titre que la consultation approfondie d'un pin)"
+
+    # ===========================================================================
+    - id: D1.2
+      nom: "Slider d'époques"
+
+      raison_d_etre: >-
+          Permettre à l'utilisateur de naviguer dans le temps de manière
+          continue, sans avoir à choisir entre des options listées. Sert
+          directement le principe d'émerveillement (la transition est un
+          moment de plaisir) et la sérendipité (le mécanisme invite à
+          découvrir une époque qu'on n'aurait pas cherchée). C'est le
+          geste signature de l'app — celui qui transforme la carte moderne
+          en livre vivant.
+
+      comportement: >-
+          Le slider est continu : l'utilisateur fait glisser son doigt et
+          voit défiler les années (ou demi-siècles pour les périodes
+          anciennes). Pendant le geste, l'apparence de la carte évolue
+          progressivement pour refléter la période en cours, et un retour
+          visible indique l'année courante. À la fin du geste, l'époque se
+          cale automatiquement sur la période fixe la plus proche, et les
+          pins de cette époque se chargent. L'expérience est fluide
+          (pas de paliers manuels) mais la logique métier reste simple
+          (époques fixes pour le contenu).
+
+      regles_fonctionnelles:
+          - "L'apparence de la carte évolue en continu pendant le geste"
+          - "Les pins se rechargent à la fin du geste, pas pendant"
+          - "Une dizaine d'époques au total (à affiner avec la lead/historienne)"
+          - "Sur la période la plus récente ('Aujourd'hui'), tous les pins de toutes les époques sont accessibles (vue cumulée)"
+          - "Le slider peut être positionné automatiquement par un parcours en cours, sans bloquer la navigation manuelle"
+
+      capabilites:
+          - "Permettre la navigation continue entre époques"
+          - "Adapter l'apparence de la carte au fil du geste"
+          - "Donner un retour visible sur la période en cours de sélection"
+          - "Caler à l'époque la plus proche à la fin du geste"
+          - "Synchroniser le rechargement des pins avec la fin du geste"
+          - "Se positionner automatiquement quand un parcours en cours l'exige"
+
+      ce_qu_on_ne_fait_pas:
+          - "Pas de navigation par paliers manuels (la fluidité fait partie de l'expérience)"
+          - "Pas de chargement de pins pendant le geste"
+          - "Pas de blocage de la navigation manuelle pendant un parcours actif (l'utilisateur reste libre d'explorer)"
+
+      criteres_de_reussite:
+          - "Atteint le test_litmus de Mme Martin (défilement entre 3 époques en classe sans rupture visible)"
+          - "Atteint le test_litmus de Kenji (compréhension du mécanisme sans tutoriel ni texte)"
+          - "Le passage entre époques est ressenti comme un voyage temporel, pas comme un changement d'écran"
+
+      definition_of_done:
+          - "L'utilisateur peut activer une navigation continue entre les époques"
+          - "À la fin du geste, l'époque sélectionnée est calée et les pins correspondants sont chargés"
+          - "La période en cours de sélection est lisible pendant le geste"
+          - "Sur la période 'Aujourd'hui', tous les pins de toutes les époques sont accessibles"
+          - "Un parcours en cours peut positionner le slider automatiquement, et l'utilisateur peut toujours le déplacer manuellement"
+
+      enjeux_transversaux:
+          accessibilite: >-
+              Critique pour Mme Martin (projection en classe — la lisibilité
+              de la période et de la transition est essentielle, y compris
+              depuis le fond de la classe). Une alternative à l'interaction
+              gestuelle continue doit être anticipée pour les utilisateurs
+              avec déficience motrice.
+          performance: >-
+              Critique : la fluidité du geste fait partie de l'expérience
+              (ressenti d'émerveillement non négociable). Le rechargement
+              des pins en fin de geste ne doit pas être perçu comme une
+              rupture.
+          vie_privee: "Pas d'enjeu spécifique."
+
+      questions_ouvertes:
+          - "Bornes exactes des ~10 époques — à valider avec la lead/historienne"
+          - "Comportement de l'auto-positionnement par un parcours quand l'utilisateur manipule activement le slider (priorité utilisateur ou parcours ?) — à arbitrer"
+
+      priorite: "coeur"
+
+      personas_principaux:
+          - kenji
+          - mme_martin
+          - pere_lyonnais
+
+      dependances:
+          - "D1.1 (carte de base — surface d'accueil du slider)"
+          - "D1.3 (apparence visuelle de la carte par époque — pilotée par le slider)"
+
+    # ===========================================================================
+    - id: D1.3
+      nom: "Apparence visuelle de la carte par époque"
+
+      raison_d_etre: >-
+          Donner à voir le voyage temporel — la carte ne doit pas être une
+          base statique sur laquelle on filtre du contenu, elle doit
+          RESPIRER l'époque. Sans cette dimension visuelle, le slider
+          n'est qu'un sélecteur de pins. Avec elle, le slider devient un
+          voyage : on SENT le passage du temps. Sert directement le
+          principe d'émerveillement.
+
+      comportement: >-
+          Chaque époque a une apparence visuelle propre, appliquée à la
+          carte de base (cf. brief § 6.1, "type filtre Snapchat"). Quand
+          l'utilisateur déplace le slider, l'apparence transitionne
+          progressivement entre l'époque de départ et l'époque cible —
+          pas de saut net. À la fin du geste, l'apparence se cale
+          précisément sur celle de l'époque sélectionnée. L'apparence
+          ne masque jamais les pins : la lisibilité reste prioritaire.
+
+      regles_fonctionnelles:
+          - "Une apparence distincte par époque"
+          - "Transition progressive pendant le geste du slider"
+          - "Calage net à la fin du geste"
+          - "La lisibilité des pins reste prioritaire — l'apparence ne doit pas les masquer"
+
+      capabilites:
+          - "Adapter visuellement la carte selon l'époque sélectionnée"
+          - "Animer la transition entre deux apparences pendant le geste"
+          - "Maintenir les pins visibles à travers les apparences"
+
+      ce_qu_on_ne_fait_pas:
+          - "Pas de personnalisation par l'utilisateur — l'époque dicte l'apparence"
+          - "Pas d'apparence statique (l'évolution est liée au slider)"
+          - "Pas d'apparence si chargée qu'elle masque le contenu cartographique"
+
+      criteres_de_reussite:
+          - "Mme Martin défile entre 3 époques en classe et le 'voyage temporel' est immédiatement visible pour les élèves"
+          - "Le père lyonnais distingue à l'œil l'époque sur laquelle il est, sans avoir à lire l'année"
+          - "Sur les apparences les plus chargées, les pins restent visibles et cliquables"
+
+      definition_of_done:
+          - "Chaque époque dispose d'une apparence visuelle définie et appliquée"
+          - "La transition entre deux apparences est progressive pendant le geste"
+          - "L'apparence se cale net à la fin du geste"
+          - "Les pins restent visibles et cliquables sous toutes les apparences"
+
+      enjeux_transversaux:
+          accessibilite: >-
+              Le contraste de la carte avec les pins doit rester suffisant
+              pour Mme Martin qui projette ET pour les utilisateurs en
+              situation de déficience visuelle. Vérification daltonisme à
+              prévoir au palier 9.
+          performance: >-
+              Critique : la transition fluide est ce qui distingue le slider
+              d'un sélecteur banal. Toute saccade tue l'effet.
+          vie_privee: "Pas d'enjeu."
+
+      questions_ouvertes:
+          - "Quelle apparence pour quelle époque (palette, traitement) — palier 9 cartographie + lead/historienne"
+          - "Mode 'Aujourd'hui' (tous pins de toutes époques) : faut-il une apparence neutre ou particulière ?"
+          - "Couches de reconstitution cartographique (cartes d'archives) à intégrer ici ou en D1.5 ?"
+
+      priorite: "coeur"
+
+      personas_principaux:
+          - mme_martin
+          - pere_lyonnais
+          - kenji
+
+      dependances:
+          - "D1.1 (carte de base)"
+          - "D1.2 (slider qui pilote)"
+
+    # ===========================================================================
+    - id: D1.4
+      nom: "Recherche"
+
+      raison_d_etre: >-
+          Permettre à un utilisateur qui a une intention précise de trouver
+          ce qu'il cherche — un lieu, une période, une catégorie — sans
+          devoir parcourir au hasard. C'est l'exception assumée à la
+          sérendipité : on n'oblige pas la sérendipité quand l'utilisateur
+          sait ce qu'il veut. Mais on garde la cohérence : la recherche
+          vit SUR la carte, pas dans un écran séparé.
+
+      comportement: >-
+          Une barre de recherche est accessible depuis la carte. L'utilisateur
+          peut taper du texte libre et combiner avec des filtres (par époque,
+          par catégorie de pin, par mot-clé). Les résultats apparaissent en
+          surimpression sur la carte (la carte reste visible derrière) et
+          possiblement aussi en liste. Le tap sur un résultat recadre la
+          carte sur le pin et ouvre l'aperçu du pin (D2.4). La recherche
+          fonctionne hors-ligne sur le contenu téléchargé.
+
+      regles_fonctionnelles:
+          - "La recherche vit SUR la carte, pas dans un écran 'Explorer' séparé (essence § ce_qu_on_refuse)"
+          - "Recherche par mot-clé sur le nom du lieu, le contenu narratif, la catégorie, l'époque, les alias"
+          - "Filtres combinables (mot-clé + époque + catégorie)"
+          - "La recherche fonctionne hors-ligne sur le contenu téléchargé"
+          - "Le tap sur un résultat recadre la carte et ouvre l'aperçu du pin (D2.4)"
+
+      capabilites:
+          - "Rechercher par mot-clé sur le contenu des pins"
+          - "Filtrer par époque"
+          - "Filtrer par catégorie de pin (cf. D2.2)"
+          - "Combiner mot-clé et filtres"
+          - "Afficher les résultats sur la carte ou en liste"
+          - "Recadrer la carte sur un résultat sélectionné"
+          - "Ouvrir l'aperçu d'un résultat sélectionné"
+          - "Effectuer la recherche hors-ligne sur le contenu téléchargé"
+
+      ce_qu_on_ne_fait_pas:
+          - "Pas d'écran 'Explorer' séparé (essence § ce_qu_on_refuse)"
+          - "Pas de recherche en plein écran qui masquerait la carte"
+          - "Pas de catalogue navigable indépendant (la sérendipité reste le mode principal)"
+          - "Pas d'historique de recherche en clair (vie privée)"
+
+      criteres_de_reussite:
+          - "Kenji cherche 'Bellecour' et trouve la place rapidement"
+          - "Mme Dupont prépare une sortie en filtrant par catégorie + époque, et obtient une liste exploitable"
+          - "Si l'utilisateur tape un terme inconnu, le retour est gracieux (pas agressif), et propose des alternatives si possible"
+
+      definition_of_done:
+          - "Le champ de recherche libre fonctionne sur les noms et le contenu des pins"
+          - "Les filtres par époque et par catégorie fonctionnent"
+          - "La combinaison mot-clé + filtres fonctionne"
+          - "Le tap sur un résultat recadre la carte et ouvre l'aperçu (D2.4)"
+          - "La recherche fonctionne sans connexion sur le contenu téléchargé"
+          - "Aucun écran séparé n'est créé pour la recherche"
+
+      enjeux_transversaux:
+          accessibilite: >-
+              Le champ de recherche et les filtres doivent être navigables
+              au clavier et lisibles par lecteurs d'écran. Le nombre de
+              résultats doit être annoncé à voix haute.
+          performance: >-
+              Réactivité aux frappes attendue (perception 'instantanée') ;
+              critères chiffrés en palier 16.
+          vie_privee: >-
+              Pas d'historique des recherches en clair stocké de façon
+              identifiable. Suggestions implicites locales acceptables.
+
+      questions_ouvertes:
+          - "Recherche fuzzy ou stricte (recommandation : fuzzy avec score, perf à valider)"
+          - "Suggestions / autocomplétion (à valider avec les devs selon perf)"
+          - "Recherche sur les parcours en plus des pins (recommandation : oui, à articuler avec D3.2)"
+          - "Recherche vocale (Kenji mains libres) — pas dans le brief, à arbitrer"
+
+      priorite: "important"
+
+      personas_principaux:
+          - kenji
+          - mme_dupont
+          - mme_martin
+
+      dependances:
+          - "D1.1 (carte — surface d'accueil)"
+          - "D2.2 (catégorisation — pour le filtre par catégorie)"
+          - "D2.4 (aperçu pin — ouvert au tap sur un résultat)"
+
+    # ===========================================================================
+    - id: D1.5
+      nom: "Couches cartographiques avancées"
+
+      raison_d_etre: >-
+          Une fois le cœur stable (carte de base, slider, apparences par
+          époque), on peut enrichir la carte de couches plus poussées :
+          cartes d'archives historiques, plans 2D anciens, voire
+          reconstitutions générées. Ces couches ouvrent une autre
+          profondeur d'expérience pour Mme Martin (cours sur l'évolution
+          urbaine) et donnent matière au 'wow' supplémentaire. Le brief
+          § 6.1 le précise : ces couches s'ajoutent 'au fur et à mesure
+          si le temps le permet'.
+
+      comportement: >-
+          Une couche cartographique d'archive (par exemple un plan de Lyon
+          de 1750) peut être superposée à la carte de base, avec une
+          visibilité ajustable. Le choix des couches disponibles dépend
+          de l'époque sélectionnée. L'utilisateur active une couche depuis
+          un menu discret ; elle reste active jusqu'à désactivation
+          explicite ou changement majeur d'époque. Les pins continuent
+          de fonctionner par-dessus la couche.
+
+      regles_fonctionnelles:
+          - "Couche optionnelle, jamais activée par défaut"
+          - "Disponibilité dépendante de l'époque sélectionnée"
+          - "Visibilité de la couche ajustable par l'utilisateur"
+          - "Les pins restent visibles et fonctionnels par-dessus la couche"
+          - "Pas obligatoire pour le cœur de l'app"
+
+      capabilites:
+          - "Activer / désactiver une couche cartographique"
+          - "Superposer une carte historique sur la carte moderne"
+          - "Ajuster la visibilité de la couche superposée"
+          - "Sélectionner parmi plusieurs couches disponibles pour une époque"
+
+      ce_qu_on_ne_fait_pas:
+          - "Pas de remplacement de la carte de base (toujours en superposition)"
+          - "Pas de couche activée silencieusement"
+          - "Pas dans le cœur du produit"
+
+      criteres_de_reussite:
+          - "Mme Martin peut superposer une carte de Lyon en 1789 et montrer aux élèves comment les remparts disparaissaient"
+          - "Si une couche manque pour une époque donnée, l'app le signale gracieusement"
+
+      definition_of_done:
+          - "Au moins une couche d'archive disponible pour au moins une époque"
+          - "Activation et désactivation de la couche fonctionnent"
+          - "La visibilité est ajustable"
+          - "Les pins restent fonctionnels par-dessus la couche"
+
+      enjeux_transversaux:
+          accessibilite: >-
+              Le contrôle de visibilité de la couche doit rester accessible
+              au clavier et aux lecteurs d'écran. La superposition ne doit
+              pas dégrader le contraste des pins.
+          performance: >-
+              L'activation/désactivation ne doit pas dégrader la fluidité
+              de la carte de base.
+          vie_privee: "Pas d'enjeu spécifique."
+
+      questions_ouvertes:
+          - "Quelles cartes d'archives disponibles ? — à négocier avec l'institution (cf. palier 2 acteurs_hors_personas)"
+          - "Reconstitutions générées — moteur, fidélité ? — palier 9 + dev IA"
+          - "Pré-rendu vs temps réel pour les reconstitutions 3D aériennes — perf vs qualité"
+          - "Combien de couches viables sur la durée du projet ?"
+
+      priorite: "si_le_temps"
+
+      personas_principaux:
+          - mme_martin
+
+      dependances:
+          - "D1.1 (carte de base)"
+          - "D1.2 (slider — détermine quelle couche est disponible)"
+          - "D1.3 (apparence par époque — interaction couche × apparence à arbitrer)"
+
+# -----------------------------------------------------------------------------
+# Persona-check du domaine D1
+# -----------------------------------------------------------------------------
+persona_check:
+    kenji:
+        pertinence: "Très élevée — la carte est sa surface principale d'usage à Lyon"
+        scenarios_passes:
+            - scenario: "Premier lancement à l'hôtel, comprendre l'app sans tutoriel ni français"
+              reponse: "Couvert par D1.1 (zéro friction au lancement)"
+            - scenario: "Marche avec casque, vivre 80% de l'expérience sans regarder l'écran"
+              reponse: "Couvert partiellement ici (la carte oriente quand il regarde) ; l'audio des pins (D7) est l'autre moitié"
+            - scenario: "Plus de data au milieu de Bellecour, continuer hors-ligne"
+              reponse: "Couvert par D1.1 (mode hors-ligne canonique) — étendue à trancher avec les devs Flutter (question ouverte)"
+        questions_levees:
+            - "Étendue exacte du mode hors-ligne pour Kenji"
+
+    mme_dupont:
+        pertinence: "Élevée — utilise la carte pour préparer sa sortie scolaire et l'exécuter"
+        scenarios_passes:
+            - scenario: "Préparer un parcours en moins de 30 minutes"
+              reponse: "La carte (D1.1) est le support, la recherche (D1.4) le facilitateur. Temps de préparation surtout dépendant de D3.7 (création de parcours)"
+        questions_levees: []
+
+    mme_martin:
+        pertinence: "Très élevée — projette la carte au tableau en classe"
+        scenarios_passes:
+            - scenario: "Projeter au tableau avec un mode présentation propre"
+              reponse: "Référencé en D1.1 (mode présentation sans chrome canonique D2.5). Application explicite à la carte à confirmer en palier 7. Recommandation forte : OUI."
+            - scenario: "Défiler entre 3 époques en 30 secondes pour montrer une évolution"
+              reponse: "Couvert par D1.2 (slider continu) et D1.3 (apparence par époque)"
+        questions_levees:
+            - "À acter explicitement : la carte (D1.1) est-elle projetable en mode présentation comme la consultation d'un pin (D2.5) ?"
+
+    pere_lyonnais:
+        pertinence: "Très élevée — flâne sur la carte de son quartier"
+        scenarios_passes:
+            - scenario: "Marche 5 min en mode Surprenez-moi, recevoir une anecdote au bon moment"
+              reponse: "La géoloc (D1.1) est le déclencheur — elle alimente le mode Surprenez-moi (D4.2)"
+            - scenario: "Aucune friction au lancement"
+              reponse: "Couvert par D1.1 — c'est exactement la promesse"
+        questions_levees: []
+
+    anais_back_office:
+        pertinence: "Faible — domaine côté grand public"
+        scenarios_passes:
+            - scenario: "Production de couches cartographiques avancées (D1.5)"
+              reponse: "Renvoi vers D10 (back-office) pour le workflow d'import — détaillé en palier 13 admin"
+        questions_levees: []

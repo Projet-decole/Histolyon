@@ -1,0 +1,603 @@
+# =============================================================================
+# Palier 13 — Icônes — INDEX
+# =============================================================================
+# Le palier 13 livre la CHARTE GRAPHIQUE des icônes ET l'inventaire complet
+# mappé aux usages fonctionnels. Ce n'est pas un simple catalogue — c'est
+# un système de continuité visuelle qui garantit que toutes les icônes de
+# l'app (catégories Pin, UI fonctionnelles, back-office admin) appartiennent
+# à une même famille graphique.
+#
+# La charte DA archivée mentionnait Lucide en bibliothèque, mais NE POSAIT
+# PAS de charte de style indépendante, ne couvrait PAS les ~25 slots
+# d'icônes UI consommés par le palier 10, et laissait des trous (modes de
+# notification, back-office admin, état système). Le palier 13 comble ces
+# trous tout en assumant la cohérence avec la palette tokens (palier 12)
+# et les compositions composants (palier 10).
+# =============================================================================
+
+document:
+  type: palier_icones_index
+  numero: 13
+  version: "0.1"
+  date: "2026-05-07"
+  audience:
+    - "Tout agent qui rédige les fichiers de contenu 01-04"
+    - "relecture"
+    - "Auteurs des paliers 14 (surfaces hors-app), 15 (Figma), 16 (validation)"
+    - "production des SVG"
+  role: >-
+    Index, anti-périmètre par palier aval, vocabulaire, articulation
+    9/10/11/12/14/15/16, persona-check, format de fiche par famille,
+    décisions structurelles initiales.
+  format: yaml
+  prerequis_de_lecture:
+    - "design/conception/intention.yaml — § paliers num=13"
+    - "design/conception/09-cartographie/00-index.yaml — décisions D1 (catégorie par icône), D2 (Personne / Célébrité → Personne), D6 (badge Officiel abandonné)"
+    - "design/conception/09-cartographie/02-pins.yaml — catégorie via icône, contenu immersif sans signe distinctif"
+    - "design/conception/10-composants/01-atomes.yaml — comp-icone (palier 10 atomes:650) consommé par ~25 slots"
+    - "design/conception/10-composants/04-shell.yaml — slots icone des templates de mode et surfaces persistantes"
+    - "design/conception/12-tokens/01-couleurs.yaml — TOK-COLOR-PRIMARY (active), TOK-COLOR-TEXTE-TERTIAIRE (inactive), TOK-COLOR-PRIMARY-CLAIR (sur fond sombre)"
+    - "design/conception/12-tokens/02-typographies.yaml — TOK-TYPO-UI-XS pour labels sous icônes du sélecteur de section"
+    - "archives/_bmad-output/design/da-charte.md — base de référence Lucide à RETRAITER (charte courte, beaucoup de trous identifiés)"
+
+# -----------------------------------------------------------------------------
+# 1. Rôle du palier 13 — charte graphique + inventaire
+# -----------------------------------------------------------------------------
+role:
+
+  ce_qu_il_livre:
+    - "CHARTE GRAPHIQUE indépendante : style monoline strict, stroke 1.5px, grille 24×24, optical correction par taille, métaphores universelles"
+    - "POLITIQUE DE BIBLIOTHÈQUE : Lucide source par défaut (couvre ~90% des besoins), CUSTOM en cohérence stricte si trou"
+    - "CONTINUITÉ catégories Pin / UI / back-office : même grille, même stroke, même style — d'une seule famille graphique"
+    - "VARIANTS codifiés : tailles (XS 14 / SM 16 / MD 20 / LG 24 / XL 32), états (default / active / disabled / hover-pressed)"
+    - "INVENTAIRE des 11 icônes catégories Pin (palier 9 D1 réifié)"
+    - "INVENTAIRE des 37 icônes UI fonctionnelles (mappées aux slots palier 10, aux métadonnées de Parcours et au sélecteur de langue de la page web, complétées par les icônes de bascule mot de passe et de permissions caméra/notification)"
+    - "INVENTAIRE des icônes back-office admin (modération, validation, retrait, promotion)"
+    - "POLITIQUE OUTLINED EXCLUSIVE — pas de filled même pour activations (favori activé = outlined + couleur + spring + haptique HAP-NET)"
+
+  ce_qu_il_ne_livre_pas:
+    - "Mapping état dynamique → icône (ex. play vs pause selon ETAT-AUDIO-EN-COURS) — c'est le composant palier 10 qui le câble (la fiche d'icône liste les variantes possibles, le composant choisit)"
+    - "Couleurs des icônes — palier 12 fournit TOK-COLOR-PRIMARY / TOK-COLOR-TEXTE-TERTIAIRE / TOK-COLOR-PRIMARY-CLAIR ; le palier 13 dit QUEL token utiliser dans QUEL contexte (active sur fond clair, inactive, etc.)"
+    - "Tailles en pixels — déjà au palier 12 (mais le palier 13 nomme les tailles par usage)"
+    - "Animations / transitions des icônes — palier 11 (CRV-SPRING-NET pour favori activé, etc.)"
+    - "Microcopy associée — palier 8 fait"
+    - "Cibles tactiles chiffrées (≥ 44px) — palier 16 valide ; le palier 13 dit que la zone tactile inclut un padding implicite autour de l'icône"
+    - "SVG eux-mêmes — produits plus tard dans design/conception/13-icones/assets/"
+    - "Logo de l'app et icône d'app store — assets de marque distincts (palier 14 surfaces hors-app si pertinent ou production séparée)"
+
+  risque_orphelin_signale: >-
+    LOGO DE L'APP — le palier 13 renvoie le sujet au palier 14 (surfaces
+    hors-app). Si le palier 14 ne le traite pas non plus (page web,
+    QR, story partageable utilisent le logo mais ne le PRODUISENT pas),
+    le sujet sera ORPHELIN. La charte DA archivée mentionne le lion +
+    skyline + dégradé terracotta — base de référence à formaliser quelque
+    part. Risque tracé pour vigilance palier 14 / palier 16.
+
+  pourquoi_un_palier_dedie: >-
+    Sans charte graphique indépendante, l'adoption de Lucide serait une
+    dépendance fragile : si Lucide n'a pas une icône, l'app improvise.
+    Sans inventaire mappé aux slots palier 10, les développeurs
+    inventent des icônes par contexte. La rigueur du palier 13 est de
+    poser un système qui SURVIT à un changement de bibliothèque
+    (Lucide → autre conforme à la charte) sans perdre la cohérence.
+
+# -----------------------------------------------------------------------------
+# 2. Périmètre et anti-périmètre strict
+# -----------------------------------------------------------------------------
+perimetre:
+
+  inclus:
+    - "Charte graphique des icônes (style, grille, stroke, variants)"
+    - "Politique de bibliothèque source + custom"
+    - "Inventaire complet des icônes (catégories + UI + back-office)"
+    - "Mapping icône ↔ slot palier 10"
+    - "Variants par taille et état (avec mapping vers tokens palier 12)"
+
+  exclus:
+    - "Couleurs en hex (palier 12)"
+    - "Mapping état applicatif → variante d'icône (ex. play/pause selon ETAT-AUDIO-EN-COURS) — c'est le composant palier 10 qui choisit"
+    - "Animations / transitions (palier 11)"
+    - "Microcopy (palier 8)"
+    - "SVG produits (étape ultérieure — production via rédacteurs dans assets/)"
+    - "Cibles tactiles chiffrées (palier 16)"
+
+  test_de_purete: |
+    Trois tests à passer fiche par fiche :
+
+    (1) BIBLIOTHÈQUE-AGNOSTIQUE — si Lucide disparaît demain, peut-on
+        reconstituer toutes les icônes en suivant uniquement la charte
+        01-charte-graphique ? Si oui : le palier est solide.
+
+    (2) MAPPING SLOT — chaque slot d'icône du palier 10 (~25 occurrences
+        comp-icone) trouve-t-il une icône précise dans 03 ou 04 ? Aucun
+        slot orphelin.
+
+    (3) STYLE NEUTRE — les métaphores choisies sont-elles universelles
+        (utilisateur Kenji étranger les comprend sans tutoriel) ? Pas
+        de jeu visuel ni de référence culturelle obscure.
+
+  anti_perimetre_par_palier_aval:
+
+    palier_8:
+      titre: "Contenu et microcopy"
+      pas_au_palier_13:
+        - "Texte exact entre guillemets"
+      ce_que_le_palier_13_dit:
+        - "L'icône d'erreur inline est associée à TOK-COLOR-FONCTIONNEL-ERREUR mais le texte d'erreur relève de palier 8"
+
+    palier_9:
+      titre: "Cartographie"
+      respect_des_decisions:
+        - "D1 : chaque catégorie Pin est signalée par UNE icône distinctive (palier 13 fournit le mapping concret)"
+        - "D2 : catégorie 'Personne / Célébrité' renommée en 'Personne'"
+        - "D6 : badge 'Officiel' à plume ABANDONNÉ — pas d'icône plume pour signifier 'éditorial'"
+        - "D10 : pas de signe distinctif sur la carte pour pins à contenu immersif (3D / AR / audio long) — pas d'icône palier 13 pour ce cas"
+
+    palier_10:
+      titre: "Composants"
+      pas_au_palier_13:
+        - "Anatomie des composants (slots, cardinalité)"
+        - "Machines d'état des composants"
+      ce_que_le_palier_13_dit:
+        - "L'icône concrète qui s'insère dans CHAQUE slot icone du palier 10"
+        - "Variantes d'icônes possibles (état-dépendantes : play/pause, favori activé/non, etc.)"
+        - "Le composant palier 10 choisit la variante selon son état interne"
+
+    palier_11:
+      titre: "Réponse paramétrique"
+      pas_au_palier_13:
+        - "Durées de transition entre variantes d'icône (favori activé)"
+        - "Courbes (CRV-SPRING-NET pour favori)"
+        - "Haptiques associées"
+
+    palier_12:
+      titre: "Tokens visuels statiques"
+      pas_au_palier_13:
+        - "Valeurs hex des couleurs"
+        - "Tailles en pixels exactes (les tailles XS/SM/MD/LG/XL ci-dessous sont des NOMS, leurs px relèvent de palier 12 ou tableau de correspondance ici)"
+      ce_que_le_palier_13_dit:
+        - "QUEL token couleur utiliser dans QUEL contexte (icône active = TOK-COLOR-PRIMARY, inactive = TOK-COLOR-TEXTE-TERTIAIRE, sur fond sombre = TOK-COLOR-PRIMARY-CLAIR)"
+
+    palier_14:
+      titre: "Surfaces hors-app"
+      pas_au_palier_13:
+        - "Logo de l'app, icône d'app store"
+        - "Icônes spécifiques à la version web responsive"
+      relation: >-
+        Si le palier 14 nécessite des icônes (page web, story partageable),
+        il consomme l'inventaire et la charte du palier 13. Aucune icône
+        propre au palier 14 hors logo/branding.
+
+    palier_15:
+      titre: "Construction Figma"
+      pas_au_palier_13:
+        - "Variables Figma de couleur appliquées aux icônes"
+        - "Composants Figma d'icônes (instances)"
+      relation: >-
+        Le palier 15 instancie les icônes du palier 13 en composants
+        Figma. Le palier 13 fournit les SVG   ; le palier 15
+        les importe dans Figma.
+
+    palier_16:
+      titre: "Validation"
+      pas_au_palier_13:
+        - "Cibles tactiles chiffrées (≥ 44px)"
+        - "Tests de daltonisme effectifs sur les icônes catégories"
+        - "Lisibilité depuis le fond de classe (Mme Martin)"
+      relation: >-
+        Le palier 13 pose le système ; le palier 16 valide. Tests
+        notamment sur la perceptibilité des icônes catégories Pin
+        à 14px sur fond couleur de provenance + fond carte interpolé,
+        et sur la distinguabilité des paires daltonisme citées par
+        la charte DA archivée (Classique/Vie quotidienne ; Anecdote/
+        Événement) — palier 9 D1 a tranché 'icône suffit pour
+        daltonisme', le palier 16 valide.
+
+# -----------------------------------------------------------------------------
+# 3. Typologie 4 familles d'icônes
+# -----------------------------------------------------------------------------
+typologie_des_familles:
+
+  - famille: CATEGORIE
+    nom: "Icônes catégories Pin"
+    description: >-
+      11 icônes signalant la catégorie d'un Pin sur la carte (palier 9
+      D1 réifié). Affichées en blanc à 14px à l'intérieur du Pin (couleur
+      de provenance), reprises à 20px dans le chip catégorie de l'aperçu
+      rapide M2 et de la consultation approfondie M3.
+    fichier: "02-icones-categories.yaml"
+    cardinalité: 11
+    consommateurs:
+      - "comp-pin slot icone_categorie (palier 10 03-fonctionnels)"
+      - "comp-chip-categorie slot icone (palier 10 01-atomes)"
+      - "comp-tag-categorie slot icone (palier 10 01-atomes)"
+      - "comp-cluster-densite (héritage par majorité)"
+
+  - famille: UI_FONCTIONNELLE
+    nom: "Icônes UI fonctionnelles"
+    description: >-
+      37 icônes mappées aux slots des composants atomes/molécules/shell
+      du palier 10 + métadonnées de Parcours et internationalisation
+      consommées par palier 14 (page web responsive) : navigation
+      (retour, fermeture), actions (favori, partage, signalement),
+      saisie (calendrier, lieu, bascule mot de passe), états (erreur,
+      succès), médias (play, pause), permissions (caméra, notification),
+      métadonnées Parcours (durée, distance, étapes),
+      internationalisation (sélecteur de langue), etc.
+    fichier: "03-icones-ui-fonctionnelles.yaml"
+    cardinalité: 37
+    consommateurs: "Atomes interactifs du palier 10 (boutons, chips, champs de saisie, sélecteur de section, persistantes, indicateurs) + palier 14 fichier 02 (page web responsive — métadonnées et langue)"
+
+  - famille: BACK_OFFICE
+    nom: "Icônes back-office admin"
+    description: >-
+      Icônes des actions desktop admin (modération communautaire,
+      validation scientifique, retrait, promotion communautaire vers
+      éditorial, soumission). Cohérence stricte avec la charte 01.
+    fichier: "04-icones-back-office.yaml"
+    cardinalité_estimee: "~8-12"
+    consommateurs: "Composants palier 10 05-back-office.yaml"
+
+# -----------------------------------------------------------------------------
+# 4. Découpage en 4 fichiers de contenu
+# -----------------------------------------------------------------------------
+fichiers:
+
+  - id: "01"
+    nom: "Charte graphique"
+    fichier: "01-charte-graphique.yaml"
+    cible_volume_estime: "~300-400 lignes"
+    role: >-
+      Le cœur du palier. Style de référence indépendant (monoline strict,
+      stroke 1.5px, grille 24×24, optical correction), politique de
+      bibliothèque source (Lucide par défaut + custom si trou),
+      continuité inter-familles, variants codifiés (tailles, états,
+      mapping tokens palier 12), politique OUTLINED exclusive.
+    pilote: true
+    note: >-
+      PILOTE — calibre le format des fiches d'icône (id, nom Lucide ou
+      custom, métaphore, slot palier 10, variants taille/état) et le
+      ton de retraitement de la charte DA archivée.
+
+  - id: "02"
+    nom: "Icônes catégories"
+    fichier: "02-icones-categories.yaml"
+    cible_volume_estime: "~200-280 lignes"
+    role: >-
+      11 catégories Pin avec icône concrète + justification métaphorique.
+      Catégorie 6 'Lieu disparu' → landmark-off (validé) pour éviter le
+      cliché ghost. Vérification daltonisme (paires Classique/Vie
+      quotidienne, Anecdote/Événement déjà signalées par charte DA).
+
+  - id: "03"
+    nom: "Icônes UI fonctionnelles"
+    fichier: "03-icones-ui-fonctionnelles.yaml"
+    cible_volume_estime: "~350-450 lignes"
+    role: >-
+      Inventaire des 37 icônes UI, mappées aux slots palier 10, aux métadonnées de Parcours et au sélecteur de langue de la page web (palier 14), complétées par la bascule mot de passe et les permissions caméra/notification.
+      Couvre navigation, actions, saisie, états, médias, sélecteur de
+      section, persistantes, indicateurs.
+
+  - id: "04"
+    nom: "Icônes back-office"
+    fichier: "04-icones-back-office.yaml"
+    cible_volume_estime: "~150-200 lignes"
+    role: >-
+      Icônes des actions desktop admin. Cardinalité réduite (~8-12)
+      mais cohérence stricte avec la charte 01.
+
+fichiers_total_estime: "~1000-1330 lignes pour le palier 13."
+
+# -----------------------------------------------------------------------------
+# 5. Format des fiches d'icône
+# -----------------------------------------------------------------------------
+format_des_fiches:
+
+  charpente_commune:
+    - "id (préfixé selon famille : ICON-CAT-X, ICON-UI-X, ICON-ADMIN-X)"
+    - "nom_palier_13 (nom interne sémantique, ex. 'lieu_disparu', 'navigation_retour')"
+    - "source (lucide:nom_lucide ou custom:slug)"
+    - "metaphore (court paragraphe expliquant pourquoi cette icône pour ce sens)"
+    - "slot_palier_10 (référence au composant + slot consommateur, par id)"
+    - "variants (tailles applicables, états applicables)"
+    - "mapping_couleurs (token palier 12 par contexte : actif, inactif, sur fond sombre)"
+    - "fichier_svg_attendu (chemin dans assets/, produites)"
+    - "questions_ouvertes (rare)"
+
+  exemple_categorie:
+    structure: |
+      - id: ICON-CAT-LIEU-DISPARU
+        nom_palier_13: "lieu_disparu"
+        source: "lucide:landmark-off"
+        metaphore: >-
+          Monument (landmark) barré d'une diagonale (off) — métaphore
+          fonctionnelle 'le bâtiment historique n'existe plus
+          physiquement'. Cohérent avec ICON-CAT-CLASSIQUE qui utilise
+          landmark non barré. Évite le cliché ghost (fantôme infantile).
+        slot_palier_10:
+          - "comp-pin slot icone_categorie (palier 10 03-fonctionnels) variant categorie=lieu_disparu"
+          - "comp-chip-categorie slot icone variant categorie=lieu_disparu"
+        variants:
+          tailles: [XS, MD, LG]
+          etats: [default, active, inactive]
+        mapping_couleurs:
+          dans_pin_sur_carte: "blanc (TOK-COLOR-BLANC-NARRATIF) sur fond TOK-COLOR-PIN-EDITORIAL ou TOK-COLOR-PIN-COMMUNAUTAIRE"
+          dans_chip_categorie: "TOK-COLOR-TEXTE-PRINCIPAL sur fond TOK-COLOR-FOND-SECONDAIRE neutre (palier 12 D7 — fond chip catégorie neutre uniforme)"
+        fichier_svg_attendu: "assets/categories/lieu-disparu.svg"
+
+  exemple_ui:
+    structure: |
+      - id: ICON-UI-RETOUR
+        nom_palier_13: "navigation_retour"
+        source: "lucide:arrow-left"
+        metaphore: "Flèche vers la gauche — convention universelle de retour gracieux."
+        slot_palier_10:
+          - "comp-button-back slot icone (palier 10 01-atomes)"
+        variants:
+          tailles: [LG]   # 24px standard
+          etats: [default, pressed, disabled]
+        mapping_couleurs:
+          sur_fond_clair: "TOK-COLOR-TEXTE-PRINCIPAL"
+          en_mode_M4_ou_overlay_sombre: "TOK-COLOR-PRIMARY-CLAIR"
+        fichier_svg_attendu: "assets/ui/navigation-retour.svg"
+
+  exemple_back_office:
+    structure: |
+      - id: ICON-ADMIN-VALIDER-PIN
+        nom_palier_13: "valider_pin_communautaire"
+        source: "lucide:check-circle"
+        metaphore: "Cercle avec validation — convention universelle d'acceptation."
+        slot_palier_10:
+          - "comp-moderation-soumissions (palier 10 05-back-office)"
+        variants:
+          tailles: [LG]
+          etats: [default, hover, pressed]
+        mapping_couleurs:
+          actif: "TOK-COLOR-FONCTIONNEL-SUCCES"
+          inactif: "TOK-COLOR-TEXTE-TERTIAIRE"
+        fichier_svg_attendu: "assets/back-office/valider-pin.svg"
+
+  vocabulaire_admis:
+    - "noms d'icônes Lucide (snake-case ou kebab-case selon Lucide)"
+    - "slug custom (kebab-case, ex. mode-presentation, surprenez-moi)"
+    - "tailles nommées XS/SM/MD/LG/XL (px en correspondance dans charte 01)"
+    - "états nommés default/active/inactive/disabled/hover/pressed"
+
+  vocabulaire_a_eviter:
+    - "Mention de bibliothèques concurrentes (Material Symbols, Heroicons, Phosphor, etc.) sauf en note de comparaison ponctuelle"
+    - "Valeurs hex de couleur (palier 12 — référencer par token TOK-COLOR-X)"
+    - "Tailles en px nues (utiliser les noms XS/SM/MD/LG/XL)"
+    - "Animations (palier 11)"
+    - "Microcopy entre guillemets (palier 8)"
+
+# -----------------------------------------------------------------------------
+# 6. Articulation avec les paliers en aval
+# -----------------------------------------------------------------------------
+articulation_paliers_aval:
+
+  - palier: 14
+    nom: surfaces_hors_app
+    transmission: >-
+      Le palier 14 consomme la charte et l'inventaire du palier 13 pour
+      les surfaces web/QR/story partageable. Logo et branding hors
+      périmètre du palier 13.
+
+  - palier: 15
+    nom: construction_figma
+    transmission: >-
+      Le palier 15 importe les SVG produits plus tard (assets/) dans
+      Figma comme composants d'icône. Le palier 13 fournit le contrat
+      technique (viewBox 24×24, stroke 1.5, currentColor) ; le palier 15
+      gère l'organisation Figma.
+
+  - palier: 16
+    nom: validation
+    transmission: >-
+      Le palier 16 valide la perceptibilité des icônes (catégories Pin
+      à 14px sur fond carte interpolé palier 11 / palier 9, distinguabilité
+      daltonisme, lisibilité depuis fond de classe Mme Martin), les
+      cibles tactiles (≥ 44px en zone tactile incluant padding autour
+      de l'icône), et la cohérence visuelle perçue (test proxy-personas
+      sur la sensation 'famille graphique unique').
+
+# -----------------------------------------------------------------------------
+# 7. Conventions de référencement
+# -----------------------------------------------------------------------------
+conventions:
+  ids_categories: "ICON-CAT-X (ICON-CAT-CLASSIQUE, ICON-CAT-LIEU-DISPARU, etc.)"
+  ids_ui: "ICON-UI-X (ICON-UI-RETOUR, ICON-UI-FAVORI, etc.)"
+  ids_admin: "ICON-ADMIN-X (ICON-ADMIN-VALIDER-PIN, ICON-ADMIN-RETIRER-PIN, etc.)"
+  source_externe: "lucide:nom-de-l-icone (kebab-case Lucide)"
+  source_custom: "custom:slug (kebab-case interne — ex. custom:mode-presentation)"
+  composants_palier_10: "Référence par id + ligne (ex. palier 10 01-atomes pour comp-button-back)"
+  tokens_couleur_palier_12: "TOK-COLOR-X cité directement (TOK-COLOR-PRIMARY, TOK-COLOR-TEXTE-TERTIAIRE, etc.)"
+  tailles: "Noms XS/SM/MD/LG/XL — correspondance px dans charte 01"
+
+# -----------------------------------------------------------------------------
+# 8. Persona check global
+# -----------------------------------------------------------------------------
+persona_check_global:
+
+  kenji:
+    impact: ÉLEVÉ
+    note: >-
+      Kenji = utilisateur étranger. Les métaphores doivent être
+      UNIVERSELLES (heart pour favori, search pour loupe, share pour
+      partage — conventions cross-culturelles). Pas de référence
+      culturelle obscure (ex. plume comme symbole d'autorité éditoriale
+      ABANDONNÉ — cohérent palier 9 D6). Test_litmus 'comprendre l'app
+      en moins de 60 secondes' garanti par la sobriété des icônes.
+
+  mme_dupont:
+    impact: moyen
+    note: >-
+      Catégories Pin lisibles à 14px sur le terrain (en mouvement,
+      luminosité variable). Charte 01 garantit l'optical correction
+      par taille.
+
+  mme_martin:
+    impact: ÉLEVÉ
+    note: >-
+      Test_litmus 'projection en classe, lecture depuis le fond' :
+      les icônes 24px (LG) doivent rester perceptibles à distance.
+      Stroke 1.5px à 24px = ratio robuste. Validation palier 16.
+
+  pere_lyonnais:
+    impact: moyen
+    note: >-
+      Icônes catégories Pin, alerte de proximité M7, et bouton de
+      partage sont sa surface principale en flânerie. Métaphores
+      simples (sparkles pour anecdote, heart-handshake pour patrimoine
+      vivant — héritage charte DA).
+
+  anais_back_office:
+    impact: ÉLEVÉ
+    note: >-
+      Icônes back-office desktop (fichier 04). Cohérence stricte
+      avec UI mobile pour qu'Anaïs ne se sente pas dans un autre
+      produit.
+
+# -----------------------------------------------------------------------------
+# 9. Décisions structurelles prises
+# -----------------------------------------------------------------------------
+decisions_structurelles_prises:
+
+  - id: D1
+    decision: "Découpage en 4 fichiers (charte / catégories / UI / back-office)"
+    pourquoi: "4 familles d'objets distinctes, charte indépendante en pilote."
+
+  - id: D2
+    decision: "Méthode allégée séquentielle (façon palier 9/11/12)"
+    pourquoi: "Système interconnecté — la charte conditionne l'inventaire."
+
+  - id: D3
+    decision: "Style monoline strict, stroke 1.5px, grille 24×24"
+    pourquoi: >-
+      Cohérent charte DA archivée (qui adoptait Lucide). Style universellement
+      utilisable, lisible à toute taille avec optical correction. Pas
+      de mélange filled/outlined/duotone.
+
+  - id: D4
+    decision: "Bibliothèque source par défaut : Lucide ; custom strict si trou"
+    pourquoi: >-
+      Lucide couvre ~90% des besoins UI courants, est sous licence
+      ISC permissive (autorise reproduction avec attribution), et son
+      style est conforme à la charte. Si une icône manque (ex.
+      'mode-presentation' n'a pas d'équivalent immédiat), on dessine
+      en respectant les règles strictes de la charte (stroke 1.5,
+      monoline, métaphore neutre).
+
+  - id: D5
+    decision: "OUTLINED EXCLUSIVEMENT — pas de filled même pour activations (validé utilisateur 2026-05-07)"
+    pourquoi: >-
+      Cohérence visuelle stricte. L'activation d'un favori se signale
+      par changement de couleur (TOK-COLOR-PRIMARY) + animation
+      CRV-SPRING-NET (palier 11) + haptique HAP-NET (palier 11), pas
+      par changement de remplissage. Sobriété cohérente avec la
+      posture B palier 9.
+
+  - id: D6
+    decision: "Catégorie 6 'Lieu disparu' → lucide:landmark-off (au lieu de ghost)"
+    pourquoi: >-
+      Validé utilisateur 2026-05-07. Évite le cliché 'fantôme'
+      infantile pour un lieu historique disparu. landmark-off est
+      cohérent avec ICON-CAT-CLASSIQUE qui utilise landmark non barré,
+      métaphore claire 'monument qui n'est plus'.
+
+  - id: D7
+    decision: "Continuité inter-familles : catégories Pin et UI fonctionnelles partagent même grille / stroke / style"
+    pourquoi: >-
+      Test 'd'une seule famille graphique' : un utilisateur ne doit
+      pas sentir que les icônes catégories viennent d'une bibliothèque
+      différente des icônes UI. Charte 01 impose les contraintes
+      communes ; les fiches 02/03/04 référencent ces contraintes.
+
+  - id: D8
+    decision: "étape ultérieure — production SVG via rédacteurs en parallèle dans assets/"
+    pourquoi: >-
+      Décision utilisateur 2026-05-07. Une fois le palier validé
+       , on crée le sous-dossier assets/ avec
+      sous-dossiers categories/ ui/ back-office/ et on délègue la
+      production SVG à des rédacteurs en parallèle. Conventions
+      techniques : viewBox 0 0 24 24, stroke 1.5, stroke-linecap
+      round, stroke-linejoin round, fill none, currentColor.
+      Sources Lucide récupérées avec attribution ISC ; custom dessinés
+      en cohérence stricte. README dans assets/ avec attribution
+      Lucide ISC.
+
+  - id: D9
+    decision: "Couverture exhaustive des slots palier 10 (occurrences comp-icone)"
+    pourquoi: >-
+      Aucun slot orphelin. Le test_de_purete (2) du palier impose
+      que chaque slot d'icône palier 10 trouve son mapping ICON-X
+      précis. Liste exhaustive des slots dans
+      l'index.
+
+  - id: D10
+    decision: "Icônes catégories Pin XS (14px) = SVG dédiés 14×14 stroke 2 SYSTÉMATIQUEMENT"
+    pourquoi: >-
+      À 14px de rendu, le stroke 1.5 SVG produit ~0.875 px effectif —
+      sub-pixel à risque de flouté. Pour les 11 icônes catégories
+      utilisées dans le Pin sur la carte (taille critique pour la
+      lecture), production OBLIGATOIRE d'une version dédiée 14×14
+      avec stroke 2 (et tracé simplifié si nécessaire — cf. charte 01
+      § 4 optical_correction). Pas une décision conditionnelle palier 16.
+      Validé sur insistance relecture (verdict que le stroke
+      sub-pixel à 14px est trop fragile pour rester en option).
+
+# -----------------------------------------------------------------------------
+# 10. Audit des slots d'icônes palier 10 (couverture attendue par 03 / 04)
+# -----------------------------------------------------------------------------
+# Liste des slots comp-icone consommés par les composants palier 10. Le
+# fichier 03-icones-ui-fonctionnelles.yaml DOIT couvrir tous ces slots.
+# Le fichier 04 couvre les slots back-office.
+audit_slots_palier_10:
+
+  atomes:
+    - "comp-button-primary slot icone (palier 10 01-atomes) — icône optionnelle"
+    - "comp-button-secondary slot icone (01-atomes) — icône optionnelle"
+    - "comp-button-tertiary slot icone (01-atomes) — icône optionnelle"
+    - "comp-button-back slot icone (01-atomes) — RETOUR"
+    - "comp-button-fermeture-overlay slot icone (01-atomes) — FERMETURE"
+    - "comp-button-fab-creation slot icone (01-atomes) — CRÉATION FAB"
+    - "comp-button-play-audio slot icone (01-atomes) — PLAY/PAUSE état-dépendant"
+    - "comp-chip-epoque slot icone (01-atomes) — optionnelle"
+    - "comp-chip-couche-carte slot icone (01-atomes) — COUCHE"
+    - "comp-chip-categorie slot icone (01-atomes) — CATÉGORIE (mapping palier 13 fichier 02)"
+    - "comp-chip-filtre slot icone_retrait (01-atomes) — RETRAIT (X)"
+    - "comp-badge-statut slot icone (01-atomes) — optionnelle"
+    - "comp-champ-saisie-texte slot icone_prefix (01-atomes) — PRÉFIXE optionnel"
+    - "comp-champ-saisie-date slot icone_calendrier (01-atomes) — CALENDRIER"
+    - "comp-champ-saisie-lieu slot icone_lieu (01-atomes) — LIEU"
+    - "comp-message-erreur-inline slot icone_erreur (01-atomes) — ERREUR"
+    - "comp-message-success-inline slot icone_succes (01-atomes) — SUCCÈS"
+    - "comp-lien-texte slot icone_externe (01-atomes) — LIEN EXTERNE"
+    - "comp-mention-anonymat slot icone_anonymat (01-atomes) — ANONYMAT"
+    - "comp-tag-provenance slot icone_provenance (01-atomes) — PROVENANCE éditorial / communautaire"
+    - "comp-status-pin-verification slot icone_verification (01-atomes) — VÉRIFICATION en cours"
+
+  molecules:
+    - "comp-vignette-pin slot icone_decoration (palier 10 02-molecules) — décoration optionnelle"
+    - "comp-controle-favori (palier 10 02-molecules) — FAVORI heart"
+    - "comp-controle-partage (palier 10 02-molecules) — PARTAGE share"
+    - "comp-controle-signalement (palier 10 02-molecules) — SIGNALEMENT flag"
+
+  shell:
+    - "comp-selecteur-section-principale slot icone_S1 (04-shell) — SECTION CARTE"
+    - "comp-selecteur-section-principale slot icone_S2 (04-shell) — SECTION PARCOURS"
+    - "comp-selecteur-section-principale slot icone_S3 (04-shell) — SECTION PROFIL"
+    - "comp-message-ephemere slot icone (04-shell) — feedback optionnel"
+    - "comp-indication-onboarding slot icone (04-shell) — pointage optionnel"
+    - "comp-bandeau-information-offline slot icone_offline (04-shell) — OFFLINE"
+
+  fonctionnels:
+    - "comp-pin slot icone_categorie (palier 10 03-fonctionnels) — CATÉGORIE (mapping palier 13 fichier 02)"
+
+  total_slots_distincts: 32   # décompte non recalculé depuis l'ajout des icônes bascule mot de passe (atomes) et permissions caméra/notification (shell) — voir 03-icones-ui-fonctionnelles.yaml pour l'inventaire à jour (37 icônes UI)
+  decompte_par_famille: "atomes 21 + molecules 4 + shell 6 + fonctionnels 1 = 32 (base avant les 3 icônes ajoutées depuis)"
+  note: >-
+    Certains slots utilisent la même icône finale (ex. ICON-UI-FERMETURE
+    dessert à la fois comp-button-fermeture-overlay ET comp-chip-filtre
+    icone_retrait). Les fichiers 03 et 04 inventorient les icônes uniques
+    et listent leurs slots consommateurs — s'y référer pour le décompte
+    à jour plutôt qu'à ce total de slots.

@@ -1,0 +1,95 @@
+# =============================================================================
+# E-ADMIN-PROMOTION-COMMUNAUTAIRE — Promotion d'un Pin communautaire en éditorial
+# =============================================================================
+# Décision éditoriale d'élever un Pin de provenance communautaire (déjà validé
+# et publié via H4) en provenance éditoriale (instanciation I10). Le pseudonyme
+# de l'auteur communautaire est CONSERVÉ pour traçage du crédit. Crée une Trace
+# de validation (cluster 05) avec décision = approuvé et mention spécifique en
+# motif. Couvre le flow H5.
+# =============================================================================
+
+document:
+  type: palier_ecrans_fiche
+  format: yaml
+
+ecran:
+  id: E-ADMIN-PROMOTION-COMMUNAUTAIRE
+  nom: "Promotion d'un Pin communautaire en éditorial"
+
+  mode: "back-office"
+  surface_parente: "back-office"
+
+  raison_d_etre: >-
+    Permettre à l'équipe éditoriale d'identifier un Pin communautaire publié
+    de qualité éditoriale et de le promouvoir en provenance éditoriale (I10),
+    tout en CONSERVANT le pseudonyme de l'auteur original en crédit. La
+    promotion crée une Trace de validation avec mention spécifique en motif
+    (cluster 05 v0.3). Sans cette surface, le contenu communautaire de
+    qualité reste sous le marquage 'communautaire' alors qu'il a vocation
+    à devenir partie de la voix éditoriale.
+
+  composition:
+    - zone: "candidats à promotion"
+      role: "liste des Pins communautaires publiés (sans marque distinctive — sortis de H4 avec succès) marqués comme candidats par un modérateur, ou consultables sur sélection libre"
+      entites_affichees: [Pin]
+
+    - zone: "filtres"
+      role: "filtre par auteur communautaire, par Catégorie, par Époque, par date de publication, par marquage 'candidat à promotion'"
+
+    - zone: "prévisualisation conforme grand public"
+      role: "affiche le Pin tel qu'il est vu côté grand public (rendu en P5.M3) avec son auteur communautaire pseudonyme visible"
+      entites_affichees: [Pin, Catégorie, Époque, Média, Source, Compte]
+
+    - zone: "Sources structurées"
+      role: "panneau dédié pour relire la qualité des Sources rattachées (élément clef de la décision de promotion)"
+      entites_affichees: [Source]
+
+    - zone: "panneau d'amendement éditorial préalable"
+      role: "si l'éditeur juge que le Pin nécessite des compléments avant promotion (Sources éditoriales additionnelles, enrichissement des Médias), il peut renvoyer le Pin via E-ADMIN-SAISIE-PIN-TEMPLATE en mode édition (le Pin retourne en brouillon ou en_revue, nouveau cycle H1+H2 avant promotion) — cf. H5 bifurcation"
+
+    - zone: "audit — Traces antérieures"
+      role: "historique : Trace de modération de validation initiale (H4), éventuelles Traces ultérieures ; immutabilité préservée"
+      entites_affichees: ["Trace de modération", "Trace de validation"]
+
+    - zone: "panneau de décision de promotion"
+      role: "déclenchement de la promotion : provenance bascule communautaire → éditorial ; auteur_communautaire est CONSERVÉ ; motif de la Trace porte la mention spécifique 'promotion communautaire → éditorial' ; décision = approuvé"
+
+    - zone: "notification de l'auteur (recommandée)"
+      role: "courtoisie d'une notification à l'auteur original au moment de la promotion ; modalité exacte palier 13 (cf. H5 question ouverte)"
+
+  etats:
+    nominal_charge: "Liste des candidats chargée, prévisualisation accessible, panneau de décision activable"
+    pin_candidat_ouvert: "Un Pin candidat est sélectionné, prévisualisation et Sources affichées, décision pas encore prise"
+    pret_pour_promotion: "Le Pin est jugé conforme à la ligne éditoriale, la promotion est activable directement"
+    amendement_prealable_decide: "L'éditeur a décidé d'amender le Pin avant promotion ; renvoi vers E-ADMIN-SAISIE-PIN-TEMPLATE en mode édition + nouveau cycle H1+H2"
+    promotion_effectuee: "provenance basculée en éditorial, auteur_communautaire conservé, Trace de validation créée avec mention spécifique en motif, marque distinctive (s'il en restait une) levée définitivement, Pin reste publié — mais affiché comme éditorial avec crédit pseudonyme"
+    auteur_compte_supprime: "L'auteur communautaire a supprimé son Compte ; promotion possible (le pseudonyme reste tracé en crédit) ; aucune notification possible"
+    pin_avec_marque_distinctive: "Cas particulier H5 — le Pin candidat porte encore une marque distinctive (vérification non levée) ; promotion REFUSÉE tant que H4 n'est pas conclu"
+    pin_reference_par_parcours_communautaire: "Cas particulier H5 — un Parcours communautaire référence ce Pin nommément ; promotion possible, le Parcours reste communautaire et référence simplement un Pin devenu éditorial"
+    chargement: "Liste ou prévisualisation en cours de chargement"
+    erreur_chargement: "Impossible de charger les éléments ; nouvelle tentative possible"
+    permission_insuffisante: "L'utilisateur n'a pas le rôle éditeur senior ou validateur — accès refusé"
+
+  elements_interactifs:
+    - "Application et combinaison de filtres"
+    - "Sélection d'un Pin candidat"
+    - "Consultation de la prévisualisation, des Sources, des Traces antérieures"
+    - "Décision d'amendement préalable → renvoi vers E-ADMIN-SAISIE-PIN-TEMPLATE"
+    - "Saisie du motif de promotion (mention spécifique 'promotion communautaire → éditorial' + commentaire éventuel)"
+    - "Déclenchement de la promotion → bascule provenance + création Trace de validation immuable"
+    - "Notification (courtoisie) de l'auteur original — modalité palier 13"
+
+  flows_actifs:
+    - H5
+
+  surfaces_imbriquees:
+    - E-ADMIN-ACCUEIL  # retour
+    - E-ADMIN-MODERATION-SOUMISSIONS  # source des candidats marqués lors de H4
+    - E-ADMIN-SAISIE-PIN-TEMPLATE  # si amendement préalable décidé
+    - E-ADMIN-VALIDATION-SCIENTIFIQUE  # nouveau cycle H2 si amendement
+
+  questions_ouvertes:
+    - "Consentement explicite de l'auteur communautaire requis pour la promotion ? Position assumée H5 : non formellement requis, mais courtoisie de notification — palier 13"
+    - "Promotion ANALOGUE pour un Parcours communautaire (I10 ne couvre actuellement que les Pins) — cluster 02 + palier 13"
+    - "Modalité exacte de notification de l'auteur (canal, contenu, possibilité de demander la non-promotion) — palier 13"
+    - "Réversibilité de la promotion (dépromouvoir un Pin éditorial en communautaire) — non couverte par I10 ni H5, à arbitrer si cas concret émerge"

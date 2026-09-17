@@ -1,0 +1,91 @@
+# =============================================================================
+# E-COMMUNAUTE-REDACTION-RETOUR-PARCOURS — Rédaction d'un Retour sur un Parcours
+# =============================================================================
+# Surface ponctuelle (P5.M6) ouverte depuis C9 (fin de parcours communautaire)
+# ou depuis C3 (fiche d'un Parcours communautaire déjà vécu — cf. Historique).
+# Saisie d'une évaluation discrète (palette ordonnée — forme exacte palier 8)
+# et d'un commentaire libre optionnel. Mode édition implicite si Retour
+# existant pour ce Compte sur ce Parcours (recommandation cluster 04 — 1 par
+# Compte par Parcours, modifiable). Compte requis (I2). Auteurs exclus.
+# =============================================================================
+
+document:
+  type: palier_ecrans_fiche
+  format: yaml
+
+ecran:
+  id: E-COMMUNAUTE-REDACTION-RETOUR-PARCOURS
+  nom: "Rédaction d'un Retour de parcours"
+
+  mode: P5.M6
+  surface_parente: P5.S2
+
+  raison_d_etre: >-
+    Permet à un utilisateur connecté ayant vécu un Parcours communautaire de
+    laisser une évaluation discrète et un commentaire libre optionnel (D9.3).
+    Modération a priori (I3 nuance Retour) : à la validation, le Retour passe
+    en en_attente, n'apparaît pas immédiatement publiquement. Si l'utilisateur
+    a déjà un Retour publié sur ce Parcours, l'écran s'ouvre en mode édition
+    pré-rempli (recommandation cluster 04 — 1 Retour par Compte par Parcours,
+    modifiable).
+
+  composition:
+    - zone: "rappel du Parcours cible"
+      role: "rappel synthétique du Parcours évalué (titre, auteur communautaire, durée estimée) afin que l'auteur du Retour sache à quoi il réagit"
+      entites_affichees: [Parcours]
+
+    - zone: "identité publique de l'auteur"
+      role: "affichage du pseudonyme et de la représentation graphique du Compte tels qu'ils apparaîtront publiquement (I1 — jamais d'identité civile)"
+      entites_affichees: [Compte]
+
+    - zone: "saisie de l'évaluation"
+      role: "choix d'une valeur discrète parmi un petit ensemble ordonné (forme exacte — échelle, palette de mots, étoiles, pouce — relève du palier 8)"
+      entites_affichees: ["Retour de parcours"]
+
+    - zone: "commentaire libre optionnel"
+      role: "champ de saisie texte court facultatif (D9.3 — le Retour fonctionne avec l'évaluation seule)"
+
+    - zone: "actions de soumission"
+      role: "valider (déclenche la soumission ou la modification) ou annuler (referme la surface)"
+
+    - zone: "rappel des règles communautaires"
+      role: "mention discrète rappelant que le Retour passe par modération avant publication (cohérence I3)"
+
+  etats:
+    nominal_saisie: "Surface ouverte sur un nouveau Retour, aucune évaluation choisie ; l'utilisateur sélectionne et saisit ; valider ou annuler"
+    evaluation_non_choisie: "Aucune évaluation sélectionnée ; validation désactivée jusqu'au choix"
+    saisie_complete: "Évaluation choisie (commentaire libre éventuel) ; validation disponible"
+    soumission_en_cours: "Soumission émise, en attente de confirmation ; l'utilisateur ne peut pas modifier ou re-valider"
+    soumission_reussie: "Le Retour est passé en en_attente côté serveur ; message éphémère P5.M9 confirme ; la surface se referme et retourne à la surface d'origine (C9 ou C3)"
+    soumission_echouee: "Échec d'envoi ; message gracieux invitant à réessayer ; le contenu reste préservé"
+    offline_avec_attente_locale: "Connexion réseau indisponible ; envoi mis en attente locale ; bandeau P5.P3 visible derrière"
+    compte_absent: "Aucun Compte n'est associé à l'utilisateur ; redirection préalable vers E-PROFIL-CREATION-COMPTE déclenchée par G6 ; au retour, on revient sur cette surface"
+    mode_edition: "Un Retour existant (publié ou en_attente) du même Compte sur ce Parcours est détecté ; surface ouverte en édition pré-remplie (évaluation et commentaire libre repris) ; validation soumet une modification — politique de re-modération à arbitrer (cf. cluster 04)"
+    parcours_retire_pendant_redaction: "Le Parcours est passé en retiré pendant la saisie ; validation impossible ; message gracieux ; le contenu peut être copié manuellement par l'utilisateur"
+    retours_desactives_pendant_redaction: "L'auteur du Parcours a désactivé la fonctionnalité de retour pendant la saisie ; validation échoue gracieusement avec message ; cohérent avec invariant cluster 04"
+    pre_requis_non_satisfait: "Conditions G6 non remplies — Parcours non communautaire, ou utilisateur = auteur du Parcours, ou Parcours non encore vécu (depuis C3) ; le contrôle de retour ne s'expose pas, l'écran n'est pas atteint dans cet état"
+
+  elements_interactifs:
+    - "Sélection de l'évaluation discrète"
+    - "Saisie au clavier dans le commentaire libre optionnel"
+    - "Validation de la soumission → flow G6 étape 5 (passage en en_attente)"
+    - "Annulation explicite → si saisie non vide, dialogue P5.M8 de confirmation d'abandon ; sinon fermeture directe"
+    - "Geste neutre de fermeture (équivalent annulation, P5.N5)"
+
+  flows_actifs:
+    - G6   # Soumission d'un Retour de parcours
+
+  surfaces_imbriquees:
+    - E-TRANSVERSES-DIALOGUE-CONFIRMATION   # M8 si abandon avec saisie non vide
+    - E-TRANSVERSES-MESSAGE-EPHEMERE        # M9 confirmation ou erreur
+    - E-PROFIL-CREATION-COMPTE              # redirection préalable si compte_absent
+    - E-TRANSVERSES-BANDEAU-OFFLINE         # P3 si offline
+
+  entites_affichees: ["Retour de parcours", Parcours, Compte, "Historique de visite"]
+
+  questions_ouvertes:
+    - "Forme exacte de l'évaluation discrète (échelle 1-5, palette de mots, étoiles, pouce binaire) — relève palier 7/8 ; impacte la composition de la zone saisie de l'évaluation"
+    - "Politique de re-modération en mode édition : la modification redéclenche-t-elle un cycle de modération (re-passage en en_attente du Retour publié) ? Cluster 04 question ouverte parallèle à celle du Commentaire"
+    - "Unicité 1 Retour par Compte par Parcours, modifiable (recommandation cluster 04 retenue ici en mode édition) — à confirmer"
+    - "Évaluation seule (sans commentaire libre) comptée dans le seuil minimal de synthèse — recommandation cluster 04 = oui ; sans impact sur la composition de l'écran"
+    - "Sauvegarde de brouillon entre fermeture et réouverture — politique parallèle à celle du Commentaire, cf. G2 question ouverte"

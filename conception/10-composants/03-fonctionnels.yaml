@@ -1,0 +1,781 @@
+# =============================================================================
+# Palier 10 — Composants fonctionnels (PILOTE)
+# =============================================================================
+# Composants qui réifient un concept métier (palier 9 grammaire visuelle,
+# palier 4 entités) ou portent une machine d'état d'interaction. Distincts
+# des atomes (briques DRY pures), des molécules (combinaisons d'atomes),
+# des shell (templates de mode), et des back-office (composants admin).
+#
+# PILOTE — calibre le format pour 01-atomes, 02-molecules, 04-shell,
+# 05-back-office.
+# =============================================================================
+
+document:
+  type: palier_composants_fonctionnels
+  numero: 10
+  fichier: "03-fonctionnels.yaml"
+  version: "0.1"
+  date: "2026-05-06"
+  format: yaml
+  pilote: true
+  prerequis_de_lecture:
+    - "design/conception/10-composants/00-index.yaml v0.2 — § 3 échelles E1-E5, § 4 état partagé, § 5 patterns, § 7 format de fiche"
+    - "design/conception/09-cartographie/ — mappings réifiés ici (Pin, Tracé, Cluster, Carte, Slider d'Époque)"
+    - "design/conception/05-architecture-info.yaml — modes M1-M9, surfaces persistantes P1-P3"
+
+raison_d_etre: >-
+  Les composants fonctionnels portent la matière interactive vivante
+  d'HistoLyon : la Carte qui interpole, le Pin qui combine 5 dimensions
+  orthogonales, le Slider d'Époque producteur d'état partagé, le Lecteur
+  audio qui enclenche P1, les formulaires producteurs de Compte ou de
+  contributions communautaires. C'est ICI que le palier 9 (cartographie)
+  se réifie en composants nommés. C'est aussi ici que vivent les 6 machines
+  d'état + 1 matrice variants (comp-pin) détaillées du palier 10 (cf. § 2).
+  Le Pin a une matrice de variants orthogonaux à 5 dimensions, pas une
+  machine d'état séquentielle classique.
+
+# -----------------------------------------------------------------------------
+# 1. Composants fonctionnels — fiches
+# -----------------------------------------------------------------------------
+# 24 composants fonctionnels (20 d'origine + 4 cascade palier 5 maquette
+# 2026-06-25 : comp-enigme, comp-citation, comp-saviez-vous, comp-puzzle).
+# Format compact pour la majorité ; les 6 machines d'état + 1 matrice variants
+# (comp-pin) ont leur section machine_etats détaillée en § 2.
+# Atomes/molécules intégrés référencés par id (résolus en 01/02 par rédacteurs).
+composants:
+
+  # ---------------------------------------------------------------------------
+  # FICHE EXEMPLAIRE COMPLÈTE — modèle pour les rédacteurs
+  # ---------------------------------------------------------------------------
+  - id: comp-pin
+    nom: "Pin"
+    famille: fonctionnel
+    raison_d_etre: >-
+      Marqueur géolocalisé sur la Carte qui réifie le mapping palier 9
+      02-pins (provenance via couleur, multi-époques via forme empilée,
+      vérification via contour, catégorie via icône). 5 dimensions
+      orthogonales de variant, ~32 combinaisons théoriques avec
+      contraintes invariantielles I3/I8/I9.
+
+    ancrage:
+      ecrans: [E-CARTE-PRINCIPALE, E-CARTE-APERCU-PIN]
+      composants_qui_l_integrent: [comp-carte, comp-cluster-densite (héritage couleur dominante), comp-grid-recherche (variante mini)]
+
+    composition:
+      - id: comp-icone
+        slot: "icone_categorie"
+        cardinalite: 1
+        note: "icône de catégorie ; mapping concret palier 13"
+      - id: comp-badge-nombre
+        slot: "badge_multi_epoques"
+        cardinalite: 0..1
+        note: "présent uniquement si multi-époques"
+
+    variants:
+      - dimension: provenance
+        valeurs: [editorial, communautaire]
+        registre: "couleur du Pin (palier 9 D3)"
+      - dimension: multi_epoques
+        valeurs: [simple, empile]
+        registre: "forme du Pin (palier 9 D4)"
+      - dimension: statut_verification
+        valeurs: [absent, en_cours]
+        registre: "contour du Pin (palier 9 D5)"
+      - dimension: contexte_parcours
+        valeurs: [normal, etape_courante, etape_complete, etape_future, hors_parcours]
+        registre: "modulation halo+relief / opacité / atténuation (palier 9 02-pins variantes ; cohérent comp-item-liste-etape qui distingue [complete, courante, future])"
+      - dimension: deja_visite
+        valeurs: [non, oui]
+        registre: "nuance chromatique adoucie"
+
+    contraintes_invariantielles:
+      - "I3 : provenance editorial → statut_verification toujours absent (jamais en cours)"
+      - "I8 : multi_epoques admis sans restriction"
+      - "I9 : Pin sans coordonnées géographiques → invisible sur Carte (mais accessible via comp-recherche-surface et catégorie)"
+      - "PR1 (cf. 09-cartographie/02-pins.yaml) : combinaison etape_courante + deja_visite → mise en relief prime sur atténuation"
+      - "PR2 : combinaison hors_parcours + deja_visite → cumul des deux modulations"
+
+    etats_interactifs:
+      - default
+      - pressed
+      - selected
+      - focused        # a11y clavier/lecteur d'écran
+      - disabled       # rare — Pin retiré ou hors-Époque
+
+    interactions_natives:
+      - "Tap → E2 émet 'pin_sélectionné' → écran parent ouvre B1 aperçu rapide (E-CARTE-APERCU-PIN)"
+      - "Long-press → E2 émet 'pin_signalé' (potentiel — à confirmer plus tard ; pattern long-press retiré du catalogue § 5 de l'index faute de composants attachés confirmés)"
+
+    intention_portee:
+      parametrable: true   # l'écran qui l'instancie câble la cible (B1 ou autre)
+      echelle: E2_inter_composant
+      intention: "ouverture_apercu_pin"
+      cible_referencee_par_defaut: "flow B1 (E-CARTE-APERCU-PIN)"
+      note: "Composant à intention OUVERTE — l'écran orchestre la cible. Le Pin émet le signal ; la Carte le câble."
+
+    couplage_etat_partage:
+      - etat: ETAT-EPOQUE-COURANTE
+        role: consommateur
+        note: "visibilité conditionnelle (cf. palier 3 D1.2 — sur 'Aujourd'hui' tous les Pins de toutes Époques cumulés)"
+      - etat: ETAT-PARCOURS-EN-COURS
+        role: consommateur
+        note: "détermine variant contexte_parcours"
+
+    patterns_attaches: []
+
+    consequences_variabilite:
+      - "Icône catégorie absente → fallback icône générique (palier 13)"
+      - "Combinaisons extrêmes (5 modulations cumulées) — perceptibilité validée palier 16"
+
+    machine_etats: "voir § 2 — machine d'état riche détaillée"
+
+    questions_ouvertes:
+      - "Long-press → menu signalement : pertinent palier 10 ou réserver palier 11 ?"
+
+  # ---------------------------------------------------------------------------
+  # Composants fonctionnels — format compact
+  # ---------------------------------------------------------------------------
+
+  - id: comp-carte
+    nom: "Carte"
+    famille: fonctionnel
+    raison_d_etre: "Affichage cartographique avec interpolation paramétrique du fond par Époque (palier 9 D8) et coexistence couches/pins/tracé."
+    ancrage: { ecrans: [E-CARTE-PRINCIPALE], composants_qui_l_integrent: [comp-layout-carte-principale] }
+    composition:
+      - { id: comp-pin, slot: pins, cardinalite: 0..n }
+      - { id: comp-cluster-densite, slot: clusters, cardinalite: 0..n }
+      - { id: comp-trace-parcours, slot: trace_actif, cardinalite: 0..1 }
+      - { id: comp-slider-epoque, slot: navigateur_temporel, cardinalite: 1 }
+    variants:
+      - { dimension: niveau_zoom, valeurs: [large, intermediaire, proche], registre: "selon zoom (cf. palier 9 04-densite-zoom)" }
+      - { dimension: mode_affichage_offline, valeurs: [nominal, offline_avec_cache, offline_sans_cache] }
+    etats_interactifs: [default, panning, zooming, loading_tuiles, geoloc_cursor_actif, pin_selected]
+    interactions_natives:
+      - "Pan (drag) → E1 recadrage carte"
+      - "Pinch / pan zoom → E1 changement niveau zoom (peut déclencher clustering, palier 9 04)"
+      - "Tap Pin → propage E2 'pin_sélectionné' au parent"
+      - "Tap cluster → E1 zoom_in sur la zone du cluster (palier 9 R2)"
+    intention_portee:
+      parametrable: true
+      echelle: E4_systemique
+      note: "Le tap pin est une intention ouverte. Le pan/zoom est purement local. Le couplage E4 vient du slider d'Époque intégré (cascade palier 9 D8)."
+    couplage_etat_partage:
+      - { etat: ETAT-EPOQUE-COURANTE, role: consommateur, note: "interpolation des 5 axes paramétriques palier 9 fichier 01-fond-et-epoques" }
+      - { etat: ETAT-CONNEXION-RESEAU, role: consommateur, note: "bascule vers offline_avec_cache si réseau perdu" }
+      - { etat: ETAT-PERMISSIONS-SYSTEME, role: consommateur, note: "geoloc_cursor visible si permission accordée" }
+    patterns_attaches: [PI-DRAG-ENTRE-VARIANTS]
+    consequences_variabilite:
+      - "Tuiles non disponibles offline → cas dégradé, message gracieux"
+      - "Aucun Pin pour l'Époque courante → état vide gracieux (cf. palier 7 E-CARTE-PRINCIPALE état vide_a_l_epoque)"
+    machine_etats: "voir § 2"
+
+  - id: comp-slider-epoque
+    nom: "Slider d'Époque"
+    famille: fonctionnel
+    raison_d_etre: "Navigateur temporel — drag continu interpolant les filtres carte (palier 9 D8) et fixant l'Époque au snap. PRODUCTEUR PRIMAIRE de ETAT-EPOQUE-COURANTE."
+    ancrage: { ecrans: [E-CARTE-PRINCIPALE], composants_qui_l_integrent: [comp-carte] }
+    composition:
+      - { id: comp-libelle-texte, slot: epoque_courante, cardinalite: 1 }
+      - { id: comp-libelle-texte, slot: dates_courantes, cardinalite: 1 }
+    variants:
+      - { dimension: orientation, valeurs: [horizontal, vertical], note: "palier 7 fixe l'orientation par écran" }
+    etats_interactifs: [repos, dragging, snapping, pilote_automatique]
+    interactions_natives:
+      - "Drag handle → E4 émet position continue (interpolation 5 axes palier 9)"
+      - "Relâchement (snap) → E4 émet Époque finale calée"
+      - "Pilote automatique par parcours en cours possible (cf. palier 3 D1.2)"
+    intention_portee:
+      parametrable: false
+      echelle: E4_systemique
+      intention: "navigation_temporelle"
+      cible_referencee: "ETAT-EPOQUE-COURANTE producteur — cascade carte+pins+tracés"
+      note: "Intention CLOSE — le slider produit l'état d'Époque, ce comportement est invariant."
+    couplage_etat_partage:
+      - { etat: ETAT-EPOQUE-COURANTE, role: producteur, note: "primaire" }
+      - { etat: ETAT-PARCOURS-EN-COURS, role: consommateur, note: "pilotage automatique optionnel par étape courante" }
+    patterns_attaches: [PI-DRAG-ENTRE-VARIANTS]
+    consequences_variabilite:
+      - "Libellé Époque variable (longueurs FR/EN/JA) → truncate ou taille adaptative (palier 12)"
+    machine_etats: "voir § 2"
+
+  - id: comp-cluster-densite
+    nom: "Cluster de densité"
+    famille: fonctionnel
+    raison_d_etre: "Agrégation visuelle de Pins quand densité élevée à un niveau de zoom (palier 9 04-densite-zoom). Hérite registres Pin (couleur provenance dominante, forme empilée si hétérogénéité temporelle)."
+    ancrage: { ecrans: [E-CARTE-PRINCIPALE], composants_qui_l_integrent: [comp-carte] }
+    composition:
+      - { id: comp-libelle-texte, slot: compteur, cardinalite: 1, note: "abréviation au-delà d'un seuil (palier 16)" }
+    variants:
+      - { dimension: provenance_dominante, valeurs: [editorial, communautaire], registre: "≥1 éditorial → couleur éditoriale (palier 9 04)" }
+      - { dimension: heterogeneite_temporelle, valeurs: [homogene, hetero], registre: "forme empilée si hétérogène ou ≥1 Pin multi-époque" }
+      - { dimension: contient_verification, valeurs: [non, oui], registre: "contour distinctif si ≥1 Pin en cours de vérification" }
+    etats_interactifs: [default, pressed]
+    interactions_natives:
+      - "Tap → E1 zoom_in sur la zone (palier 9 R2)"
+    intention_portee:
+      parametrable: false
+      echelle: E1_atomique
+      intention: "zoom_in_zone"
+      cible_referencee: "comportement carte (palier 9 R2)"
+      note: "Intention CLOSE — un cluster fait toujours zoom_in au tap."
+    couplage_etat_partage:
+      - { etat: ETAT-EPOQUE-COURANTE, role: consommateur, note: "recompute des clusters à chaque changement Époque" }
+    consequences_variabilite:
+      - "Compteur variable (jusqu'à abréviation '5+' ou similaire — palier 16)"
+
+  - id: comp-trace-parcours
+    nom: "Tracé Parcours"
+    famille: fonctionnel
+    raison_d_etre: "Réifie le mapping palier 9 03-parcours-traces : provenance via couleur, parcouru/à parcourir via opacité, étape courante en relief, vérification I3 via contour."
+    ancrage: { ecrans: [E-PARCOURS-EN-COURS-TERRAIN, E-PARCOURS-FICHE-DETAIL (preview)], composants_qui_l_integrent: [comp-carte] }
+    composition: []
+    variants:
+      - { dimension: provenance, valeurs: [editorial, communautaire], registre: "couleur du tracé" }
+      - { dimension: etat_segment, valeurs: [a_parcourir, parcouru, etape_courante], registre: "rendu plein vif / rendu atténué / mise en relief" }
+      - { dimension: statut_verification, valeurs: [absent, en_cours], registre: "contour distinctif (cohérent comp-pin)" }
+      - { dimension: mode, valeurs: [terrain, canape, non_commence], note: "non_commence depuis fiche détail" }
+    etats_interactifs: [default, loading, hidden_M4]
+    interactions_natives:
+      - "Tap segment → E2 émet 'etape_visee' (potentiel, optionnel)"
+    intention_portee:
+      parametrable: true
+      echelle: E2_inter_composant
+      note: "Tap optionnel — la carte parente câble si pertinent (sinon tracé décoratif)"
+    couplage_etat_partage:
+      - { etat: ETAT-PARCOURS-EN-COURS, role: consommateur, note: "détermine état_segment et étape courante" }
+      - { etat: ETAT-EPOQUE-COURANTE, role: consommateur, note: "atténuation des étapes hors Époque courante" }
+    consequences_variabilite:
+      - "Tracé absent (Parcours sans coordonnées d'étapes — improbable mais I9 potentiel) → invisible carte"
+
+  - id: comp-recherche-surface
+    nom: "Surface de recherche"
+    famille: fonctionnel
+    raison_d_etre: "Surface ponctuelle (M6) de recherche libre + filtres. Réagit au texte avec debounce, filtre offline si réseau absent."
+    ancrage: { ecrans: [E-CARTE-RECHERCHE], composants_qui_l_integrent: [comp-layout-carte-principale (point d'accès)] }
+    composition:
+      - { id: comp-champ-saisie-texte, slot: requete, cardinalite: 1 }
+      - { reformulation_textuelle: "rangée scrollable de comp-chip-* (filtre/époque/catégorie selon contexte)", slot: filtres_actifs, cardinalite: 0..1 }
+      - { id: comp-grid-recherche, slot: resultats, cardinalite: 1 }
+      - { id: comp-button-fermeture-overlay, slot: fermeture, cardinalite: 1 }
+    variants: []
+    etats_interactifs: [empty, typing, querying, results_loaded, no_results, error, offline_local]
+    interactions_natives:
+      - "Tap résultat → E2 émet 'item_sélectionné' → écran parent recadre Carte + ouvre B1 ou C3 selon type"
+      - "Tap-hors → fermeture (PI-TAP-HORS)"
+    intention_portee:
+      parametrable: true
+      echelle: E2_inter_composant
+      cible_referencee: "flow A4 recherche et filtrage"
+    couplage_etat_partage:
+      - { etat: ETAT-CONNEXION-RESEAU, role: consommateur, note: "bascule offline_local si pas de réseau" }
+    patterns_attaches: [PI-TAP-HORS]
+    consequences_variabilite:
+      - "Liste résultats variable (0 à n)"
+      - "Saisie i18n divergente (FR/EN/JA)"
+    machine_etats: "voir § 2"
+
+  - id: comp-grid-recherche
+    nom: "Grille de résultats"
+    famille: fonctionnel
+    raison_d_etre: "Affiche une liste/grille paginée ou en scroll infini de Pins ou Parcours."
+    ancrage: { ecrans: [E-CARTE-RECHERCHE, E-PARCOURS-PRINCIPAL (catalogue)], composants_qui_l_integrent: [comp-recherche-surface, comp-layout-parcours] }
+    composition:
+      - { id: comp-item-liste-pin-apercu, slot: items_pin, cardinalite: 0..n }
+      - { id: comp-item-liste-parcours-simple, slot: items_parcours, cardinalite: 0..n }
+      - { id: comp-indicateur-chargement, slot: loader, cardinalite: 0..1 }
+    variants:
+      - { dimension: type_contenu, valeurs: [pins, parcours, mixte] }
+      - { dimension: mode_affichage, valeurs: [grille, liste] }
+    etats_interactifs: [nominal, loading, vide, scroll_loading_more, erreur]
+    interactions_natives:
+      - "Scroll → charge plus (scroll infini par défaut)"
+      - "Tap item → E2 émet 'item_sélectionné'"
+    intention_portee:
+      parametrable: true
+      echelle: E2_inter_composant
+    consequences_variabilite:
+      - "Liste vide → état vide gracieux (composant dédié comp-zone-vide en atome)"
+
+  - id: comp-filtres-couches
+    nom: "Sélecteur de Couches cartographiques"
+    famille: fonctionnel
+    raison_d_etre: "Surface ponctuelle (M6) qui active/désactive les Couches cartographiques (palier 4 cluster 01 entité Couche cartographique)."
+    ancrage: { ecrans: [E-CARTE-FILTRES-COUCHES], composants_qui_l_integrent: [comp-layout-carte-principale] }
+    composition:
+      - { id: comp-chip-couche-carte, slot: couches, cardinalite: 1..n }
+      - { id: comp-button-fermeture-overlay, slot: fermeture, cardinalite: 1 }
+    etats_interactifs: [default, pressed, applied]
+    interactions_natives:
+      - "Tap couche → toggle activation, émet E2 'couches_appliquees'"
+    intention_portee: { parametrable: true, echelle: E2_inter_composant }
+    patterns_attaches: [PI-TAP-HORS]
+
+  - id: comp-alerte-proximite
+    nom: "Alerte de proximité"
+    famille: fonctionnel
+    raison_d_etre: "M7 ponctuelle qui surgit sur la Carte quand un Pin éligible passe en proximité (mode Surprenez-moi flow E1) ou qu'on arrive à une Étape (mode terrain flow E2)."
+    ancrage: { ecrans: [E-CARTE-ALERTE-PROXIMITE], composants_qui_l_integrent: [comp-layout-carte-principale] }
+    composition:
+      - { id: comp-libelle-texte, slot: titre, cardinalite: 1 }
+      - { id: comp-libelle-texte, slot: teaser, cardinalite: 0..1 }
+      - { id: comp-button-secondary, slot: action_accepter, cardinalite: 1 }
+      - { id: comp-button-fermeture-overlay, slot: rejet, cardinalite: 1 }
+    etats_interactifs: [emise, expiration, tap_accepte, geste_rejet, mode_silencieux_systeme]
+    interactions_natives:
+      - "Tap accepter → E3 → ouvre B1 (E1) ou B2 (E2 étape)"
+      - "Geste rejet ou expiration → dismiss"
+    intention_portee:
+      parametrable: false
+      echelle: E3_navigationnelle
+      intention: "alerte_de_proximite"
+      cible_referencee: "flows E1 (Surprenez-moi) et E2 (étape)"
+      note: "Intention CLOSE — l'alerte ne sert qu'à proposer la cible géoloc."
+    couplage_etat_partage:
+      - { etat: ETAT-MODE-NOTIFICATION, role: consommateur, note: "présente uniquement si Surprenez-moi ou En parcours actif" }
+      - { etat: ETAT-PERMISSIONS-SYSTEME, role: consommateur, note: "géoloc requise" }
+    patterns_attaches: [PI-SWIPE-DISMISS]
+    consequences_variabilite:
+      - "Mode silencieux OS → alerte émise sans son ni vibration"
+
+  - id: comp-lecteur-audio
+    nom: "Lecteur audio"
+    famille: fonctionnel
+    raison_d_etre: "Lit la narration audio d'un Pin (palier 4 cluster 01 Média audio_narration). PRODUCTEUR de ETAT-AUDIO-EN-COURS."
+    ancrage: { ecrans: [E-PIN-CONSULTATION-APPROFONDIE, E-PIN-MODE-PRESENTATION], composants_qui_l_integrent: [comp-layout-consultation-pin-approfondie] }
+    composition:
+      - { id: comp-button-play-audio, slot: play_pause, cardinalite: 1 }
+      - { id: comp-libelle-texte, slot: titre_pin, cardinalite: 1 }
+      - { id: comp-libelle-texte, slot: temps_courant, cardinalite: 1 }
+      - { id: comp-libelle-texte, slot: temps_total, cardinalite: 1 }
+    variants:
+      - { dimension: posture, valeurs: [inline_consultation, persistant_p1] }
+    etats_interactifs: [buffering, playing, paused, ended, error, seeking]
+    interactions_natives:
+      - "Tap play/pause → toggle"
+      - "Drag timeline → seek"
+      - "Activation depuis Pin → E4 produit ETAT-AUDIO-EN-COURS, émet apparition P1"
+    intention_portee:
+      parametrable: false
+      echelle: E4_systemique
+      cible_referencee: "ETAT-AUDIO-EN-COURS producteur ; cascade P1 surface persistante"
+    couplage_etat_partage:
+      - { etat: ETAT-AUDIO-EN-COURS, role: producteur }
+    patterns_attaches: [PI-DRAG-ENTRE-VARIANTS]
+    consequences_variabilite:
+      - "Audio absent → composant masqué (Pin sans audio_narration)"
+      - "Réseau perdu en streaming → bascule erreur ou cache"
+    machine_etats: "voir § 2"
+
+  - id: comp-lecteur-video
+    nom: "Lecteur vidéo"
+    famille: fonctionnel
+    raison_d_etre: "Lit une vidéo intégrée à la narration d'un Pin (Média de type non explicitement modélisé en cluster 01 — relève de l'évolution plus tard si pertinent)."
+    ancrage: { ecrans: [E-PIN-CONSULTATION-APPROFONDIE], composants_qui_l_integrent: [comp-zone-narration] }
+    composition:
+      - { id: comp-button-secondary, slot: play_pause, cardinalite: 1 }
+      - { id: comp-libelle-texte, slot: temps, cardinalite: 1 }
+    variants:
+      - { dimension: ratio, valeurs: ['16:9', '4:3', '1:1'] }
+    etats_interactifs: [buffering, playing, paused, ended, error, fullscreen]
+    interactions_natives:
+      - "Tap play/pause, scrub timeline, fullscreen"
+    intention_portee: { parametrable: true, echelle: E1_atomique, note: "Pas de cascade applicative (distinct de l'audio narratif)" }
+    consequences_variabilite:
+      - "Vidéo absente → fallback titre"
+
+  - id: comp-viewer-3d
+    nom: "Viewer 3D"
+    famille: fonctionnel
+    raison_d_etre: "Visualisation 3D d'un Modèle 3D rattaché à un Pin (palier 4 cluster 01 entité Modèle 3D)."
+    ancrage: { ecrans: [E-PIN-CONSULTATION-3D] }
+    composition:
+      - { id: comp-button-tertiary, slot: bascule_ar, cardinalite: 0..1 }
+      - { id: comp-button-back, slot: retour, cardinalite: 1 }
+    etats_interactifs: [loading, loaded, manipulating, error, fullscreen]
+    interactions_natives:
+      - "Drag → rotation 3D"
+      - "Pinch → zoom 3D"
+      - "Tap bascule_ar → E3 ouvre E-PIN-CONSULTATION-AR"
+    intention_portee: { parametrable: false, echelle: E1_atomique, intention: "manipulation_3d" }
+    consequences_variabilite:
+      - "Modèle absent → message gracieux"
+
+  - id: comp-camera-ar
+    nom: "Caméra AR"
+    famille: fonctionnel
+    raison_d_etre: "Superposition AR d'un Modèle 3D sur le réel via la caméra du device."
+    ancrage: { ecrans: [E-PIN-CONSULTATION-AR] }
+    composition:
+      - { id: comp-button-back, slot: retour, cardinalite: 1, note: "variant 'darked' (composant polymorphe N1+N4, cf. 01-atomes:154)" }
+    etats_interactifs: [requesting_permission, permission_denied, initializing, active, error]
+    interactions_natives:
+      - "Pan caméra → ancrage Modèle 3D au lieu réel"
+      - "Tap retour → E3 sortie M4 vers M3 (palier 5 N4)"
+    intention_portee:
+      parametrable: false
+      echelle: E3_navigationnelle
+      cible_referencee: "P5.M4 mode présentation ; sortie via N4"
+    couplage_etat_partage:
+      - { etat: ETAT-PERMISSIONS-SYSTEME, role: consommateur, note: "caméra + géoloc requises" }
+
+  - id: comp-quiz
+    nom: "Quiz"
+    famille: fonctionnel
+    raison_d_etre: "Élément interactif post-narratif — questions à choix multiples, vrai/faux, texte court (palier 3 D2.7 zone post-narrative)."
+    ancrage: { ecrans: [E-PIN-CONSULTATION-APPROFONDIE (zone post-narrative)] }
+    composition:
+      - { id: comp-libelle-texte, slot: question, cardinalite: 1 }
+      - { id: comp-button-secondary, slot: reponses, cardinalite: 1..n }
+      - { id: comp-button-primary, slot: valider, cardinalite: 1 }
+      - { id: comp-libelle-texte, slot: feedback, cardinalite: 0..1 }
+    etats_interactifs: [unanswered, answering, answered, feedback_revealed, hint_shown, completed, error]
+    interactions_natives:
+      - "Tap réponse → sélection"
+      - "Tap valider → E1 enregistre + révèle feedback"
+    intention_portee: { parametrable: true, echelle: E1_atomique }
+    consequences_variabilite:
+      - "Nombre questions variable, longueur question variable (i18n)"
+    machine_etats: "voir § 2"
+
+  - id: comp-avant-apres
+    nom: "Comparateur avant/après"
+    famille: fonctionnel
+    raison_d_etre: "Slider de comparaison de deux états temporels (typiquement deux époques d'un même lieu) intégré au récit narratif."
+    ancrage: { ecrans: [E-PIN-CONSULTATION-APPROFONDIE (zone narration)] }
+    composition:
+      - { id: comp-image-hero, slot: avant, cardinalite: 1 }
+      - { id: comp-image-hero, slot: apres, cardinalite: 1 }
+      - { id: comp-libelle-texte, slot: legende_avant, cardinalite: 0..1 }
+      - { id: comp-libelle-texte, slot: legende_apres, cardinalite: 0..1 }
+    variants:
+      - { dimension: orientation, valeurs: [horizontal, vertical] }
+    etats_interactifs: [default, dragging, paused]
+    interactions_natives:
+      - "Drag handle → interpolation continue de la révélation"
+    intention_portee: { parametrable: false, echelle: E1_atomique, intention: "comparaison_temporelle" }
+    patterns_attaches: [PI-DRAG-ENTRE-VARIANTS]
+    consequences_variabilite:
+      - "Image manquante → fallback placeholder avec message"
+
+  - id: comp-frise-chronologique
+    nom: "Frise chronologique"
+    famille: fonctionnel
+    raison_d_etre: "Mini-frise visuelle des Époques accessibles d'un Pin multi-époques (palier 4 I8). Permet la navigation entre couches temporelles d'un Pin (flow B3)."
+    ancrage: { ecrans: [E-PIN-CONSULTATION-APPROFONDIE (zone navigation multi-époque)] }
+    composition:
+      - { id: comp-chip-epoque, slot: epoques, cardinalite: 1..n }
+    etats_interactifs: [default, epoque_selectionnee]
+    interactions_natives:
+      - "Tap chip → E2 émet 'epoque_alternative_selectionnee' (flow B3 — bascule contenu sans rechargement)"
+    intention_portee: { parametrable: true, echelle: E2_inter_composant }
+    couplage_etat_partage:
+      - { etat: ETAT-EPOQUE-COURANTE, role: consommateur, note: "highlight l'Époque courante (lecture seule, pas modification)" }
+
+  # ---------------------------------------------------------------------------
+  # Contenus complexes — cascade depuis palier 5 maquette (2026-06-25)
+  # ---------------------------------------------------------------------------
+  # Componentisation de 4 blocs de contenu complexe : 3 sous-types post-narratifs
+  # définis au palier 8 (08-contenu/02-template-pin.yaml) + le puzzle issu de la
+  # vision (01-essence) et de l'entité Média (04-donnees/01-contenu.yaml). Cette
+  # ratification referme la question ouverte 04-donnees/01-contenu sur la
+  # sous-typologie des éléments interactifs. Déjà matérialisés en maquette palier 5.
+
+  - id: comp-enigme
+    nom: "Énigme"
+    famille: fonctionnel
+    raison_d_etre: >-
+      Sous-type post-narratif (08-contenu/02-template-pin.yaml id 'enigme') : défi
+      de lecture attentive ou d'observation du lieu réel. L'énigme RACONTE — elle ne
+      pose pas un QCM et n'affiche pas de score ; énoncé qui pointe quelque chose à
+      chercher + révélation différée à la demande. Anti-gamification stricte.
+    ancrage:
+      ecrans: [E-PIN-CONSULTATION-APPROFONDIE (zone post-narrative)]
+      composants_qui_l_integrent: [comp-zone-post-narrative]
+    composition:
+      - { id: comp-libelle-texte, slot: enonce, cardinalite: 1 }
+      - { id: comp-libelle-texte, slot: reponse, cardinalite: 1, note: "révélée à la demande" }
+      - { id: comp-button-tertiary, slot: reveal, cardinalite: 1, note: "Dévoiler ↔ Replier" }
+    etats_interactifs: [posee, devoilee]
+    interactions_natives:
+      - "Tap reveal → bascule posee↔devoilee (révélation narrative, ni validation ni score)"
+    intention_portee:
+      parametrable: false
+      echelle: E1_atomique
+      intention: "reveler_reponse"
+      note: "Intention CLOSE — la révélation est interne au composant."
+    consequences_variabilite:
+      - "Longueur de l'énoncé variable (phrase à paragraphe) ; i18n FR/EN/JA"
+    anti_perimetre_specifique:
+      - "Pas de badge/niveau/score (anti-pattern Duolingo, cf. 08-contenu post_narratif)"
+
+  - id: comp-citation
+    nom: "Citation historique"
+    famille: fonctionnel
+    raison_d_etre: >-
+      Sous-type post-narratif (08-contenu/02-template-pin.yaml id
+      'citation_historique') : archive ou témoignage qui prolonge le récit dans un
+      registre d'époque — introduction sobre du conteur + citation entre guillemets
+      + crédit court. Bloc statique (sources visibles, P6 historicité).
+    ancrage:
+      ecrans: [E-PIN-CONSULTATION-APPROFONDIE (zone narration ou post-narrative)]
+      composants_qui_l_integrent: [comp-zone-narration, comp-zone-post-narrative]
+    composition:
+      - { id: comp-libelle-texte, slot: intro, cardinalite: 0..1, note: "amorce du conteur" }
+      - { id: comp-libelle-texte, slot: citation, cardinalite: 1, note: "texte cité entre guillemets" }
+      - { id: comp-libelle-texte, slot: attribution, cardinalite: 1, note: "crédit + date + source" }
+    intention_portee: { non_interactif: true }
+    consequences_variabilite:
+      - "Longueur de la citation variable (haïku à paragraphe) ; crédit obligatoire"
+
+  - id: comp-saviez-vous
+    nom: "Le saviez-vous"
+    famille: fonctionnel
+    raison_d_etre: >-
+      Sous-type post-narratif (08-contenu/02-template-pin.yaml id 'le_saviez_vous') :
+      fait annexe qui prolonge le récit — anecdote, détail, écho contemporain.
+      Ouverture marquée (« Le saviez-vous ») + fait + résonance. PROLONGEMENT (ajoute,
+      ne répète pas). Bloc statique.
+    ancrage:
+      ecrans: [E-PIN-CONSULTATION-APPROFONDIE (zone post-narrative)]
+      composants_qui_l_integrent: [comp-zone-post-narrative]
+    composition:
+      - { id: comp-icone, slot: icone, cardinalite: 1, note: "marqueur d'anecdote (concrète palier 13)" }
+      - { id: comp-libelle-texte, slot: ouverture, cardinalite: 1, note: "« Le saviez-vous »" }
+      - { id: comp-libelle-texte, slot: fait, cardinalite: 1 }
+    intention_portee: { non_interactif: true }
+    consequences_variabilite:
+      - "Longueur du fait variable (phrase à court paragraphe)"
+
+  - id: comp-puzzle
+    nom: "Puzzle"
+    famille: fonctionnel
+    raison_d_etre: >-
+      Élément interactif ludique de la vision (01-essence : « le ludique — quiz,
+      énigmes, AR, puzzles ») : image d'archive recomposée par jeu de tuiles
+      (taquin). Réifie le type 'élément_interactif → puzzle' de l'entité Média
+      (04-donnees/01-contenu.yaml l.310). Sa ratification REFERME la question ouverte
+      04-donnees/01-contenu (l.333) sur la sous-typologie des éléments interactifs.
+    ancrage:
+      ecrans: [E-PIN-CONSULTATION-APPROFONDIE (zone narration ou post-narrative)]
+      composants_qui_l_integrent: [comp-zone-narration, comp-zone-post-narrative]
+    composition:
+      - { id: comp-image-hero, slot: photo, cardinalite: 1, note: "image d'archive à reconstituer" }
+      - { id: comp-button-primary, slot: action_demarrer, cardinalite: 0..1, note: "Mélanger et jouer" }
+      - { id: comp-button-tertiary, slot: action_indice, cardinalite: 0..1 }
+    etats_interactifs: [intro, en_cours, resolu]
+    interactions_natives:
+      - "Tap démarrer → intro→en_cours (mélange)"
+      - "Glissement de tuile → déplacement (résolution interne)"
+      - "Résolution complète → en_cours→resolu (photo reconstituée + crédit)"
+    intention_portee:
+      parametrable: false
+      echelle: E1_atomique
+      intention: "reconstituer_image"
+      note: "Intention CLOSE — manipulation interne. Optionnel et 'passable' (priorité basse)."
+    machine_etats:
+      etats: [intro, en_cours, resolu]
+      transitions:
+        - { de: intro, vers: en_cours, sur: tap_demarrer }
+        - { de: en_cours, vers: resolu, sur: tuiles_toutes_en_place }
+    consequences_variabilite:
+      - "Taille de grille variable (3×3, 4×4) ; image absente → fallback message"
+    parti_pris_maquette: "Placeholder ludique en maquette (pas de moteur de jeu) ; résolution réelle = code dev."
+
+  - id: comp-formulaire-creation-compte
+    nom: "Formulaire création de Compte"
+    famille: fonctionnel
+    raison_d_etre: "Création d'un Compte (palier 4 cluster 03) — pseudonyme + email + mot de passe. Producteur de ETAT-COMPTE-CONNECTE."
+    ancrage: { ecrans: [E-PROFIL-CREATION-COMPTE] }
+    composition:
+      - { id: comp-champ-saisie-texte, slot: pseudonyme, cardinalite: 1 }
+      - { id: comp-champ-saisie-texte, slot: email, cardinalite: 1 }
+      - { id: comp-champ-saisie-texte, slot: mot_de_passe, cardinalite: 1 }
+      - { id: comp-button-primary, slot: cta_creer, cardinalite: 1 }
+      - { id: comp-lien-texte, slot: legal, cardinalite: 1 }
+    etats_interactifs: [empty, partial_draft, full_valid, validating, submitting, submitted, error, offline_queued]
+    interactions_natives:
+      - "Tap cta_creer → E4 soumission, validation serveur (unicité email/pseudo), émet ETAT-COMPTE-CONNECTE"
+    intention_portee: { parametrable: false, echelle: E4_systemique, cible_referencee: "ETAT-COMPTE-CONNECTE producteur" }
+    couplage_etat_partage:
+      - { etat: ETAT-COMPTE-CONNECTE, role: producteur }
+    consequences_variabilite:
+      - "Email/pseudo déjà utilisés → erreur explicite (palier 8 microcopy)"
+
+  - id: comp-formulaire-connexion-compte
+    nom: "Formulaire connexion Compte"
+    famille: fonctionnel
+    raison_d_etre: "Connexion à un Compte existant. Producteur de ETAT-COMPTE-CONNECTE."
+    ancrage: { ecrans: [E-PROFIL-CONNEXION-COMPTE] }
+    composition:
+      - { id: comp-champ-saisie-texte, slot: identifiant, cardinalite: 1 }
+      - { id: comp-champ-saisie-texte, slot: mot_de_passe, cardinalite: 1 }
+      - { id: comp-button-primary, slot: cta_connecter, cardinalite: 1 }
+      - { id: comp-lien-texte, slot: oubli_mdp, cardinalite: 0..1 }
+    etats_interactifs: [empty, partial_draft, validating, submitting, submitted, error, offline_queued]
+    interactions_natives:
+      - "Tap cta_connecter → E4 authentifie, émet ETAT-COMPTE-CONNECTE"
+    intention_portee: { parametrable: false, echelle: E4_systemique }
+    couplage_etat_partage:
+      - { etat: ETAT-COMPTE-CONNECTE, role: producteur }
+
+  - id: comp-formulaire-saisie-pin
+    nom: "Formulaire de soumission Pin (communautaire)"
+    famille: fonctionnel
+    raison_d_etre: "Saisie d'un Pin de provenance communautaire (palier 6 flow G4). Composant unique avec sections internes (titre, catégorie, époque, localisation, narration, sources, médias). Évaluation : split NON recommandé (pas d'ancrage palier 7 pour les sous-composants isolés, validation cross-fields forte)."
+    ancrage: { ecrans: [E-COMMUNAUTE-SOUMISSION-PIN] }
+    composition:
+      - { id: comp-champ-saisie-texte, slot: titre, cardinalite: 1 }
+      - { id: comp-chip-categorie, slot: categorie, cardinalite: 1 }
+      - { id: comp-champ-saisie-date, slot: epoque, cardinalite: 1 }
+      - { id: comp-champ-saisie-lieu, slot: localisation, cardinalite: 1 }
+      - { id: comp-champ-saisie-textarea, slot: narration, cardinalite: 1 }
+      - { id: comp-zone-sources, slot: sources, cardinalite: 1 }
+      - { id: comp-carousel, slot: medias_uploades, cardinalite: 0..1 }
+      - { id: comp-button-primary, slot: cta_soumettre, cardinalite: 1 }
+    etats_interactifs: [empty, partial_draft, full_draft, validating, submitting, submitted, error, offline_queued]
+    interactions_natives:
+      - "Tap cta_soumettre → validation cross-fields + soumission asynchrone, modération à venir (I3)"
+    intention_portee: { parametrable: false, echelle: E4_systemique, cible_referencee: "flow G4 soumission Pin" }
+    couplage_etat_partage:
+      - { etat: ETAT-COMPTE-CONNECTE, role: consommateur, note: "I2 — Compte requis pour publier" }
+      - { etat: ETAT-CONNEXION-RESEAU, role: consommateur, note: "queue offline si pas de réseau" }
+    consequences_variabilite:
+      - "Brouillon long persistant à conserver (palier 16 valide la stratégie sauvegarde locale)"
+      - "Médias volumineux → upload progressif (palier 16)"
+    machine_etats: "voir § 2"
+
+  - id: comp-formulaire-creation-parcours
+    nom: "Éditeur de Parcours personnel"
+    famille: fonctionnel
+    raison_d_etre: "Création/édition d'un Parcours personnel (palier 6 flows C11/C12). Permet ajout, retrait, réordonnancement d'Étapes."
+    ancrage: { ecrans: [E-PARCOURS-EDITEUR] }
+    composition:
+      - { id: comp-champ-saisie-texte, slot: titre, cardinalite: 1 }
+      - { id: comp-champ-saisie-textarea, slot: description, cardinalite: 1 }
+      - { reformulation_textuelle: "plusieurs comp-item-liste-etape ordonnées (cf. 02-molecules)", slot: etapes_liste, cardinalite: 1 }
+      - { id: comp-button-fab-creation, slot: ajout_etape, cardinalite: 1 }
+      - { id: comp-button-primary, slot: cta_sauvegarder, cardinalite: 1 }
+    etats_interactifs: [empty, editing, reordering, deleting, saving, saved, error]
+    interactions_natives:
+      - "Drag étape (PI-DRAG-ENTRE-VARIANTS) → reorder"
+      - "Tap supprimer étape → flow C13 confirmation via comp-dialogue-confirmation"
+      - "Tap cta_sauvegarder → sauvegarde locale (I6 strictement local jusqu'à publication)"
+    intention_portee: { parametrable: false, echelle: E4_systemique }
+    couplage_etat_partage: []
+    patterns_attaches: [PI-DRAG-ENTRE-VARIANTS]
+    consequences_variabilite:
+      - "Nombre étapes variable (1..n)"
+
+# -----------------------------------------------------------------------------
+# 2. Machines d'état détaillées (7 composants riches)
+# -----------------------------------------------------------------------------
+# Pour chaque composant à machine d'état riche, états + transitions +
+# événements déclencheurs. Référencé depuis chaque fiche par "voir § 2".
+machines_etats:
+
+  comp-pin:
+    note: >-
+      Le Pin n'a pas une machine d'état au sens transitions séquentielles —
+      il a une MATRICE de variants orthogonaux. Représentation par contraintes
+      invariantielles plutôt que par diagramme classique.
+    matrice_variants:
+      provenance: [editorial, communautaire]
+      multi_epoques: [simple, empile]
+      statut_verification: [absent, en_cours]
+      contexte_parcours: [normal, etape_courante, etape_complete, etape_future, hors_parcours]
+      deja_visite: [non, oui]
+    contraintes_invariantielles:
+      - { id: I3, regle: "provenance=editorial → statut_verification=absent (toujours)" }
+      - { id: I8, regle: "multi_epoques admis sans restriction" }
+      - { id: I9, regle: "Pin sans coordonnées géographiques → invisible Carte" }
+      - { id: PR1, regle: "(etape_courante ET deja_visite) → mise en relief prime sur atténuation" }
+      - { id: PR2, regle: "(hors_parcours ET deja_visite) → cumul des deux modulations" }
+    transitions_etat_d_interaction:
+      - { de: default, vers: pressed, sur: tap_press }
+      - { de: pressed, vers: selected, sur: tap_release }
+      - { de: selected, vers: default, sur: tap_hors_ou_navigation_externe }
+
+  comp-slider-epoque:
+    etats: [repos, dragging, snapping, pilote_automatique]
+    transitions:
+      - { de: repos, vers: dragging, sur: pointer_down_handle }
+      - { de: dragging, vers: snapping, sur: pointer_up }
+      - { de: snapping, vers: repos, sur: snap_complete, condition: "Époque ancrée la plus proche atteinte" }
+      - { de: repos, vers: pilote_automatique, sur: parcours_actif_emet_pilotage, condition: "ETAT-PARCOURS-EN-COURS impose une Époque cible" }
+      - { de: pilote_automatique, vers: dragging, sur: pointer_down_handle, note: "interaction utilisateur prime sur pilotage automatique (à confirmer palier 11)" }
+    evenements_emis:
+      - { evenement: drag_continue, charge: "position interpolée 0.0–1.0", consommateur: "ETAT-EPOQUE-COURANTE (mise à jour continue, cascade fond carte palier 9 D8)" }
+      - { evenement: snap_complete, charge: "Époque ancrée finale", consommateur: "ETAT-EPOQUE-COURANTE + recharge Pins (palier 3 D1.2)" }
+
+  comp-carte:
+    etats: [nominal, panning, zooming, loading_tuiles, offline_avec_cache, offline_sans_cache, geoloc_cursor_actif, pin_selected]
+    transitions:
+      - { de: nominal, vers: panning, sur: pan_drag_start }
+      - { de: panning, vers: nominal, sur: pan_drag_end }
+      - { de: nominal, vers: zooming, sur: pinch_zoom }
+      - { de: zooming, vers: nominal, sur: pinch_release }
+      - { de: nominal, vers: loading_tuiles, sur: pan_zoom_atteint_zone_non_chargee }
+      - { de: loading_tuiles, vers: nominal, sur: tuiles_recues }
+      - { de: '*', vers: offline_avec_cache, sur: ETAT-CONNEXION-RESEAU_perdu, condition: "tuiles préchargées disponibles" }
+      - { de: '*', vers: offline_sans_cache, sur: ETAT-CONNEXION-RESEAU_perdu, condition: "pas de tuiles préchargées" }
+      - { de: nominal, vers: pin_selected, sur: tap_pin }
+    evenements_emis:
+      - { evenement: pin_selected, consommateur: "écran parent, ouvre B1 aperçu" }
+    cascades_consommees:
+      - { source: ETAT-EPOQUE-COURANTE, effet: "interpolation continue des 5 axes paramétriques (palier 9 01-fond-et-epoques)" }
+      - { source: ETAT-PARCOURS-EN-COURS, effet: "affichage tracé + étape courante en relief" }
+
+  comp-lecteur-audio:
+    etats: [buffering, playing, paused, ended, error, seeking]
+    transitions:
+      - { de: buffering, vers: playing, sur: audio_pret_et_tap_play }
+      - { de: buffering, vers: error, sur: telechargement_echec }
+      - { de: playing, vers: paused, sur: tap_pause }
+      - { de: paused, vers: playing, sur: tap_play }
+      - { de: 'playing|paused', vers: seeking, sur: drag_timeline }
+      - { de: seeking, vers: playing, sur: relachement_timeline }
+      - { de: 'playing|seeking', vers: ended, sur: fin_naturelle_audio }
+    evenements_emis:
+      - { evenement: play_demarre, consommateur: "ETAT-AUDIO-EN-COURS (producteur)" }
+      - { evenement: ended, consommateur: "ETAT-AUDIO-EN-COURS (libère état)" }
+
+  comp-formulaire-saisie-pin:
+    etats: [empty, partial_draft, full_draft, validating, submitting, submitted, error, offline_queued]
+    transitions:
+      - { de: empty, vers: partial_draft, sur: premier_champ_renseigne }
+      - { de: partial_draft, vers: full_draft, sur: tous_champs_requis_renseignes }
+      - { de: full_draft, vers: partial_draft, sur: champ_efface_revient_invalide }
+      - { de: full_draft, vers: validating, sur: tap_cta_soumettre, condition: "validation locale OK" }
+      - { de: validating, vers: submitting, sur: validation_serveur_OK }
+      - { de: submitting, vers: submitted, sur: api_accepte_creation }
+      - { de: '*', vers: error, sur: validation_locale_KO_ou_serveur_rejette_ou_timeout }
+      - { de: '*', vers: offline_queued, sur: ETAT-CONNEXION-RESEAU_perdu_pendant_soumission }
+    invariants:
+      - "Brouillon préservé localement à toutes étapes — l'utilisateur ne perd jamais sa saisie"
+    note: >-
+      Verdict : split en sous-composants (saisie-meta, saisie-narration,
+      saisie-medias, saisie-sources) NON recommandé actuellement car validation
+      cross-fields forte, machine d'état unitaire, pas d'ancrage palier 7
+      pour les sous-composants isolés. Ré-évaluable plus tard si admin renforcé.
+
+  comp-recherche-surface:
+    etats: [empty, typing, querying, results_loaded, no_results, error, offline_local]
+    transitions:
+      - { de: empty, vers: typing, sur: focus_clavier_et_saisie }
+      - { de: typing, vers: querying, sur: debounce_ecoule }
+      - { de: querying, vers: results_loaded, sur: api_retour_OK_avec_resultats }
+      - { de: querying, vers: no_results, sur: api_retour_OK_sans_resultats }
+      - { de: querying, vers: error, sur: timeout_ou_erreur_serveur }
+      - { de: '*', vers: offline_local, sur: ETAT-CONNEXION-RESEAU_perdu, note: "recherche dégradée sur cache local" }
+      - { de: 'results_loaded|no_results', vers: typing, sur: continue_saisie }
+    note: "Le debounce (durée précise) est au palier 11."
+
+  comp-quiz:
+    etats: [unanswered, answering, answered, feedback_revealed, hint_shown, completed, error]
+    transitions:
+      - { de: unanswered, vers: answering, sur: tap_reponse_candidate }
+      - { de: answering, vers: answered, sur: tap_valider }
+      - { de: answered, vers: feedback_revealed, sur: revelation_serveur_ou_locale }
+      - { de: '*', vers: hint_shown, sur: tap_hint_optionnel }
+      - { de: feedback_revealed, vers: completed, sur: derniere_question }
+      - { de: feedback_revealed, vers: unanswered, sur: question_suivante, note: "boucle si plusieurs questions" }

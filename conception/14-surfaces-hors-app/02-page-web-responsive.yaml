@@ -1,0 +1,379 @@
+# =============================================================================
+# Palier 14 — 02 Page web responsive
+# =============================================================================
+# Surface receveur quand un Lien universel est ouvert sur un terminal sans
+# l'app installée (palier 5 § 6 entrée externe E2 cas_app_non_installee ;
+# palier 6 F5 cas particulier 'App non installée'). Trois vues consultables
+# en lecture seule (Pin, Parcours, fin de parcours partagée), un comportement
+# responsive téléphone/tablette/desktop, une page de résolution gracieuse
+# quand le lien tombe sur une cible retombée.
+#
+# Le palier 3 D11.2 a posé la matière fonctionnelle pure. Ce fichier ajoute
+# la STRUCTURE (sections de page, hiérarchie de contenu), le COMPORTEMENT
+# RESPONSIVE (téléphone/tablette/desktop), la CONSOMMATION (tokens palier 12,
+# icônes palier 13, microcopy palier 8 par référence), les ÉTATS (nominal,
+# retombé, hors connexion).
+#
+# Le palier 14 NE DIT PAS quel framework web (mécanisme d'implémentation),
+# ni quelles animations CSS (palier 11 — pas de motion riche modélisée ici),
+# ni quel hébergement (implémentation — D11.2 question ouverte tracée).
+# =============================================================================
+
+document:
+  type: palier_surfaces_hors_app_artefact
+  artefact: page_web_responsive
+  numero: 14
+  fichier_id: "02"
+  version: "0.3"
+  date: "2026-05-08"
+  format: yaml
+  prerequis_de_lecture:
+    - "design/conception/14-surfaces-hors-app/00-index.yaml — cadre, anti-périmètre"
+    - "design/conception/14-surfaces-hors-app/01-lien-universel.yaml — chaîne de fallback (SHA-LIEN-CHAINE-FALLBACK extrémité 2 et 3)"
+    - "design/conception/03-fonctionnalites/11-surfaces-hors-app.yaml — D11.2 (matière fonctionnelle)"
+    - "design/conception/12-tokens/01-couleurs.yaml — palette parchemin / encre brune / terracotta"
+    - "design/conception/12-tokens/02-typographies.yaml — TOK-TYPO-* (Playfair / Lora / Inter avec capacité CJK)"
+    - "design/conception/13-icones/03-icones-ui-fonctionnelles.yaml — sous-ensemble UI consommé"
+    - "design/conception/08-contenu/06-i18n.yaml — 3 langues fr/en/ja, contenu en français"
+
+# -----------------------------------------------------------------------------
+# 1. Raison d'être — pourquoi ce fichier existe en plus de D11.2
+# -----------------------------------------------------------------------------
+raison_d_etre: >-
+  Le palier 3 D11.2 a dit ce que la version web FAIT (lecture seule,
+  pas de mur, ton conteur préservé, adaptation aux écrans, proposition
+  discrète d'app). Ce fichier dit ce que la page EST quand un parent
+  accompagnateur de Mme Dupont l'ouvre le jour J sur un téléphone
+  qu'il connaît mal : la structure des sections qu'il découvre, l'ordre
+  dans lequel il les voit, ce qui apparaît au scroll, ce qui change
+  entre son téléphone et la tablette du voisin, ce qui se passe quand
+  le réseau tombe au milieu d'un parcours. C'est la vue depuis le
+  destinataire qui lit — pas depuis l'app qui prépare la cible.
+
+# -----------------------------------------------------------------------------
+# 2. Héritage palier 3 D11.2 — par référence, pas redit
+# -----------------------------------------------------------------------------
+heritage_palier_3:
+  reference: "design/conception/03-fonctionnalites/11-surfaces-hors-app.yaml § D11.2"
+  ce_qui_est_deja_pose:
+    - "Capabilités (afficher Pin / Parcours / fin de parcours en lecture, adaptation aux écrans, proposition discrète d'app, préservation du ton)"
+    - "Règles fonctionnelles (lecture seule, pas de mur, pas de city branding, pas de tracking, pas de cookies non essentiels)"
+    - "Ce qu'on ne fait pas (pas de version dégradée, pas de création / compte / favoris, pas de monétisation)"
+    - "Critères de réussite (test_litmus Mme Dupont, ton immédiatement reconnaissable, pas de frustration)"
+    - "Definition of Done D11.2"
+    - "Enjeux transversaux (a11y critique, performance sur réseau dégradé, vie privée stricte)"
+    - "Questions ouvertes encore valides (étendue audio / archives / 3D-AR sur web ; hébergement ; comportement hors-ligne ; langues)"
+  ce_que_ce_fichier_n_a_pas_a_redire: >-
+    Tout ce qui précède est tenu pour acquis. Si une affirmation ci-dessous
+    paraît contredire D11.2, c'est D11.2 qui prime.
+
+# -----------------------------------------------------------------------------
+# 3. Décisions structurelles propres au fichier 02
+# -----------------------------------------------------------------------------
+decisions_structurelles:
+
+  - id: D-WEB-1
+    decision: "Trois vues consultables — Pin, Parcours, fin de parcours partagée — pas plus"
+    pourquoi: >-
+      Le brief D11.2 nomme ces trois cibles. La page d'accueil HistoLyon
+      (sans cible référencée) n'est PAS modélisée ici — la version web
+      est un fallback de Lien universel, pas un site marketing autonome.
+      Si quelqu'un tape l'URL racine sans cible, il atterrit sur une
+      page minimale qui propose le téléchargement de l'app et une brève
+      présentation du projet — formalisée comme cas particulier dans
+      D-WEB-7 ci-dessous, pas comme quatrième vue.
+
+  - id: D-WEB-2
+    decision: "Audio narratif accessible en lecture sur web (avec lecteur HTML5 standard)"
+    pourquoi: >-
+      Cohérence avec le ton conteur. La narration audio est centrale
+      dans D7 (audio narration) ; la priver côté web reviendrait à
+      donner une version dégradée (interdit D11.2). Lecteur HTML5
+      standard, sous-titres affichables — héritage transversal a11y.
+
+  - id: D-WEB-3
+    decision: "Contenu 3D et AR NON disponible sur web actuellement"
+    pourquoi: >-
+      D8 (3D / AR) a une lourde dette technique côté implémentation
+      mobile et n'a pas de pendant web standard. La fiche du Pin
+      mentionne la disponibilité de contenu 3D/AR dans l'app ('disponible
+      dans l'app') sans bloquer la lecture. Tranche la question ouverte
+      D11.2 'étendue 3D/AR sur web'. Réversible plus tard si pertinent.
+
+  - id: D-WEB-4
+    decision: "Page web en français uniquement — héritage palier 8 06-i18n"
+    pourquoi: >-
+      Le palier 8 06-i18n a tranché une application mono-langue
+      (français). Ce fichier hérite strictement : pas de détection de
+      langue navigateur, pas de sélecteur de langue dans l'en-tête.
+      Un visiteur non francophone peut faire traduire la page par son
+      téléphone si besoin (limitation assumée, cf. 06-i18n § 4).
+
+  - id: D-WEB-5
+    decision: "Trois breakpoints conceptuels — téléphone / tablette / desktop — sans valeurs en pixels"
+    pourquoi: >-
+      Le palier 14 ne pose pas de seuils chiffrés (palier 16 valide).
+      Conceptuellement : téléphone (lecture en colonne unique),
+      tablette (lecture confortable, marges plus généreuses),
+      desktop (lecture en colonne centrée, marges importantes pour
+      ne pas étirer les lignes au-delà du confort de lecture). Les
+      valeurs px exactes sont du palier 15 (Figma) et 16 (validation).
+
+  - id: D-WEB-6
+    decision: "Page de résolution gracieuse quand le lien tombe sur une cible retombée"
+    pourquoi: >-
+      Héritage SHA-LIEN-CHAINE-FALLBACK extrémité 3 (fichier 01).
+      Pas de page d'erreur 'page non trouvée' brutale — ton sobre,
+      conteur, point d'accès vers l'app ou la racine. Microcopy
+      patternée par palier 8 (cluster transverse 'résolution
+      gracieuse').
+
+  - id: D-WEB-7
+    decision: "Page racine sans cible — présentation minimale de HistoLyon + téléchargement de l'app"
+    pourquoi: >-
+      Si quelqu'un tape l'URL racine HistoLyon sans Lien universel
+      (cas marginal mais réel : bouche-à-oreille, recherche web), il
+      ne tombe pas sur une 404 ni sur un site marketing chargé. Page
+      minimale : un titre, un court paragraphe sur le projet (ton
+      conteur, microcopy palier 8), un bouton de téléchargement de
+      l'app. Pas de catalogue public, pas de recherche, pas de carte
+      interactive sur web (cohérent D11.2 'lecture seule').
+
+# -----------------------------------------------------------------------------
+# 4. Fiches d'artefact
+# -----------------------------------------------------------------------------
+artefacts:
+
+  # ===========================================================================
+  - id: SHA-WEB-VUE-PIN
+    nom: "Vue Pin — page de consultation d'un Pin sur le web"
+
+    raison_d_etre: >-
+      Quand le Lien universel d'un Pin tombe sur un terminal sans app,
+      le destinataire arrive sur cette page. Elle doit donner accès
+      au contenu du Pin avec le ton conteur préservé, sans demander
+      de compte, sans bloquer la lecture par une intrusion d'app.
+
+    structure_destinataire_centree:
+      en_tete:
+        - "Marque HistoLyon discrète (logo palier 14 fichier 07 en taille modérée, lien vers la page racine)"
+        - "Sélecteur de langue UI (3 langues palier 8 06-i18n) si la détection navigateur n'est pas certaine"
+      corps:
+        - "Catégorie du Pin (chip avec ICON-CAT-X palier 13 + libellé palier 8) en accroche"
+        - "Titre du Pin (TOK-TYPO-DISPLAY-LG palier 12)"
+        - "Vignette ou image hero du Pin (composition palier 9 / palier 12 — ratio adapté à la largeur d'écran)"
+        - "Texte narratif du Pin en pleine largeur de lecture (TOK-TYPO-BODY-LG palier 12)"
+        - "Audio narratif si disponible (D-WEB-2 — lecteur HTML5 standard avec sous-titres)"
+        - "Mention 'contenu 3D / AR disponible dans l'app' (D-WEB-3) si le Pin en a, sans bouton qui force l'installation"
+        - "Bloc 'Pour aller plus loin' avec sortie navigateur (voir 06-page-externe-pour-aller-plus-loin.yaml)"
+      pied_de_page:
+        - "Proposition discrète de téléchargement de l'app (héritage D11.2 — un bouton sobre, pas un bandeau intrusif)"
+        - "Mention de la cible retombée éventuelle (héritage D-WEB-6 si le Pin a été retiré entre la résolution et la lecture)"
+
+    comportement_responsive:
+      telephone:
+        description: >-
+          Colonne unique pleine largeur, marges minimales mais cohérentes
+          avec TOK-SPACE-X palier 12. L'image hero occupe la largeur
+          entière. Le texte narratif est en pleine largeur de lecture
+          confortable (taille typographique TOK-TYPO-BODY-LG palier 12).
+      tablette:
+        description: >-
+          Colonne unique avec marges plus généreuses. L'image hero peut
+          conserver son ratio sans déborder. La largeur de ligne du
+          texte narratif est plafonnée pour rester confortable.
+      desktop:
+        description: >-
+          Colonne unique centrée, marges importantes des deux côtés.
+          La largeur de ligne du texte narratif est strictement plafonnée
+          (cohérent avec une lecture longue confortable). L'image hero
+          conserve son ratio sans étirement.
+
+    etats:
+      nominal: "Pin existant et accessible, rendu complet"
+      cible_retombee: "Pin retiré ou non publié au moment de la résolution — bascule vers SHA-WEB-RESOLUTION-GRACIEUSE"
+      hors_connexion: "Connexion réseau perdue après chargement initial — le contenu déjà chargé reste lisible (le navigateur gère son cache standard) ; pas de mécanisme PWA propre (D7 du palier 14 — PWA écartée)"
+      connexion_degradee: "Page se charge progressivement — le texte narratif apparaît en priorité, l'image hero et l'audio chargent ensuite (héritage D11.2 enjeu performance)"
+      premier_chargement_lent: "Aucune surface vide blanche — un ton conteur d'attente est posé en placeholder (microcopy palier 8 cluster transverse)"
+
+    consommation_paliers_amont:
+      tokens_palier_12: "TOK-COLOR-FOND-PRINCIPAL, TOK-COLOR-TEXTE-PRINCIPAL, TOK-COLOR-PRIMARY, TOK-TYPO-DISPLAY-LG, TOK-TYPO-BODY-LG, TOK-TYPO-UI-MD, TOK-SPACE-X, TOK-RADIUS-X, TOK-OPACITY-X"
+      icones_palier_13:
+        - "ICON-CAT-X (la catégorie du Pin selon le mapping palier 13 fichier 02)"
+        - "ICON-UI-LIEN-EXTERNE (pour le bloc 'Pour aller plus loin')"
+        - "ICON-UI-PLAY / ICON-UI-PAUSE (lecteur audio si Pin en a — palier 13 fichier 03)"
+      microcopy_palier_8: "Patterns du cluster 02-template-pin (teaser, narration, post-narratif, mentions de provenance)"
+
+  # ===========================================================================
+  - id: SHA-WEB-VUE-PARCOURS
+    nom: "Vue Parcours — page de consultation d'une fiche de Parcours sur le web"
+
+    raison_d_etre: >-
+      Quand le Lien universel d'un Parcours tombe sur un terminal sans
+      app, le destinataire arrive sur cette page. Cas central pour
+      Mme Dupont qui envoie son parcours scolaire aux six parents
+      accompagnateurs : ils doivent comprendre quoi faire le jour J
+      en moins de 30 secondes.
+
+    structure_destinataire_centree:
+      en_tete:
+        - "Marque HistoLyon discrète"
+        - "Sélecteur de langue UI"
+      corps:
+        - "Titre du Parcours et sa thématique (TOK-TYPO-DISPLAY-LG)"
+        - "Image hero / représentation visuelle du parcours (composition palier 9 — tracé stylisé sur fond carte ; pas la trajectoire GPS personnelle d'un utilisateur, héritage cluster 06)"
+        - "Métadonnées du Parcours en bloc compact : durée estimée, distance, nombre d'étapes, mode terrain ou canapé (microcopy palier 8 cluster 03-template-parcours)"
+        - "Description narrative (TOK-TYPO-BODY-LG)"
+        - "Liste des étapes du Parcours avec leurs Pins associés (titre, époque, vignette ; tap renvoie vers SHA-WEB-VUE-PIN du Pin de l'étape)"
+        - "Mention de la marque distinctive si Parcours communautaire en cours de vérification (héritage I3 cluster 06)"
+      pied_de_page:
+        - "Proposition discrète de téléchargement de l'app (avec mention que l'app permet de suivre le parcours en mobilité avec géolocalisation, ce que la version web ne fait pas)"
+
+    comportement_responsive:
+      telephone: "Colonne unique, étapes empilées verticalement avec leurs vignettes"
+      tablette: "Colonne unique avec marges, étapes empilées avec image et texte côte à côte si confortable"
+      desktop: "Colonne centrée avec marges importantes, étapes en liste compacte avec image en miniature"
+
+    etats:
+      nominal: "Parcours existant et accessible, rendu complet"
+      parcours_personnel_capability:
+        heritage: "Palier 6 F5 cas particulier 'Parcours personnel non publié partagé par son auteur'"
+        rendu: >-
+          Cas central Mme Dupont. Aucune marque visuelle 'parcours
+          privé' côté destinataire (héritage palier 6 — la résolution
+          réussit normalement pour qui détient le lien). Le parcours
+          n'apparaît PAS dans la liste de l'éventuelle racine ni dans
+          aucun listing — mais la vue Parcours du destinataire qui a
+          le lien est strictement identique à celle d'un parcours
+          public.
+      cible_retombee: "Parcours retiré ou non publié — bascule vers SHA-WEB-RESOLUTION-GRACIEUSE"
+      hors_connexion: "Cohérent avec SHA-WEB-VUE-PIN — cache navigateur standard, pas de PWA"
+
+    consommation_paliers_amont:
+      tokens_palier_12: "Identique SHA-WEB-VUE-PIN"
+      icones_palier_13:
+        - "ICON-CAT-X pour les Pins listés en étapes"
+        - "ICON-UI-DUREE / ICON-UI-DISTANCE / ICON-UI-ETAPES (bloc métadonnées de Parcours — palier 13 fichier 03 § 11 metadonnees_parcours)"
+      microcopy_palier_8: "Patterns du cluster 03-template-parcours"
+
+  # ===========================================================================
+  - id: SHA-WEB-VUE-FIN-PARCOURS
+    nom: "Vue Fin de parcours partagée — page atteinte via Lien d'une fin de parcours d'autrui"
+
+    raison_d_etre: >-
+      Quand un Lien universel d'une fin de parcours est partagé (Kenji
+      poste sa fin de parcours sur Instagram avec le lien sous l'image),
+      un destinataire qui clique le lien atterrit ici. Cas plus rare
+      que les deux précédents mais cohérent avec D11.1 (fin de parcours
+      partageable).
+
+    structure_destinataire_centree:
+      en_tete:
+        - "Marque HistoLyon discrète"
+        - "Sélecteur de langue UI"
+      corps:
+        - "Mention sobre 'parcours complété' avec la microcopy palier 8 cluster 04 (sans glorification, ton conteur)"
+        - "Représentation visuelle du Parcours complété (cohérent avec l'Image partageable fichier 04 — tracé idéal stylisé, pas la trajectoire GPS personnelle)"
+        - "Statistiques discrètes (étapes complétées, distance idéale, durée) — héritage D11.4 question ouverte tranchée fichier 04"
+        - "Liste des Pins du Parcours avec lien vers chacune des vues SHA-WEB-VUE-PIN"
+        - "Bouton de bascule vers SHA-WEB-VUE-PARCOURS (vue de la fiche du Parcours d'origine, si le destinataire veut le faire à son tour)"
+      pied_de_page:
+        - "Proposition discrète de téléchargement de l'app (incite à essayer le parcours en mobilité)"
+
+    consommation_paliers_amont:
+      tokens_palier_12: "Identique SHA-WEB-VUE-PIN ; usage de TOK-COLOR-FONCTIONNEL-SUCCES sobre pour la mention 'parcours complété'"
+      icones_palier_13: "Sous-ensemble des deux vues précédentes"
+      microcopy_palier_8: "Patterns du cluster 03-template-parcours section fin de parcours partagée"
+
+    questions_ouvertes:
+      - "Cette vue est-elle visible aussi par l'utilisateur qui a complété (en se ré-ouvrant son propre lien) ou seulement par les destinataires ? — articulation D11.4 / palier 6 F3 question ouverte 'Re-partage depuis l'Historique'"
+
+  # ===========================================================================
+  - id: SHA-WEB-RESOLUTION-GRACIEUSE
+    nom: "Page de résolution gracieuse quand la cible est retombée"
+
+    raison_d_etre: >-
+      Cible retirée, non publiée au moment de la résolution, ou supprimée
+      entre l'envoi du Lien et son ouverture. Le destinataire ne doit
+      jamais voir 'page non trouvée' brutale — le ton conteur tient
+      même hors de l'app (héritage essence § ce_qu_on_refuse).
+
+    structure_destinataire_centree:
+      composition: >-
+        Page courte, centrée, sobre. Mention conteur que l'élément
+        n'est plus disponible (microcopy palier 8 cluster transverse
+        'résolution gracieuse'). Bouton de retour vers la page racine
+        (D-WEB-7) ou vers le téléchargement de l'app. Pas de stack
+        trace, pas de message technique, pas de '404'.
+      ton: "Sobre, conteur — exemple de phrasé palier 8 (sans le redire ici)"
+
+    consommation_paliers_amont:
+      tokens_palier_12: "TOK-COLOR-FOND-PRINCIPAL, TOK-COLOR-TEXTE-PRINCIPAL, TOK-TYPO-BODY-LG — sous-ensemble minimal"
+      microcopy_palier_8: "Pattern dédié cluster transverse"
+
+  # ===========================================================================
+  - id: SHA-WEB-PAGE-RACINE
+    nom: "Page racine sans cible (URL HistoLyon tapée directement)"
+
+    raison_d_etre: >-
+      Cas marginal mais réel (D-WEB-7) : quelqu'un tape l'URL racine
+      HistoLyon sans Lien spécifique. Pas de site marketing, pas de
+      catalogue, pas de carte interactive sur web — une page minimale
+      cohérente avec le ton.
+
+    structure_destinataire_centree:
+      composition:
+        - "Marque HistoLyon (logo palier 14 fichier 07 en taille notable, peut-être décliné en horizontal)"
+        - "Phrase d'accroche sur le projet (microcopy palier 8 cluster transverse)"
+        - "Bouton de téléchargement de l'app (cohérent SHA-WEB-VUE-PIN pied de page)"
+        - "Mention discrète qu'il faut un Lien universel pour accéder à un Pin ou un Parcours sur le web (microcopy palier 8)"
+      ce_qu_il_n_y_a_pas:
+        - "Pas de catalogue de Pins"
+        - "Pas de catalogue de Parcours"
+        - "Pas de carte interactive"
+        - "Pas de moteur de recherche"
+        - "Pas de section blog ou actualités"
+
+    consommation_paliers_amont:
+      tokens_palier_12: "Sous-ensemble minimal, palette parchemin / encre"
+      microcopy_palier_8: "Patterns dédiés cluster transverse 'page racine'"
+
+# -----------------------------------------------------------------------------
+# 5. Personas servis
+# -----------------------------------------------------------------------------
+personas_servis:
+
+  mme_dupont:
+    test_litmus_servi: "Six parents accompagnateurs ouvrent le lien le jour J et savent quoi faire en moins de 30 secondes"
+    apport_du_fichier: >-
+      SHA-WEB-VUE-PARCOURS sert directement ce scénario. Cas
+      'parcours_personnel_capability' garantit que le parcours
+      personnel non publié résout sans mur. La structure compacte
+      des étapes avec leurs Pins permet au parent de visualiser
+      l'itinéraire en quelques secondes. La proposition d'app est
+      discrète, pas bloquante.
+
+  kenji:
+    test_litmus_servi: "Page web lisible en mobilité, compréhensible même sans lire couramment le français"
+    apport_du_fichier: >-
+      La page reste en français (D-WEB-4) ; Kenji peut la faire
+      traduire par son téléphone si besoin. La structure
+      destinataire-centrée avec image hero et catégorie en accroche
+      lui permet de comprendre de quoi il s'agit avant même de lire
+      le narratif.
+
+  mme_martin:
+    test_litmus_servi: "Élèves accèdent à un Pin sur leur tablette scolaire sans app"
+    apport_du_fichier: >-
+      SHA-WEB-VUE-PIN sur tablette (D-WEB-5) — colonne unique avec
+      marges, lecture confortable. Pas de mur, pas de compte, pas
+      de tracking — cohérent avec un environnement scolaire sensible
+      à la vie privée.
+
+  pere_lyonnais:
+    test_litmus_servi: "Recevoir une découverte d'un ami sans installer l'app"
+    apport_du_fichier: >-
+      SHA-WEB-VUE-PIN ou SHA-WEB-VUE-PARCOURS selon ce que l'ami a
+      partagé. La proposition d'app discrète peut le convertir s'il
+      apprécie le contenu, sans le bloquer s'il ne veut pas
+      installer.

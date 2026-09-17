@@ -1,0 +1,444 @@
+# =============================================================================
+# Palier 6 — 01-decouverte — Famille A : Découverte et exploration
+# =============================================================================
+# Cette famille couvre les flows qui structurent l'arrivée et l'exploration
+# libre de l'app. Elle adresse le tout premier lancement, l'invitation
+# discrète au micro-parcours, la navigation cartographique de base
+# (slider d'époques, pan/zoom, sélection d'époque), la recherche, le
+# basculement vers le mode Surprenez-moi, et le pattern transverse de
+# demande de permission juste-à-temps (référencé par les autres familles).
+#
+# Suit strictement les conventions définies en 00-index.yaml (préfixe P5.
+# pour palier 5, pré-requis non triviaux uniquement, granularité atomique).
+# Imite le format du pilote 03-parcours.yaml.
+# =============================================================================
+
+document:
+  type: palier_flows_cluster
+  cluster_id: "01-decouverte"
+  nom: "Découverte et exploration"
+  version: "0.1"
+  date: "2026-05-05"
+  format: yaml
+
+raison_d_etre_du_cluster: >-
+  La famille A modélise comment l'utilisateur ARRIVE dans HistoLyon et
+  comment il EXPLORE la carte avant tout engagement particulier (parcours,
+  consultation de pin, contribution). Elle porte la promesse fondatrice
+  de l'app — zéro friction au lancement, sérendipité possible mais jamais
+  imposée — et fixe le contrat de demande de permission juste-à-temps
+  (A6) appelé par toutes les familles qui sollicitent une autorisation
+  système.
+
+# -----------------------------------------------------------------------------
+# Flows
+# -----------------------------------------------------------------------------
+flows:
+
+  # ---------------------------------------------------------------------------
+  - id: A1
+    nom: "Premier lancement de l'app"
+
+    declencheur: "Ouverture initiale de l'application (P5.E1)"
+    acteurs: [utilisateur grand public]
+
+    deroule:
+      - etape: 1
+        action: >-
+          L'app instancie un Profil local avec identifiant_local anonyme,
+          mode_notification_proximité = balade_libre, langue_préférée
+          héritée de la langue système, première_ouverture_effectuée = faux
+          (cf. cluster 03).
+      - etape: 2
+        action: "Atterrissage direct sur P5.S1 Carte en P5.M1, centrée sur le point d'ancrage par défaut. Aucun écran intermédiaire, aucune slide d'onboarding, aucune demande de permission, aucune demande de Compte"
+        surfaces_actives: [P5.S1, P5.M1]
+      - etape: 3
+        action: "L'utilisateur peut immédiatement explorer la carte (pan, zoom, tap sur un Pin, slider d'époque). Aucune action n'est requise pour avancer."
+      - etape: 4
+        action: >-
+          Au moment où l'utilisateur quitte la position initiale (premier
+          pan, premier zoom, premier tap sur Pin, ou bascule vers une
+          autre surface top-level), première_ouverture_effectuée bascule
+          à vrai et le flow A2 est armé.
+
+    bifurcations:
+      - si: "L'utilisateur tape sur un Pin avant que A2 se déclenche"
+        alors: "bascule vers B1 (Aperçu rapide d'un Pin) — A2 reste en attente et peut se déclencher au retour à la Carte"
+      - si: "L'utilisateur manipule le slider d'époque sans avoir suivi A2 ni le micro-parcours"
+        alors: "bascule vers A3 (Navigation cartographique et sélection d'époque) ; en parallèle l'indication ponctuelle D5.4 est armée pour la prochaine arrivée sur le slider sans interaction"
+      - si: "L'utilisateur tape sur le sélecteur de section Parcours ou Profil"
+        alors: "bascule vers la surface concernée (P5.S2 ou P5.S3) — A2 reste en attente sur la Carte"
+
+    sorties_normales:
+      - "Carte affichée et prête à l'exploration libre"
+      - "Armement de A2 (invitation au micro-parcours) sans la déclencher si l'utilisateur reste passif"
+
+    cas_particuliers:
+      - cas: "Lancement initié par un Lien universel (P5.E2) ciblant un Pin ou un Parcours"
+        comportement: "Le flow F5 prend la main : atterrissage en P5.M3 sur la cible. A1 ne déclenche pas A2 dans ce cas (le contexte d'arrivée est explicite), mais le Profil est bien instancié"
+      - cas: "Lancement initié par une notification système (P5.E3)"
+        comportement: "Cas inapplicable au PREMIER lancement (aucune notif n'a pu être configurée auparavant — cohérent avec D5.5 et A6)"
+      - cas: "Connexion réseau indisponible au tout premier lancement"
+        comportement: "La carte de base reste affichée à partir des tuiles préchargées avec l'app (étendue exacte du préchargement = question ouverte de D1.1) ; un bandeau persistant P5.P3 signale le mode hors-ligne. Aucun blocage."
+      - cas: "Réinstallation après une utilisation antérieure"
+        comportement: "Considéré comme un premier lancement (le Profil précédent a été effacé avec l'app — cf. cluster 03 invariant). A2 sera proposé à nouveau"
+
+    entites_impliquees: [Profil]
+    surfaces_et_modes: [P5.S1, P5.M1, P5.E1, P5.P3]
+    references_palier_3: [D5.1, D1.1]
+    invariants_respectes: [I1, I6]
+
+    questions_ouvertes:
+      - "Sauvegarde système (iOS/Android backup) qui pourrait réinstancier un Profil sur un nouveau terminal — cf. cluster 03 question ouverte"
+
+  # ---------------------------------------------------------------------------
+  - id: A2
+    nom: "Invitation au micro-parcours découverte"
+
+    declencheur: >-
+      Au cours du tout premier lancement (A1), après l'apparition de la
+      Carte et au premier moment pertinent (à arbitrer en palier 7), une
+      invitation discrète est armée.
+    acteurs: [utilisateur grand public]
+
+    pre_requis_specifiques:
+      - "première_ouverture_effectuée = faux ou tout juste basculé à vrai (cluster 03)"
+      - "Lancement non initié par un Lien universel ou une notification (sinon le contexte d'arrivée est explicite)"
+
+    deroule:
+      - etape: 1
+        action: "Une indication ponctuelle (forme P5.M9 ou P5.M7 selon arbitrage palier 7) propose de suivre un micro-parcours découverte — sans masquer la Carte, sans bloquer l'interaction"
+        surfaces_actives: [P5.S1, P5.M1]
+      - etape: 2
+        action: "Deux choix : accepter ou reporter. Aucune troisième option, aucune validation neutre obligatoire."
+
+    bifurcations:
+      - si: "L'utilisateur accepte"
+        alors: "le micro-parcours D5.3 démarre — bascule vers C4 (Lancement) sur ce parcours spécifique tagué pour commencer ; à la fin, micro_parcours_acheve = vrai (effet sur A1 et D5.4)"
+      - si: "L'utilisateur reporte"
+        alors: "l'invitation disparaît et NE réapparaît PAS aux lancements suivants. Le micro-parcours reste accessible depuis le catalogue P5.S2 (C1)"
+      - si: "L'utilisateur ignore l'invitation et commence à manipuler la Carte (pan, zoom, tap)"
+        alors: "l'invitation se dissipe (équivalent à un report implicite) — A3, A4, B1 selon l'action"
+
+    sorties_normales:
+      - "Acceptation → micro-parcours en cours via C4"
+      - "Report (explicite ou implicite) → exploration libre sur la Carte, l'indication D5.4 sur le slider reste armée pour le moment opportun"
+
+    cas_particuliers:
+      - cas: "L'utilisateur ferme l'app sans avoir tranché"
+        comportement: "Question ouverte D5.2 — politique provisoire : l'invitation est considérée comme reportée (cohérent avec ne pas relancer agressivement)"
+
+    entites_impliquees: [Profil, Parcours]
+    surfaces_et_modes: [P5.S1, P5.M9]
+    references_palier_3: [D5.2, D5.3]
+    invariants_respectes: [I6]
+
+    questions_ouvertes:
+      - "Délai exact entre apparition de la Carte et apparition de l'invitation — palier 7"
+      - "Forme exacte de l'invitation (message éphémère P5.M9 vs alerte ponctuelle P5.M7) — palier 7"
+
+  # ---------------------------------------------------------------------------
+  - id: A3
+    nom: "Navigation cartographique et sélection d'époque"
+
+    declencheur: >-
+      L'utilisateur manipule le slider d'époque, ou effectue un pan/zoom
+      sur la Carte (P5.S1).
+    acteurs: [utilisateur grand public]
+
+    deroule:
+      cas_pan_zoom:
+        - etape: 1
+          action: "L'utilisateur effectue un geste de pan ou zoom dans la zone Lyon + agglomération"
+          surfaces_actives: [P5.S1, P5.M1]
+        - etape: 2
+          action: "La Carte se recadre. Les Pins visibles sont mis à jour selon l'emprise et l'Époque sélectionnée. Les Couches cartographiques actives suivent."
+
+      cas_slider_epoque:
+        - etape: 1
+          action: "L'utilisateur fait glisser le slider d'époque. Pendant le geste, l'apparence de la Carte transitionne progressivement, le retour visible indique l'année courante"
+        - etape: 2
+          action: "À la fin du geste, l'Époque se cale sur la valeur fixe la plus proche du catalogue ouvert (cf. I7). Les Pins de cette Époque se chargent — pas pendant le geste"
+        - etape: 3
+          action: "Sur la position 'Aujourd'hui', tous les Pins de toutes les Époques sont accessibles (vue cumulée)"
+
+      cas_me_localiser:
+        - etape: 1
+          action: "L'utilisateur active le contrôle 'Me localiser'"
+        - etape: 2
+          action: "Si la permission de géolocalisation est accordée et l'utilisateur dans le périmètre de Lyon → recadrage sur sa position. Sinon → comportement détaillé en cas particuliers"
+
+    bifurcations:
+      - si: "L'utilisateur tape sur un Pin visible"
+        alors: "bascule vers B1 (Aperçu rapide d'un Pin)"
+      - si: "L'utilisateur active le contrôle de recherche"
+        alors: "bascule vers A4 (Recherche et filtrage)"
+      - si: "L'utilisateur active une Couche cartographique"
+        alors: "la Couche s'active en superposition (D1.5) ; la navigation se poursuit sur P5.S1"
+      - si: "L'utilisateur active 'Me localiser' et la permission de géolocalisation N'est PAS accordée ni encore demandée"
+        alors: "bascule vers A6 (Demande de permission juste-à-temps) avec cible = géolocalisation ; au retour, soit recadrage sur position si accordée, soit message éphémère P5.M9 indiquant que le recadrage n'est pas possible"
+
+    sorties_normales:
+      - "Carte recadrée / Époque mise à jour, exploration continue"
+      - "Bascule vers B1 (Pin tapé), A4 (recherche), A6 (permission)"
+
+    cas_particuliers:
+      - cas: "Premier passage sur le slider d'époque sans avoir suivi le micro-parcours D5.3"
+        comportement: "L'indication ponctuelle D5.4 (forme exacte palier 7) attire l'attention sur le slider une seule fois ; elle se dissipe à la première interaction effective ou après un délai (cf. D5.4)"
+      - cas: "'Me localiser' activé hors zone Lyon, permission accordée"
+        comportement: "Message éphémère P5.M9 informant que la position est hors zone ; la Carte recentre sur le point d'ancrage par défaut sans blocage"
+      - cas: "Permission de géolocalisation refusée (déjà demandée, refusée) lors d'un 'Me localiser'"
+        comportement: "Message éphémère P5.M9 sobre invitant à activer la permission depuis les paramètres système ; aucun blocage de la navigation"
+      - cas: "Connexion réseau indisponible"
+        comportement: "Bandeau P5.P3 signalant le mode hors-ligne ; pan/zoom limités à l'emprise des tuiles préchargées ; les Pins préchargés restent affichables. Le slider d'époque fonctionne sur le contenu local."
+      - cas: "Parcours en cours (P5.P2 visible) — pilotage automatique du slider par l'étape courante"
+        comportement: "L'utilisateur peut toujours manipuler manuellement le slider ; le pilotage automatique cesse temporairement au profit de la manipulation manuelle (cf. question ouverte D1.2 et C5)"
+
+    entites_impliquees: [Pin, Époque, "Couche cartographique"]
+    surfaces_et_modes: [P5.S1, P5.M1, P5.M9, P5.P3]
+    references_palier_3: [D1.1, D1.2, D1.3, D1.5]
+    invariants_respectes: [I7, I8, I9]
+
+    questions_ouvertes:
+      - "Priorité entre pilotage automatique du slider par un parcours en cours et manipulation manuelle (déjà signalée en C5 et D1.2) — à arbitrer collectivement"
+      - "Étendue exacte du mode hors-ligne pour le pan/zoom et le rechargement des Pins par Époque — devs Flutter (D1.1)"
+
+  # ---------------------------------------------------------------------------
+  - id: A4
+    nom: "Recherche et filtrage sur la carte"
+
+    declencheur: "Activation du point d'accès recherche depuis P5.S1 Carte"
+    acteurs: [utilisateur grand public]
+
+    deroule:
+      - etape: 1
+        action: "Une surface ponctuelle (P5.M6) s'ouvre par-dessus la Carte qui reste visible derrière (cf. D1.4 — la recherche vit SUR la carte)"
+        surfaces_actives: [P5.S1, P5.M6]
+      - etape: 2
+        action: "L'utilisateur saisit du texte libre et/ou ajuste les filtres : Époque, Catégorie, mot-clé"
+      - etape: 3
+        action: "Les résultats se mettent à jour dynamiquement (Pins correspondants), affichés en surimpression sur la Carte et/ou en liste (forme exacte palier 7)"
+
+    bifurcations:
+      - si: "L'utilisateur tape sur un résultat"
+        alors: "la Carte recadre sur le Pin et bascule vers B1 (Aperçu rapide d'un Pin) ; la surface ponctuelle se ferme"
+      - si: "L'utilisateur efface sa requête et ferme la recherche (geste de fermeture ou validation à vide)"
+        alors: "la surface ponctuelle se ferme (P5.N5 — annulation implicite gracieuse), Carte reprend son état antérieur"
+      - si: "L'utilisateur active un filtre Époque"
+        alors: "le filtre se combine au mot-clé ; le slider d'époque peut refléter l'Époque filtrée (à arbitrer palier 7)"
+
+    sorties_normales:
+      - "Sélection d'un résultat → B1 puis B2 selon l'utilisateur"
+      - "Fermeture de la recherche → retour à A3"
+
+    cas_particuliers:
+      - cas: "Aucun résultat pour la requête"
+        comportement: "Retour gracieux dans la surface (forme exacte palier 8 microcopy) ; suggestions d'élargissement éventuelles si pertinent"
+      - cas: "Connexion réseau indisponible"
+        comportement: "La recherche s'effectue sur le contenu téléchargé localement (cf. D1.4). Aucun blocage. Bandeau P5.P3 reste visible si pertinent."
+      - cas: "Mode présentation P5.M4 actif (Mme Martin en classe)"
+        comportement: "La recherche reste accessible mais la surface ponctuelle s'inscrit dans le chrome minimal du mode présentation (cf. P5.C2)"
+
+    entites_impliquees: [Pin, Époque, Catégorie, Parcours]
+    surfaces_et_modes: [P5.S1, P5.M6]
+    references_palier_3: [D1.4]
+    invariants_respectes: [I7]
+
+    questions_ouvertes:
+      - "Recherche couvre-t-elle aussi les Parcours (en plus des Pins) ? — recommandation D1.4 : oui, à articuler avec D3.2 et donc avec C1"
+      - "Suggestions / autocomplétion à la frappe — palier 16 perf"
+
+  # ---------------------------------------------------------------------------
+  - id: A5
+    nom: "Activation du mode Surprenez-moi"
+
+    declencheur: >-
+      Tap sur le sélecteur de mode notification depuis P5.S1 Carte ou
+      depuis P5.S3 Profil > Paramètres.
+    acteurs: [utilisateur grand public]
+
+    deroule:
+      - etape: 1
+        action: "L'utilisateur active explicitement la bascule vers Surprenez-moi (jamais activé silencieusement, cf. essence § ce_qu_on_refuse)"
+      - etape: 2
+        action: >-
+          La préférence Profil.mode_notification_proximité passe de
+          balade_libre à surprenez_moi (cluster 03). Aucune entité
+          dédiée n'est créée — c'est une préférence, pas un objet.
+      - etape: 3
+        action: >-
+          Si la permission notification système n'a pas encore été
+          demandée à ce Profil → bascule vers A6 (cible = notifications)
+          avant la confirmation. Si déjà accordée → activation directe.
+          Si déjà refusée → activation logique du mode mais signal
+          éphémère P5.M9 indiquant que les notifications en arrière-plan
+          ne fonctionneront pas tant que la permission n'est pas accordée
+          dans les paramètres système (cf. D4.2 — mode utilisable au
+          moins au premier plan).
+      - etape: 4
+        action: "Le mode reste actif d'une session à l'autre. À l'engagement d'un Parcours (C5 terrain), le mode 3 (D4.3) prend le relais ; à la fin du parcours, Surprenez-moi est restauré"
+
+    bifurcations:
+      - si: "Permission notification non encore demandée"
+        alors: "bascule vers A6 ; au retour, achèvement de l'activation (étape 4)"
+      - si: "L'utilisateur souhaite revenir à Balade libre depuis Surprenez-moi"
+        alors: "Profil.mode_notification_proximité repasse à balade_libre ; arrêt immédiat de la mécanique de proximité ; la permission système accordée n'est pas révoquée par l'app (cf. D4.1, D4.2)"
+      - si: "Un Parcours est engagé (P5.P2 visible)"
+        alors: "le mode 3 (D4.3) est actif ; A5 modifie la préférence courante mais l'effet visible attend la fin du parcours"
+
+    sorties_normales:
+      - "Surprenez-moi actif, persistant entre sessions"
+      - "Retour à Balade libre depuis le même sélecteur — mécanique coupée immédiatement"
+
+    cas_particuliers:
+      - cas: "Système en mode silencieux ou Ne pas déranger"
+        comportement: "L'activation est honorée mais les signaux sonores / vibrations sont supprimés conformément aux réglages système (cf. D4.2)"
+      - cas: "Activation depuis P5.S3 Paramètres alors qu'aucune session sur la Carte n'est en cours"
+        comportement: "Identique à activation depuis la Carte — la préférence est une donnée du Profil, pas de la session"
+
+    entites_impliquees: [Profil]
+    surfaces_et_modes: [P5.S1, P5.S3, P5.M9]
+    references_palier_3: [D4.2, D4.1]
+    invariants_respectes: [I6]
+
+    questions_ouvertes:
+      - "Refus de la permission notification système : mode utilisable au premier plan uniquement, ou désactivation logique complète ? — D4.2 question ouverte, à arbitrer"
+      - "Cooldown / fenêtre de re-notification d'un même Pin (D4.2) — à acter palier 16"
+
+  # ---------------------------------------------------------------------------
+  - id: A6
+    nom: "Demande de permission juste-à-temps"
+
+    declencheur: >-
+      Action utilisateur qui requiert une permission système non encore
+      accordée (géolocalisation, notifications, caméra, micro). Flow
+      TRANSVERSE référencé par A3 (géoloc), A5 (notifs), B5 (caméra
+      pour AR), C4/C5 (géoloc), E1/E2 (notifs), entre autres.
+    acteurs: [utilisateur grand public]
+
+    pre_requis_specifiques:
+      - "La fonctionnalité appelante a besoin d'une permission système précise (géolocalisation, notifications, caméra, micro)"
+      - "Profil.permissions_déjà_demandées indique l'état pour cette permission (jamais demandée / déjà demandée et accordée / déjà demandée et refusée)"
+
+    deroule:
+      cas_jamais_demandee:
+        - etape: 1
+          action: >-
+            L'app présente une explication fonctionnelle BRÈVE de
+            l'usage de la permission (forme = surface ponctuelle P5.M6
+            ou message contextuel selon arbitrage palier 7 ; microcopy
+            palier 8). Cette explication n'est pas une étape obligatoire
+            artificielle — l'utilisateur peut continuer directement.
+        - etape: 2
+          action: "L'app déclenche la demande système (gérée par l'OS, hors périmètre de l'app — cf. D5.5)"
+        - etape: 3
+          action: >-
+            L'utilisateur répond au prompt système (accorder / refuser).
+            Profil.permissions_déjà_demandées enregistre que la demande
+            a été ouverte pour cette permission (cf. cluster 03 — l'app
+            ne miroire pas l'état lui-même, l'autorité reste à l'OS).
+        - etape: 4
+          action: "Retour au flow appelant avec l'information accordée / refusée"
+
+      cas_deja_refusee:
+        - etape: 1
+          action: >-
+            L'app n'ouvre pas un nouveau prompt système (politique exacte
+            de re-sollicitation = question ouverte D5.5 et D4.3). Selon
+            l'OS, un nouveau prompt peut être impossible.
+        - etape: 2
+          action: >-
+            L'app propose discrètement d'orienter l'utilisateur vers les
+            paramètres système (forme palier 7), sans insistance et sans
+            culpabilisation.
+        - etape: 3
+          action: "Retour au flow appelant en mode dégradé selon la fonctionnalité (cf. cas_particuliers de chaque flow appelant)"
+
+    bifurcations:
+      - si: "Utilisateur accorde"
+        alors: "retour au flow appelant qui peut exécuter l'action attendue (recadrage géoloc, notif arrière-plan, ouverture caméra…)"
+      - si: "Utilisateur refuse"
+        alors: "retour au flow appelant en mode dégradé. Aucun blocage du reste de l'app ; aucun rappel insistant"
+      - si: "Utilisateur a déjà refusé et choisit d'aller dans les paramètres système"
+        alors: "le système de l'OS prend la main ; au retour de l'app, l'état est ré-évalué selon ce que l'utilisateur a fait dans les paramètres"
+
+    sorties_normales:
+      - "Permission accordée → flow appelant continue normalement"
+      - "Permission refusée → flow appelant continue en mode dégradé documenté (cas_particuliers de A3, A5, C4, C5, B5, E1, E2 selon le cas)"
+
+    cas_particuliers:
+      - cas: "Plusieurs permissions nécessaires pour une même action (rare — ex. parcours terrain qui veut géoloc + notifications)"
+        comportement: "Chaque permission est demandée SÉPARÉMENT (jamais en bloc, cf. D5.5). L'ordre est dicté par le flow appelant. L'utilisateur peut accepter l'une et refuser l'autre."
+      - cas: "OS susceptible de bloquer la re-demande d'une permission une fois refusée"
+        comportement: "L'app n'insiste pas — l'orientation vers les paramètres système est la seule voie. Particularités par OS documentées en palier 14."
+      - cas: "Permission révoquée en arrière-plan (l'utilisateur la coupe depuis les paramètres système entre deux sessions)"
+        comportement: "Au déclenchement suivant de la fonctionnalité, A6 est appelé à nouveau. Si l'OS bloque la re-demande, comportement identique au cas_deja_refusee."
+      - cas: "App lancée pour la première fois — A6 appelé immédiatement"
+        comportement: "Cas anormal sauf si Lien universel ou notification système (P5.E2 / P5.E3) — sinon A1 garantit aucune permission au lancement (cf. D5.1)"
+
+    entites_impliquees: [Profil]
+    surfaces_et_modes: [P5.M6, P5.M9]
+    references_palier_3: [D5.5, D1.1, D4.2, D4.3]
+    invariants_respectes: [I6]
+
+    questions_ouvertes:
+      - "Politique de re-sollicitation après refus (combien de temps avant qu'un nouveau prompt puisse être proposé en contexte) — D5.5 question ouverte, à arbitrer"
+      - "Explication fonctionnelle systématique avant chaque demande, ou réservée aux permissions sensibles (caméra, micro) ? — D5.5 question ouverte"
+
+# -----------------------------------------------------------------------------
+# Persona check
+# -----------------------------------------------------------------------------
+persona_check:
+
+  kenji:
+    impact: "MAJEUR"
+    note: >-
+      A1 répond directement à son test_litmus (premier lancement sans
+      tutoriel, sans français). A2 lui propose le micro-parcours
+      découverte qu'il acceptera ou non — sans pénalité dans les deux
+      cas. A3 lui permet d'appréhender Lyon par le slider et le pan
+      avant tout engagement. A6 sur la géoloc, déclenchée juste-à-temps
+      au premier 'Me localiser', honore son besoin de zéro friction au
+      lancement à l'hôtel.
+
+  mme_dupont:
+    impact: "direct"
+    note: >-
+      A1 + A2 lui permettent d'entrer dans l'app sans onboarding lourd
+      pour préparer sa sortie. A4 (recherche + filtres par catégorie et
+      époque) sert directement la préparation de son parcours — c'est
+      souvent par là qu'elle commence. Les parents accompagnateurs qui
+      reçoivent un Lien universel zappent A2 (cas particulier de A1) et
+      atterrissent directement sur le Parcours partagé via F5 / C3.
+
+  mme_martin:
+    impact: "direct"
+    note: >-
+      A1 garantit l'entrée propre dans l'app pour préparer son cours,
+      sans tutoriel imposé. A4 lui permet de filtrer rapidement par
+      époque et catégorie pour préparer un point précis du programme.
+      A3 + le slider sont au cœur de son scénario en classe (défilement
+      entre 3 époques) — A3 cas_particuliers couvre la cohabitation
+      avec le mode présentation P5.M4. A5 ne la concerne pas (elle
+      reste en Balade libre — silence garanti en classe).
+
+  pere_lyonnais:
+    impact: "MAJEUR"
+    note: >-
+      Persona-incarnation de A5 (Surprenez-moi). A1 + A6 garantissent
+      qu'il n'a aucune friction au lancement et que la permission de
+      notification ne lui est demandée qu'au moment où IL active
+      Surprenez-moi. La bifurcation 'retour à Balade libre depuis le
+      même sélecteur' (A5) répond exactement à son test_litmus
+      ('couper rapidement les notifs depuis l'écran principal'). A3
+      en mode flânerie sur la carte de son quartier (avec ou sans
+      Surprenez-moi) est sa surface principale d'usage.
+
+  anais_back_office:
+    impact: "indirect"
+    note: >-
+      Anaïs n'est pas utilisatrice de cette famille (elle opère sur le
+      back-office, palier 13). Indirectement, elle PRODUIT le contenu
+      des Pins exposés en A3 / A4, et le contenu poussé par A5
+      (Surprenez-moi) repose sur les coordonnées et le titre/teaser
+      qu'elle saisit. Aucun flow A1-A6 ne la concerne directement.

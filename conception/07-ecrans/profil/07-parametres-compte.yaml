@@ -1,0 +1,96 @@
+# =============================================================================
+# E-PROFIL-PARAMETRES-COMPTE — Paramètres de Compte
+# =============================================================================
+# Vue dédiée à la gestion d'un Compte rattaché (P5.S3 en P5.M3). Visible
+# uniquement quand Profil.compte_associé est présent. Inclut la
+# configuration de la synchronisation granulaire (D8), la déconnexion
+# (sous-cas de D9), la suppression de Compte (D9 — dialogue P5.M8
+# obligatoire). La tension I6 vs sauvegardes système OS est notée en
+# question ouverte (cf. cluster 03).
+# =============================================================================
+
+document:
+  type: palier_ecrans_fiche
+  format: yaml
+
+ecran:
+  id: E-PROFIL-PARAMETRES-COMPTE
+  nom: "Paramètres de Compte"
+
+  mode: P5.M3
+  surface_parente: P5.S3
+
+  raison_d_etre: >-
+    Réunit toutes les opérations sur le Compte rattaché : configurer la
+    synchronisation par catégorie de données (D8), se déconnecter de cet
+    appareil (sans toucher aux données cloud), supprimer le Compte
+    définitivement (D9). C'est aussi le seul endroit où l'utilisateur
+    peut consulter et modifier ses attributs publics (pseudonyme,
+    représentation graphique).
+
+  composition:
+    - zone: "récapitulatif Compte"
+      role: "affiche pseudonyme, représentation graphique, email d'authentification (lecture seule sauf édition explicite — cf. modification du pseudonyme, question ouverte cluster 03), date de création"
+      entites_affichees: [Compte]
+
+    - zone: "rubrique modification du pseudonyme et de la représentation graphique"
+      role: "permet d'éditer ces attributs ; politique exacte (libre / délai / unique) en arbitrage ; impact sur les contributions déjà publiées à arbitrer"
+      entites_affichees: [Compte]
+
+    - zone: "rubrique synchronisation"
+      role: "expose la granularité_synchronisation par catégorie (favoris, parcours_personnels_créés, historique, préférences) — toutes désactivées par défaut, même après création de Compte ; déclenche le flow D8 à l'activation"
+      entites_affichees: [Profil, Compte, Favori, "Historique de visite", Parcours]
+
+    - zone: "rubrique déconnexion"
+      role: "permet de se déconnecter de cet appareil sans supprimer le Compte côté serveur ; vide Profil.compte_associé localement, conserve les données locales et les données cloud (cf. D9 sortie alternative — sous-cas de D9)"
+      entites_affichees: [Profil, Compte]
+
+    - zone: "rubrique suppression de Compte"
+      role: "déclenche le flow D9 — dialogue P5.M8 obligatoire ; supprime le Compte côté serveur, retire le rattachement local ; les contributions communautaires sont conservées avec pseudonyme remplacé par mention neutre (cluster 03)"
+      entites_affichees: [Compte]
+
+    - zone: "rubrique date de dernière connexion"
+      role: "informe de la dernière session enregistrée (sécurité — alerte changement d'appareil) ; détail palier 16"
+      entites_affichees: [Compte]
+
+  etats:
+    nominal_charge: "Vue chargée, Compte actif, toutes les rubriques opérationnelles"
+    chargement: "Lecture des informations Compte côté serveur (rare ; les attributs principaux sont mis en cache local)"
+    sync_aucune_categorie_active: "Granularité_synchronisation entièrement désactivée (état par défaut après création/connexion) ; rubrique sync présente mais aucune catégorie n'est synchronisée"
+    sync_partielle_active: "Une ou plusieurs catégories actives ; chaque catégorie peut être en état 'à jour', 'en cours', 'en attente de connexion' (palier 7)"
+    sync_historique_consentement_demande: "Activation de la catégorie 'historique' déclenche un dialogue P5.M8 dédié (D8 bifurcation — sensibilité particulière ; cluster 03 invariant : historique jamais cloud sans consentement spécifique au-delà de la sync générale)"
+    deconnexion_en_cours: "Échange serveur léger pour notifier la déconnexion (selon politique sécu) ; à l'aboutissement, retour à E-PROFIL-PRINCIPAL en état 'sans Compte'"
+    suppression_dialogue_ouvert: "Dialogue P5.M8 de suppression actif (E-TRANSVERSES-DIALOGUE-CONFIRMATION) ; saisie de secret recommandée (D9, à acter sécu)"
+    suppression_en_cours: "Échange serveur de suppression en cours ; non interruptible sans risque ; idempotent (palier 16 — cf. D9 cas particulier perte de connexion)"
+    suppression_succes: "Compte supprimé côté serveur, rattachement local retiré ; sync neutralisée ; retour à E-PROFIL-PRINCIPAL en état 'sans Compte'"
+    compte_suspendu: "Compte en état 'suspendu' côté serveur (cluster 03) ; les rubriques sync et modification sont en lecture seule ou désactivées ; un message explique la suspension (palier 8)"
+    offline_sans_action_serveur: "Lecture des informations cachées localement possible ; les opérations qui exigent réseau (D8 sync initiale, déconnexion serveur, suppression) signalent l'indisponibilité ; bandeau E-TRANSVERSES-BANDEAU-OFFLINE visible"
+    offline_avec_action_serveur_en_attente: "Cas spécifique : effacement d'historique propagé en attente de connexion (cf. D4 cas particulier) ou désactivation de catégorie sync en attente — un indicateur signale les opérations en attente"
+    erreur_serveur: "Échec d'une opération distante ; message gracieux ; possibilité de retenter sans risque (palier 16 — opérations idempotentes)"
+
+  elements_interactifs:
+    - "Tap sur Modifier pseudonyme / représentation graphique → surface ponctuelle P5.M6 d'édition"
+    - "Activation / désactivation d'une catégorie de sync → flow D8 ; activation 'historique' déclenche dialogue P5.M8 dédié"
+    - "Désactivation d'une catégorie déjà active → dialogue P5.M8 proposant 'conserver côté cloud' / 'effacer côté cloud' (D8 bifurcation)"
+    - "Tap sur Déconnexion → confirmation légère (à confirmer palier 7) puis échange serveur ; vide Profil.compte_associé local sans toucher au cloud (D9 sortie alternative)"
+    - "Tap sur Supprimer le Compte → flow D9 → E-TRANSVERSES-DIALOGUE-CONFIRMATION ; saisie de secret recommandée à la confirmation (palier 16)"
+    - "Retour vers E-PROFIL-PARAMETRES ou E-PROFIL-PRINCIPAL"
+
+  flows_actifs:
+    - D8   # Configuration de la synchronisation cloud
+    - D9   # Suppression d'un Compte (et sous-cas Déconnexion)
+
+  surfaces_imbriquees:
+    - E-TRANSVERSES-DIALOGUE-CONFIRMATION   # M8 pour D8 (catégorie historique, désactivation), D9 (suppression), Déconnexion (à confirmer palier 7)
+    - E-TRANSVERSES-MESSAGE-EPHEMERE        # confirmations sync, déconnexion, suppression
+    - E-TRANSVERSES-BANDEAU-OFFLINE
+
+  entites_affichees: [Profil, Compte, Favori, "Historique de visite", Parcours]
+
+  questions_ouvertes:
+    - "Modification du pseudonyme : libre / avec délai / unique (cluster 03 et palier 7) ? Impact sur les contributions déjà publiées (pseudonyme historique conservé en crédit ou propagé) ?"
+    - "Délai et procédure exacts de la suppression effective côté serveur (rétention résiduelle, mention neutre dans les contributions conservées) — cluster 03 D6.5 et palier 16"
+    - "Saisie d'un secret d'authentification AU MOMENT de la suppression — recommandation oui pour action sensible (D9), à acter sécu"
+    - "Tension I6 vs sauvegardes système OS : un Profil restauré sans Compte est cohérent avec le contrat ; mais si l'app détecte qu'un Compte de même email a été récemment supprimé, faut-il alerter ? Recommandation D9 : non, chaque appareil est indépendant"
+    - "Déconnexion : confirmation légère via dialogue P5.M8 ou simple message éphémère P5.M9 — cohérence avec les autres actions sensibles ; recommandation : confirmation légère car action réversible (re-connexion)"
+    - "Catégories exactes de sync (D8 question ouverte) ; granularité du consentement spécifique à l'historique (drapeau dédié) — cluster 03 cohérence_inter_entites"

@@ -1,0 +1,82 @@
+# =============================================================================
+# E-PARCOURS-FIN-CELEBRATION — Célébration de fin de parcours
+# =============================================================================
+# Surface dédiée (P5.M3) à la complétion d'un Parcours. Présente un
+# récapitulatif honnête (étapes complétées vs sautées sans culpabiliser),
+# une conclusion narrative (éditoriaux), et propose la génération d'une Image
+# partageable (F3 — bascule vers E-PARTAGE-FIN-PARCOURS-IMAGE) ainsi que la
+# rédaction d'un Retour si Parcours communautaire (G6).
+# =============================================================================
+
+document:
+  type: palier_ecrans_fiche
+  format: yaml
+
+ecran:
+  id: E-PARCOURS-FIN-CELEBRATION
+  nom: "Célébration de fin de parcours"
+
+  mode: P5.M3
+  surface_parente: P5.S2
+
+  raison_d_etre: >-
+    Marquer la complétion d'un Parcours par un moment dédié — pas un
+    simple message de fin. Affiche un récapitulatif honnête de ce qui
+    a été vécu (étapes complétées, étapes sautées le cas échéant, durée
+    écoulée, époques traversées), une conclusion narrative quand le
+    Parcours en porte une (éditoriaux), et propose les actions de fin
+    (image partageable, retour, retour à la surface Parcours).
+    L'expérience reste pleine même en cas de complétion partielle.
+
+  composition:
+    - zone: "ouverture de célébration"
+      role: "image atmosphérique, titre du Parcours complété, mention 'parcours achevé' (ou 'partiellement complété' si étapes sautées)"
+      entites_affichees: [Parcours]
+
+    - zone: "conclusion narrative"
+      role: "présent uniquement pour les Parcours éditoriaux qui portent une conclusion_narrative (cluster 02) ; phrase de clôture rédigée par l'auteur"
+      entites_affichees: [Parcours]
+
+    - zone: "récapitulatif honnête"
+      role: "nombre d'étapes complétées vs sautées (mention sans culpabiliser ni minimiser, cf. cas particulier C9), durée écoulée totale, époques traversées, badges éventuellement décernés (à confirmer cf. cluster 02 question ouverte sur quiz et badges de complétion)"
+      entites_affichees: [Étape, Époque, Badge, "Historique de visite"]
+
+    - zone: "actions de fin"
+      role: "regroupe la génération d'une Image partageable (F3 → E-PARTAGE-FIN-PARCOURS-IMAGE), la rédaction d'un Retour (G6) si éligible, le partage classique du Parcours (Lien universel, F2), le retour à la surface Parcours"
+
+  etats:
+    nominal_complete: "Toutes les étapes sont complétées ; récapitulatif positif, conclusion narrative affichée si présente"
+    nominal_partiel: "Au moins une étape sautée ; le récapitulatif mentionne explicitement les étapes sautées sans culpabiliser ; la célébration reste pleine (cf. cas particulier C9)"
+    parcours_retire_entre_temps: "Le Parcours communautaire a été dépublié pendant que l'utilisateur le vivait ; la célébration a quand même lieu (l'expérience vécue compte) ; un message éphémère P5.M9 signale que le parcours n'est plus disponible publiquement ; la rédaction d'un Retour est désactivée"
+    parcours_communautaire_retour_eligible: "Parcours communautaire dont l'auteur a activé les retours_actifs et l'utilisateur n'est pas l'auteur ; l'action 'rédiger un retour' est mise en avant"
+    parcours_personnel_ou_editorial: "Pas de retour à rédiger ; l'action correspondante est absente"
+    chargement_image_partageable: "L'utilisateur a tapé partager image ; génération en cours ; à la fin, bascule vers E-PARTAGE-FIN-PARCOURS-IMAGE"
+    offline_avec_cache: "Réseau indisponible ; récapitulatif local pleinement disponible ; image partageable peut être générée localement, son partage effectif sera mis en attente ; bandeau P3 visible"
+    offline_sans_image: "Réseau indisponible et certaines ressources visuelles non préchargées ; l'image partageable est dégradée ou différée"
+    re_consultation: "Le Parcours a été complété précédemment et l'utilisateur revient sur la célébration depuis l'Historique (cf. note inventaire E-PARTAGE-FIN-PARCOURS-IMAGE — re-génération depuis l'historique) ; affichage du récapitulatif de la complétion concernée"
+
+  elements_interactifs:
+    - "Tap génération image partageable → flow F3, bascule vers E-PARTAGE-FIN-PARCOURS-IMAGE"
+    - "Tap rédaction de retour (Parcours communautaire éligible) → flow G6, bascule vers E-COMMUNAUTE-REDACTION-RETOUR-PARCOURS"
+    - "Tap partage du Parcours (Lien universel ou Code visuel) → flow F2, bascule vers E-PARTAGE-CODE-VISUEL ou partage natif système"
+    - "Tap fermer / retour → ramène à E-PARCOURS-PRINCIPAL, vue 'Mes parcours' positionnée sur le parcours complété ; P5.P2 a déjà disparu (cf. C9 étape 4)"
+    - "Tap sur une étape du récapitulatif → ouverture E-PIN-CONSULTATION-APPROFONDIE (B2) sur le Pin de l'étape (re-consultation hors contexte parcours)"
+
+  flows_actifs:
+    - C9   # Fin de parcours et célébration
+    - F3   # Partage d'une fin de parcours (image partageable)
+
+  surfaces_imbriquees:
+    - E-PARTAGE-FIN-PARCOURS-IMAGE         # M3 image partageable de fin
+    - E-COMMUNAUTE-REDACTION-RETOUR-PARCOURS # M6 si rédaction d'un retour
+    - E-PARTAGE-CODE-VISUEL                # M6 si partage par Code visuel
+    - E-PIN-CONSULTATION-APPROFONDIE       # M3 si re-consultation d'une étape
+    - E-TRANSVERSES-MESSAGE-EPHEMERE       # M9 récurrent (parcours retiré, etc.)
+    - E-TRANSVERSES-AUDIO-PERSISTANT       # P1 si audio en cours
+    - E-TRANSVERSES-BANDEAU-OFFLINE        # P3 si offline
+
+  questions_ouvertes:
+    - "Quiz et badges décernés à la complétion (cf. D3.9 et cluster 02 question ouverte) : intégrés dans cette surface ou différés plus tard ? Pour l'instant on prévoit la zone récapitulatif d'accueillir un éventuel badge décerné, sans plus"
+    - "Re-consultation de la célébration depuis l'Historique : génération d'une nouvelle Image partageable autorisée à chaque fois, ou unique ? — cf. cluster 06 distribution"
+    - "Tonalité de la mention 'partiellement complété' : palier 8 microcopy. Le principe non négociable est l'absence de culpabilisation"
+    - "Réservation d'un slot 'message conteur de clôture' qui s'affiche aussi pour communautaire et personnel sans conclusion_narrative formelle, ou laisser ces deux cas sans message de clôture ? — palier 8"

@@ -1,0 +1,445 @@
+# =============================================================================
+# Palier 9 — Cartographie — INDEX
+# =============================================================================
+# Le palier 9 livre la GRAMMAIRE VISUELLE SYSTÉMIQUE de la carte. Pas un
+# catalogue de couleurs (palier 12). Pas un catalogue d'icônes (palier 13).
+# Pas un composant Pin (palier 10). Pas une transition d'époque (palier 11).
+# Pas un seuil de zoom chiffré (palier 16).
+#
+# La grammaire — c'est-à-dire le CHOIX qu'une dimension fonctionnelle
+# manipulée par la cartographie s'exprime dans tel registre visuel
+# (couleur, forme, contour, opacité, badge, icône, modulation paramétrique
+# du fond carte). Sans ce palier, les paliers 10/11/12/13 prendraient
+# chacun leur décision d'allocation des registres en silo, et le système
+# perdrait sa cohérence.
+#
+# Conséquence directe : ce palier est plus court qu'un catalogue
+# exhaustif. Sa rigueur se mesure à la pureté du périmètre, pas à la
+# quantité produite (cf. design/conception/intention.yaml § 5.7).
+# =============================================================================
+
+document:
+  type: palier_cartographie_index
+  numero: 9
+  version: "0.1"
+  date: "2026-05-06"
+  audience:
+    - "Tout agent qui rédige les fichiers de contenu 01-04"
+    - "Toute relecture ultérieure"
+    - "Auteurs des paliers 10, 11, 12, 13, 16 — pour récupérer la grammaire et la traduire dans leur niveau"
+  role: >-
+    Index et cadre commun du palier 9. Pose le rôle (grammaire visuelle
+    systémique), l'anti-périmètre strict (par palier aval), le découpage
+    en 4 fichiers de contenu, le format souple des fiches, l'articulation
+    avec les paliers en aval, le persona check global, et trace les
+    décisions structurelles déjà prises (§ 7).
+  format: yaml
+  prerequis_de_lecture:
+    - "design/conception/intention.yaml — § 5.7 separation_des_responsabilites_entre_paliers"
+    - "design/conception/01-essence.yaml — métaphore racine (livre vivant), triptyque sérendipité/historicité/émerveillement"
+    - "design/conception/02-personas.yaml — test_litmus de chaque persona qui touche la carte"
+    - "design/conception/03-fonctionnalites/01-carte-exploration-temporelle.yaml — D1.1 à D1.5"
+    - "design/conception/03-fonctionnalites/02-pins-et-contenu.yaml — D2.1 à D2.3 (pins, catégorisation, multi-époques)"
+    - "design/conception/04-donnees/00-index.yaml — invariants I3 (vérification), I7 (catalogues ouverts), I8 (multi-époques), I9 (sans localisation)"
+    - "design/conception/04-donnees/01-contenu.yaml — entités Pin, Catégorie, Époque, Couche cartographique, Badge"
+    - "design/conception/05-architecture-info.yaml — modes (M2 aperçu, M3 approfondi, M4 présentation, M7 alerte), surfaces persistantes (P1 audio, P2 parcours, P3 bandeau)"
+
+# -----------------------------------------------------------------------------
+# 1. Rôle du palier 9 — grammaire visuelle systémique
+# -----------------------------------------------------------------------------
+role:
+
+  ce_qu_il_livre:
+    grammaire_visuelle_systemique: >-
+      Pour CHAQUE dimension fonctionnelle manipulée par la cartographie
+      (provenance, multi-époques, statut de vérification, contexte de
+      parcours, déjà visité, époque, catégorie, densité…), le palier 9
+      DÉCIDE dans QUEL REGISTRE VISUEL elle s'exprime — couleur, forme,
+      contour, opacité, badge, icône, modulation paramétrique du fond
+      carte. Pas la valeur. Pas l'icône concrète. Pas la durée de
+      transition. Pas le composant. Le CHOIX D'ALLOCATION du registre.
+
+  cinq_axes_irreductibles:
+    - "Axes paramétriques de transformation continue de la carte — les filtres par Époque comme fonction de la position du slider (température, saturation, grain, vignettage, contraste). Aucun autre palier ne porte ce genre de fonction."
+    - "Mapping registre visuel ↔ dimension fonctionnelle — provenance → couleur du pin et du tracé ; multi-époques → forme empilée ; statut de vérification → contour ; catégorie → icône."
+    - "Variantes contextuelles des Pins — modulations par état (normal baseline, pin du Parcours actif, étape courante, hors-parcours, déjà visité, sans localisation). Le palier 9 dit QUELS axes modulent (opacité ? désaturation ? mise en relief ?), pas avec quelles valeurs."
+    - "Règles de cohabitation visuelle — quand fond carte filtré, couches d'archives, pins, tracé, alertes ponctuelles et bandeaux persistants peuvent se superposer, qui prime sur quoi en lisibilité."
+    - "Règles de densité et clustering qualifiées — à quel niveau de zoom on regroupe, quelles informations le cluster hérite (couleur de provenance, forme empilée si hétérogénéité temporelle)."
+
+  pourquoi_un_palier_dedie: >-
+    La cartographie est le CŒUR VISUEL d'HistoLyon (essence § promesse
+    « livre d'histoire vivant »). La grammaire visuelle systémique
+    mérite un endroit dédié pour qu'aucun palier aval ne décide à la
+    place du système : si le palier 10 décidait seul que la provenance
+    se voit par badge plutôt que par couleur, le système perdrait sa
+    cohérence. Le palier 9 est la PARTITION ; les paliers 10-13 sont
+    les instruments.
+
+# -----------------------------------------------------------------------------
+# 2. Anti-périmètre strict (par palier aval)
+# -----------------------------------------------------------------------------
+# Liste explicite de ce que le palier 9 NE FAIT PAS, par palier aval. Cette
+# section est lue avant la rédaction de chaque fichier de contenu.
+anti_perimetre_strict:
+
+  - palier_aval: 10
+    nom: composants
+    pas_au_palier_9:
+      - "Spécification du composant Pin (forme exacte, anatomie, slots)"
+      - "Spécification du composant Carte (zoom, pan, recadrage)"
+      - "Spécification du composant Tracé"
+      - "Spécification du composant Cluster"
+      - "Spécification du composant Slider d'époque"
+    reformulations_attendues:
+      - "AU LIEU DE 'le pin est un teardrop avec icône au centre' → DIRE 'la catégorie d'un pin se voit par une icône intégrée à la forme du pin'"
+      - "AU LIEU DE 'le cluster a un badge avec un compteur 5+' → DIRE 'le cluster porte une indication numérique de la quantité regroupée'"
+
+  - palier_aval: 11
+    nom: interactions_et_motion
+    pas_au_palier_9:
+      - "Durées précises des transitions entre Époques"
+      - "Courbes d'easing"
+      - "Animations de calage (snap), de scale-in des pins, de pulsation"
+      - "Vibrations haptiques"
+    reformulations_attendues:
+      - "AU LIEU DE 'transition en 250ms avec spring curve' → DIRE 'transition perçue comme continue ; durée et courbe au palier 11'"
+      - "AU LIEU DE 'pulsation de l'étape courante toutes les 1.5s' → DIRE 'l'étape courante est mise en relief de manière vivante ; comportement précis au palier 11'"
+
+  - palier_aval: 12
+    nom: tokens
+    pas_au_palier_9:
+      - "Valeurs hexadécimales des couleurs de provenance"
+      - "Valeurs hexadécimales des accents par Époque"
+      - "Valeurs chiffrées d'opacité, de désaturation, de teinte aux marqueurs Époque"
+      - "Tailles des pins, des badges, des contours"
+    reformulations_attendues:
+      - "AU LIEU DE 'or éditorial #C9901A, gris communautaire #7A6555' → DIRE 'la provenance se voit par deux teintes contrastées du pin, une chaude pour éditorial, une neutre pour communautaire ; valeurs au palier 12'"
+      - "AU LIEU DE 'pin hors-parcours à 35% d'opacité' → DIRE 'pin hors-parcours visuellement atténué ; valeur au palier 12'"
+
+  - palier_aval: 13
+    nom: icones
+    pas_au_palier_9:
+      - "Mapping Catégorie → icône concrète (ex. landmark, sparkles, archway)"
+      - "Choix des icônes secondaires (signe immersif si retenu, badge institutionnel)"
+      - "Style graphique des icônes (Lucide, monoline, etc.)"
+    reformulations_attendues:
+      - "AU LIEU DE 'la catégorie Classique utilise l'icône landmark de Lucide' → DIRE 'chaque catégorie se voit par une icône distinctive ; mapping concret au palier 13'"
+
+  - palier_aval: 16
+    nom: validation
+    pas_au_palier_9:
+      - "Niveau de zoom chiffré de bascule en clustering"
+      - "Densité chiffrée à partir de laquelle on regroupe"
+      - "Contrastes a11y chiffrés (ratio WCAG)"
+      - "Tests de daltonisme avec valeurs"
+    reformulations_attendues:
+      - "AU LIEU DE 'clustering à partir de zoom 14 et densité ≥ 8 pins par 100px²' → DIRE 'clustering activé au-delà d'une densité élevée ; seuils au palier 16'"
+
+test_de_purete: |
+  Pour chaque décision : si on remplace toutes les couleurs par des
+  nuances de gris ET qu'on remplace toutes les icônes par des formes
+  abstraites distinctes, est-ce que la grammaire reste valide ?
+  Si oui : palier 9. Si non : la décision a glissé vers 12 ou 13.
+
+  Ou plus simplement : si demain on bascule de Mapbox à MapLibre ou
+  à un moteur 3D, le palier 9 reste-t-il intact ? Si oui, c'est bon.
+
+# -----------------------------------------------------------------------------
+# 3. Découpage en 4 fichiers de contenu
+# -----------------------------------------------------------------------------
+fichiers:
+
+  - id: 01
+    nom: "Fond de carte et Époques"
+    fichier: "01-fond-et-epoques.yaml"
+    role: >-
+      Système d'apparence du fond carte comme FONCTION CONTINUE de la
+      position du slider d'Époque. Axes paramétriques (température,
+      saturation, grain, vignettage, contraste) avec ancres aux
+      marqueurs Époque. Cohabitation avec les Couches cartographiques
+      d'archives (D1.5). Comportement au calage (snap) et hors geste.
+      Invariants de lisibilité prioritaires sur l'effet stylistique.
+
+  - id: 02
+    nom: "Pins"
+    fichier: "02-pins.yaml"
+    role: >-
+      Mapping registre visuel ↔ dimension fonctionnelle pour les Pins :
+      catégorie via icône, provenance via couleur, multi-époques via
+      forme empilée, statut de vérification via contour, contenu
+      immersif sans signe distinctif (sobriété actée). Variantes
+      contextuelles : hors-parcours, déjà visité, étape courante,
+      pin sans localisation (invisible carte mais accessible recherche).
+
+  - id: 03
+    nom: "Tracés de Parcours"
+    fichier: "03-parcours-traces.yaml"
+    role: >-
+      Mapping pour les tracés : couleur de provenance (cohérent avec
+      le pin), distinction segments parcourus / à parcourir, étape
+      courante en relief, signal visuel de déviation, numérotation
+      des Étapes, mode terrain (tracé visible) vs mode canapé. Règle
+      d'unicité : un seul tracé actif à la fois (cohérent P5.P2).
+
+  - id: 04
+    nom: "Densité et zoom"
+    fichier: "04-densite-zoom.yaml"
+    role: >-
+      Règles qualifiées : niveaux de zoom (très large, intermédiaire,
+      proche), déclenchement du clustering, héritage des registres
+      visuels (couleur de provenance dominante, forme empilée si
+      hétérogénéité temporelle), comportement au tap d'un cluster
+      (zoom avant), lisibilité quand l'Époque concentre les Pins.
+
+# -----------------------------------------------------------------------------
+# 4. Format souple des fiches
+# -----------------------------------------------------------------------------
+format_des_fiches:
+
+  principe: >-
+    Pas de template uniforme imposé. Chaque fichier adopte la structure
+    naturelle de son objet — paramétrique pour 01, mappings pour 02 et
+    03, règles qualifiées pour 04. Une charpente d'esprit commune relie
+    les 4 fichiers.
+
+  charpente_d_esprit_commune:
+    - "raison_d_etre — pourquoi la décision sert le triptyque essence"
+    - "decisions — mappings, règles, axes (qualifiés, jamais chiffrés)"
+    - "variantes_contextuelles — modulations selon l'état fonctionnel"
+    - "anti_perimetre — ce que la décision NE dit PAS, et où ça va"
+    - "enjeux_transversaux — a11y, perf, vie privée, i18n quand pertinent"
+    - "questions_ouvertes — non-bloquantes, à acter en aval ou avec lead/historienne/équipe"
+    - "dependances — autres composantes du palier 9 qui doivent rester cohérentes"
+
+  pas_de_definition_of_done_chiffre: >-
+    Cohérence avec la leçon palier 3 v1.0. Le DoD du palier 9, s'il
+    apparaît, est strictement fonctionnel (« le système est cohérent
+    avec le test de pureté ») ; les seuils et mesures vont au palier
+    16.
+
+  vocabulaire_a_eviter:
+    - "hex, RGB, rgba, # suivi d'un code couleur"
+    - "px, pt, ms, fps, % avec valeur"
+    - "noms de composants UI (BottomSheet, Pin component, FAB, TabBar)"
+    - "noms d'icônes concrètes (landmark, sparkles, etc. — palier 13)"
+    - "valeurs absolues d'opacité, de désaturation, de saturation, de contraste"
+
+  vocabulaire_admis:
+    - "qualifié : « teinte chaude », « atténué », « en relief », « contraste accentué »"
+    - "fonctionnel : « registre visuel », « ancre », « marqueur », « modulation »"
+    - "directionnel : « plus chaud que », « moins saturé que », « priorité d'affichage supérieure »"
+
+# -----------------------------------------------------------------------------
+# 5. Articulation avec les paliers en aval
+# -----------------------------------------------------------------------------
+articulation_paliers_aval:
+
+  - palier: 4
+    nom: donnees_et_contrats
+    transmission: >-
+      AUCUNE modification du palier 4. Le palier 9 utilise les entités
+      existantes (Pin, Catégorie, Époque, Couche cartographique, Badge,
+      Modèle 3D, Parcours, Étape) et leurs invariants (I3, I7, I8, I9,
+      I10) tels quels. Si une tension émerge en cours de rédaction,
+      remontée explicite ici en question_ouverte.
+
+  - palier: 7
+    nom: ecrans
+    transmission: >-
+      AUCUNE modification du palier 7. Le palier 9 fournit la grammaire
+      qui précise les états visuels mentionnés dans les écrans
+      cartographiques (E-CARTE-PRINCIPALE, E-CARTE-APERCU-PIN,
+      E-CARTE-FILTRES-COUCHES, E-CARTE-ALERTE-PROXIMITE) — notamment
+      les états offline_avec_cache, parcours_en_cours,
+      mode_presentation_active, premier_lancement. Les écrans
+      assemblent ; le palier 9 colore.
+
+  - palier: 10
+    nom: composants
+    transmission: >-
+      Le palier 10 prend les mappings du palier 9 et les RÉIFIE en
+      composants UI nommés (Pin, Tracé, Carte, Cluster, Slider
+      d'Époque). Le palier 10 décide la forme exacte du pin
+      (teardrop ou autre), le slot d'icône, l'ancrage du badge,
+      les variants de composant. Les valeurs précises viennent du
+      palier 12.
+
+  - palier: 11
+    nom: interactions_et_motion
+    transmission: >-
+      Le palier 11 chorégraphie les transitions qualifiées par le
+      palier 9 — interpolation continue des axes paramétriques
+      pendant le geste du slider, calage à la fin du geste,
+      apparition/disparition des pins, mise en relief de l'étape
+      courante. Le palier 11 fixe les durées, courbes, vibrations.
+
+  - palier: 12
+    nom: tokens
+    transmission: >-
+      Le palier 12 fixe les VALEURS du palier 9 : couleurs de
+      provenance, valeurs aux marqueurs Époque pour chaque axe
+      paramétrique, valeurs des opacités/désaturations contextuelles,
+      valeur du contour de vérification, valeurs des contrastes a11y.
+
+  - palier: 13
+    nom: icones
+    transmission: >-
+      Le palier 13 fixe le mapping Catégorie → icône concrète, le
+      style graphique (Lucide ou autre), les icônes des badges, et
+      le signe immersif s'il est réintroduit en palier 16.
+
+  - palier: 16
+    nom: validation
+    transmission: >-
+      Le palier 16 valide les SEUILS chiffrés du palier 9 : niveaux
+      de zoom de bascule en clustering, densité de regroupement,
+      contrastes a11y aux ancres ET aux interpolations, tests de
+      daltonisme. Le palier 16 valide aussi les choix sémantiques
+      (la marque de vérification se distingue-t-elle suffisamment
+      des autres modulations ?).
+
+# -----------------------------------------------------------------------------
+# 6. Persona check global du palier 9
+# -----------------------------------------------------------------------------
+# Repère résumé. Chaque fichier de contenu (01-04) précisera son persona
+# check en propre selon ses décisions.
+persona_check_global:
+
+  kenji:
+    impact: "élevé"
+    note: >-
+      La grammaire visuelle de la carte est sa surface principale en
+      marche. Test_litmus : 'comprendre l'app sans tutoriel, en
+      japonais' — la lisibilité des registres (couleur provenance,
+      forme empilée multi-époque, icône catégorie) doit être
+      auto-explicite. Test_litmus : 'vivre 80% de l'expérience sans
+      regarder l'écran' — la carte n'est pas la cible principale en
+      marche, c'est l'audio (palier 7 surface persistante P1).
+
+  mme_dupont:
+    impact: "moyen"
+    note: >-
+      Touche le palier 9 surtout via les tracés de Parcours
+      (préparation et exécution sortie scolaire). La distinction
+      provenance via couleur du tracé l'aide à reconnaître ses
+      propres parcours communautaires partagés aux parents
+      accompagnateurs. Le mode terrain doit rester lisible avec
+      28 enfants à surveiller (densité oculaire faible disponible).
+
+  mme_martin:
+    impact: "MAJEUR"
+    note: >-
+      Test_litmus : 'projection au tableau, lisibilité depuis le
+      fond de la classe' — c'est le test le plus exigeant du palier 9.
+      Les axes paramétriques par Époque (sépia / N&B / Kodachrome)
+      doivent rester contrastés aux interpolations comme aux ancres.
+      Le mode présentation (M4) implique que les pins et leurs
+      modulations restent lisibles sans chrome. Test_litmus :
+      'défilement entre 3 époques en 30 secondes' — la fonction
+      paramétrique continue est conçue exactement pour ça.
+
+  pere_lyonnais:
+    impact: "élevé"
+    note: >-
+      Sa surface principale en flânerie. Test_litmus : 'recevoir
+      une anecdote au bon moment' — l'alerte de proximité
+      (E-CARTE-ALERTE-PROXIMITE) doit cohabiter visuellement avec
+      la carte sans bloquer (règle de cohabitation visuelle).
+      Test_litmus : 'reconnaître à l'œil l'époque' — le filtre
+      paramétrique du fond doit être assez expressif pour signaler
+      l'époque sans qu'il faille lire l'année.
+
+  anais_back_office:
+    impact: "indirect"
+    note: >-
+      Anaïs n'utilise pas la carte au sens grand public, mais sa
+      production passe par les Catégories (icône distinctive
+      requise au palier 13), les Époques (axes paramétriques
+      visibles en prévisualisation côté outil de saisie), et la
+      provenance qui détermine la couleur du pin sur la carte
+      grand public. Sa frustration 'pas de prévisualisation'
+      (cf. persona) reste un drapeau rouge palier 13 admin.
+
+# -----------------------------------------------------------------------------
+# 7. Décisions structurelles prises
+# -----------------------------------------------------------------------------
+# Décisions actées en discussion utilisateur 2026-05-05/06 avant rédaction
+# des fichiers de contenu. Servent de pivot aux 4 fichiers et au relecture.
+decisions_structurelles_prises:
+
+  posture_methodologique: >-
+    Méthode allégée façon palier 5 (pas de production parallèle car le
+    palier 9 est un système interconnecté, pas un inventaire). Posture
+    'B resserrée' : le palier 9 contient UNIQUEMENT
+    la grammaire visuelle systémique, pas les valeurs ni les
+    composants ni les transitions ni les icônes concrètes.
+
+  posture_da_charte: >-
+    La charte DA du brief produit d'origine est MATIÈRE PREMIÈRE INSPIRANTE — pas vérité. Elle propose des
+    structures parfois cohérentes (axes paramétriques par Époque,
+    forme distinctive multi-époques, badge cluster numéroté) qu'on
+    retraite avec esprit critique. Elle propose aussi des valeurs
+    précises (hex, sizes) qui sortent du palier 9 — elles sont
+    IGNORÉES ici et reviendront au palier 12 sous forme de tokens
+    issus des mappings du palier 9.
+
+  decisions_actees:
+    - id: D1
+      decision: "Catégories signalées par ICÔNE uniquement, pas par couleur"
+      pourquoi: "Sobriété — la carte est déjà chargée. La couleur du pin est réservée à la provenance, registre fonctionnel plus important. Mapping Catégorie → icône concrète au palier 13."
+      impact: "Fichier 02-pins. Palier 13 (icônes). Charte DA archives § 11 catégories ignorée pour les couleurs, retenue pour l'idée d'icônes distinctives."
+
+    - id: D2
+      decision: "Renommage de la catégorie 'Personne / Célébrité' en 'Personne'"
+      pourquoi: "Inclusivité — un canut anonyme, une lavandière, un compagnon de route méritent la même catégorie qu'une figure illustre. La sémantique 'singularité d'une vie' fonctionne pour tous."
+      impact: "Répercuté en amont 2026-05-06 : design/conception/03-fonctionnalites/02-pins-et-contenu.yaml D2.2, design/livrables-academiques/03-fonctionnalites.md."
+
+    - id: D3
+      decision: "Provenance encodée par la COULEUR du pin et du tracé"
+      pourquoi: "Provenance (éditorial / communautaire) est un statut fonctionnel important — il doit se voir au premier coup d'œil. La couleur est le registre visuel le plus immédiat."
+      impact: "Fichier 02-pins (couleur du pin), fichier 03-parcours-traces (couleur du tracé). Valeurs au palier 12 (deux teintes contrastées, une chaude pour éditorial, une neutre pour communautaire)."
+
+    - id: D4
+      decision: "Multi-époques encodé par la FORME du pin (pin 'empilé' évoquant plusieurs pins superposés au fil des époques)"
+      pourquoi: "Sémantiquement éloquent — la forme dit 'ce lieu traverse le temps'. Pas de surcharge couleur ni badge ; la forme suffit. Cohérent avec I8."
+      impact: "Fichier 02-pins. Composant Pin au palier 10 (deux variants de forme : simple et empilé). Réplique sur cluster (forme empilée si hétérogénéité temporelle dans le cluster)."
+
+    - id: D5
+      decision: "Statut de vérification (Pin / Parcours communautaire en revue, I3) encodé par CONTOUR du pin ou du tracé"
+      pourquoi: "Le contour est un registre visuel disjoint des badges et de la couleur — il signale un statut transitoire sans entrer en conflit avec les autres registres. Cohérent avec la nuance I3 (visibilité immédiate avec marque distinctive)."
+      impact: "Fichiers 02-pins, 03-parcours-traces. Valeur du contour au palier 12 (contour distinctif : pointillé ? trait double ? teinte spécifique ?)."
+
+    - id: D6
+      decision: "Badge 'Officiel' à plume (DA charte) ABANDONNÉ"
+      pourquoi: "Redondant avec la couleur de provenance qui suffit à signaler l'éditorial. Le catalogue Badge cluster 01 reste ouvert pour cas spéciaux (avant-première, partenaire institutionnel) si pertinents — mais aucun badge actif par défaut."
+      impact: "Fichier 02-pins (pas de badge éditorial par défaut). Cluster 01 entité Badge reste valide pour évolutions ultérieures."
+
+    - id: D7
+      decision: "Pas de couleur accent par Époque dans l'UI (chips, surfaces persistantes audio, liserés modale)"
+      pourquoi: "Sobriété — l'app est déjà chargée. L'Époque est lisible via le slider (position) + le filtre carte (paramétrique) + un chip neutre dans le contenu Pin (libellé seul)."
+      impact: "Fichier 01-fond-et-epoques (pas d'accent UI). Charte DA archives § 10 époques ignorée pour les couleurs accent, retenue pour les axes paramétriques de transformation du fond carte."
+
+    - id: D8
+      decision: "Filtres carte par Époque CONSERVÉS comme axes paramétriques continus"
+      pourquoi: "Cœur de la métaphore racine 'livre vivant' (essence § promesse). La fluidité interpolée pendant le geste du slider est exactement ce qui transforme la carte moderne en voyage temporel. Préset discrets exclus — fonction continue retenue."
+      impact: "Fichier 01-fond-et-epoques (système paramétrique avec ancres aux marqueurs). Palier 11 chorégraphie l'interpolation. Palier 12 fixe les valeurs aux ancres. Palier 16 valide la lisibilité aux interpolations."
+
+    - id: D9
+      decision: "Couleur du tracé Parcours = couleur de provenance (cohérent avec le pin)"
+      pourquoi: "Lit la nature du parcours (officiel ou communautaire) instantanément. Cohérence verticale avec le pin. Couleur d'Époque dominante du Parcours abandonnée (entrerait en conflit visuel avec le filtre carte)."
+      impact: "Fichier 03-parcours-traces. Valeurs au palier 12 (mêmes teintes que pin)."
+
+    - id: D10
+      decision: "Pas de signe distinctif sur la carte pour pins à contenu immersif (3D / AR / audio long / interactif)"
+      pourquoi: "Sobriété de la carte. L'enrichissement se découvre à l'aperçu rapide (M2) ou en consultation approfondie (M3) — la carte n'a pas à le pré-annoncer."
+      impact: "Fichier 02-pins. Question ouverte palier 16 : si retour utilisateur signale un manque, à reconsidérer."
+
+  decisions_a_prendre_en_phase_1: >-
+    Quelques décisions plus fines seront prises en propre lors de la
+    rédaction des 4 fichiers, sans bloquer l'index : forme exacte du
+    contour de vérification (pointillé, double trait, teinte
+    spécifique) ; nature du registre 'mise en relief' de l'étape
+    courante (taille ? halo ? pulsation qualifiée ?) ; nature du
+    'signal de déviation' sur le tracé ; ordre de priorité
+    d'affichage en cohabitation visuelle. L'utilisateur sera
+    consulté à chaque arbitrage non trivial.

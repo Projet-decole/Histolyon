@@ -1,0 +1,351 @@
+# =============================================================================
+# Palier 11 — 02 Haptique et feedback non-visuel
+# =============================================================================
+# Classes de feedback haptique NOMMÉES + chiffrées (HAP-X). Mapping classes
+# d'événement ↔ HAP. Politiques mode silencieux OS et préférences a11y.
+#
+# L'haptique est l'allié principal des personas qui ne regardent pas
+# l'écran (Kenji en marche avec son casque, père lyonnais qui flâne).
+# C'est aussi un canal qui se DÉSACTIVE (préférence utilisateur) — le
+# système doit rester pleinement fonctionnel sans haptique.
+# =============================================================================
+
+document:
+  type: palier_reponse_parametrique_haptique
+  numero: 11
+  fichier: "02-haptique-et-feedback-non-visuel.yaml"
+  version: "0.1"
+  date: "2026-05-07"
+  format: yaml
+  prerequis_de_lecture:
+    - "design/conception/11-reponse-parametrique/00-index.yaml — § 3 typologie 6 familles, § 5 format HAP"
+    - "design/conception/11-reponse-parametrique/01-durees-et-courbes.yaml — pour les classes d'événement déjà documentées"
+
+raison_d_etre: >-
+  Trois classes d'haptique couvrent l'ensemble des situations. Catalogue
+  fini ici, référencé par les chorégraphies (fichier 03) qui décident,
+  pour chaque graphe, si une étape porte un haptique et lequel. Un
+  feedback haptique mal calibré est intrusif (Mme Martin en classe) ou
+  illisible (Kenji en marche) — la rigueur du palier est de poser des
+  classes claires et de respecter scrupuleusement les préférences
+  utilisateur.
+
+# -----------------------------------------------------------------------------
+# 1. Classes d'haptique (HAP-X)
+# -----------------------------------------------------------------------------
+haptiques:
+
+  - id: HAP-LEGER
+    nom: "Léger"
+    description: >-
+      Confirmation tactile discrète. Feedback de causalité tap→effet
+      sur cible interactive — l'utilisateur sent que son doigt a été
+      'pris en compte'.
+    intensite_relative: 0.4   # 0.0 (absent) à 1.0 (max device)
+    duree_impulsion_ms: 10
+    classes_evenement:
+      - "Tap sur atome interactif (E1) — boutons, chips, switch, item de liste"
+      - "Sélection d'un chip (chip-epoque, chip-categorie, chip-couche-carte)"
+      - "Activation d'un toggle-switch"
+    note_tactique: >-
+      C'est le HAP le plus fréquent — l'utilisateur le sent dizaines
+      de fois par session. Doit rester subtil pour ne pas devenir
+      saturant.
+    questions_ouvertes: []
+
+  - id: HAP-FRANC
+    nom: "Franc"
+    description: >-
+      Impulsion plus marquée. Réservée aux événements qui méritent une
+      attention claire SANS être disruptifs. Calage du slider d'Époque
+      (l'Époque vient de changer — événement systémique perceptible),
+      arrivée d'une alerte de proximité M7 (le téléphone vibre dans la
+      poche pour Kenji ou le père lyonnais qui ne regardent pas l'écran).
+    intensite_relative: 0.7
+    duree_impulsion_ms: 15
+    classes_evenement:
+      - "Calage du slider d'Époque au snap (CHO-CALAGE-EPOQUE)"
+      - "Apparition d'une alerte de proximité M7 (CHO-OUVERTURE-M7) — feedback principal pour qui ne regarde pas l'écran"
+      - "Arrivée à une étape de Parcours en mode terrain (notification d'arrivée)"
+    note_tactique: >-
+      Évite l'overshoot mécanique d'un HAP-NET — on signale, on ne
+      célèbre pas.
+    questions_ouvertes:
+      - "Cas du calage du slider en pilotage automatique (parcours en cours qui pilote l'Époque) : haptique présent ou silencieux ? Trancher fichier 03 CHO-PILOTAGE-AUTOMATIQUE-EPOQUE."
+
+  - id: HAP-NET
+    nom: "Net"
+    description: >-
+      Impulsion brève et nette à intensité maximale. Réservée aux
+      confirmations d'action utilisateur RÉUSSIE et aux erreurs
+      bloquantes. Usage parcimonieux — un HAP-NET par session courante,
+      pas plus.
+    intensite_relative: 1.0
+    duree_impulsion_ms: 20
+    classes_evenement:
+      - "Activation d'un favori (comp-controle-favori → activé) — concomitant avec CRV-SPRING-NET visuel"
+      - "Soumission réussie d'un Pin communautaire ou d'un Parcours personnel publié"
+      - "Erreur bloquante (validation formulaire échouée à la soumission, perte de connexion pendant action critique)"
+    note_tactique: >-
+      L'utilisateur DOIT le percevoir distinctement même en marche ou
+      en environnement bruyant. Pas adapté aux feedbacks fréquents —
+      saturerait.
+    questions_ouvertes:
+      - "Différencier l'haptique de SUCCÈS et d'ERREUR ? Beaucoup d'apps utilisent un double-tap haptique pour le succès et un buzz long pour l'erreur. À acter palier 16 ou laisser HAP-NET unique actuellement."
+
+# -----------------------------------------------------------------------------
+# 2. Mapping classes d'événement ↔ HAP (vue récapitulative)
+# -----------------------------------------------------------------------------
+mapping_classes_evenement:
+
+  tap_atomique:
+    description: "Tap sur tout atome interactif (E1) — universel"
+    haptique: HAP-LEGER
+    note: "Si un composant active simultanément CRV-SPRING-NET visuel (overshoot), l'haptique passe à HAP-NET (cf. activation_favori)"
+
+  selection_chip:
+    description: "Tap sur chip-epoque, chip-categorie, chip-couche-carte, chip-filtre"
+    haptique: HAP-LEGER
+
+  toggle_switch:
+    description: "Tap sur comp-toggle-switch"
+    haptique: HAP-LEGER
+
+  apparition_message_ephemere_M9:
+    description: "M9 apparaît"
+    haptique: null   # explicitement silencieux — un M9 est non-bloquant et ne doit pas distraire
+    note: "M9 est un message éphémère informatif — l'haptique serait sur-signalisation"
+
+  apparition_alerte_proximite_M7:
+    description: "Alerte de proximité M7 (mode Surprenez-moi ou En parcours)"
+    haptique: HAP-FRANC
+    note: >-
+      Cohérent avec l'usage en marche (Kenji, père lyonnais) — c'est
+      l'événement signature d'HistoLyon en flânerie. Le respect du
+      mode silencieux OS s'applique (cf. § 3).
+
+  apparition_dialogue_M8:
+    description: "Dialogue de confirmation M8 apparaît"
+    haptique: null
+    note: "Le focus exclusif et la chorégraphie d'apparition sont déjà des signaux forts — pas besoin d'haptique."
+
+  ouverture_M2_apercu:
+    description: "Aperçu rapide M2 ouvert depuis tap pin"
+    haptique: HAP-LEGER
+    note: "Hérite de l'haptique du tap atomique sur le Pin — pas de doublon, c'est UNE impulsion."
+
+  ouverture_M3_consultation:
+    description: "Consultation approfondie M3 ouverte depuis aperçu M2 ou cible directe"
+    haptique: null
+    note: "Transition de surface plus structurelle — l'utilisateur a déjà eu un haptique au tap qui l'a déclenchée."
+
+  entree_sortie_M4:
+    description: "Entrée/sortie mode présentation M4"
+    haptique: null
+    note: "Mme Martin en classe — un haptique distrairait. Volontairement silencieux."
+
+  saut_lateral_S1_S2_S3:
+    description: "Bascule entre surfaces top-level"
+    haptique: HAP-LEGER
+    note: "Hérite de l'haptique du tap sur le sélecteur."
+
+  calage_slider_epoque:
+    description: "Snap du slider à la fin du drag (manuel)"
+    haptique: HAP-FRANC
+    note: >-
+      L'événement signature du voyage temporel — Mme Martin défile entre
+      3 époques et SENT chaque calage. Cohérent avec test_litmus.
+
+  calage_slider_pilotage_automatique:
+    description: "Snap du slider piloté par étape de Parcours en cours"
+    haptique: null   # par défaut silencieux — l'utilisateur n'a pas demandé ce calage
+    note: >-
+      Question ouverte (cf. HAP-FRANC ci-dessus) — silencieux par
+      défaut, haptique seulement si l'utilisateur a tapé sur l'étape
+      en cours pour la rappeler.
+
+  arrivee_etape_parcours_terrain:
+    description: "L'utilisateur arrive géographiquement à une étape (mode parcours terrain)"
+    haptique: HAP-FRANC
+    note: "Important — l'utilisateur peut être en marche, casque audio, écran éteint."
+
+  activation_favori:
+    description: "Tap sur comp-controle-favori activant le favori (vs désactivation)"
+    haptique: HAP-NET
+    note: "Désactivation = HAP-LEGER (pas de célébration pour retirer)."
+
+  soumission_reussie:
+    description: "Soumission Pin communautaire / publication Parcours personnel / création Compte réussie"
+    haptique: HAP-NET
+    note: "Concomitant avec une chorégraphie de confirmation visuelle."
+
+  erreur_bloquante:
+    description: "Validation formulaire échouée à la soumission, erreur réseau pendant action critique"
+    haptique: HAP-NET
+    note: "Cf. question ouverte HAP-NET — différenciation succès/erreur à reconsidérer palier 16."
+
+  long_press:
+    description: "Long-press dépassant TMP-LONG-PRESS (cf. fichier 05)"
+    haptique: HAP-FRANC
+    note: >-
+      Confirme à l'utilisateur que le seuil est franchi — sans cet
+      haptique, beaucoup d'apps perdent leur utilisateur en long-press
+      (il relâche trop tôt par incertitude).
+
+# -----------------------------------------------------------------------------
+# 3. Politique mode silencieux OS
+# -----------------------------------------------------------------------------
+mode_silencieux_os:
+
+  principe: >-
+    Le système d'exploitation expose un mode silencieux (sonneries
+    désactivées) et parfois un mode 'pas déranger' plus large. La
+    politique d'HistoLyon respecte le mode 'pas déranger' STRICTEMENT
+    (silence haptique inclus) ; le mode silencieux audio simple LAISSE
+    les haptiques actifs (l'utilisateur cherche le silence sonore, pas
+    tactile).
+
+  cas_par_plateforme:
+    iOS:
+      - "Mode silencieux (Ring/Silent switch) — haptiques actifs (politique iOS standard)"
+      - "Mode 'Ne pas déranger' — haptiques DÉSACTIVÉS"
+    Android:
+      - "Mode silencieux + vibration on — haptiques actifs"
+      - "Mode silencieux + vibration off — haptiques DÉSACTIVÉS"
+      - "Mode 'Ne pas déranger' — haptiques DÉSACTIVÉS"
+
+  exception:
+    - "Aucune. Pas d'override en interne — l'app respecte les paramètres système."
+
+# -----------------------------------------------------------------------------
+# 4. Politique préférence utilisateur 'reduce haptics'
+# -----------------------------------------------------------------------------
+# Sur iOS et certaines distributions Android, l'utilisateur peut désactiver
+# les haptiques globalement (Settings > Sounds & Haptics > System Haptics).
+# L'app respecte ce paramètre.
+reduce_haptics:
+
+  principe: >-
+    Si l'utilisateur a désactivé les haptiques système, l'app
+    n'émet AUCUN haptique. Le système reste pleinement fonctionnel
+    par signaux visuels (cohérent avec l'engagement 'pleinement
+    utilisable sans haptique').
+
+  cas_critiques_a_compenser_visuellement:
+    description: >-
+      Pour les événements où l'haptique était le canal PRINCIPAL
+      (utilisateur qui ne regarde pas l'écran), un fallback visuel
+      doit garantir la perception.
+    cas:
+      - "Alerte de proximité M7 — déjà visuelle (apparition de surface), pas de fallback supplémentaire requis"
+      - "Calage du slider d'Époque — déjà visuel (changement perceptible du fond carte par le mapping paramétrique)"
+      - "Arrivée à une étape de Parcours terrain — DOIT être doublée d'un signal visuel ET d'une notification audio si Kenji a son casque"
+    note: >-
+      Cas spécifique 'arrivée étape terrain' : si haptique ET son sont
+      désactivés ET l'utilisateur ne regarde pas l'écran, on perd
+      l'événement. À VALIDER au palier 16 — peut-être verrouiller au
+      moins UN canal de notification au lancement de Parcours terrain.
+
+# -----------------------------------------------------------------------------
+# 5. Cas particulier mode présentation M4 (Mme Martin)
+# -----------------------------------------------------------------------------
+mode_presentation_M4:
+
+  politique: >-
+    En mode présentation M4, TOUS les haptiques sont DÉSACTIVÉS
+    automatiquement (sans toucher aux paramètres utilisateur). Mme Martin
+    projette en classe — un téléphone qui vibre sur son bureau pendant
+    qu'elle commente serait disruptif pour les élèves.
+
+  exceptions:
+    - "Aucune. M4 = silence haptique total."
+
+  application:
+    - "À l'entrée M4 (CHO-ENTREE-M4 fichier 03) : flag 'haptiques inhibés' activé"
+    - "À la sortie M4 (CHO-SORTIE-M4) : flag levé, haptiques reprennent selon préférences utilisateur"
+
+# -----------------------------------------------------------------------------
+# 6. Note d'implémentation-agnosticisme
+# -----------------------------------------------------------------------------
+note_implementation: >-
+  Ce fichier ne nomme aucune API plateforme. Les valeurs (intensité 0-1,
+  durée d'impulsion en ms) sont neutres. À l'implémentation, mapper :
+  iOS UIImpactFeedbackGenerator (.light = HAP-LEGER, .medium = HAP-FRANC,
+  .heavy = HAP-NET) ou nouveau Core Haptics pour pilotage fin ; Android
+  HapticFeedbackConstants (KEYBOARD_TAP ≈ HAP-LEGER, VIRTUAL_KEY ≈
+  HAP-LEGER, LONG_PRESS ≈ HAP-FRANC, REJECT ≈ HAP-NET) ou VibrationEffect
+  pour pilotage fin ; Flutter HapticFeedback.lightImpact / mediumImpact /
+  heavyImpact ou paquet vibration pour pilotage fin. Le mapping exact est
+  une décision d'implémentation, pas du palier 11.
+
+# -----------------------------------------------------------------------------
+# 7. Persona check
+# -----------------------------------------------------------------------------
+persona_check:
+
+  kenji:
+    impact: ÉLEVÉ
+    note: >-
+      Test_litmus 'vivre 80% de l'expérience sans regarder l'écran' :
+      HAP-FRANC à l'arrivée d'une alerte de proximité M7 et à l'arrivée
+      à une étape de Parcours sont ses canaux principaux de notification
+      en marche. Les chorégraphies fichier 03 doivent les utiliser
+      systématiquement pour les événements géolocalisés.
+
+  mme_dupont:
+    impact: faible
+    note: >-
+      Préparation et exécution sortie scolaire — quelques HAP-LEGER
+      sur les actions atomiques. Pas de cas haptique critique. Cas
+      spécifique : pendant la sortie réelle elle est probablement
+      en mode présentation M4 ou silencieux total — politiques § 3
+      et § 5 garantissent qu'elle ne dérangera pas la classe.
+
+  mme_martin:
+    impact: ÉLEVÉ
+    note: >-
+      Politique § 5 — TOUS haptiques INHIBÉS en M4 (mode présentation).
+      Critique pour son test_litmus. À VALIDER au palier 16 sur un
+      cas concret (projection avec ouvertures de M2 et calages slider
+      pendant l'animation).
+
+  pere_lyonnais:
+    impact: ÉLEVÉ
+    note: >-
+      Mode Surprenez-moi en flânerie — HAP-FRANC à l'arrivée d'une
+      alerte de proximité M7 est son signal principal (il a le téléphone
+      en poche, il sent vibrer, il sort le téléphone). Sans cet haptique,
+      l'expérience Surprenez-moi perd 80% de sa valeur.
+
+  anais_back_office:
+    impact: nul
+    note: >-
+      Back-office desktop — aucune haptique (la plupart des desktops
+      n'ont pas de haptique). Les feedbacks visuels (palier 9 + palier
+      12) suffisent.
+
+# -----------------------------------------------------------------------------
+# 8. Enjeux transversaux
+# -----------------------------------------------------------------------------
+enjeux_transversaux:
+
+  accessibilite: >-
+    Haptique = canal alternatif au visuel (utilisateurs malvoyants) ET
+    canal alternatif à l'audio (utilisateurs sourds en environnement
+    bruyant). Préserver les 3 classes ; respecter les préférences
+    utilisateur ; cas critiques compensés visuellement (§ 4). Test
+    palier 16 avec proxy malvoyant.
+
+  performance: "Aucun enjeu — l'haptique est géré par le hardware dédié."
+
+  vie_privee: "Aucun enjeu spécifique."
+
+  i18n: "Indépendant de la locale."
+
+# -----------------------------------------------------------------------------
+# 9. Questions ouvertes (récapitulatif)
+# -----------------------------------------------------------------------------
+questions_ouvertes:
+  - "Calage slider en pilotage automatique : haptique présent ou silencieux ? À acter CHO-PILOTAGE-AUTOMATIQUE-EPOQUE — proposition par défaut : silencieux."
+  - "Différenciation haptique succès vs erreur (HAP-NET unique vs deux variantes) ? À reconsidérer palier 16 sur retour utilisateur."
+  - "Cas 'arrivée étape terrain' avec haptiques + son désactivés ET utilisateur ne regardant pas l'écran : verrouiller au moins un canal au lancement de Parcours terrain ? À VALIDER palier 16."

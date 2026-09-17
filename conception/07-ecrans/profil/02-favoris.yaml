@@ -1,0 +1,74 @@
+# =============================================================================
+# E-PROFIL-FAVORIS — Liste des Favoris
+# =============================================================================
+# Vue dédiée à la collection des Favoris de l'utilisateur (P5.S3 en P5.M3).
+# Favori est polymorphe : la cible est un Pin OU un Parcours (cluster 03).
+# Tap sur un Favori → bascule vers la consultation approfondie correspondante.
+# Strictement local par défaut (I6).
+# =============================================================================
+
+document:
+  type: palier_ecrans_fiche
+  format: yaml
+
+ecran:
+  id: E-PROFIL-FAVORIS
+  nom: "Liste des Favoris"
+
+  mode: P5.M3
+  surface_parente: P5.S3
+
+  raison_d_etre: >-
+    Permet à l'utilisateur de retrouver les Pins et Parcours qu'il a
+    marqués au fil de ses consultations. Sert directement les moments de
+    vérité du père lyonnais (« retrouver l'anecdote du dimanche le mardi »)
+    et de Kenji (« le soir à l'hôtel, refaire le tour des choix »).
+
+  composition:
+    - zone: "liste des Favoris"
+      role: "présente les Favoris chronologiquement (récents en tête par défaut) ; chaque vignette identifie clairement le type de cible (Pin ou Parcours) et porte les éléments d'identification (titre, époque, image clef)"
+      entites_affichees: [Favori, Pin, Parcours, Époque]
+
+    - zone: "filtre / tri"
+      role: "permet de filtrer par type (Pins / Parcours / tous) et de changer le tri ; structure exacte palier 7"
+
+    - zone: "indicateur d'état de collection"
+      role: "compteur, mention vide, ou indication de chargement selon le cas"
+
+  etats:
+    nominal_charge: "Collection chargée et non vide ; vignettes affichées ; filtre/tri opérationnels"
+    chargement: "Lecture locale en cours (généralement instantané — état rare)"
+    vide: "Aucun Favori ; message gracieux non culpabilisant rappelant les gestes pour ajouter un Favori (depuis E-PIN-CONSULTATION-APPROFONDIE ou E-PARCOURS-FICHE-DETAIL)"
+    filtre_actif_resultats_vides: "Filtre appliqué dont aucun Favori ne correspond ; message contextuel proposant de retirer le filtre"
+    cible_indisponible: "Au moins un Favori dont la cible (Pin éditorial retiré ou Parcours communautaire retiré) n'est plus accessible — l'entrée reste affichée avec mention neutre 'contenu indisponible' (cluster 03 invariant) et propose le retrait du Favori à l'ouverture"
+    offline_avec_cache: "Collection locale lisible normalement ; bandeau E-TRANSVERSES-BANDEAU-OFFLINE visible si pertinent ; l'ouverture d'un Favori dont le contenu n'est pas dans le cache renvoie vers un message gracieux"
+    offline_sans_cache: "Identique pour la lecture de la liste (locale) ; ouvertures peuvent être dégradées selon disponibilité du contenu cible"
+    sync_en_cours: "Si Compte rattaché et catégorie 'favoris' synchronisée (D8), un indicateur discret peut signaler la sync (palier 7) — sans bloquer la consultation"
+    erreur_lecture: "Échec rare (corruption locale) ; message gracieux et accès aux paramètres"
+
+  elements_interactifs:
+    - "Défilement de la liste"
+    - "Tap sur un Favori dont la cible est un Pin → bascule vers E-PIN-CONSULTATION-APPROFONDIE (flow B2 via D2)"
+    - "Tap sur un Favori dont la cible est un Parcours → bascule vers E-PARCOURS-FICHE-DETAIL (flow C3 via D2)"
+    - "Geste de retrait d'un Favori → suppression immédiate de l'entrée, message éphémère P5.M9 d'annulation rapide possible (à confirmer palier 7)"
+    - "Application d'un filtre / changement de tri"
+    - "Retour vers E-PROFIL-PRINCIPAL"
+
+  flows_actifs:
+    - D2   # Consultation des favoris
+
+  surfaces_imbriquees:
+    - E-PIN-CONSULTATION-APPROFONDIE       # ouverture sur Favori de type Pin
+    - E-PARCOURS-FICHE-DETAIL              # ouverture sur Favori de type Parcours
+    - E-TRANSVERSES-MESSAGE-EPHEMERE       # confirmation retrait, etc.
+    - E-TRANSVERSES-AUDIO-PERSISTANT
+    - E-TRANSVERSES-PARCOURS-PERSISTANT
+    - E-TRANSVERSES-BANDEAU-OFFLINE
+
+  entites_affichees: [Favori, Pin, Parcours, Époque]
+
+  questions_ouvertes:
+    - "Tri par défaut : chronologique récents en tête, par catégorie, ou par époque ? Recommandation chronologique (cluster 03), à acter en palier 7"
+    - "Annulation rapide d'un retrait via message éphémère P5.M9 (« Favori retiré — Annuler ») : option offerte ou retrait définitif immédiat ? — palier 7"
+    - "Affichage groupé Pins / Parcours (deux sections) ou liste mêlée chronologique avec marqueur de type (recommandation cluster 03) ? — palier 7"
+    - "Si le contenu cible est en mode 'cible_indisponible', l'utilisateur peut-il toujours voir les méta du Favori (titre, image clef au moment du marquage) ou rien hormis la mention neutre ? — palier 7/8"

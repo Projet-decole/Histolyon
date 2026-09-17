@@ -1,0 +1,544 @@
+# =============================================================================
+# Palier 3 — Domaine D8 — 3D et réalité augmentée
+# =============================================================================
+# Reconstitutions historiques en 3D, visualisables soit en consultation
+# immersive (le modèle 3D dans l'app), soit en superposition AR (le modèle
+# replacé dans la vue caméra du téléphone, à l'endroit du bâtiment réel).
+# Engagement minimal du projet : au moins UN bâtiment reconstruit en 3D
+# visualisable en AR sur la durée du projet (cf. brief § 15).
+#
+# Domaine de priorité 'si_le_temps' : la 3D/AR est rare, présente sur les
+# pins qui s'y prêtent (un édifice disparu, un état antérieur d'un monument,
+# un décor à reconstituer). L'app fonctionne pleinement sans ce domaine —
+# il vient ajouter une couche d'émerveillement supplémentaire.
+#
+# Format strict, périmètre fonctionnel pur — voir 00-index § 2.
+# =============================================================================
+
+document:
+    type: palier_fonctionnalites_domaine
+    domaine_id: D8
+    numero: 3
+    audience:
+        - "Tout agent qui rédige un palier en aval (4 à 16)"
+        - "Dev 3D/VR (cahier des charges fonctionnel pour les reconstitutions)"
+        - "Dev Flutter (intégration des surfaces 3D et AR dans l'app)"
+        - "Lead/historienne (cadrage du choix des bâtiments à reconstituer)"
+    role: >-
+        Décrire fonctionnellement la 3D et l'AR : où l'utilisateur y accède,
+        comment il consulte un modèle 3D, comment il bascule en superposition
+        AR, et comment ces contenus sont produits côté back-office. Le cœur de
+        l'expérience reste D1 (carte) et D2 (pins) — D8 est un enrichissement
+        qui se déclenche uniquement quand un pin a du contenu 3D/AR disponible.
+    format: yaml
+    prerequis_de_lecture:
+        - "design/conception/intention.yaml — § 5.7 separation_des_responsabilites_entre_paliers"
+        - "design/conception/01-essence.yaml"
+        - "design/conception/02-personas.yaml"
+        - "design/conception/03-fonctionnalites/00-index.yaml — § 2 anti_perimetre_strict est OBLIGATOIRE"
+        - "design/conception/03-fonctionnalites/01-carte-exploration-temporelle.yaml — modèle de format"
+
+# -----------------------------------------------------------------------------
+# Raison d'être du domaine
+# -----------------------------------------------------------------------------
+raison_d_etre_du_domaine: >-
+    Donner à voir ce qui n'existe plus — ou ce qui n'existe plus de la même
+    façon. Un texte décrit un bâtiment disparu ; une image d'archive le fige ;
+    une reconstitution 3D le rend volumétrique, manipulable, exploré. L'AR
+    pousse encore d'un cran : le bâtiment n'est plus dans l'app, il est posé
+    là où il était, sur la place où l'utilisateur se tient. C'est le ressort
+    d'émerveillement le plus puissant du produit (essence § principe
+    émerveillement) — celui qui produit le 'frisson' que ni Wikipedia ni un
+    audioguide ne peuvent produire.
+
+    Ce domaine sert d'abord Mme Martin (projection en classe d'une
+    reconstitution comme support visuel d'un cours sur l'urbanisme lyonnais),
+    Kenji (immersion devant un édifice qu'il visite — l'AR est un argument
+    fort dans les retours touristes) et le père lyonnais (révélation de
+    ce qui se trouvait à l'emplacement où il se tient). Mme Dupont peut
+    l'utiliser comme moment fort d'une sortie scolaire, mais sans en
+    dépendre — l'AR n'est jamais une exigence du parcours.
+
+    L'engagement minimal du projet est UN bâtiment reconstruit en 3D
+    visualisable en AR (cf. brief § 15). Au-delà, le périmètre dépend de
+    ce que le dev 3D/VR peut produire dans le temps imparti — d'où des
+    questions ouvertes majeures sur le nombre de modèles, le caractère
+    interactif ou pré-rendu, et le moteur technique (à trancher avec
+    l'équipe).
+
+# -----------------------------------------------------------------------------
+# Sous-domaines
+# -----------------------------------------------------------------------------
+sous_domaines:
+    # ===========================================================================
+    - id: D8.1
+      nom: "Point d'accès conditionnel à la 3D/AR"
+
+      raison_d_etre: >-
+          Un pin ne donne accès à la 3D/AR QUE si un contenu 3D/AR existe pour
+          lui. La majorité des pins n'en ont pas — c'est rare et précieux.
+          Il faut donc un point d'accès qui n'apparaît qu'en présence de
+          contenu, pour ne pas suggérer une fonctionnalité absente, ne pas
+          encombrer la consultation des autres pins, et faire de l'apparition
+          du point d'accès un signal en soi : 'ce lieu a une dimension de plus'.
+
+      comportement: >-
+          Quand l'utilisateur consulte un pin en mode approfondi (D2.5) et que
+          ce pin dispose d'un contenu 3D/AR, un point d'accès dédié apparaît
+          dans la consultation pour lui permettre de basculer vers la
+          consultation 3D immersive (D8.2). Si le pin n'a pas de contenu
+          3D/AR, ce point d'accès n'existe simplement pas — pas de version
+          grisée, pas de message 'indisponible'. Le déclenchement est une
+          action consciente de l'utilisateur (la 3D/AR n'est jamais activée
+          automatiquement), conformément à l'esprit du brief § 8.2 : 'lever
+          le téléphone, activer la caméra' demande un acte volontaire.
+
+      regles_fonctionnelles:
+          - "Le point d'accès n'apparaît QUE si le pin dispose d'un contenu 3D/AR — son apparition est conditionnelle, pas permanente"
+          - "L'absence de contenu 3D/AR ne génère aucun élément visuel, aucun message — le point d'accès est strictement invisible dans ce cas"
+          - "Le point d'accès est présent sur la consultation approfondie du pin (D2.5), pas sur l'aperçu rapide (D2.4)"
+          - "L'activation est une action consciente de l'utilisateur — jamais déclenchée automatiquement par le scroll, le défilement, l'arrivée à proximité ou un parcours en cours"
+          - "Activer le point d'accès ouvre la consultation 3D immersive (D8.2), pas directement la superposition AR (la bascule en AR se fait depuis D8.2)"
+
+      capabilites:
+          - "Détecter si un pin dispose d'un contenu 3D/AR"
+          - "Faire apparaître un point d'accès à la consultation 3D quand le contenu existe"
+          - "Masquer entièrement le point d'accès quand le contenu n'existe pas"
+          - "Ouvrir la consultation 3D immersive (D8.2) à l'activation"
+
+      ce_qu_on_ne_fait_pas:
+          - "Pas de point d'accès permanent affiché sur tous les pins (rare = signal)"
+          - "Pas de point d'accès grisé ou désactivé pour les pins sans contenu (silence total)"
+          - "Pas de déclenchement automatique sans action explicite de l'utilisateur"
+          - "Pas de point d'accès depuis la carte ou l'aperçu rapide (réservé à la consultation approfondie)"
+
+      criteres_de_reussite:
+          - "L'utilisateur ne se demande jamais 'pourquoi il n'y a pas de 3D ici' — l'absence est silencieuse, pas frustrante"
+          - "Quand le point d'accès apparaît, c'est un signal en soi : ce lieu a une dimension de plus à explorer"
+          - "Kenji découvre par hasard la 3D/AR sur un pin qui s'y prête, sans avoir lu de tutoriel"
+          - "Le père lyonnais comprend que le point d'accès est rare, et le savoure quand il apparaît"
+
+      definition_of_done:
+          - "Un pin avec contenu 3D/AR fait apparaître un point d'accès à la consultation 3D dans sa consultation approfondie"
+          - "Un pin sans contenu 3D/AR n'affiche aucun élément lié à la 3D/AR"
+          - "L'activation du point d'accès ouvre la consultation 3D immersive (D8.2)"
+          - "Le point d'accès n'est pas présent dans l'aperçu rapide du pin (D2.4)"
+          - "Aucune activation automatique de la 3D/AR n'est possible sans action explicite de l'utilisateur"
+
+      enjeux_transversaux:
+          accessibilite: >-
+              Le point d'accès doit être annoncé par les lecteurs d'écran avec
+              une étiquette indiquant qu'il ouvre une consultation 3D. Important
+              aussi : la 3D/AR n'étant pas accessible à tous (déficience visuelle,
+              vestibulaire), tout contenu transmis via la 3D/AR DOIT avoir un
+              équivalent texte/image dans la consultation approfondie elle-même
+              (D2.5) — la 3D est un enrichissement, jamais le seul vecteur d'une
+              information.
+          performance: >-
+              L'apparition du point d'accès ne doit pas alourdir la consultation
+              approfondie des pins qui n'ont PAS de contenu 3D/AR (la majorité).
+              La détection de disponibilité doit être légère.
+          vie_privee: "Pas d'enjeu spécifique sur ce sous-domaine."
+
+      questions_ouvertes:
+          - "Combien de pins disposeront d'un contenu 3D/AR sur la durée du projet ? Engagement minimal : 1. Au-delà, dépend du dev 3D/VR — à trancher en équipe"
+          - "Le point d'accès donne-t-il toujours sur la consultation 3D, ou peut-il directement proposer le choix entre 3D et AR ? Recommandation : passer par 3D d'abord (D8.2), puis bascule AR depuis là — à confirmer en palier 7"
+
+      priorite: "si_le_temps"
+
+      personas_principaux:
+          - kenji
+          - mme_martin
+          - pere_lyonnais
+
+      dependances:
+          - "D2.5 (consultation approfondie d'un pin — surface où apparaît le point d'accès)"
+          - "D8.2 (consultation 3D immersive — destination de l'activation)"
+          - "D10 (production de contenu — alimente la disponibilité d'un contenu 3D/AR par pin)"
+
+    # ===========================================================================
+    - id: D8.2
+      nom: "Consultation 3D immersive"
+
+      raison_d_etre: >-
+          Donner à l'utilisateur le temps et l'espace pour explorer un modèle 3D
+          reconstitué — un bâtiment disparu, un état antérieur d'un monument,
+          une scène. Cette exploration demande de l'attention : on tourne
+          autour, on s'approche, on cherche un détail. Toute surface
+          persistante non-narrative est dans le chemin. D'où une consultation
+          immersive sans chrome, qui s'inscrit dans la même famille
+          fonctionnelle que le mode présentation canonique (D2.5) — la
+          consultation 3D EST une forme de mode présentation, dédiée au
+          modèle 3D.
+
+      comportement: >-
+          Quand l'utilisateur active le point d'accès 3D/AR (D8.1), il bascule
+          dans une consultation où le modèle 3D occupe l'espace principal et
+          où le chrome non-essentiel est masqué. Il peut manipuler le modèle
+          pour l'explorer (le tourner, l'approcher, l'éloigner). Une
+          légende/contextualisation reste accessible (qu'est-ce que je
+          regarde, à quelle époque, d'après quelle source) — la rigueur
+          historique n'est pas suspendue parce qu'on est dans un mode
+          immersif. Depuis cette consultation, l'utilisateur peut basculer
+          vers la superposition AR (D8.3) si le pin et son terminal le
+          permettent. Le retour à la consultation approfondie reste toujours
+          accessible.
+
+      regles_fonctionnelles:
+          - "La consultation 3D s'inscrit dans la famille fonctionnelle du mode présentation sans chrome (canonique D2.5)"
+          - "L'utilisateur peut manipuler le modèle 3D pour l'explorer (rotation, rapprochement, éloignement)"
+          - "Une contextualisation reste accessible pendant la consultation (titre, époque, source) — l'immersion ne supprime pas l'historicité"
+          - "Le retour à la consultation approfondie du pin (D2.5) est accessible à tout moment"
+          - "La bascule vers la superposition AR (D8.3) est accessible depuis cette consultation, conditionnée à la disponibilité d'un contenu AR pour ce modèle et à un terminal compatible"
+          - "Pendant la consultation 3D, les surfaces persistantes non-narratives cèdent le pas — leur comportement exact relève du mode présentation canonique défini en D2.5"
+
+      capabilites:
+          - "Afficher un modèle 3D reconstitué en occupant l'espace principal"
+          - "Permettre la manipulation fluide du modèle (exploration du volume)"
+          - "Présenter une contextualisation (légende, époque, source) sans rompre l'immersion"
+          - "Basculer vers la superposition AR (D8.3) quand elle est disponible"
+          - "Revenir à la consultation approfondie du pin (D2.5)"
+          - "Masquer le chrome non-essentiel pendant la consultation (mode présentation canonique D2.5)"
+
+      ce_qu_on_ne_fait_pas:
+          - "Pas de consultation 3D imposée à l'ouverture du pin (toujours sur action consciente — D8.1)"
+          - "Pas de modèle 3D présenté sans contextualisation (qu'est-ce, quand, source)"
+          - "Pas de chrome non-essentiel pendant la consultation immersive"
+          - "Pas de manipulation à la fois fluide ET interactive scénarisée (ex. parcours guidé dans le modèle) sur ce périmètre — à reporter si le temps le permet"
+
+      criteres_de_reussite:
+          - "Mme Martin projette une reconstitution en classe et la lisibilité est suffisante depuis le fond de la salle (atteint test_litmus Mme Martin sur le mode présentation)"
+          - "Kenji manipule le modèle sans tutoriel et comprend ce qu'il regarde grâce à la contextualisation présente"
+          - "L'expérience est ressentie comme un voyage volumétrique — pas comme un viewer 3D générique"
+          - "La rigueur historique reste sensible (source visible) — Mme Martin n'aurait pas honte de projeter cela à un collègue"
+
+      definition_of_done:
+          - "Un modèle 3D peut être consulté en occupant l'espace principal de l'app"
+          - "Le chrome non-essentiel est masqué pendant la consultation (cohérent avec D2.5)"
+          - "L'utilisateur peut faire tourner, rapprocher et éloigner le modèle"
+          - "Une contextualisation (titre, époque, source) reste accessible pendant la consultation"
+          - "Le retour à la consultation approfondie (D2.5) est possible à tout moment"
+          - "Quand un contenu AR existe pour ce modèle et que le terminal est compatible, la bascule vers la superposition AR (D8.3) est possible depuis cette consultation"
+
+      enjeux_transversaux:
+          accessibilite: >-
+              Critique : la 3D n'est pas accessible à tous. Tout contenu
+              transmis via la consultation 3D doit avoir un équivalent
+              texte/image dans la consultation approfondie (D2.5) — la 3D est
+              un enrichissement, jamais le seul vecteur. La contextualisation
+              affichée pendant la consultation doit être lisible par les
+              lecteurs d'écran, et la lisibilité visuelle doit rester forte
+              pour Mme Martin qui projette en classe (cf. test_litmus).
+              Sensibilité au mal des transports / vertige à anticiper
+              (manipulations brusques à éviter).
+          performance: >-
+              Critique : la fluidité de manipulation du modèle fait partie
+              intégrante de l'expérience d'émerveillement. Une manipulation
+              saccadée tue l'effet. Le compromis qualité/fluidité est un sujet
+              à arbitrer avec le dev 3D/VR (interactif vs pré-rendu — voir
+              questions ouvertes). Critères chiffrés en palier 16.
+          vie_privee: "Pas d'enjeu spécifique."
+
+      questions_ouvertes:
+          - "Modèles interactifs (manipulables en temps réel) ou pré-rendus (vidéos / séquences cinématiques) ? À trancher avec le dev 3D/VR — impact direct sur la nature de la manipulation"
+          - "Moteur technique : Unity bridge, Three.js, pré-rendu, autre ? À trancher avec le dev 3D/VR"
+          - "Niveau de fidélité visuelle visé sur les modèles (silhouette texturée minimaliste vs reconstitution photoréaliste) — dépend du temps disponible et du niveau de validation scientifique des sources"
+          - "Comportement audio pendant la consultation 3D (l'audio narratif du pin continue-t-il ? est-il remplacé par une ambiance sonore d'époque ?) — à articuler avec D7"
+          - "Présence d'une narration audio dédiée au modèle 3D (différente de celle du pin) ? À acter avec la lead/historienne"
+
+      priorite: "si_le_temps"
+
+      personas_principaux:
+          - mme_martin
+          - kenji
+          - pere_lyonnais
+
+      dependances:
+          - "D8.1 (point d'accès qui ouvre cette consultation)"
+          - "D2.5 (consultation approfondie — référence canonique du mode présentation sans chrome ; surface de retour)"
+          - "D8.3 (superposition AR — bascule possible depuis ici)"
+          - "D8.4 (production des reconstitutions — alimente le contenu)"
+
+      comportements_transverses_referenced:
+          - "Mode présentation sans chrome (canonique D2.5) — la consultation 3D est une forme de ce mode, appliquée au modèle 3D"
+
+    # ===========================================================================
+    - id: D8.3
+      nom: "Superposition AR"
+
+      raison_d_etre: >-
+          Sortir du téléphone et replacer le modèle 3D dans le monde réel —
+          l'utilisateur lève son terminal et voit, à travers la caméra, la
+          reconstitution superposée à l'endroit même où le bâtiment se trouvait.
+          C'est le moment de bascule le plus fort de l'expérience : la
+          reconstitution n'est plus regardée, elle est visitée. La sérendipité
+          géographique du produit (D1) trouve ici son aboutissement
+          d'émerveillement.
+
+          L'AR demande une action consciente : on lève le téléphone, on active
+          la caméra, on accepte la permission si on ne l'a pas déjà donnée.
+          Cette friction est ASSUMÉE — elle marque la solennité du moment.
+
+      comportement: >-
+          Depuis la consultation 3D immersive (D8.2), l'utilisateur peut
+          basculer vers une superposition AR si un contenu AR est disponible
+          pour ce modèle et si son terminal est compatible. Au moment du
+          basculement, si la permission caméra n'a pas encore été accordée,
+          elle est demandée par le système (permission juste-à-temps,
+          canonique D5.5) — un refus ne pénalise pas l'app, il revient
+          simplement à la consultation 3D. Une fois la caméra active, le
+          modèle est superposé à la vue réelle du téléphone, idéalement
+          ancré à l'emplacement attendu (le pin du lieu). L'utilisateur peut
+          bouger, regarder le modèle sous différents angles, s'en approcher.
+          Le retour à la consultation 3D (D8.2) ou à la consultation
+          approfondie du pin (D2.5) reste accessible à tout moment.
+
+      regles_fonctionnelles:
+          - "La superposition AR n'est proposée que si un contenu AR est disponible pour le modèle et si le terminal est compatible (capacité AR détectée)"
+          - "L'activation est une action consciente — l'utilisateur déclenche le basculement depuis la consultation 3D (D8.2), jamais automatiquement"
+          - "La permission caméra est demandée juste-à-temps (canonique D5.5) au moment du basculement, pas en amont"
+          - "Un refus de la permission caméra ne pénalise pas l'app — l'utilisateur revient à la consultation 3D sans message agressif ni dégradation perçue"
+          - "La superposition AR vise à s'ancrer à l'emplacement du pin quand l'utilisateur est sur place ; quand il ne l'est pas, le comportement reste fonctionnel mais l'ancrage géographique exact peut ne pas être garanti"
+          - "Les enjeux de fiabilité de l'ancrage (précision GPS urbaine, suivi visuel) sont des sujets techniques — leur traitement précis est arbitré avec le dev 3D/VR et tracé en palier 16"
+          - "Le retour à la consultation 3D (D8.2) ou à la consultation approfondie du pin (D2.5) est accessible à tout moment"
+
+      capabilites:
+          - "Détecter si le terminal est compatible AR"
+          - "Détecter si un contenu AR est disponible pour le modèle"
+          - "Demander la permission caméra au moment du basculement (juste-à-temps)"
+          - "Activer la vue caméra du téléphone et y superposer le modèle 3D"
+          - "Tenter d'ancrer le modèle à l'emplacement du pin quand l'utilisateur est sur place"
+          - "Permettre à l'utilisateur de bouger autour du modèle superposé"
+          - "Revenir à la consultation 3D (D8.2) ou à la consultation approfondie (D2.5)"
+          - "Gérer gracieusement un refus de permission caméra (retour à la consultation 3D)"
+
+      ce_qu_on_ne_fait_pas:
+          - "Pas de demande de permission caméra avant l'activation explicite de la superposition AR"
+          - "Pas de superposition AR sans action consciente (jamais déclenchée par le scroll, la proximité GPS ou un parcours en cours)"
+          - "Pas de blocage de l'app si la permission caméra est refusée (retour propre à la consultation 3D)"
+          - "Pas de message culpabilisant en cas de terminal incompatible — la bascule AR n'est simplement pas proposée"
+          - "Pas de superposition imposée à l'utilisateur qui n'est pas sur place (le mode reste fonctionnel à distance, mais l'ancrage géographique exact n'est pas garanti)"
+          - "Pas d'enregistrement durable des images captées par la caméra (aucune captation persistante)"
+
+      criteres_de_reussite:
+          - "Kenji, devant un édifice qui s'y prête, lève son téléphone et la superposition donne le frisson 'je suis dans le passé' (test_litmus Kenji — l'AR est l'argument de récit le plus fort qu'il rapportera au Japon)"
+          - "Le père lyonnais découvre par hasard qu'un pin propose l'AR sur sa rue, l'active, et a la révélation 'voilà ce qui était là'"
+          - "Un refus de permission caméra ne donne pas le sentiment d'être 'puni' — l'utilisateur reste dans la consultation 3D sans drame"
+          - "Mme Martin, en classe, peut expliquer à ses élèves que l'AR existe pour ce pin sans avoir à l'activer elle-même (la consultation 3D suffit en mode canapé)"
+
+      definition_of_done:
+          - "Quand un terminal est compatible AR et qu'un contenu AR existe, la bascule depuis la consultation 3D (D8.2) est possible"
+          - "La permission caméra est demandée au moment du basculement, jamais avant"
+          - "Une fois la permission accordée, le modèle est superposé à la vue caméra du téléphone"
+          - "Quand l'utilisateur est sur place, l'ancrage à l'emplacement du pin est tenté"
+          - "Un refus de permission caméra ramène l'utilisateur à la consultation 3D sans dégradation perçue"
+          - "Un terminal incompatible ne propose simplement pas la bascule AR (pas de message d'erreur)"
+          - "Le retour à la consultation 3D (D8.2) ou à la consultation approfondie (D2.5) est possible à tout moment"
+          - "Aucune image captée par la caméra n'est conservée par l'app"
+
+      enjeux_transversaux:
+          accessibilite: >-
+              Critique : l'AR n'est pas accessible à tous (déficience visuelle,
+              vestibulaire, mobilité réduite empêchant de se mouvoir autour
+              d'un point). Tout contenu transmis via l'AR DOIT avoir un
+              équivalent texte/image dans la consultation approfondie (D2.5) —
+              l'AR est un enrichissement, jamais le seul vecteur. La
+              compatibilité du terminal ne doit pas être présentée comme un
+              défaut de l'utilisateur.
+          performance: >-
+              Critique : la stabilité de l'ancrage et la fluidité du suivi
+              sont des facteurs déterminants de la qualité ressentie. Une
+              superposition qui décroche tue l'effet. Compromis qualité /
+              compatibilité terminaux à arbitrer avec le dev 3D/VR. Critères
+              chiffrés en palier 16.
+          vie_privee: >-
+              Critique : la caméra capte le monde réel de l'utilisateur. Aucune
+              image captée n'est stockée durablement par l'app, aucune n'est
+              transmise à un serveur. Cohérent avec la posture vie privée du
+              produit (D1.1 sur la position GPS, D6 sur les données
+              personnelles). La permission caméra est demandée juste-à-temps
+              (canonique D5.5).
+
+      questions_ouvertes:
+          - "Compatibilité AR exacte selon les terminaux (ARCore Android / ARKit iOS, fallback éventuel) — à trancher avec le dev 3D/VR et les devs Flutter"
+          - "Précision attendue de l'ancrage géographique en milieu urbain (rues étroites, immeubles haussmanniens) — réaliste vs idéal — à valider avec le dev 3D/VR"
+          - "Comportement quand l'utilisateur n'est PAS sur place (à distance) : fallback en consultation 3D simple, ou superposition AR libre dans son environnement actuel ? À arbitrer"
+          - "Audio pendant la superposition AR (ambiance sonore, narration) — à articuler avec D7"
+          - "Présence d'éléments interactifs dans la superposition AR (info-bulles, points d'intérêt sur le modèle) — sur ce périmètre, recommandation : non, à reporter"
+
+      priorite: "si_le_temps"
+
+      personas_principaux:
+          - kenji
+          - pere_lyonnais
+          - mme_martin
+
+      dependances:
+          - "D8.2 (consultation 3D immersive — surface de basculement)"
+          - "D8.4 (production des reconstitutions — alimente la disponibilité du contenu AR)"
+          - "D5.5 (permissions juste-à-temps — référence canonique pour la permission caméra)"
+          - "D1.1 (géolocalisation — pour l'ancrage géographique quand l'utilisateur est sur place)"
+
+      comportements_transverses_referenced:
+          - "Permissions juste-à-temps (canonique D5.5) — appliquée ici à la permission caméra (AR)"
+          - "Géolocalisation (canonique D1.1) — utilisée pour l'ancrage AR quand l'utilisateur est sur place"
+
+    # ===========================================================================
+    - id: D8.4
+      nom: "Production des reconstitutions 3D/AR"
+
+      raison_d_etre: >-
+          Une reconstitution 3D/AR ne se génère pas toute seule : elle est
+          modélisée par le dev 3D/VR à partir de sources historiques validées,
+          contextualisée par la lead/historienne (qu'est-ce qu'on reconstitue,
+          à quel état, d'après quelle source), puis associée à un pin qui en
+          devient porteur. Sans ce pipeline de production côté back-office,
+          les surfaces D8.1, D8.2 et D8.3 n'ont rien à montrer.
+
+          Ce sous-domaine est une extension fonctionnelle de D10 (production
+          de contenu) appliquée au cas particulier de la 3D/AR — il décrit
+          les capabilités que le back-office doit offrir pour qu'un contenu
+          3D/AR puisse exister, être validé et être attaché à un pin.
+
+      comportement: >-
+          Côté back-office (D10), un contenu 3D/AR peut être attaché à un pin
+          par l'éditeur de contenu (Anaïs) en collaboration avec le dev 3D/VR.
+          Le contenu se rattache à une époque (le bâtiment était dans cet état
+          à telle période), à des sources historiques (sur quoi on s'appuie
+          pour la reconstitution), et à un emplacement géographique précis
+          (où s'ancre l'AR). Une fois le contenu validé scientifiquement
+          (cohérent avec D10 et le rôle de valideur scientifique défini en
+          personas), il devient disponible pour les surfaces grand public —
+          ce qui fait apparaître le point d'accès D8.1 sur le pin concerné.
+          L'engagement minimal est qu'au moins UN bâtiment soit produit et
+          disponible sur la durée du projet.
+
+      regles_fonctionnelles:
+          - "Tout contenu 3D/AR est rattaché à un pin (D2)"
+          - "Tout contenu 3D/AR est rattaché à une ou plusieurs époques (cohérence avec le slider D1.2)"
+          - "Tout contenu 3D/AR est rattaché à des sources historiques traçables (cohérent avec le principe d'historicité — essence § principe historicite)"
+          - "Tout contenu 3D/AR a un emplacement géographique précis pour l'ancrage AR"
+          - "Un contenu 3D/AR n'est rendu disponible aux surfaces grand public qu'après validation scientifique (cohérent avec D10)"
+          - "Un même pin peut potentiellement porter plusieurs contenus 3D/AR (différents états, différentes époques) — gestion à acter avec le dev 3D/VR et la lead/historienne"
+          - "Engagement minimal : au moins un bâtiment reconstruit en 3D visualisable en AR sur la durée du projet"
+
+      capabilites:
+          - "Attacher un contenu 3D/AR à un pin"
+          - "Renseigner l'époque, les sources et l'emplacement géographique d'un contenu 3D/AR"
+          - "Soumettre un contenu 3D/AR à la validation scientifique"
+          - "Rendre disponible aux surfaces grand public un contenu 3D/AR validé"
+          - "Retirer ou mettre à jour un contenu 3D/AR existant"
+
+      ce_qu_on_ne_fait_pas:
+          - "Pas de mise en ligne d'un contenu 3D/AR sans validation scientifique préalable"
+          - "Pas de contenu 3D/AR détaché d'un pin (l'ancrage à un lieu est une condition d'existence)"
+          - "Pas de génération automatique de modèles 3D par IA sur ce périmètre (à acter explicitement si l'équipe veut s'y aventurer — implications de sourçage et de fiabilité historique)"
+          - "Pas de modélisation libre par les utilisateurs grand public (la 3D/AR est produite côté back-office, pas soumise par la communauté)"
+
+      criteres_de_reussite:
+          - "Au minimum un bâtiment est reconstruit, validé et disponible aux utilisateurs sur la durée du projet (engagement minimal du brief § 15 atteint)"
+          - "Anaïs peut associer un contenu 3D/AR produit par le dev 3D/VR à un pin sans batailler avec un outil dédié"
+          - "La validation scientifique d'un contenu 3D/AR est traçable au même titre que celle d'un texte de pin (cohérence avec D10)"
+          - "L'apparition d'un nouveau contenu 3D/AR ne perturbe pas la consultation des pins qui n'en ont pas"
+
+      definition_of_done:
+          - "Un contenu 3D/AR peut être attaché à un pin côté back-office"
+          - "L'époque, les sources et l'emplacement géographique d'un contenu 3D/AR sont renseignables"
+          - "Un contenu 3D/AR n'est disponible aux surfaces grand public qu'après validation scientifique"
+          - "Au minimum un bâtiment 3D/AR est produit, validé et publié"
+          - "Le retrait ou la mise à jour d'un contenu 3D/AR existant est possible côté back-office"
+
+      enjeux_transversaux:
+          accessibilite: >-
+              Côté production : la lead/historienne et Anaïs doivent pouvoir
+              renseigner les équivalents texte/image qui accompagneront le
+              contenu 3D/AR pour les utilisateurs qui n'y accèdent pas (cf.
+              a11y de D8.2 et D8.3). L'enjeu est ici de FORCER côté template
+              la présence d'un équivalent textuel — sans quoi l'a11y aval n'est
+              pas tenable.
+          performance: >-
+              Le poids des modèles 3D/AR a un impact direct sur le
+              téléchargement et le mode hors-ligne (D1.1). À arbitrer avec
+              le dev 3D/VR : modèles préchargés à l'avance ? À la demande ?
+              Quel impact sur l'autonomie d'usage ? Critères chiffrés en
+              palier 16.
+          vie_privee: >-
+              Pas d'enjeu spécifique sur la production côté back-office.
+              Les enjeux vie privée se concentrent sur la consommation
+              (caméra AR, D8.3).
+
+      questions_ouvertes:
+          - "Combien de modèles 3D/AR seront produits sur la durée du projet ? Engagement minimal : 1. Au-delà : à trancher avec le dev 3D/VR selon sa charge"
+          - "Quel(s) bâtiment(s) prioritaire(s) reconstituer ? À arbitrer avec la lead/historienne (richesse de la source, intérêt narratif, couverture d'époque)"
+          - "Pipeline de production : modélisation Blender → export vers quel format ? À acter avec le dev 3D/VR"
+          - "Validation scientifique d'un modèle 3D vs validation d'un texte : mêmes critères ou critères ad-hoc ? À acter avec la lead/historienne"
+          - "Versionnage des modèles (le dev 3D/VR met à jour un modèle après publication — comment gère-t-on les versions ?) — à articuler avec D10"
+
+      priorite: "si_le_temps"
+
+      personas_principaux:
+          - editeur_de_contenu
+
+      dependances:
+          - "D10 (production de contenu — cadre général dans lequel s'inscrit la production 3D/AR)"
+          - "D2 (pins et contenu — un contenu 3D/AR est nécessairement attaché à un pin)"
+          - "D8.1, D8.2, D8.3 (surfaces grand public alimentées par cette production)"
+
+# -----------------------------------------------------------------------------
+# Persona-check du domaine D8
+# -----------------------------------------------------------------------------
+persona_check:
+    kenji:
+        pertinence: "Élevée — l'AR est l'argument d'émerveillement le plus fort qu'il rapportera au Japon"
+        scenarios_passes:
+            - scenario: "Devant un édifice à Lyon, lever son téléphone et voir une reconstitution superposée"
+              reponse: "Couvert par D8.3 (superposition AR avec ancrage géographique). Conditionnel à la disponibilité d'un contenu 3D/AR pour ce pin (D8.4). Priorité 'si_le_temps' — on garantit au minimum 1 cas."
+            - scenario: "Comprendre la 3D/AR sans tutoriel ni français"
+              reponse: "Couvert : le point d'accès D8.1 est conditionnel et visible sur les pins concernés ; la consultation D8.2 a une contextualisation. La compréhension repose sur l'évidence du visuel, pas sur une explication textuelle."
+            - scenario: "Permission caméra refusée par défaut sur son terminal d'hôtel"
+              reponse: "Couvert par D8.3 : retour propre à la consultation 3D, pas de drame, pas de dégradation perçue (cohérent avec la posture canonique permissions juste-à-temps D5.5)."
+        questions_levees:
+            - "Quel(s) bâtiment(s) seront prioritaires pour Kenji (Vieux Lyon, Croix-Rousse) ? — arbitrage lead/historienne"
+
+    mme_dupont:
+        pertinence: "Modérée — la 3D/AR peut être un moment fort d'une sortie, mais le parcours ne doit jamais en dépendre"
+        scenarios_passes:
+            - scenario: "Préparer une sortie incluant un pin avec contenu 3D/AR"
+              reponse: "Le point d'accès est conditionnel (D8.1) — Mme Dupont sait à l'avance si un pin a de la 3D/AR. Aucune dépendance imposée : si la 3D ne marche pas le jour J (terminal d'un parent incompatible), la sortie tient quand même grâce au contenu textuel/image équivalent (a11y D8.2)."
+            - scenario: "Parent accompagnateur dont le terminal n'est pas compatible AR"
+              reponse: "Couvert par D8.3 : la bascule AR n'est simplement pas proposée, sans message culpabilisant. Le parent peut consulter en 3D (D8.2) si le terminal supporte la 3D, sinon il consulte le contenu approfondi (D2.5) qui contient l'équivalent."
+        questions_levees:
+            - "Compatibilité AR sur l'ensemble du parc de smartphones des parents accompagnateurs — à valider"
+
+    mme_martin:
+        pertinence: "Élevée — la projection en classe d'une reconstitution 3D est un moment fort du cours d'histoire urbaine"
+        scenarios_passes:
+            - scenario: "Projeter une reconstitution 3D au tableau pour un cours sur l'évolution urbaine"
+              reponse: "Couvert par D8.2 (consultation 3D immersive en mode présentation sans chrome canonique D2.5). La lisibilité depuis le fond de la classe est un critère explicite. La contextualisation (source) reste accessible — crédibilité préservée devant les élèves."
+            - scenario: "Expliquer aux élèves que l'AR existe sur le terrain sans pouvoir l'activer en classe"
+              reponse: "Couvert : la consultation 3D (D8.2) suffit en mode canapé/classe, l'AR (D8.3) n'est pas nécessaire pour le cours."
+            - scenario: "Citer la source de la reconstitution devant les élèves"
+              reponse: "Couvert par D8.2 (contextualisation accessible pendant la consultation) et D8.4 (production avec sources renseignées et validées)."
+        questions_levees:
+            - "Niveau de fidélité visuelle nécessaire pour ne pas paraître 'gadget' devant des collégiens — à arbitrer avec le dev 3D/VR"
+
+    pere_lyonnais:
+        pertinence: "Élevée — l'AR sur sa rue produit l'effet de révélation 'voilà ce qui était là' qui est exactement son moteur (cf. citation persona)"
+        scenarios_passes:
+            - scenario: "Découvrir par hasard qu'un pin de son quartier propose l'AR"
+              reponse: "Couvert par D8.1 (point d'accès conditionnel — son apparition est en soi un signal). Cohérent avec le principe de sérendipité (essence § principe sérendipité)."
+            - scenario: "Lever son téléphone devant un mur familier et voir ce qui s'y trouvait"
+              reponse: "Couvert par D8.3 (superposition AR avec ancrage géographique sur place)."
+            - scenario: "Activer l'AR sans avoir préparé quoi que ce soit"
+              reponse: "Couvert : zéro préparation nécessaire, permission caméra demandée juste-à-temps."
+        questions_levees: []
+
+    anais_back_office:
+        pertinence: "Élevée sur D8.4 (production des reconstitutions) — c'est elle qui orchestre l'attachement contenu/pin/sources"
+        scenarios_passes:
+            - scenario: "Attacher un modèle 3D produit par le dev 3D/VR à un pin existant, avec sources et époque"
+              reponse: "Couvert par D8.4 (capabilités de production). Détail du workflow d'attachement à articuler avec D10."
+            - scenario: "Soumettre la reconstitution à validation scientifique"
+              reponse: "Couvert par D8.4 (validation préalable obligatoire avant disponibilité grand public). Workflow exact défini en D10."
+        questions_levees:
+            - "Validation scientifique d'un modèle 3D : critères ad-hoc ou mêmes que pour un texte ? — à acter avec la lead/historienne"

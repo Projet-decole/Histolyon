@@ -1,0 +1,786 @@
+# =============================================================================
+# Palier 3 — Domaine D2 — Pins et contenu d'un lieu
+# =============================================================================
+# Les pins sont la deuxième brique non-négociable d'HistoLyon (cf. brief § 7).
+# Ils marquent les lieux qui 'ont quelque chose à dire' et incarnent à la fois
+# la sérendipité (le pin surgit là où on passe), l'historicité (chaque pin
+# repose sur du contenu sourcé) et l'émerveillement (le contenu se déploie
+# par couches successives).
+#
+# Ce domaine couvre TOUT ce qui touche à un pin : sa présence sur la carte,
+# sa catégorisation, sa nature multi-époques, et le contenu qui se déploie
+# (aperçu rapide → consultation approfondie → contenus complexes entrelacés
+# → engagement post-narratif).
+#
+# Définit canoniquement le MODE PRÉSENTATION SANS CHROME (D2.5) — comportement
+# transverse référencé depuis D1.1 (carte projetable), D3.6 (mode canapé) et
+# D8.2 (consultation 3D).
+# =============================================================================
+
+document:
+    type: palier_fonctionnalites_domaine
+    domaine_id: D2
+    numero: 3
+    audience:
+        - "Tout agent qui rédige un palier en aval (4 à 16)"
+        - "Devs Flutter (cahier des charges fonctionnel pour les pins et la consultation)"
+        - "Anaïs Lefèvre (productrice de contenu — comprendre comment son contenu sera vu)"
+    role: >-
+        Décrire fonctionnellement les pins et tout ce qui s'ouvre depuis un pin :
+        aperçu rapide, consultation approfondie, contenus complexes, engagement
+        post-narratif.
+    format: yaml
+    prerequis_de_lecture:
+        - "design/conception/intention.yaml — § 5.7 et § 11"
+        - "design/conception/01-essence.yaml"
+        - "design/conception/02-personas.yaml"
+        - "design/conception/03-fonctionnalites/00-index.yaml v1.1 — § 2 anti_perimetre_strict OBLIGATOIRE"
+        - "design/conception/03-fonctionnalites/01-carte-exploration-temporelle.yaml v1.1 (pilote)"
+
+# -----------------------------------------------------------------------------
+# Raison d'être du domaine
+# -----------------------------------------------------------------------------
+raison_d_etre_du_domaine: >-
+    Si la carte (D1) est la scène, les pins sont les acteurs. Sans eux, la carte
+    est une carte. Avec eux, elle devient un livre vivant — chaque marqueur est
+    une porte qui s'ouvre sur une histoire, une archive, une voix.
+
+    Ce domaine sert TOUS les personas grand public, et c'est lui qui transporte
+    le ton conteur de l'app. Mme Martin trouve ici le contenu rigoureux à
+    projeter en classe ; Kenji ses anecdotes audio à écouter en marchant ;
+    Mme Dupont les pins qu'elle assemble en parcours scolaire ; le père
+    lyonnais ses pépites dominicales. C'est aussi le domaine qui matérialise
+    le principe d'historicité (sources visibles, contenu sourcé) et celui
+    d'émerveillement (entrelacement narratif, archives, audio, surprises).
+
+    Anaïs (palier 2, back-office) PRODUIT pour ce domaine — tous les
+    sous-domaines doivent rester compatibles avec ses templates (D10).
+
+# -----------------------------------------------------------------------------
+# Sous-domaines
+# -----------------------------------------------------------------------------
+sous_domaines:
+    # ===========================================================================
+    - id: D2.1
+      nom: "Pin sur la carte"
+
+      raison_d_etre: >-
+          Marquer les lieux qui ont du contenu, sans saturer la carte.
+          Le pin est le déclencheur immédiat de la sérendipité — il
+          doit attirer l'œil sans crier, et signaler du premier coup d'œil
+          le TYPE de lieu (catégorie) et son STATUT (parcours actif, hors
+          parcours, multi-époques).
+
+      comportement: >-
+          Chaque pin est associé à un lieu et signale visuellement sa
+          catégorie (cf. D2.2) et son contexte d'usage (normal, mis en
+          avant pendant un parcours, atténué hors parcours, à proximité du
+          tracé). Quand la densité de pins est trop forte au niveau de zoom
+          courant, les pins proches se regroupent pour ne pas saturer
+          l'écran. Au tap, le pin déclenche l'ouverture de l'aperçu rapide
+          (D2.4) ; au tap sur un regroupement, la carte s'approfondit sur
+          la zone correspondante. Si un pin a du contenu à plusieurs
+          époques (D2.3), il le signale visuellement de façon distincte.
+
+      regles_fonctionnelles:
+          - "Un pin est associé à un lieu et à une catégorie (cf. D2.2)"
+          - "Un pin est associé à au moins une époque (multi-époques OK)"
+          - "Le pin reflète son contexte d'usage : normal, parcours actif (mis en avant), hors parcours (atténué), à proximité du tracé d'un parcours actif"
+          - "Regroupement automatique des pins proches au-dessous d'un certain niveau de zoom"
+          - "Tap pin → ouverture de l'aperçu rapide (D2.4)"
+          - "Tap regroupement → approfondissement de la carte sur la zone"
+          - "Le filtre par époque (piloté par D1.2) détermine quels pins sont visibles, sauf en mode 'Aujourd'hui' où tous les pins de toutes les époques sont visibles (cf. D1.2)"
+
+      capabilites:
+          - "Présenter un pin associé à un lieu, à une catégorie et à une ou plusieurs époques"
+          - "Distinguer visuellement chaque pin selon sa catégorie (cf. D2.2)"
+          - "Adapter la présentation du pin à son contexte d'usage (parcours actif, hors parcours, à proximité)"
+          - "Regrouper les pins proches en cas de forte densité au zoom courant"
+          - "Réagir au tap d'un pin et au tap d'un regroupement"
+          - "Signaler visuellement les pins multi-époques (cf. D2.3)"
+          - "Filtrer l'affichage des pins selon l'époque sélectionnée par D1.2"
+
+      ce_qu_on_ne_fait_pas:
+          - "Pas de pin sans catégorie (catégorie obligatoire à la création par Anaïs, cf. D10.1)"
+          - "Pas de pin sans au moins une époque associée"
+          - "Pas d'animation permanente sur les pins (réservée à l'étape en cours d'un parcours, cf. palier 11)"
+          - "Pas de pin masquant la lecture de la carte sous lui (la lisibilité prime)"
+
+      criteres_de_reussite:
+          - "Le père lyonnais distingue d'un coup d'œil un pin 'Anecdote' d'un pin 'Architecture'"
+          - "Mme Martin projette la carte en classe et les pins restent lisibles depuis le fond"
+          - "Pendant un parcours, l'utilisateur identifie immédiatement les pins du parcours versus les autres (atteint le test_litmus du brief § 9.4)"
+          - "Aucun écran de la carte n'est saturé visuellement, même dans les zones denses"
+
+      definition_of_done:
+          - "Chaque pin reflète sa catégorie de manière visuellement distinguable"
+          - "Le regroupement fonctionne au-dessous d'un niveau de zoom donné"
+          - "Le tap sur un pin ouvre l'aperçu rapide (D2.4)"
+          - "Le tap sur un regroupement approfondit la carte sur la zone"
+          - "Les contextes d'usage (normal, parcours actif, hors parcours, à proximité) sont distinguables"
+          - "Les pins multi-époques sont signalés visuellement"
+          - "Le filtre par époque (D1.2) modifie l'affichage des pins"
+
+      enjeux_transversaux:
+          accessibilite: >-
+              La distinction des catégories ne doit pas reposer sur un seul
+              canal sensoriel — daltonisme, déficience visuelle, projection
+              de Mme Martin. Le pin doit avoir un label vocal accessible
+              (catégorie + nom du lieu).
+          performance: >-
+              Critique : la carte doit rester fluide même avec une densité
+              élevée de pins. Le regroupement aide. Critères chiffrés en
+              palier 16.
+          vie_privee: "Pas d'enjeu spécifique."
+
+      questions_ouvertes:
+          - "Niveau de zoom de déclenchement du regroupement — palier 9"
+          - "Si un pin est multi-époques en mode 'Aujourd'hui' (vue cumulée), garde-t-il sa marque distinctive multi-époques ou pas ?"
+
+      priorite: "coeur"
+
+      personas_principaux:
+          - kenji
+          - mme_dupont
+          - mme_martin
+          - pere_lyonnais
+
+      dependances:
+          - "D1.1 (carte de base — surface d'accueil)"
+          - "D1.2 (slider d'époques — détermine quels pins sont visibles)"
+          - "D2.2 (catégorisation — base de la distinction visuelle)"
+          - "D2.3 (multi-époques — détermine la marque distinctive)"
+          - "D2.4 (aperçu rapide — ouvert au tap)"
+
+    # ===========================================================================
+    - id: D2.2
+      nom: "Catégorisation"
+
+      raison_d_etre: >-
+          Donner à l'utilisateur un repère typologique immédiat (chaque pin
+          appartient à un type de lieu identifiable au coup d'œil) et
+          permettre le filtrage par catégorie dans la recherche (D1.4).
+          Onze catégories ont émergé du brief (§ 7.2), couvrant tout ce
+          qu'un lieu lyonnais peut avoir à dire — du monument aux mères
+          lyonnaises, de la Révolte des Canuts à la Fête des Lumières.
+
+      comportement: >-
+          Chaque pin appartient à UNE seule catégorie, choisie à la
+          création par la productrice de contenu (Anaïs, D10.1). Onze
+          catégories mutuellement exclusives sont disponibles : Classique,
+          Anecdote, Musée/Institution, Personne (Célébrité (Jean moulin, Bocuse, ...) / un canut / une lavandière), Événement,
+          Lieu disparu, Vie quotidienne, Architecture, Nature/Géographie,
+          Patrimoine vivant & Traditions, Gastronomie. Une règle de tri
+          claire départage les cas frontières : si l'objet est encore
+          vivant ou expérimentable en 2026, il va dans 'Patrimoine vivant'
+          ou 'Gastronomie' ; s'il appartient au passé, il rejoint la
+          catégorie historique correspondante. Chaque catégorie est
+          visuellement distinguable des autres.
+
+      regles_fonctionnelles:
+          - "11 catégories : Classique, Anecdote, Musée/Institution, Personne, Événement, Lieu disparu, Vie quotidienne, Architecture, Nature/Géographie, Patrimoine vivant & Traditions, Gastronomie"
+          - "Mutuellement exclusives — un pin = exactement 1 catégorie"
+          - "Catégorie obligatoire à la création"
+          - "Règle de tri vivant/passé : encore expérimentable en 2026 → Patrimoine vivant ou Gastronomie ; passé → catégorie historique"
+          - "Chaque catégorie est visuellement distinguable des autres (la manière exacte de la distinction relève du palier 9/13)"
+
+      capabilites:
+          - "Associer un pin à une catégorie unique"
+          - "Filtrer les pins par catégorie (utilisé par D1.4 recherche)"
+          - "Présenter visuellement la catégorie d'un pin de façon distinguable"
+          - "Garantir la cohérence du classement grâce à la règle vivant/passé"
+
+      ce_qu_on_ne_fait_pas:
+          - "Pas de pin multi-catégories (1 pin = 1 catégorie stricte)"
+          - "Pas de catégorie 'Autre' ou 'Divers' (force Anaïs à classer rigoureusement)"
+          - "Pas de personnalisation utilisateur des catégories (la liste est figée côté produit)"
+          - "Pas de hiérarchie de catégories (toutes au même niveau)"
+
+      criteres_de_reussite:
+          - "Anaïs hésite rarement à classer un pin (la règle de tri est claire)"
+          - "Mme Dupont peut filtrer 'Patrimoine vivant' pour préparer une sortie sur les Canuts et obtenir un ensemble cohérent"
+          - "Le père lyonnais reconnaît à l'œil qu'un pin est une 'Anecdote' après quelques découvertes"
+
+      definition_of_done:
+          - "Les 11 catégories sont définies et disponibles à la création d'un pin"
+          - "Un pin ne peut être créé sans catégorie"
+          - "La distinction visuelle de chaque catégorie est appliquée sur le pin (D2.1) et dans les surfaces de consultation (D2.4, D2.5)"
+          - "Le filtrage par catégorie fonctionne dans la recherche (D1.4)"
+
+      enjeux_transversaux:
+          accessibilite: >-
+              Critique : la distinction des catégories doit fonctionner pour
+              les utilisateurs daltoniens, les utilisateurs de lecteurs
+              d'écran (label vocal), et la projection en classe par
+              Mme Martin. La nature exacte de la distinction (couleur,
+              icône, forme, combinaison) sera tranchée au palier 9/13 en
+              tenant compte de ces contraintes.
+          performance: "Pas d'enjeu spécifique."
+          vie_privee: "Pas d'enjeu."
+
+      questions_ouvertes:
+          - "Mode de distinction visuelle (couleur, icône, forme, combinaison) — palier 9 + 13"
+          - "Évolution future : faut-il prévoir l'ajout d'une 12e catégorie ? (recommandation : liste figée actuellement)"
+
+      priorite: "coeur"
+
+      personas_principaux:
+          - mme_dupont
+          - mme_martin
+          - pere_lyonnais
+          - kenji
+          - anais_back_office
+
+      dependances:
+          - "D2.1 (présentation visuelle des pins en découle)"
+          - "D2.4 et D2.5 (présentation de la catégorie dans les surfaces de consultation)"
+          - "D10.1 (templates : champ catégorie obligatoire)"
+
+    # ===========================================================================
+    - id: D2.3
+      nom: "Multi-époques"
+
+      raison_d_etre: >-
+          Un même lieu peut avoir du contenu à plusieurs époques —
+          Bellecour à l'Antiquité (forum romain), au XVIIIe (statue de
+          Louis XIV), aujourd'hui (centre vivant). Le multi-époques est
+          l'incarnation du concept de feuilleté historique : le lieu est
+          habité par toutes ses vies. Sans cette capacité, l'app perd sa
+          profondeur temporelle et n'est plus qu'un guide moderne.
+
+      comportement: >-
+          Sur la carte, un pin multi-époques est signalé visuellement de
+          façon distincte d'un pin mono-époque, pour qu'on identifie au
+          coup d'œil que le lieu a plusieurs vies. Dans l'aperçu rapide
+          (D2.4) et la consultation approfondie (D2.5), une navigation
+          entre les couches temporelles est offerte en haut, qui permet
+          à l'utilisateur de passer d'une époque à l'autre du même lieu
+          sans changer de pin. La couche pré-sélectionnée à l'ouverture
+          est celle pointée par le slider d'époques (D1.2) si elle a du
+          contenu, sinon la première disponible.
+
+      regles_fonctionnelles:
+          - "Un pin est multi-époques s'il a du contenu à au moins 2 époques"
+          - "Sur la carte : marque distinctive visuelle (D2.1)"
+          - "Dans l'aperçu et la consultation : navigation entre les époques disponibles"
+          - "Tap sur une époque change le contenu affiché sans fermer l'aperçu/consultation"
+          - "L'époque pré-sélectionnée est celle du slider (D1.2) si elle a du contenu, sinon la première disponible"
+          - "Pas de navigation entre époques pour un pin mono-époque (élément absent)"
+
+      capabilites:
+          - "Identifier un pin multi-époques par une marque distinctive sur la carte"
+          - "Offrir une navigation entre les couches temporelles d'un même pin dans l'aperçu et la consultation"
+          - "Naviguer entre les couches sans quitter la surface de consultation"
+          - "Pré-sélectionner la couche pertinente à l'ouverture selon la position du slider"
+
+      ce_qu_on_ne_fait_pas:
+          - "Pas de pin multi-époques sans qu'au moins une époque ait du contenu narratif"
+          - "Pas d'affichage simultané de toutes les époques dans une même surface (navigation entre, pas tout étalé)"
+          - "Pas d'élément de navigation époques pour les pins mono-époque"
+
+      criteres_de_reussite:
+          - "Mme Martin présente Bellecour en classe et navigue entre Antiquité / XVIIIe / Aujourd'hui sans changer de pin (atteint test_litmus mme_martin n°2)"
+          - "Kenji distingue immédiatement un pin multi-époques d'un pin simple sur la carte"
+          - "Le père lyonnais découvre que sa rue préférée est multi-époques et navigue dans son passé — moment d'émerveillement"
+
+      definition_of_done:
+          - "La marque distinctive est visible sur les pins multi-époques de la carte"
+          - "La navigation entre époques est offerte dans l'aperçu (D2.4) et la consultation (D2.5) si ≥ 2 époques"
+          - "Le tap sur une époque change le contenu affiché"
+          - "La pré-sélection à l'ouverture suit la position du slider"
+
+      enjeux_transversaux:
+          accessibilite: >-
+              La marque multi-époques doit avoir un label vocal explicite
+              (ex. 'lieu présent à 3 époques'). La navigation entre époques
+              doit être accessible au clavier et annoncée par lecteurs
+              d'écran.
+          performance: >-
+              Le passage d'une époque à l'autre dans une même consultation
+              doit être perçu comme immédiat (pas de chargement long).
+          vie_privee: "Pas d'enjeu."
+
+      questions_ouvertes:
+          - "Forme exacte de la marque distinctive multi-époques — palier 9/13"
+          - "En mode 'Aujourd'hui' (D1.2 vue cumulée), les pins multi-époques gardent-ils leur marque distinctive ou pas ?"
+
+      priorite: "coeur"
+
+      personas_principaux:
+          - kenji
+          - mme_martin
+          - pere_lyonnais
+
+      dependances:
+          - "D2.1 (marque sur la carte)"
+          - "D2.4 (navigation entre époques dans l'aperçu)"
+          - "D2.5 (navigation entre époques dans la consultation)"
+          - "D1.2 (slider — pré-sélection à l'ouverture)"
+
+    # ===========================================================================
+    - id: D2.4
+      nom: "Aperçu rapide d'un pin"
+
+      raison_d_etre: >-
+          Permettre une découverte rapide d'un pin sans engager une lecture
+          profonde. C'est le pas-de-porte de l'histoire — l'utilisateur tap
+          un pin, voit en quelques secondes si ça l'intéresse, et décide
+          d'aller plus loin (consultation approfondie) ou de refermer.
+          L'écran principal (la carte) reste visible derrière l'aperçu —
+          l'utilisateur ne perd pas son orientation. C'est une concession
+          nécessaire à la sérendipité : on ouvre vite, on ferme vite, on
+          reste libre.
+
+      comportement: >-
+          Au tap sur un pin (D2.1), un aperçu rapide s'ouvre en superposition
+          de la carte. Il laisse la carte visible derrière, et l'utilisateur
+          peut le refermer par un geste simple. L'aperçu présente : le titre
+          du lieu, sa catégorie, la navigation entre époques si multi-époques
+          (D2.3), un teaser narratif court, une image, un accès à la
+          consultation approfondie (D2.5), un accès au partage (référence
+          D11.5). Pendant la création d'un parcours (D3.7), un accès
+          'Ajouter au parcours' apparaît également ; il n'est visible
+          qu'en mode création. Pendant un parcours actif, sur un pin hors
+          parcours, l'aperçu signale discrètement que ce lieu n'est pas
+          dans le parcours en cours.
+
+      regles_fonctionnelles:
+          - "L'aperçu se superpose à la carte qui reste visible derrière"
+          - "Ouverture par tap sur un pin (D2.1)"
+          - "Fermeture par geste simple (à préciser au palier 7) ou tap en dehors"
+          - "Présente : titre, catégorie, navigation entre époques (si multi), teaser narratif court, image, accès à la consultation approfondie, accès au partage"
+          - "Accès 'Ajouter au parcours' visible UNIQUEMENT pendant la création d'un parcours (D3.7)"
+          - "Pendant un parcours actif, sur un pin hors parcours : signal discret 'Ce lieu n'est pas dans votre parcours' (cf. D3.10)"
+
+      capabilites:
+          - "Ouvrir un aperçu rapide au tap sur un pin"
+          - "Présenter titre, catégorie, époques si multi, teaser narratif, image"
+          - "Permettre l'accès à la consultation approfondie (D2.5)"
+          - "Permettre le partage du pin (référence D11.5)"
+          - "Permettre l'ajout au parcours en construction (D3.7) si applicable"
+          - "Signaler le statut hors-parcours pendant un parcours actif"
+
+      ce_qu_on_ne_fait_pas:
+          - "Pas d'ouverture directe de la consultation approfondie au tap (un tap explicite est nécessaire)"
+          - "Pas d'accès 'Ajouter au parcours' visible en dehors du mode création (évite la pollution)"
+          - "Pas de scroll long dans l'aperçu (la lecture profonde est en D2.5)"
+          - "Pas de fermeture automatique de l'aperçu quand l'utilisateur tap un autre pin (mise à jour avec le nouveau pin)"
+
+      criteres_de_reussite:
+          - "Le père lyonnais lit le teaser en quelques secondes et décide soit de fermer soit d'aller plus loin (atteint test_litmus pere_lyonnais)"
+          - "Kenji ouvre un aperçu, le teaser est traduit, image visible, accès à la consultation compréhensible sans français"
+          - "Mme Dupont en mode création de parcours peut ajouter un pin en peu d'actions"
+
+      definition_of_done:
+          - "L'aperçu s'ouvre au tap sur un pin"
+          - "Tous les éléments présentés (titre, catégorie, époques si multi, teaser, image, accès consultation, accès partage)"
+          - "L'accès 'Ajouter au parcours' est conditionnel au mode création (D3.7)"
+          - "Le signal hors-parcours est conditionnel au parcours actif"
+          - "L'aperçu se ferme par geste ou tap en dehors"
+          - "L'accès à la consultation approfondie ouvre D2.5"
+          - "L'aperçu se met à jour quand un autre pin est tapé sans se refermer"
+
+      enjeux_transversaux:
+          accessibilite: >-
+              L'aperçu doit recevoir le focus à son ouverture, et être lu
+              par lecteurs d'écran. Ses contrôles (consultation, partage,
+              fermeture) doivent être accessibles.
+          performance: >-
+              L'ouverture doit être perçue comme immédiate (pas de
+              chargement long) — l'aperçu est un geste réflexe, pas une
+              navigation lourde.
+          vie_privee: "Pas d'enjeu spécifique."
+
+      questions_ouvertes:
+          - "Comportement quand l'utilisateur tap un autre pin alors que l'aperçu est ouvert (mise à jour fluide ou re-animation ?) — palier 7"
+
+      priorite: "coeur"
+
+      personas_principaux:
+          - kenji
+          - mme_dupont
+          - mme_martin
+          - pere_lyonnais
+
+      dependances:
+          - "D2.1 (déclenché par tap sur pin)"
+          - "D2.3 (navigation entre époques si multi)"
+          - "D2.5 (consultation approfondie — accessible depuis l'aperçu)"
+          - "D3.7 (mode création de parcours — conditionne l'accès 'Ajouter')"
+          - "D3.5 (vivre un parcours — conditionne le signal hors-parcours pendant un parcours actif)"
+
+      comportements_transverses_referenced:
+          - "Partage natif système (canonique D11.5) — accès au partage de l'aperçu"
+
+    # ===========================================================================
+    - id: D2.5
+      nom: "Consultation approfondie d'un pin"
+
+      raison_d_etre: >-
+          C'est le COEUR DU CONTENU — l'endroit où l'histoire se déploie
+          pleinement. La consultation approfondie est le pattern signature
+          d'HistoLyon (cf. brief § 8) : un parcours narratif où le récit
+          est le fil conducteur, et où les contenus complexes (D2.6) sont
+          tissés dans le flux aux moments contextuellement pertinents. Pas
+          de catégorisation latérale, pas d'onglets : tout vit dans la
+          progression de la lecture. C'est ici que se joue l'émerveillement,
+          l'historicité (sources visibles), la mémorabilité.
+
+          Ce sous-domaine définit AUSSI le MODE PRÉSENTATION SANS CHROME
+          — comportement transverse référencé par D1.1 (carte projetable
+          pour Mme Martin), D3.6 (mode canapé) et D8.2 (consultation 3D).
+          Le mode masque toutes les surfaces de navigation et de
+          persistance non-narratives, pour une consultation totalement
+          immersive ou une projection en classe. La liste exacte des
+          surfaces masquées relève du palier 7.
+
+      comportement: >-
+          L'utilisateur arrive sur la consultation approfondie depuis
+          l'aperçu (D2.4) en activant 'Voir plus', ou directement à
+          l'arrivée géolocalisée pendant un parcours actif ou en mode
+          Surprenez-moi (D4.2 / D4.3). La consultation organise le
+          contenu en une progression : (a) une mise en condition visuelle
+          d'ouverture, (b) un accès aux contrôles audio si le pin a une
+          narration audio (cf. D7), (c) un teaser de l'engagement
+          post-narratif s'il existe (par exemple 'Quiz disponible'),
+          (d) le récit principal avec contenus complexes tissés (D2.6),
+          (e) une zone d'engagement post-narratif distincte (D2.7).
+          Un accès à la 3D/AR (D8) est offert UNIQUEMENT si le pin a du
+          contenu 3D/AR. Un accès au mode présentation sans chrome est
+          disponible — il masque les surfaces de navigation et de
+          persistance non-narratives, conserve le contenu et un retour
+          vers le mode normal. Pendant un parcours actif (D3.10), un
+          accès vers l'étape suivante est présent en pied de la
+          consultation.
+
+      regles_fonctionnelles:
+          - "Consultation en pleine surface avec progression continue de lecture"
+          - "Structure : mise en condition visuelle → accès audio (si narration) → teaser engagement (si quiz/énigme) → récit principal avec contenus complexes tissés → zone post-narrative"
+          - "L'accès audio n'apparaît que si le pin a une narration audio"
+          - "Le teaser d'engagement n'apparaît que si le pin a une zone post-narrative engageante (D2.7)"
+          - "L'accès 3D/AR n'apparaît que si le pin a du contenu 3D/AR (D8)"
+          - "Mode présentation sans chrome : masque les surfaces de navigation et de persistance non-narratives ; le retour reste accessible (liste exacte de ce qui est masqué — palier 7)"
+          - "Mode présentation activable depuis la consultation et depuis la consultation 3D (D8.2)"
+          - "Pendant un parcours actif, accès vers l'étape suivante visible en pied (cf. D3.10)"
+
+      capabilites:
+          - "Présenter une consultation approfondie en pleine surface"
+          - "Maintenir l'accès aux contrôles audio pendant la consultation (référence D7.5)"
+          - "Présenter conditionnellement le teaser de la zone post-narrative"
+          - "Présenter conditionnellement l'accès à la 3D/AR"
+          - "Activer le mode présentation sans chrome (et y revenir)"
+          - "Présenter un accès à l'étape suivante pendant un parcours actif"
+          - "Naviguer entre les époques d'un pin multi-époques sans quitter la consultation (cf. D2.3)"
+          - "Permettre le retour à la carte ou à l'aperçu"
+
+      ce_qu_on_ne_fait_pas:
+          - "Pas d'éléments latéraux pour ouvrir des médias (tout est tissé dans la progression, cf. brief § 8.2)"
+          - "Pas d'onglets séparant les types de contenu (sauf navigation entre époques pour multi-époques)"
+          - "Pas d'accès 3D/AR sur les pins sans contenu 3D/AR (évite la pollution)"
+          - "Pas de mode présentation qui masque le retour"
+          - "Pas de séparation invisible entre récit et zone post-narrative (frontière nette obligatoire)"
+          - "Pas de promotion ni d'auto-promotion (essence § ce_qu_on_refuse : city branding)"
+
+      criteres_de_reussite:
+          - "Mme Martin projette une consultation en mode présentation sans chrome — atteint test_litmus mme_martin n°1"
+          - "Kenji marche avec son casque, l'audio démarre, il vit la lecture sans regarder son écran (D7 dépendance)"
+          - "Le père lyonnais lit une anecdote, tombe sur une archive au moment juste, sourit"
+          - "Aucun élément de chrome ne distrait Mme Martin pendant qu'elle commente devant ses élèves"
+
+      definition_of_done:
+          - "Consultation s'ouvre depuis l'aperçu (action 'Voir plus')"
+          - "Structure de lecture respectée (mise en condition, audio si applicable, teaser conditionnel, récit, zone post-narrative)"
+          - "Accès audio conditionnel à la présence de narration audio"
+          - "Teaser d'engagement conditionnel à la présence d'une zone post-narrative"
+          - "Accès 3D/AR conditionnel à la présence de contenu 3D/AR"
+          - "Mode présentation sans chrome activable et fonctionnel ; retour accessible"
+          - "Accès à l'étape suivante visible pendant un parcours actif"
+          - "Navigation entre époques fonctionne pour les pins multi-époques"
+
+      enjeux_transversaux:
+          accessibilite: >-
+              Le mode présentation sans chrome doit rester accessible aux
+              lecteurs d'écran (les contenus restent lisibles à voix haute).
+              Le retour reste toujours accessible. L'audio doit avoir un
+              équivalent texte (cf. D7).
+          performance: >-
+              La progression de lecture doit être fluide même avec contenus
+              complexes. Le passage entre mode normal et mode présentation
+              doit être rapide.
+          vie_privee: "Pas d'enjeu spécifique."
+
+      questions_ouvertes:
+          - "Mode présentation : doit-il aussi masquer les contrôles audio, ou les conserver ? — à arbitrer en lien avec D7.5"
+          - "En mode parcours actif sur arrivée géolocalisée : ouverture en mode présentation par défaut ou en mode normal ? (recommandation : normal par défaut, optionnel via préférence utilisateur D6.4)"
+          - "Activation du mode présentation : action explicite ou geste ? — palier 7"
+
+      priorite: "coeur"
+
+      personas_principaux:
+          - kenji
+          - mme_martin
+          - pere_lyonnais
+          - mme_dupont
+
+      dependances:
+          - "D2.4 (aperçu rapide — point d'entrée)"
+          - "D2.3 (navigation entre époques si multi)"
+          - "D2.6 (contenus complexes tissés)"
+          - "D2.7 (zone post-narrative)"
+          - "D7 (audio et narration)"
+          - "D3.10 (parcours actif — accès étape suivante)"
+          - "D8 (3D/AR — accès conditionnel)"
+
+      comportements_transverses_referenced:
+          - "Mode présentation sans chrome — ce sous-domaine est la RÉFÉRENCE CANONIQUE (réutilisé en D3.6 mode canapé, D1.1 carte projetable, D8.2 consultation 3D)"
+          - "Lecture audio en arrière-plan (canonique D7.4) — l'audio peut continuer même quand la consultation se ferme"
+          - "Partage natif système (canonique D11.5) — accès au partage dans la consultation"
+
+    # ===========================================================================
+    - id: D2.6
+      nom: "Contenus complexes tissés"
+
+      raison_d_etre: >-
+          Les images d'archives, les citations, les avant/après, les
+          puzzles, les 'Le saviez-vous ?', les frises mini — tous ces
+          contenus enrichissent le récit sans le casser. Le brief
+          (§ 8.2-8.3) tranche : pas d'éléments latéraux, pas d'onglets
+          'Médias'. Tout est TISSÉ dans la progression de lecture aux
+          moments contextuellement pertinents. Une archive après
+          'Imaginez-vous en 1831...' produit de l'émotion ; une archive
+          isolée dans une galerie ne produit qu'une page de musée.
+
+      comportement: >-
+          Pendant la consultation approfondie (D2.5), le récit principal
+          est ponctué de blocs de contenu complexe insérés à des positions
+          contextuellement choisies par Anaïs (D10.1) au moment de la
+          saisie du pin. Six types principaux sont disponibles : (1)
+          images d'archives — colorisées ou brutes ; (2) avant/après —
+          superposition d'une archive sur la vue actuelle, transparence
+          modulable ; (3) puzzles — image d'archive en puzzle, optionnel,
+          passable ; (4) citations historiques — encart distinct avec
+          attribution et date ; (5) 'Le saviez-vous ?' — encart anecdotique
+          court ; (6) frise mini — dates clés du LIEU spécifique. Les
+          sources sont visibles sur chaque archive et citation
+          (essence § historicité).
+
+      regles_fonctionnelles:
+          - "Six types de contenus complexes : archives, avant/après, puzzles, citations historiques, 'Le saviez-vous ?', frise mini"
+          - "Insertion contextuelle dans la progression du récit (position choisie par Anaïs)"
+          - "Sources visibles sur chaque archive et chaque citation (essence § historicité)"
+          - "Pas d'éléments latéraux pour ouvrir un contenu : tout est dans la progression"
+          - "Avant/après : transparence modulable par l'utilisateur"
+          - "Puzzle : optionnel — l'utilisateur peut passer sans résoudre"
+          - "Frise mini : limitée aux dates clés du LIEU (pas une frise globale de Lyon)"
+          - "Chargement progressif des médias au fil de la progression"
+
+      capabilites:
+          - "Insérer une image d'archive (colorisée ou brute) dans le récit avec source"
+          - "Présenter une superposition avant/après avec transparence modulable"
+          - "Présenter un puzzle interactif sur une image d'archive"
+          - "Présenter une citation historique avec attribution"
+          - "Présenter un encart 'Le saviez-vous ?' compact"
+          - "Présenter une frise mini horizontale des dates clés du lieu"
+          - "Afficher la source de chaque contenu"
+          - "Charger progressivement les médias"
+
+      ce_qu_on_ne_fait_pas:
+          - "Pas de galerie d'archives séparée (entrelacé dans le récit)"
+          - "Pas d'onglet 'Médias' séparé"
+          - "Pas de puzzle bloquant (toujours passable)"
+          - "Pas de contenu complexe sans source visible (essence § historicité)"
+          - "Pas de citation inventée 'pour faire joli' (essence § principe historicité)"
+          - "Pas de frise globale de Lyon dans la consultation d'un pin (limitée au lieu)"
+
+      criteres_de_reussite:
+          - "Mme Martin cite une archive en cours, la source est visible et crédible aux yeux d'un collègue (atteint test_litmus mme_martin n°3)"
+          - "L'utilisateur tombe sur une archive juste après une phrase narrative qui la met en perspective — émotion ressentie"
+          - "Anaïs sait quoi mettre où grâce à des templates clairs (cf. D10.1)"
+
+      definition_of_done:
+          - "Les 6 types de contenus complexes sont implémentés et insérables"
+          - "La source est affichée sur chaque archive et citation"
+          - "L'avant/après fonctionne (transparence modulable)"
+          - "Le puzzle fonctionne (résolvable et passable)"
+          - "La frise mini fonctionne"
+          - "Le chargement progressif des médias fonctionne au fil de la progression"
+
+      enjeux_transversaux:
+          accessibilite: >-
+              Texte alternatif obligatoire sur chaque image d'archive.
+              L'avant/après doit avoir une alternative non-gestuelle. Le
+              puzzle doit avoir une alternative ('voir l'image').
+              Citations lues comme du texte par les lecteurs d'écran.
+          performance: >-
+              Le chargement progressif évite les ralentissements pendant la
+              progression. Les médias volumineux ne doivent pas bloquer.
+          vie_privee: "Pas d'enjeu spécifique."
+
+      questions_ouvertes:
+          - "Faut-il un 7e type 'Vidéo d'archive' (rare mais possible) ? — à arbitrer avec Anaïs et le dev IA"
+          - "Quel moteur pour la colorisation IA des archives ? — palier 9 + dev IA"
+          - "Limite max de contenus complexes par pin (perf, lecture)"
+
+      priorite: "coeur"
+
+      personas_principaux:
+          - mme_martin
+          - kenji
+          - pere_lyonnais
+          - anais_back_office
+
+      dependances:
+          - "D2.5 (consultation approfondie — surface d'accueil)"
+          - "D10.1 (templates — Anaïs insère ces contenus)"
+          - "D10.3 (sources — toutes les archives ont une source tracée)"
+
+    # ===========================================================================
+    - id: D2.7
+      nom: "Zone post-narrative"
+
+      raison_d_etre: >-
+          Prolonger l'engagement après la lecture. Une fois le récit
+          principal terminé, l'utilisateur est ouvert à un quiz, une
+          énigme, un lien 'Pour aller plus loin', ou à explorer un pin
+          lié. C'est la zone des 'à propos', séparée nettement du récit
+          pour que l'utilisateur sache qu'il est sorti du fil principal.
+
+      comportement: >-
+          Après le récit principal et une frontière visuelle nette, la
+          zone post-narrative propose 4 types de contenu (combinables,
+          optionnels individuellement) : (1) un quiz sur ce qu'on vient
+          de lire, adapté à la complexité du contenu ; (2) une énigme
+          plus ouverte et observationnelle ('Cherche dans la rue tel
+          élément, qu'en penses-tu ?') ; (3) des liens 'Pour aller plus
+          loin' (sources détaillées, articles externes, pages officielles
+          pour qui veut creuser) ; (4) des PINS LIÉS — 'Suite de l'histoire
+          au pin X', 'À proximité, découvrez aussi...' — qui invitent à
+          un saut géographique et thématique. La zone est entièrement
+          OPTIONNELLE par pin : Anaïs (D10.1) choisit ce qu'elle inclut.
+
+      regles_fonctionnelles:
+          - "Zone séparée du récit principal par une frontière visuelle nette"
+          - "Quatre types de contenu, combinables et optionnels individuellement : quiz, énigme, liens, pins liés"
+          - "Quiz = questions sur le contenu du pin"
+          - "Énigme = ouverte, observationnelle, pas validée automatiquement"
+          - "Liens 'Pour aller plus loin' = sources externes ou pages web officielles"
+          - "Pins liés = recommandations contextuelles (suite narrative, proximité géographique, thème)"
+          - "Pendant un parcours actif (D3.10), l'accès à l'étape suivante remplace les pins liés en pied de consultation (cf. brief § 9.10)"
+          - "Aucun de ces 4 types n'est obligatoire pour un pin"
+
+      capabilites:
+          - "Présenter un quiz interactif (questions / réponses)"
+          - "Présenter une énigme (texte ouvert, pas de validation automatique)"
+          - "Présenter des liens externes 'Pour aller plus loin'"
+          - "Présenter une liste de pins liés avec contexte"
+          - "Naviguer vers un pin lié (ouvre son aperçu D2.4)"
+          - "Conserver les résultats du quiz dans l'historique de l'utilisateur (D6.3)"
+          - "Substituer la liste 'pins liés' par l'accès à l'étape suivante pendant un parcours"
+
+      ce_qu_on_ne_fait_pas:
+          - "Pas de quiz obligatoire pour passer à la suite"
+          - "Pas de gamification lourde dans cette zone (pas de XP, pas de classements)"
+          - "Pas d'énigme avec validation automatique"
+          - "Pas de liens 'Pour aller plus loin' qui sortent vers une app concurrente ou un site marchand"
+          - "Pas de zone post-narrative présente sur tous les pins (Anaïs choisit selon le pin)"
+
+      criteres_de_reussite:
+          - "Les enfants de Mme Dupont sont attirés par le quiz (test_litmus mme_dupont)"
+          - "Le père lyonnais sourit en lisant un 'Le saviez-vous ?' bien placé"
+          - "Kenji enchaîne sur un pin lié sans friction"
+          - "Pendant un parcours actif, l'utilisateur n'est pas distrait par des pins liés concurrents (étape suivante prend le relais)"
+
+      definition_of_done:
+          - "Les 4 types (quiz, énigme, liens, pins liés) sont disponibles et combinables"
+          - "Une frontière nette sépare récit principal et zone post-narrative"
+          - "Le quiz fonctionne (sélection, validation, score)"
+          - "L'énigme s'affiche sans validation automatique"
+          - "Les liens externes ouvrent le navigateur système"
+          - "Les pins liés ouvrent l'aperçu (D2.4)"
+          - "Pendant un parcours actif, l'accès à l'étape suivante remplace les pins liés"
+          - "Les résultats du quiz sont enregistrés dans l'historique (D6.3)"
+
+      enjeux_transversaux:
+          accessibilite: >-
+              Le quiz doit être navigable au clavier. L'énigme et les liens
+              doivent être lus par lecteurs d'écran. Les liens externes
+              doivent annoncer leur destination. Les résultats du quiz lus
+              à voix haute.
+          performance: >-
+              Le quiz doit donner un retour perçu comme immédiat. Les pins
+              liés ne doivent pas bloquer le chargement par leur présence.
+          vie_privee: >-
+              Les résultats du quiz sont stockés localement par défaut
+              (cf. D6.3). Synchronisation cloud uniquement si l'utilisateur
+              a un compte ET a activé la sync (cf. D6.5).
+
+      questions_ouvertes:
+          - "Format exact du quiz (QCM, réponse libre, autre) — palier 7 + palier 8"
+          - "Algorithme de recommandation 'pins liés' : manuel par Anaïs ou automatique (catégorie/époque/distance) ? (recommandation : MIX manuel + suggestions auto)"
+          - "Limite max de pins liés par pin"
+
+      priorite: "important"
+
+      personas_principaux:
+          - mme_dupont
+          - mme_martin
+          - pere_lyonnais
+          - kenji
+
+      dependances:
+          - "D2.5 (consultation approfondie — surface d'accueil)"
+          - "D2.4 (aperçu — accessible via les pins liés)"
+          - "D3.10 (parcours actif — substitution étape suivante / pins liés)"
+          - "D6.3 (historique — stockage des résultats de quiz)"
+          - "D10.1 (templates — Anaïs choisit ce qu'elle inclut)"
+
+# -----------------------------------------------------------------------------
+# Persona-check du domaine D2
+# -----------------------------------------------------------------------------
+persona_check:
+    kenji:
+        pertinence: "Très élevée — la consultation approfondie est sa surface d'usage principale (audio + multilingue)"
+        scenarios_passes:
+            - scenario: "Marche avec casque, vivre 80% sans regarder l'écran"
+              reponse: "Couvert par D2.5 (audio en arrière-plan, référence D7.4). Texte alternatif sur les archives (D2.6 a11y) lui permet de savoir ce qui est là."
+            - scenario: "Partage d'une découverte sur Instagram en peu de temps"
+              reponse: "Couvert par référence à D11.5 dans D2.4 et D2.5. La microcopy traduite relève du palier 8."
+            - scenario: "Plus de data, continuer hors-ligne"
+              reponse: "Le contenu téléchargé reste consultable. Étendue exacte à trancher avec les devs (cf. D1.1)."
+        questions_levees:
+            - "Mode 'audio prioritaire' qui démarre automatiquement à l'ouverture pour Kenji ? — option utilisateur (D6.4) à arbitrer"
+
+    mme_dupont:
+        pertinence: "Élevée — consulte le contenu pour préparer les CM1-CM2"
+        scenarios_passes:
+            - scenario: "Le contenu d'un pin est-il adapté aux CM1-CM2 ?"
+              reponse: "La fonction CONTENU est dans D2.5/D2.6/D2.7, mais l'adaptation du TON relève du palier 8 (contenu et microcopy). Ici on garantit que la STRUCTURE permet plusieurs registres."
+        questions_levees:
+            - "Niveau de difficulté du quiz adapté à l'âge — palier 8"
+
+    mme_martin:
+        pertinence: "Très élevée — projection en classe, mode présentation sans chrome critique, sources visibles"
+        scenarios_passes:
+            - scenario: "Projeter au tableau sans chrome non pédagogique"
+              reponse: "OUI — DÉFINI CANONIQUEMENT EN D2.5. Le mode présentation masque les surfaces de navigation et de persistance non-narratives."
+            - scenario: "Citer une archive avec source crédible"
+              reponse: "Couvert par D2.6 (sources visibles obligatoires) et D10.3 (gestion des sources back-office)."
+        questions_levees:
+            - "Préférence utilisateur 'ouvrir directement en mode présentation' (D6.4) pour les enseignants ?"
+
+    pere_lyonnais:
+        pertinence: "Très élevée — sérendipité + lecture courte + pins liés pour continuer"
+        scenarios_passes:
+            - scenario: "Lire une anecdote avant que ses enfants ne le tirent"
+              reponse: "Couvert par D2.4 (teaser narratif court) + D2.5 (option d'aller plus loin si le temps)."
+            - scenario: "Retrouver le soir un fait découvert le matin"
+              reponse: "Couvert par D2.7 (historique des résultats de quiz) et D6.3 (historique des pins consultés)."
+        questions_levees: []
+
+    anais_back_office:
+        pertinence: "Très élevée — productrice de tout le contenu de ce domaine"
+        scenarios_passes:
+            - scenario: "Prévisualiser un pin avant publication, voir ce que verra l'utilisateur final"
+              reponse: "Couvert PARTIELLEMENT — la prévisualisation est une capabilité de D10.1 (templates) et D10.4 (CMS si phase 2). Critique pour son test_litmus."
+        questions_levees:
+            - "Modalité de prévisualisation : depuis le CMS ou depuis l'app en mode 'édition' ? — palier 13 admin"

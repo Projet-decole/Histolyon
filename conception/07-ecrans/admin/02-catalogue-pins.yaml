@@ -1,0 +1,94 @@
+# =============================================================================
+# E-ADMIN-CATALOGUE-PINS — Catalogue des Pins (back-office)
+# =============================================================================
+# Liste exhaustive des Pins côté back-office, TOUTES PROVENANCES (éditoriale
+# et communautaire) — décision utilisateur 2026-05-05 sur recommandation du
+# relecture. Filtre par provenance permet à Anaïs de piloter chaque
+# corpus indépendamment ou de façon consolidée. Filtres complémentaires :
+# statut (brouillon / en_revue / validé / publié / retiré), Catégorie, Époque.
+# Point d'entrée pour reprendre un brouillon, voir l'état d'un Pin publié,
+# repartir d'un Pin retiré pour réouverture, ou consulter le corpus
+# communautaire stable hors files de modération.
+# =============================================================================
+
+document:
+  type: palier_ecrans_fiche
+  format: yaml
+
+ecran:
+  id: E-ADMIN-CATALOGUE-PINS
+  nom: "Catalogue des Pins (back-office, toutes provenances)"
+
+  mode: "back-office"
+  surface_parente: "back-office"
+
+  raison_d_etre: >-
+    Donner à Anaïs (et à tout éditeur) une vue navigable de l'ensemble
+    des Pins par leur provenance (éditoriale / communautaire) et leur
+    état dans le cycle de vie. C'est ICI qu'elle reprend un brouillon
+    éditorial, vérifie qu'un Pin est bien sorti de validation, repère
+    un Pin retiré candidat à réouverture, ouvre un Pin publié pour
+    amendement, OU consulte le corpus communautaire publié hors files
+    de modération (besoin de pilotage qualité non couvert par les
+    files H3 / H4).
+
+  composition:
+    - zone: "liste des Pins"
+      role: "tableau ou liste affichant chaque Pin avec ses attributs synthétiques (titre, provenance, Catégorie, Époques, statut, dernière modification, auteur si tracé) ; tri par défaut sur la dernière modification ; indicateur visuel distinct selon provenance"
+      entites_affichees: [Pin, Catégorie, Époque]
+
+    - zone: "filtre provenance"
+      role: "permet de cibler éditorial uniquement, communautaire uniquement, ou les deux (par défaut). C'est le filtre PRIMAIRE — l'audit qualité d'Anaïs se fait souvent par provenance."
+
+    - zone: "filtres complémentaires"
+      role: "filtre par statut (brouillon, en_revue, validé, publié, retiré), par Catégorie, par Époque, par présence ou absence de localisation, par version de Template utilisée. Pour les Pins communautaires : filtre supplémentaire par état de signalement (signalés récemment, jamais signalés, etc. — à arbitrer en palier 13)"
+      entites_affichees: [Catégorie, Époque, Template]
+
+    - zone: "tri et recherche libre"
+      role: "tri sur titre, provenance, statut, dernière modification ; recherche libre sur le titre"
+
+    - zone: "point d'accès saisie d'un nouveau Pin"
+      role: "raccourci vers E-ADMIN-SAISIE-PIN-TEMPLATE en mode nouveau brouillon éditorial (entrée H1) ; non disponible pour création communautaire (cette voie passe par G4 grand public)"
+
+    - zone: "compteurs par statut et par provenance"
+      role: "rappel des effectifs par statut décliné par provenance, cohérents avec ceux de E-ADMIN-ACCUEIL"
+
+  etats:
+    nominal_charge: "Liste chargée, filtres et tris disponibles, compteurs synchronisés"
+    chargement: "Liste en cours de chargement ; filtres conservés"
+    filtre_editorial_seul: "Filtre provenance = éditorial ; comportement classique de pilotage du corpus rédactionnel"
+    filtre_communautaire_seul: "Filtre provenance = communautaire ; vue du corpus stable + en cours de vérification ; les Pins en file de modération restent ouvrables, mais H4 est le point d'action principal"
+    vide_apres_filtre: "Aucun Pin ne correspond aux filtres — message gracieux invitant à élargir ou (si filtre éditorial) créer un nouveau Pin"
+    catalogue_vide_initial: "Aucun Pin n'existe encore — invitation explicite à saisir le premier Pin éditorial (entrée H1)"
+    erreur_chargement: "Impossible de charger la liste ; les filtres restent visibles, un message d'erreur invite à réessayer"
+    permission_insuffisante: "L'utilisateur n'a pas le rôle éditeur — accès refusé ou en lecture seule selon palier 13"
+
+  elements_interactifs:
+    - "Sélection du filtre provenance (éditorial / communautaire / les deux)"
+    - "Application et combinaison de filtres complémentaires (statut, Catégorie, Époque)"
+    - "Tri sur les colonnes affichées"
+    - "Recherche libre sur le titre"
+    - "Tap sur un Pin éditorial en brouillon → ouverture E-ADMIN-SAISIE-PIN-TEMPLATE en édition (reprise du brouillon)"
+    - "Tap sur un Pin éditorial en en_revue → ouverture E-ADMIN-VALIDATION-SCIENTIFIQUE pré-positionné sur ce Pin"
+    - "Tap sur un Pin publié → ouverture en lecture (avec point d'accès vers retrait via E-ADMIN-RETRAIT-REOUVERTURE-PIN ou amendement via E-ADMIN-SAISIE-PIN-TEMPLATE pour les éditoriaux)"
+    - "Tap sur un Pin retiré → ouverture en lecture (avec point d'accès vers réouverture via E-ADMIN-RETRAIT-REOUVERTURE-PIN)"
+    - "Tap sur un Pin communautaire en en_revue → ouverture E-ADMIN-MODERATION-SOUMISSIONS pré-positionné sur ce Pin"
+    - "Tap sur un Pin communautaire publié → ouverture en lecture (avec points d'accès vers E-ADMIN-PROMOTION-COMMUNAUTAIRE et E-ADMIN-RETRAIT-REOUVERTURE-PIN)"
+    - "Tap sur point d'accès nouveau Pin → ouverture E-ADMIN-SAISIE-PIN-TEMPLATE en nouveau brouillon éditorial"
+
+  flows_actifs:
+    - H1   # saisie / reprise brouillon éditorial
+    # H2, H4, H5, H6 atteignables depuis ce catalogue mais opérés sur les écrans dédiés
+
+  surfaces_imbriquees:
+    - E-ADMIN-SAISIE-PIN-TEMPLATE
+    - E-ADMIN-VALIDATION-SCIENTIFIQUE
+    - E-ADMIN-MODERATION-SOUMISSIONS
+    - E-ADMIN-PROMOTION-COMMUNAUTAIRE
+    - E-ADMIN-RETRAIT-REOUVERTURE-PIN
+
+  questions_ouvertes:
+    - "Affichage de la version de Template utilisée par Pin (utile à l'audit, encombrant en liste) — palier 13"
+    - "Vue 'à problèmes' (Pins publiés signalés récemment, Pins retirés candidats à réouverture) intégrée ici ou dédiée à E-ADMIN-RETRAIT-REOUVERTURE-PIN ?"
+    - "Filtre par état de signalement pour les Pins communautaires (signalés récemment, en cours d'examen, etc.) — palier 13"
+    - "Trie par défaut différent selon la provenance (ex. communautaire trié par signalements récents par défaut) — à arbitrer palier 13"

@@ -1,0 +1,430 @@
+# =============================================================================
+# Palier 1 — Essence du produit HistoLyon
+# =============================================================================
+# Capture l'esprit, la philosophie et la promesse
+# du produit — pas son fonctionnel. Ici on dit POURQUOI HistoLyon
+# existe et avec QUEL esprit on le conçoit.
+# =============================================================================
+
+document:
+    type: palier_essence
+    numero: 1
+    audience:
+        - "Tout agent (humain ou IA) qui rejoint le projet"
+        - "Membres de l'équipe — devs, lead, contenu"
+        - "Lecteurs des livrables — jury, équipe future"
+    role: >-
+        Source de l'esprit. Tous les paliers suivants doivent être cohérents
+        avec ce fichier. En cas de conflit entre un palier ultérieur et l'essence
+        ici documentée, c'est l'essence qui prime — ou alors on revient ici et
+        on la met à jour explicitement.
+    format: yaml
+
+# -----------------------------------------------------------------------------
+# 1. Pitch — l'app en une phrase et trois respirations
+# -----------------------------------------------------------------------------
+# La phrase doit pouvoir être dite en présentation orale, sans béquille.
+# Les respirations sont là pour quand 'une phrase' ne suffit pas (présentation
+# longue, intro de doc, élévator pitch).
+pitch:
+    une_phrase: >-
+        HistoLyon transforme chaque rue de Lyon en livre d'histoire vivant.
+
+    respirations:
+        - "Une carte temporelle pour remonter le temps là où tu marches."
+        - "Des pins qui racontent ce que tu n'aurais jamais trouvé seul."
+        - "L'histoire comme un conteur te la dirait, pas comme un manuel l'écrirait."
+        - "Lyon, depuis la rue ou depuis le canapé."
+
+# -----------------------------------------------------------------------------
+# 2. Nature du projet — le cadre qui explique tout
+# -----------------------------------------------------------------------------
+# Beaucoup de choix produit ne se comprennent que si on a en tête que ce n'est
+# pas un produit destiné au marché. Cette section pose le cadre une fois pour
+# toutes. Toutes les sections suivantes en découlent.
+nature_du_projet:
+    cadre: "Projet de fin d'études Epitech (T-ESP-800)"
+    evalue_par: jury_ecole
+    pas_un_produit_marche: >-
+        HistoLyon n'est pas destiné à être lancé, monétisé, ni à 'trouver son
+        marché'. Le succès se mesure devant un jury, à la qualité de la démarche,
+        de la documentation et des choix — pas en rétention, pas en revenu, pas
+        en téléchargements.
+
+    consequences_philosophiques:
+        - libelle: "Pas de MVP, pas de V1/V2/V3 produit"
+          explication: >-
+              Le découpage classique 'on sort le minimum vendable, puis on itère'
+              n'a pas de sens ici. Le projet est un planning incrémental : toutes
+              les features sont planifiées, ajoutées brique par brique, et ce qui
+              est planifié-mais-pas-codé reste valorisable tant que la réflexion
+              est documentée.
+
+        - libelle: "La conception vaut autant que le code"
+          explication: >-
+              Un palier bien conçu mais non implémenté est valorisable. Un palier
+              codé mais mal pensé ne l'est pas. Le jury évalue la maturité des
+              choix — donc les YAML de design/ pèsent autant que l'app livrée.
+
+        - libelle: "Liberté d'ambition sans pression de marché"
+          explication: >-
+              On peut faire des choix qu'aucune startup ne ferait : Mode canapé
+              en citoyen de première classe, refus du mur d'inscription, ton
+              narratif assumé, pas de growth hack. Aucune dérive 'rétention à
+              tout prix' à craindre.
+
+        - libelle: "Mais pas une excuse pour bâcler"
+          explication: >-
+              L'absence de pression marché ne dispense d'aucune rigueur. Mieux
+              vaut une chose bien faite que trois choses bâclées.
+
+    contraintes_dures:
+        duree: "1 an"
+        rythme: "1/2 journée toutes les 2 semaines par membre"
+        equipe: "~7 personnes — role flou et amené à changer"
+
+# -----------------------------------------------------------------------------
+# 3. Promesse — la métaphore racine
+# -----------------------------------------------------------------------------
+# La métaphore est la boussole. Quand on hésite sur une décision (palier suivant
+# ou micro-choix d'écran), on demande : 'est-ce que ça sert le livre vivant ?'
+# Si la réponse est 'non' ou 'pas sûr', c'est probablement la mauvaise décision.
+promesse:
+    metaphore_racine: "Lyon comme un livre d'histoire vivant"
+
+    ce_que_ca_veut_dire:
+        - "Chaque lieu a quelque chose à raconter — il suffit qu'on l'écoute."
+        - "L'app est le conteur qui se penche à ton oreille quand tu passes."
+        - "Le passé n'est pas figé dans un manuel : il habite encore les rues, et l'app le réveille."
+
+    formule_courte: '"Tu vois ce bâtiment ? Voilà pourquoi il est là."'
+
+    la_difference_qu_on_veut_faire_sentir: >-
+        Entre un audioguide et un conteur, il y a toute la distance qu'on cherche.
+        L'audioguide récite. Le conteur regarde dans les yeux, ménage le suspense,
+        fait sourire, fait frissonner. HistoLyon doit toujours être du côté du
+        conteur.
+
+    role_pour_la_suite: >-
+        Cette métaphore est l'arbitre. Tout palier suivant peut être interrogé
+        avec : 'est-ce que ça sert le livre vivant ?'. Le jour où on n'arrive
+        plus à répondre 'oui', on est sorti de l'essence.
+
+# -----------------------------------------------------------------------------
+# 4. Pour qui — positionnement, pas portrait
+# -----------------------------------------------------------------------------
+# IMPORTANT : pas de description détaillée des personas ici. Le palier 2 fait
+# ça. Ici on dit OÙ se situe l'app dans l'espace humain — quels axes de tension
+# elle doit honorer simultanément. Les 4 figures sont mentionnées comme
+# boussoles, pas décrites.
+pour_qui:
+    positionnement_general: >-
+        Grand public curieux. Ni les passionnés d'histoire pointus (qui ont leur
+        Wikipedia et leurs livres), ni les chercheurs académiques (qui ont leurs
+        archives). Quelqu'un qui marche dans Lyon — ou qui en rêve — et qui se
+        demande 'mais alors, c'était quoi ici, avant ?'.
+
+    axes_de_tension:
+        pourquoi_par_axes: >-
+            L'espace utilisateur d'HistoLyon n'est pas une cible unique mais un
+            territoire balisé par 4 axes. Tout utilisateur se situe quelque part
+            sur chaque axe. Le produit doit fonctionner aux deux extrémités de
+            chaque axe simultanément — pas en 'mode A' contre 'mode B'.
+
+        axes:
+            - nom: "visiteur ↔ habitant"
+              explication: >-
+                  On peut découvrir Lyon pour la première fois ou y être né. Le
+                  produit doit servir les deux : surprendre le visiteur, et révéler
+                  au lyonnais ce qu'il croisait sans voir.
+
+            - nom: "terrain ↔ canapé"
+              explication: >-
+                  On peut être physiquement dans la rue, ou ailleurs (salle de
+                  classe, chambre d'hôtel, salon). Le mode canapé n'est pas un
+                  mode dégradé — c'est un usage à part entière, parfois principal.
+
+            - nom: "seul ↔ encadré"
+              explication: >-
+                  Usage autonome (un touriste, un curieux) ou usage encadré (un
+                  groupe scolaire, une famille). Le produit doit fonctionner pour
+                  un téléphone seul comme pour 28 téléphones en sortie scolaire.
+
+            - nom: "préparé ↔ spontané"
+              explication: >-
+                  On peut planifier (la maîtresse qui prépare sa sortie depuis chez
+                  elle) ou se laisser surprendre (le père qui marche et reçoit une
+                  anecdote). Le produit doit honorer les deux postures.
+
+    4_figures:
+        role: >-
+            Ces 4 axes sont incarnés par 4 figures représentatives qui servent
+            de boussoles humaines tout au long de la conception : Kenji (touriste
+            étranger), Mme Dupont (maîtresse en sortie scolaire), Mme Martin
+            (prof projetant en classe), le père lyonnais (sérendipité quotidienne).
+        detail: >-
+            Voir palier 02-personas pour leurs profils complets, leurs besoins,
+            leurs frustrations et la grille de validation associée. Ici on ne
+            fait que les nommer.
+
+# -----------------------------------------------------------------------------
+# 5. Envie et manque — pourquoi cette app a une raison d'exister
+# -----------------------------------------------------------------------------
+# Pas un 'problem statement' produit (on n'est pas dans un pitch deck). Plus
+# une question d'esprit : qu'est-ce qu'on vient combler que rien d'autre
+# ne comble ? Si la réponse est creuse, l'app n'a pas lieu d'être.
+envie_et_manque:
+    envie_qu_on_comble: >-
+        L'envie de comprendre POURQUOI les choses sont comme elles sont. Pourquoi
+        cette rue tourne ici, pourquoi cette place s'appelle comme ça, pourquoi
+        ce bâtiment a cette gueule. C'est une curiosité fine, contextuelle —
+        pas le désir d'apprendre 'l'histoire de Lyon' en bloc.
+
+    manque_qu_on_comble: >-
+        Aujourd'hui, quelqu'un qui marche dans Lyon avec cette curiosité a deux
+        options : ne rien savoir, ou ouvrir Wikipedia (froid, encyclopédique,
+        coupé du lieu). Entre les deux, rien. HistoLyon est cet entre-deux.
+
+    pourquoi_les_alternatives_ne_le_font_pas:
+        - alternative: "Wikipedia géolocalisé"
+          manque: "Froid, encyclopédique, déconnecté de l'expérience du lieu vécu"
+
+        - alternative: "Audioguides classiques"
+          manque: "Linéaires, lourds à activer, sentent le 'je te récite ma fiche'"
+
+        - alternative: "Applis de tourisme de ville"
+          manque: "Promotionnelles, superficielles, font du city branding"
+
+        - alternative: "Livres d'histoire de Lyon"
+          manque: "Excellents, mais on les lit chez soi, pas dans la rue"
+
+    ce_qu_on_offre_a_la_place: >-
+        Un compagnon qui se déclenche au bon moment, qui te raconte au lieu de
+        t'instruire, qui te laisse maître de la profondeur (un mot ou une archive
+        complète, à toi de choisir).
+
+# -----------------------------------------------------------------------------
+# 6. Principes essentiels — les trois grands
+# -----------------------------------------------------------------------------
+# Ce sont les principes par lesquels on juge tout le reste. Toute décision
+# (palier, feature, écran, microcopy) doit pouvoir être justifiée par au moins
+# un de ces trois principes. Si elle ne l'est pas, elle n'a probablement pas
+# lieu d'être.
+principes_essentiels:
+    preambule: >-
+        Trois principes, dans cet ordre. Sérendipité = comment l'expérience
+        commence (sans qu'on cherche). Historicité = ce qui rend la matière
+        digne d'être racontée (vrai). Émerveillement = ce qu'on cherche à
+        produire chez l'utilisateur (l'effet, le frisson). Les trois sont
+        indissociables : enlever l'un, c'est perdre l'essence.
+
+    liste:
+        - id: serendipite
+          enonce: "Découvrir sans avoir cherché."
+
+          pourquoi_non_negociable: >-
+              Si l'utilisateur doit chercher pour trouver, on a perdu. La valeur
+              première d'HistoLyon, c'est de faire surgir des histoires que personne
+              n'aurait su demander. Sinon Wikipedia suffit.
+
+          comment_on_le_reconnait:
+              - "L'utilisateur découvre quelque chose qu'il ne savait pas vouloir savoir"
+              - "Le déclencheur est le lieu, pas la requête"
+              - "L'app pousse, l'utilisateur reçoit (et peut toujours refuser)"
+
+          consequences_sur_le_produit:
+              - "La carte est l'écran d'accueil — pas une feature parmi d'autres"
+              - "Pas d'écran 'Explorer' qui forcerait un parcours dans le catalogue"
+              - "Mode 'Surprenez-moi' opt-in et soigné, pas un gadget"
+              - "Notifications de proximité jamais imposées — sur invitation seulement"
+
+        - id: historicite
+          enonce: "Vrai, sourcé, sérieux — sans être austère."
+
+          pourquoi_non_negociable: >-
+              Si le contenu n'est pas historiquement fiable, on perd le seul vrai
+              avantage qu'on a sur un Pokémon GO ou une appli touristique générique.
+              La crédibilité scientifique EST une part de la valeur, pas un détail
+              d'implémentation.
+
+          attention_a_ne_pas_confondre: >-
+              Historicité ≠ encyclopédisme. On peut être sérieux et conteur. On
+              peut être rigoureux et chaleureux. Le ton est narratif, mais ce
+              qu'il raconte doit être vrai et sourçable.
+
+          comment_on_le_reconnait:
+              - "Sources tracées, validation par l'historienne"
+              - "Pas de récits inventés, même 'pour faire joli'"
+              - "Si on simplifie, on l'assume — on ne déforme pas"
+
+          consequences_sur_le_produit:
+              - "L'institution (archives, mairie) est partenaire de contenu"
+              - "Templates de contenu cadrés — pas de saisie libre dans la nature"
+              - "Tonalité conteur, mais sur une base factuelle solide"
+              - "Pas de pins soumis librement par les utilisateurs sans modération"
+
+        - id: emerveillement
+          enonce: "L'expérience doit être enivrante, DONNER L'ENVIE DANS SAVOIR PLUS. — narratif et ludique tendus vers ce but."
+
+          pourquoi_non_negociable: >-
+              Sans émerveillement, on n'a qu'une base de données géolocalisée. Le
+              narratif (textes conteurs, audio, archives, citations) et le ludique
+              (quiz, énigmes, AR, puzzles, badges) ne sont pas des features
+              secondaires : ce sont les moyens par lesquels l'émerveillement arrive.
+
+          pourquoi_ce_mot_la: >-
+              Émerveillement pour l'effet recherché chez l'utilisateur : il s'arrête, il sourit, il
+              se penche, il a envie d'en savoir plus.
+
+          comment_on_le_reconnait:
+              - "L'utilisateur a une réaction interne — sourire, surprise, frisson"
+              - "Il a envie de raconter à quelqu'un ce qu'il vient de découvrir"
+              - "Il ne sait pas si ce qu'il a vécu est un récit ou un jeu — peu importe"
+
+          consequences_sur_le_produit:
+              - "Le ton conteur est obligatoire, pas optionnel — y compris dans la microcopy"
+              - "Quiz, énigmes, AR, audio synchronisé : moyens, pas gimmicks"
+              - "Le visuel doit faire respirer, pas asphyxier (DA chaude, sobre)"
+              - "Animations chorégraphiées (slider qui snap, transitions d'époque) au service du frisson, pas du gadget"
+
+# -----------------------------------------------------------------------------
+# 7. Ce qu'on refuse — l'anti-positionnement
+# -----------------------------------------------------------------------------
+# Ces refus ne sont pas des oublis : ce sont des choix. Ils ont été pris au
+# brainstorming. Les remettre en cause demande de revenir
+# sur l'essence. Cette section sert à éviter qu'un agent (humain ou IA) ne
+# refasse un débat déjà clos.
+ce_qu_on_refuse:
+    - quoi: "Le ton encyclopédique"
+      pourquoi: >-
+          Tue le récit. Wikipedia existe — pas besoin de le refaire. L'app est
+          du côté du conteur, pas du dictionnaire.
+
+    - quoi: "Une mascotte ou un personnage-guide"
+      pourquoi: >-
+          Le ton conteur vient du texte lui-même. Une mascotte ajouterait une
+          couche de design (personnage, dialogues, illustrations) sans bénéfice
+          narratif et coûterait du temps qu'on n'a pas.
+
+    - quoi: "Le mur d'inscription au lancement"
+      pourquoi: >-
+          L'app fonctionne sans compte. Demander de s'inscrire pour découvrir
+          Lyon est absurde. Le compte est utile (publication d'un parcours,
+          sync multi-appareils), pas obligatoire.
+
+    - quoi: "Toute friction au lancement"
+      pourquoi: >-
+          Pas de slides, pas de tutoriel, pas de pop-up de permissions en bloc.
+          L'app s'ouvre sur la carte. Point. Les permissions se demandent au
+          moment où elles servent, pas avant.
+
+    - quoi: "Le turn-by-turn GPS"
+      pourquoi: >-
+          On n'est pas un GPS de marche, on est un compagnon de balade. La ligne
+          sur la carte et la direction approximative suffisent. Si l'utilisateur
+          veut un vrai GPS, on lui ouvre Google Maps.
+
+    - quoi: "Le mode dark"
+      pourquoi: >-
+          Hors périmètre. Pas un refus de principe — un report assumé.
+          L'identité visuelle 'parchemin chaud' est plus forte sans bascule
+          dark à gérer en parallèle.
+
+    - quoi: "Le mode canapé comme mode dégradé"
+      pourquoi: >-
+          Le canapé est un usage à part entière (Mme Martin en classe, Kenji
+          à l'hôtel, le browser du soir). Il a son propre soin. Pas de message
+          'vous n'êtes pas à Lyon, voici une version au rabais'.
+
+    - quoi: "L'écran 'Explorer' séparé"
+      pourquoi: >-
+          Une barre de recherche sur la carte suffit. Un onglet 'Explorer'
+          induirait que la carte n'est pas le centre — alors qu'elle l'est.
+
+    - quoi: "Les notifications de proximité par défaut"
+      pourquoi: >-
+          Pousser des notifs sans demande, c'est une déclaration de guerre à
+          l'attention de l'utilisateur. Le mode 'Surprenez-moi' est opt-in,
+          jamais activé silencieusement.
+
+    - quoi: "Le city branding et la promotion"
+      pourquoi: >-
+          Ce n'est pas une appli de l'office du tourisme. Pas de 'venez à Lyon !',
+          pas de partenariats commerciaux glissés dans le contenu. On parle de
+          Lyon parce qu'on aime l'histoire de Lyon, pas pour vendre Lyon.
+
+    - quoi: "Le ton joyeux/peppy à la Duolingo"
+      pourquoi: >-
+          L'émerveillement n'est pas l'enthousiasme forcé. On ne célèbre pas
+          chaque interaction avec une animation et trois confettis. La joie
+          vient du contenu, pas du chrome.
+
+# -----------------------------------------------------------------------------
+# 8. Atmosphère et ton — l'âme, pas la DA
+# -----------------------------------------------------------------------------
+# Pas les couleurs, pas la typo (palier 12-tokens). Juste les mots qui
+# décrivent ce qu'on doit ressentir en utilisant l'app. Cette section sert
+# notamment au palier 8 (contenu et microcopy), pour qu'aucun texte produit
+# ne sorte du ton.
+atmosphere_et_ton:
+    mots_cles:
+        - chaud
+        - sobre
+        - conteur
+        - posé
+        - chaleureux
+        - sérieux_sans_austérité
+
+    reference_visuelle_courte: >-
+        'Lyon Conteur' — chaud, narratif, vivant. Tons parchemin et terracotta,
+        fonds crème, encre brune, pas de noir pur ni de blanc pur. Détail visuel
+        en palier 12-tokens et dans archives/_bmad-output/design/da-charte.md.
+
+    ce_que_le_ton_fait:
+        - "Te penche à ton oreille au lieu de te crier dessus"
+        - "Te raconte au lieu de t'instruire"
+        - "Te laisse t'arrêter quand tu veux, sans te culpabiliser"
+        - "Sourit sans faire de blagues à tout prix"
+
+    ce_que_le_ton_n_est_pas:
+        - "Joyeux/peppy à la Duolingo"
+        - "Froid/clinique à la Wikipedia"
+        - "Promotionnel à la appli touristique"
+        - "Mystique/sentencieux à la documentaire ARTE en voix off grave"
+
+# -----------------------------------------------------------------------------
+# 9. Test de cohérence — l'essence comme outil, pas comme prose
+# -----------------------------------------------------------------------------
+# Cette section transforme l'essence en grille opérationnelle. À chaque palier
+# (et à chaque décision importante), on passe ces questions explicitement.
+# Si une réponse est 'non' ou 'pas sûr', on s'arrête et on cherche pourquoi
+# avant de valider.
+test_de_coherence:
+    questions:
+        - question: "Est-ce que ça raconte une histoire, ou est-ce que ça récite un fait ?"
+          relie_a: principe_emerveillement_et_metaphore_racine
+
+        - question: "Le déclencheur est-il le lieu (sérendipité), ou faut-il chercher pour trouver ?"
+          relie_a: principe_serendipite
+
+        - question: "Est-ce historiquement vrai et sourçable, ou bien on déforme pour faire joli ?"
+          relie_a: principe_historicite
+
+        - question: "Est-ce que ça produit un sourire, une surprise, un frisson ? Ou est-ce informatif sec ?"
+          relie_a: principe_emerveillement
+
+        - question: "Est-ce que ça fonctionne sur les 4 axes (visiteur/habitant, terrain/canapé, seul/encadré, préparé/spontané) ?"
+          relie_a: pour_qui
+
+        - question: "Est-ce qu'on impose une friction qu'on n'a pas à imposer ?"
+          relie_a: ce_qu_on_refuse
+
+        - question: "Est-ce dans l'esprit conteur, ou dans l'esprit encyclopédie ?"
+          relie_a: atmosphere_et_ton
+
+    comment_l_utiliser: >-
+        À chaque fin de palier, l'auteur du palier passe explicitement chacune
+        de ces questions et documente la réponse dans le palier concerné.
+        Pas un check 'oui à tout' — une vraie réflexion. Si une réponse est
+        'non' ou 'pas sûr', on cherche pourquoi avant de valider, et on remonte
+        jusqu'à modification de l'essence si nécessaire.

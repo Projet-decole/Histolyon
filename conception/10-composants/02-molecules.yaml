@@ -1,0 +1,775 @@
+# =============================================================================
+# Palier 10 — Composants : Molécules
+# =============================================================================
+# Une molécule est une COMBINAISON D'ATOMES avec slots nommés explicites.
+# Distincte des atomes (briques DRY indivisibles), des fonctionnels (réifient
+# un concept métier ou portent une machine d'état riche), des shell (templates
+# de mode et surfaces top-level), et des back-office (composants admin desktop).
+#
+# Caractéristique normative : la composition est OBLIGATOIRE et utilise des
+# slots nommés (cf. consigne_slots de l'index v0.2 § 7).
+#
+# 30 molécules : 3 headers + 5 items de liste + 3 cards + 3 contrôles d'action
+# + 5 sections d'écran + 4 items consultés + 7 encarts/utilitaires
+# (dont comp-info-progress-etape et comp-carousel ajoutés en correction après relecture).
+# =============================================================================
+
+document:
+  type: palier_composants_molecules
+  numero: 10
+  fichier: "02-molecules.yaml"
+  version: "0.1"
+  date: "2026-05-06"
+  format: yaml
+  prerequis_de_lecture:
+    - "design/conception/10-composants/00-index.yaml v0.2 — § 3 échelles E1-E5, § 4 état partagé, § 5 patterns, § 7 format de fiche (notamment consigne_slots)"
+    - "design/conception/10-composants/03-fonctionnels.yaml v0.1 (PILOTE) — calibration du format compact, comp-pin exemplaire"
+    - "design/conception/10-composants/01-atomes.yaml — atomes intégrés en composition"
+    - "design/conception/05-architecture-info.yaml — modes M1-M9, surfaces S1-S3, persistantes P1-P3, règles N1-N7"
+    - "design/conception/07-ecrans/ — composants utilisés dans la composition de chaque écran"
+    - "design/conception/04-donnees/ — entités Pin, Parcours, Étape, Commentaire, Compte, Source"
+    - "design/conception/08-contenu/ — patterns de microcopy PT-X référencés"
+  audience:
+    - "relecture du palier concerné"
+    - "Auteurs des paliers 11 (timing), 12 (tokens), 13 (icônes), 16 (validation)"
+    - "Implémentation Flutter aval"
+
+raison_d_etre: >-
+  Les molécules portent les patterns d'assemblage récurrents d'HistoLyon :
+  rangées de liste (Pin aperçu, Parcours, historique, étape, favori), cards
+  (Parcours catalogue, vignettes Pin), headers avec retour ou action,
+  contrôles d'action transversaux (favori, partage, signalement) et zones
+  structurantes des écrans riches (narration Pin, sources, commentaires,
+  zones vides). Ce sont les blocs intermédiaires entre les atomes du
+  fichier 01 et les écrans du palier 7. Slots nommés explicites pour
+  chaque molécule — cohérence garantie de l'assemblage.
+
+# -----------------------------------------------------------------------------
+# 1. Composants — fiches
+# -----------------------------------------------------------------------------
+composants:
+
+  # ===========================================================================
+  # HEADERS (3)
+  # ===========================================================================
+
+  - id: comp-header-titre-action
+    nom: "Header titre + action"
+    famille: molecule
+    raison_d_etre: "En-tête simple d'un écran de niveau 1 ou de section, avec titre et action optionnelle (souvent un FAB ou un bouton secondaire)."
+    ancrage:
+      ecrans: [E-PARCOURS-PRINCIPAL, E-PROFIL-PRINCIPAL, E-PROFIL-FAVORIS, E-PROFIL-HISTORIQUE]
+      composants_qui_l_integrent: [comp-layout-parcours, comp-layout-profil]
+    composition:
+      - { id: comp-libelle-texte, slot: titre, cardinalite: 1 }
+      - { id: comp-icone, slot: icone_decoration, cardinalite: 0..1 }
+      - { id: comp-button-secondary, slot: action_optionnelle, cardinalite: 0..1, note: "ou comp-button-fab-creation selon contexte" }
+    intention_portee:
+      parametrable: true
+      echelle: E2_inter_composant
+      note: "L'action optionnelle est câblée par l'écran parent (intention ouverte)."
+    consequences_variabilite:
+      - "Titre variable (i18n FR/EN/JA) → truncate ou taille adaptative (palier 12)"
+      - "Action absente → header se rétracte sur titre seul"
+
+  - id: comp-header-retour-titre
+    nom: "Header retour + titre"
+    famille: molecule
+    raison_d_etre: "En-tête navigatif d'un écran de niveau 2 ou 3 — bouton retour à gauche, titre central. Pattern dominant de tous les M3 secondaires."
+    ancrage:
+      ecrans: [E-PARCOURS-FICHE-DETAIL, E-PIN-CONSULTATION-APPROFONDIE, E-PROFIL-PARAMETRES, E-PROFIL-COMPTE, E-COMMUNAUTE-SOUMISSION-PIN]
+      composants_qui_l_integrent: [comp-layout-consultation-pin-approfondie]
+    composition:
+      - { id: comp-button-back, slot: retour, cardinalite: 1, note: "intention close E3 — retour gracieux N1" }
+      - { id: comp-libelle-texte, slot: titre, cardinalite: 1 }
+    intention_portee:
+      parametrable: false
+      echelle: E3_navigationnelle
+      intention: "navigation_retour_avec_contexte"
+      cible_referencee: "P5.N1 retour gracieux (porté par comp-button-back)"
+      note: "Intention CLOSE héritée du bouton retour — le titre est purement informatif (non interactif)."
+    consequences_variabilite:
+      - "Titre variable (i18n) → truncate ou taille adaptative (palier 12)"
+
+  - id: comp-header-retour-titre-action
+    nom: "Header retour + titre + action"
+    famille: molecule
+    raison_d_etre: "En-tête navigatif riche — bouton retour, titre, action contextuelle (édition, partage, favori). Combine intention close (retour) et intention ouverte (action) côte à côte."
+    ancrage:
+      ecrans: [E-PIN-CONSULTATION-APPROFONDIE, E-PARCOURS-FICHE-DETAIL, E-PARCOURS-EDITEUR, E-COMMUNAUTE-RETOUR-DETAIL]
+      composants_qui_l_integrent: [comp-layout-consultation-pin-approfondie]
+    composition:
+      - { id: comp-button-back, slot: retour, cardinalite: 1 }
+      - { id: comp-libelle-texte, slot: titre, cardinalite: 1 }
+      - { id: comp-button-secondary, slot: action, cardinalite: 1, note: "ou comp-controle-favori, comp-controle-partage, comp-controle-signalement selon contexte" }
+    intention_portee:
+      parametrable: true
+      echelle: variable
+      note: "Retour : intention close E3. Action : intention ouverte E2/E3 selon usage de l'écran parent."
+    consequences_variabilite:
+      - "Titre long → truncate (priorité visuelle au retour et à l'action)"
+      - "Si l'action est un contrôle favori/signalement, son visibilité dépend de ETAT-COMPTE-CONNECTE"
+
+  # ===========================================================================
+  # ITEMS DE LISTE (5)
+  # ===========================================================================
+
+  - id: comp-item-liste-simple
+    nom: "Item de liste simple"
+    famille: molecule
+    raison_d_etre: "Rangée générique pour listes — label + action optionnelle + icône leading optionnelle. PIVOT — base de nombreuses listes (paramètres, choix, options). Utilisable seul ou comme socle d'items spécialisés."
+    ancrage:
+      ecrans: [E-PROFIL-PARAMETRES, E-PROFIL-COMPTE, E-CARTE-FILTRES-COUCHES]
+      composants_qui_l_integrent: [comp-grid-recherche (variant liste)]
+    composition:
+      - { id: comp-libelle-texte, slot: label, cardinalite: 1 }
+      - { id: comp-icone, slot: icone_leading, cardinalite: 0..1 }
+      - { id: comp-button-secondary, slot: action, cardinalite: 0..1, note: "ou comp-toggle-switch, ou chevron via icône directionnelle" }
+    etats_interactifs: [default, pressed, focused, disabled, selected]
+    interactions_natives:
+      - "Tap → E2 émet 'item_selected' → écran parent câble la cible (navigation, toggle, ouverture surface ponctuelle)"
+    intention_portee:
+      parametrable: true
+      echelle: E2_inter_composant
+      note: "Composant pivot — câblage par le parent."
+    consequences_variabilite:
+      - "Label variable (i18n) → truncate"
+      - "Sans action ni icône → rangée purement informative (a11y vérifie qu'elle reste perceptible comme telle)"
+
+  - id: comp-item-liste-pin-apercu
+    nom: "Item de liste — Pin (aperçu)"
+    famille: molecule
+    raison_d_etre: "Rangée de liste représentant un Pin avec ses attributs visibles (titre, teaser, catégorie, auteur si communautaire, vignette). Utilisée dans grilles de recherche, listes de favoris, suggestions."
+    ancrage:
+      ecrans: [E-CARTE-RECHERCHE, E-PROFIL-FAVORIS, E-PROFIL-HISTORIQUE]
+      composants_qui_l_integrent: [comp-grid-recherche, comp-rangee-favori, comp-rangee-historique]
+    composition:
+      - { id: comp-libelle-texte, slot: titre, cardinalite: 1 }
+      - { id: comp-libelle-texte, slot: teaser, cardinalite: 1, note: "extrait court ; libellé pattern PT-teaser" }
+      - { id: comp-chip-categorie, slot: categorie, cardinalite: 1 }
+      - { id: comp-avatar, slot: auteur, cardinalite: 0..1, note: "présent uniquement si provenance communautaire" }
+      - { id: comp-image-avatar-small, slot: vignette, cardinalite: 0..1, note: "miniature du Média principal du Pin si disponible" }
+    variants:
+      - { dimension: provenance, valeurs: [editorial, communautaire], registre: "présence/absence du slot auteur" }
+    etats_interactifs: [default, pressed, focused]
+    interactions_natives:
+      - "Tap → E2 émet 'pin_selectionne' → écran parent ouvre flow B1 (aperçu rapide M2) ou B2 (consultation approfondie M3) selon contexte"
+    intention_portee:
+      parametrable: true
+      echelle: E2_inter_composant
+      cible_referencee_par_defaut: "flow B1 ou B2"
+      note: "Câblage par le parent — la grille de recherche ouvre B1 par défaut, la liste de favoris peut ouvrir B2."
+    consequences_variabilite:
+      - "Vignette absente → fallback icône catégorie agrandie (palier 13)"
+      - "Titre + teaser longs (i18n) → truncate à seuil (palier 12)"
+      - "Auteur absent (éditorial) → slot replié, espace redistribué"
+
+  - id: comp-item-liste-parcours-simple
+    nom: "Item de liste — Parcours (simple)"
+    famille: molecule
+    raison_d_etre: "Rangée de liste représentant un Parcours dans un contexte synthétique — titre, durée estimée, badge de provenance, action secondaire optionnelle."
+    ancrage:
+      ecrans: [E-PARCOURS-PRINCIPAL, E-PROFIL-FAVORIS, E-PROFIL-HISTORIQUE]
+      composants_qui_l_integrent: [comp-grid-recherche, comp-rangee-favori, comp-rangee-historique]
+    composition:
+      - { id: comp-libelle-texte, slot: titre, cardinalite: 1 }
+      - { id: comp-libelle-texte, slot: duree, cardinalite: 1, note: "libellé pattern PT-duree (palier 8)" }
+      - { id: comp-badge-statut, slot: provenance, cardinalite: 1, note: "registre couleur palier 9 03-parcours-traces" }
+      - { id: comp-icone, slot: icone_leading, cardinalite: 0..1 }
+      - { id: comp-button-secondary, slot: action, cardinalite: 0..1 }
+    variants:
+      - { dimension: provenance, valeurs: [editorial, communautaire, personnel], registre: "couleur du badge_provenance" }
+    etats_interactifs: [default, pressed, focused]
+    interactions_natives:
+      - "Tap rangée → E2 émet 'parcours_selectionne' → écran parent ouvre fiche détail (E-PARCOURS-FICHE-DETAIL)"
+    intention_portee:
+      parametrable: true
+      echelle: E2_inter_composant
+      cible_referencee_par_defaut: "ouverture fiche détail Parcours (flow C2)"
+    consequences_variabilite:
+      - "Titre long → truncate"
+      - "Provenance personnel → marqueur visuel additionnel (palier 9)"
+
+  - id: comp-item-historique-visite
+    nom: "Item d'historique de visite"
+    famille: molecule
+    raison_d_etre: "Rangée représentant une visite passée (Pin ou Parcours visité) avec date, type, score optionnel. Réifie l'entité Trace de visite (palier 4 cluster 03)."
+    ancrage:
+      ecrans: [E-PROFIL-HISTORIQUE]
+      composants_qui_l_integrent: [comp-rangee-historique]
+    composition:
+      - { id: comp-libelle-texte, slot: titre, cardinalite: 1, note: "titre du Pin ou Parcours visité" }
+      - { id: comp-libelle-texte, slot: date, cardinalite: 1, note: "libellé pattern PT-date-relative (palier 8)" }
+      - { id: comp-chip-categorie, slot: type, cardinalite: 1, note: "Pin / Parcours / Étape" }
+      - { id: comp-badge-nombre, slot: score, cardinalite: 0..1, note: "score quiz si Pin avec quiz complété" }
+    variants:
+      - { dimension: type_visite, valeurs: [pin, parcours_complete, parcours_abandonne, etape] }
+    etats_interactifs: [default, pressed, focused]
+    interactions_natives:
+      - "Tap → E2 émet 'historique_item_selectionne' → ouverture du Pin/Parcours visité (flow B2 ou C2)"
+    intention_portee:
+      parametrable: true
+      echelle: E2_inter_composant
+    consequences_variabilite:
+      - "Score absent → slot replié"
+      - "Item supprimé (hard delete utilisateur) → retiré de la liste"
+
+  - id: comp-item-liste-etape
+    nom: "Item de liste — Étape (ordonnée)"
+    famille: molecule
+    raison_d_etre: "Rangée d'une étape de Parcours dans une liste ordonnée (numéro, titre du Pin associé, statut visuel). Réifie l'entité Étape (palier 4 cluster 02)."
+    ancrage:
+      ecrans: [E-PARCOURS-FICHE-DETAIL, E-PARCOURS-EN-COURS-TERRAIN, E-PARCOURS-EDITEUR]
+      composants_qui_l_integrent: [comp-formulaire-creation-parcours]
+    composition:
+      - { id: comp-badge-nombre, slot: numero, cardinalite: 1, note: "numéro d'ordre dans le Parcours" }
+      - { id: comp-libelle-texte, slot: titre_pin, cardinalite: 1 }
+      - { id: comp-icone, slot: icone_statut, cardinalite: 1, note: "icône fonctionnelle complete / courante / future (palier 13)" }
+    variants:
+      - { dimension: statut, valeurs: [complete, courante, future], registre: "icône + opacité (cohérent palier 9 03-parcours-traces)" }
+    etats_interactifs: [default, pressed, focused, selected]
+    interactions_natives:
+      - "Tap → E2 émet 'etape_selectionnee' → écran parent ouvre saut d'étape (flow C7 saut), aperçu B1, ou édition selon contexte"
+    intention_portee:
+      parametrable: true
+      echelle: E2_inter_composant
+    couplage_etat_partage:
+      - { etat: ETAT-PARCOURS-EN-COURS, role: consommateur, note: "détermine le statut de chaque étape pendant un parcours actif" }
+    consequences_variabilite:
+      - "Pin de l'étape sans titre récupérable (anomalie) → fallback 'Étape N' (palier 8)"
+
+  # ===========================================================================
+  # CARDS (3)
+  # ===========================================================================
+
+  - id: comp-card-parcours-large
+    nom: "Card Parcours (large, hero)"
+    famille: molecule
+    raison_d_etre: "Card visuelle de mise en avant d'un Parcours en tête de catalogue ou en suggestion — image hero, titre, description, badge provenance, CTA principal."
+    ancrage:
+      ecrans: [E-PARCOURS-PRINCIPAL (hero), E-PARCOURS-FICHE-DETAIL (preview)]
+      composants_qui_l_integrent: [comp-layout-parcours]
+    composition:
+      - { id: comp-image-hero, slot: image, cardinalite: 1 }
+      - { id: comp-libelle-texte, slot: titre, cardinalite: 1 }
+      - { id: comp-libelle-texte, slot: description, cardinalite: 1, note: "libellé pattern PT-description-courte" }
+      - { id: comp-badge-statut, slot: provenance_badge, cardinalite: 1 }
+      - { id: comp-button-primary, slot: cta, cardinalite: 1, note: "souvent 'Découvrir' ou 'Lancer' — câblage par le parent" }
+    variants:
+      - { dimension: provenance, valeurs: [editorial, communautaire, personnel] }
+    etats_interactifs: [default, pressed, focused]
+    interactions_natives:
+      - "Tap card hors CTA → E2 émet 'parcours_selectionne' → ouverture fiche détail"
+      - "Tap CTA → E2/E3 émet action principale (lancer ou découvrir)"
+    intention_portee:
+      parametrable: true
+      echelle: E2_inter_composant
+    consequences_variabilite:
+      - "Image absente → fallback placeholder gracieux (palier 13)"
+      - "Description longue → truncate avec ellipse (palier 12)"
+
+  - id: comp-card-parcours-compact
+    nom: "Card Parcours (compact)"
+    famille: molecule
+    raison_d_etre: "Card compacte d'un Parcours dans un carrousel ou une grille dense — version réduite de la card large, sans image hero ni description."
+    ancrage:
+      ecrans: [E-PARCOURS-PRINCIPAL, E-PROFIL-FAVORIS, E-PROFIL-HISTORIQUE]
+      composants_qui_l_integrent: [comp-grid-recherche, comp-carousel]
+    composition:
+      - { id: comp-libelle-texte, slot: titre, cardinalite: 1 }
+      - { id: comp-badge-statut, slot: provenance, cardinalite: 1 }
+      - { id: comp-libelle-texte, slot: duree, cardinalite: 1, note: "libellé pattern PT-duree" }
+      - { id: comp-icone, slot: icone_decoration, cardinalite: 0..1 }
+    variants:
+      - { dimension: provenance, valeurs: [editorial, communautaire, personnel] }
+    etats_interactifs: [default, pressed, focused]
+    interactions_natives:
+      - "Tap → E2 émet 'parcours_selectionne' → ouverture fiche détail (flow C2)"
+    intention_portee:
+      parametrable: true
+      echelle: E2_inter_composant
+    consequences_variabilite:
+      - "Titre long → truncate sur deux lignes max"
+
+  - id: comp-vignette-pin
+    nom: "Vignette Pin"
+    famille: molecule
+    raison_d_etre: "Vignette compacte d'un Pin pour grilles, carrousels, sections 'À découvrir'. Représentation visuelle dense — vignette image + titre + chips d'époques."
+    ancrage:
+      ecrans: [E-CARTE-RECHERCHE (grille mini), E-PARCOURS-FICHE-DETAIL (étapes preview)]
+      composants_qui_l_integrent: [comp-grid-recherche, comp-carousel, comp-zone-suggestions]
+    composition:
+      - { id: comp-libelle-texte, slot: titre, cardinalite: 1 }
+      - { id: comp-image-avatar-small, slot: vignette, cardinalite: 1 }
+      - { id: comp-chip-epoque, slot: epoques, cardinalite: 0..n }
+      - { id: comp-badge-statut, slot: badge, cardinalite: 0..1, note: "badge provenance ou état déjà visité" }
+    variants:
+      - { dimension: taille, valeurs: [small, medium], registre: "ajustement présence/absence des chips d'époques" }
+    etats_interactifs: [default, pressed, focused]
+    interactions_natives:
+      - "Tap → E2 émet 'pin_selectionne' → écran parent ouvre flow B1 (aperçu rapide M2)"
+    intention_portee:
+      parametrable: true
+      echelle: E2_inter_composant
+      cible_referencee_par_defaut: "flow B1 aperçu rapide"
+    consequences_variabilite:
+      - "Vignette image absente → fallback icône catégorie centrée (palier 13)"
+      - "Plusieurs époques (multi-époque I8) → empilement visuel des chips ou compteur '+N'"
+
+  # ===========================================================================
+  # CONTRÔLES D'ACTION (3) — molécules à intention CLOSE
+  # ===========================================================================
+
+  - id: comp-controle-favori
+    nom: "Contrôle favori"
+    famille: molecule
+    raison_d_etre: "Toggle favori polymorphe pour Pin ou Parcours. Le composant connaît son target_type via variant et émet le toggle approprié. Cible l'entité Favori (palier 4 cluster 03)."
+    ancrage:
+      ecrans: [E-PIN-CONSULTATION-APPROFONDIE, E-PARCOURS-FICHE-DETAIL, E-PROFIL-FAVORIS, E-CARTE-APERCU-PIN]
+      composants_qui_l_integrent: [comp-header-retour-titre-action, comp-rangee-favori, comp-zone-narration]
+    composition:
+      - { id: comp-icone, slot: icone, cardinalite: 1, note: "icône fonctionnelle de favori (état actif/inactif) ; concrète au palier 13" }
+    variants:
+      - { dimension: target_type, valeurs: [pin, parcours], registre: "détermine la cible du toggle ; comportement et apparence identiques" }
+      - { dimension: etat_favori, valeurs: [actif, inactif], registre: "remplissage de l'icône de favori" }
+    etats_interactifs: [default, pressed, focused, disabled]
+    interactions_natives:
+      - "Tap → E2 émet 'toggle_favori' avec target_type → écran parent met à jour le Profil et l'historique des favoris"
+    intention_portee:
+      parametrable: false
+      echelle: E2_inter_composant
+      intention: "toggle_favori"
+      cible_referencee: "entité Favori (palier 4 cluster 03), flow B7 (Marquage favori)"
+      note: >-
+        Intention CLOSE — le toggle favori est invariant. Le composant ne sert
+        qu'à cette opération. target_type est un variant de cible, pas une
+        ouverture d'intention.
+    couplage_etat_partage:
+      - etat: ETAT-COMPTE-CONNECTE
+        role: consommateur
+        note: >-
+          Si déconnecté, les favoris locaux fonctionnent (I6 — Profil toujours
+          présent). La synchronisation cloud des favoris requiert Compte (I2).
+          Le composant reste donc actif sans Compte ; un message PT-favori-sync
+          peut signaler la limitation (palier 8).
+    consequences_variabilite:
+      - "Toggle rapide consécutif → debouncing local (palier 11) pour éviter races"
+
+  - id: comp-controle-partage
+    nom: "Contrôle partage"
+    famille: molecule
+    raison_d_etre: "Bouton de partage qui ouvre le menu partage natif système. Apparaît sur les Pins et Parcours pour permettre l'envoi par messagerie, copie de Lien universel, etc."
+    ancrage:
+      ecrans: [E-PIN-CONSULTATION-APPROFONDIE, E-PARCOURS-FICHE-DETAIL]
+      composants_qui_l_integrent: [comp-header-retour-titre-action, comp-zone-narration]
+    composition:
+      - { id: comp-icone, slot: icone, cardinalite: 1, note: "icône fonctionnelle de partage (palier 13)" }
+      - { id: comp-icone, slot: menu_overflow, cardinalite: 0..1, note: "menu d'options secondaires éventuel" }
+    etats_interactifs: [default, pressed, focused, disabled]
+    interactions_natives:
+      - "Tap → E3 ouvre menu partage natif système (sortie temporaire de l'app via OS)"
+    intention_portee:
+      parametrable: false
+      echelle: E3_navigationnelle
+      intention: "ouverture_partage_natif"
+      cible_referencee: "flow F1 partage natif système"
+      note: "Intention CLOSE — le composant délègue au menu OS. Le retour de l'OS ramène à l'écran courant."
+    patterns_attaches: [PI-TAP-HORS]
+    consequences_variabilite:
+      - "Item à partager sans Lien universel valide → composant désactivé (rare — uniquement Parcours personnel non publié)"
+
+  - id: comp-controle-signalement
+    nom: "Contrôle signalement"
+    famille: molecule
+    raison_d_etre: "Bouton de signalement polymorphe (Pin, Parcours, Commentaire, Retour communautaire). Ouvre le flow G3 de rédaction de signalement."
+    ancrage:
+      ecrans: [E-PIN-CONSULTATION-APPROFONDIE, E-PARCOURS-FICHE-DETAIL, E-COMMUNAUTE-RETOUR-DETAIL]
+      composants_qui_l_integrent: [comp-header-retour-titre-action, comp-zone-commentaires, comp-item-commentaire]
+    composition:
+      - { id: comp-icone, slot: icone, cardinalite: 1, note: "icône fonctionnelle de signalement (palier 13)" }
+    variants:
+      - { dimension: target_type, valeurs: [pin, parcours, commentaire, retour], registre: "détermine la cible signalée ; comportement et apparence identiques" }
+    etats_interactifs: [default, pressed, focused, disabled]
+    interactions_natives:
+      - "Tap → E3 ouvre flow G3 (rédaction signalement, surface ponctuelle M6)"
+    intention_portee:
+      parametrable: false
+      echelle: E3_navigationnelle
+      intention: "ouverture_signalement"
+      cible_referencee: "flow G3 signalement (palier 6)"
+      note: "Intention CLOSE — le composant ne fait qu'ouvrir la surface de signalement avec le target_type pré-rempli."
+    couplage_etat_partage:
+      - etat: ETAT-COMPTE-CONNECTE
+        role: consommateur
+        note: >-
+          Le signalement requiert Compte (I2 — modération nécessite identité
+          minimale). Si déconnecté, le composant est désactivé avec message
+          PT-signalement-compte-requis (palier 8) ou propose la création de
+          Compte via flow D7.
+    consequences_variabilite:
+      - "Signalement déjà émis sur la même cible par le même Compte → composant désactivé avec libellé alternatif"
+
+  # ===========================================================================
+  # SECTIONS D'ÉCRAN (5)
+  # ===========================================================================
+
+  - id: comp-zone-narration
+    nom: "Zone narration (récit Pin)"
+    famille: molecule
+    raison_d_etre: "Bloc structurant de la consultation approfondie d'un Pin (M3) — titre de section, contenu narratif riche, médias intégrés, liens. Intègre potentiellement comp-avant-apres, comp-quiz, comp-encart-information depuis fonctionnels."
+    ancrage:
+      ecrans: [E-PIN-CONSULTATION-APPROFONDIE, E-PIN-MODE-PRESENTATION]
+      composants_qui_l_integrent: [comp-layout-consultation-pin-approfondie]
+    composition:
+      - { id: comp-libelle-texte, slot: titre, cardinalite: 1, note: "titre de section narration" }
+      - { id: comp-libelle-texte, slot: contenu_narratif, cardinalite: 1, note: "texte riche du récit ; libellé pattern PT-narration-pin" }
+      - { id: comp-image-hero, slot: medias, cardinalite: 0..n, note: "images intégrées au récit" }
+      - { id: comp-lien-texte, slot: liens, cardinalite: 0..n, note: "liens externes ou internes (autres Pins)" }
+      - { id: comp-avant-apres, slot: comparateur_temporel, cardinalite: 0..n, note: "intégration depuis fonctionnels" }
+      - { id: comp-quiz, slot: quiz_inline, cardinalite: 0..n, note: "intégration depuis fonctionnels (rare en zone narration ; surtout post-narrative)" }
+      - { id: comp-encart-information, slot: encarts, cardinalite: 0..n }
+    intention_portee: { non_interactif: true, note: "Zone structurante non-interactive en elle-même ; les enfants portent leurs propres interactions." }
+    consequences_variabilite:
+      - "Contenu narratif long → scroll vertical interne ou pagination par sections (palier 12)"
+      - "Médias absents → bloc texte seul reste valide"
+      - "Médias volumineux → chargement progressif (palier 16)"
+
+  - id: comp-zone-sources
+    nom: "Zone sources d'un Pin"
+    famille: molecule
+    raison_d_etre: "Bloc des sources documentaires d'un Pin — titre de section, liste de Sources (palier 4 cluster 01), badge de validation scientifique éventuel."
+    ancrage:
+      ecrans: [E-PIN-CONSULTATION-APPROFONDIE, E-COMMUNAUTE-SOUMISSION-PIN (édition)]
+      composants_qui_l_integrent: [comp-layout-consultation-pin-approfondie, comp-formulaire-saisie-pin]
+    composition:
+      - { id: comp-libelle-texte, slot: titre, cardinalite: 1, note: "libellé pattern PT-section-sources (palier 8)" }
+      - { id: comp-lien-texte, slot: sources, cardinalite: 1..n, note: "une entrée par Source" }
+      - { id: comp-icone, slot: validation_badge, cardinalite: 0..1, note: "icône fonctionnelle de validation scientifique si applicable (palier 13)" }
+    variants:
+      - { dimension: contexte, valeurs: [consultation, edition], registre: "édition permet ajout/retrait de Sources ; consultation lecture seule" }
+    etats_interactifs: [default, focused]
+    interactions_natives:
+      - "Tap source (consultation) → E3 ouverture du lien externe (sortie temporaire vers navigateur OS) ou ouverture interne du Pin lié"
+    intention_portee:
+      parametrable: true
+      echelle: variable
+      note: "Variable selon contexte (consultation = E3 lien externe ; édition = E2 modification locale)."
+    consequences_variabilite:
+      - "Aucune source (cas Pin éditorial sans bibliographie publiée) → bloc remplacé par message gracieux (palier 8)"
+
+  - id: comp-zone-commentaires
+    nom: "Zone commentaires (modérés)"
+    famille: molecule
+    raison_d_etre: "Section commentaires d'un Pin avec liste paginée + CTA de rédaction. Réifie l'entité Commentaire (palier 4 cluster 03 communautaire)."
+    ancrage:
+      ecrans: [E-PIN-CONSULTATION-APPROFONDIE, E-PARCOURS-FICHE-DETAIL]
+      composants_qui_l_integrent: [comp-layout-consultation-pin-approfondie]
+    composition:
+      - { id: comp-libelle-texte, slot: titre_section, cardinalite: 1, note: "libellé pattern PT-section-commentaires" }
+      - { id: comp-item-commentaire, slot: commentaires_list, cardinalite: 0..n }
+      - { id: comp-button-primary, slot: cta_rediger, cardinalite: 1, note: "ouvre flow G2 rédaction commentaire" }
+      - { id: comp-indicateur-chargement, slot: loader, cardinalite: 0..1 }
+    etats_interactifs: [empty, loading, loaded, scroll_loading_more, error]
+    interactions_natives:
+      - "Tap CTA rédiger → E3 ouvre surface ponctuelle M6 de rédaction (flow G2)"
+      - "Scroll bas → charge plus (pagination)"
+    intention_portee:
+      parametrable: true
+      echelle: variable
+      note: "CTA = E3 navigationnelle vers M6 de rédaction. Pagination = E1 atomique."
+    couplage_etat_partage:
+      - etat: ETAT-COMPTE-CONNECTE
+        role: consommateur
+        note: >-
+          CTA rédiger désactivé si pas de Compte (I2 — publication communautaire
+          requiert Compte). Liste des commentaires reste consultable sans Compte.
+    consequences_variabilite:
+      - "Aucun commentaire → état vide avec invitation à être le premier (PT-commentaires-vides palier 8)"
+      - "Commentaires en cours de modération non visibles publiquement (I3)"
+
+  - id: comp-zone-post-narrative
+    nom: "Zone post-narrative (quiz, liens)"
+    famille: molecule
+    raison_d_etre: "Section après-récit d'un Pin (palier 3 D2.7) — quiz d'engagement, liens de prolongement vers d'autres Pins ou Parcours."
+    ancrage:
+      ecrans: [E-PIN-CONSULTATION-APPROFONDIE]
+      composants_qui_l_integrent: [comp-layout-consultation-pin-approfondie]
+    composition:
+      - { id: comp-libelle-texte, slot: titre, cardinalite: 1, note: "libellé pattern PT-section-prolongement" }
+      - { id: comp-libelle-texte, slot: contenu_post, cardinalite: 0..1, note: "texte d'introduction au quiz ou aux liens" }
+      - { id: comp-quiz, slot: quiz, cardinalite: 0..1, note: "intégration depuis fonctionnels" }
+      - { id: comp-lien-texte, slot: liens, cardinalite: 0..n, note: "Pins ou Parcours suggérés" }
+    intention_portee: { non_interactif: true, note: "Zone structurante ; le quiz et les liens portent leurs interactions." }
+    consequences_variabilite:
+      - "Quiz absent ET liens absents → zone non rendue (Pin sans engagement post-narratif)"
+      - "Plusieurs liens → présentation en liste ou en mini-cartes (palier 12)"
+
+  - id: comp-zone-vide
+    nom: "Zone vide gracieuse"
+    famille: molecule
+    raison_d_etre: "État vide générique pour listes, recherches sans résultat, sections sans contenu — icône évocatrice + message + action optionnelle pour rebondir."
+    ancrage:
+      ecrans: [E-CARTE-RECHERCHE, E-PROFIL-FAVORIS, E-PROFIL-HISTORIQUE, E-PARCOURS-PRINCIPAL]
+      composants_qui_l_integrent: [comp-grid-recherche, comp-zone-commentaires, comp-zone-narration (cas erreur)]
+    composition:
+      - { id: comp-icone, slot: icone, cardinalite: 1, note: "icône fonctionnelle d'état vide (palier 13)" }
+      - { id: comp-libelle-texte, slot: message, cardinalite: 1, note: "libellé pattern PT-vide-{contexte} (palier 8)" }
+      - { id: comp-button-secondary, slot: action, cardinalite: 0..1, note: "ex. 'Explorer la carte', 'Découvrir des parcours' — rebondi gracieux" }
+    variants:
+      - { dimension: contexte, valeurs: [recherche, favoris, historique, commentaires, parcours_personnel], registre: "détermine icône + libellé message + action proposée" }
+    etats_interactifs: [default, focused]
+    interactions_natives:
+      - "Tap action → E2/E3 émet rebondi (selon variant : ouverture S1 carte, S2 parcours, etc.)"
+    intention_portee:
+      parametrable: true
+      echelle: variable
+      note: "Action câblée par l'écran parent selon le variant de contexte."
+    consequences_variabilite:
+      - "Action absente → état vide informatif uniquement"
+
+  # ===========================================================================
+  # ITEMS CONSULTÉS (4)
+  # ===========================================================================
+
+  - id: comp-item-commentaire
+    nom: "Item commentaire"
+    famille: molecule
+    raison_d_etre: "Représentation d'un commentaire publié — avatar auteur, pseudo, date, contenu, actions secondaires (signalement, partage)."
+    ancrage:
+      ecrans: [E-PIN-CONSULTATION-APPROFONDIE, E-PARCOURS-FICHE-DETAIL]
+      composants_qui_l_integrent: [comp-zone-commentaires]
+    composition:
+      - { id: comp-avatar, slot: avatar, cardinalite: 1 }
+      - { id: comp-libelle-texte, slot: auteur, cardinalite: 1, note: "pseudonyme du Compte" }
+      - { id: comp-libelle-texte, slot: date, cardinalite: 1, note: "libellé pattern PT-date-relative" }
+      - { id: comp-libelle-texte, slot: contenu, cardinalite: 1, note: "texte du commentaire" }
+      - { id: comp-controle-signalement, slot: actions, cardinalite: 0..1, note: "target_type=commentaire" }
+    etats_interactifs: [default, focused]
+    interactions_natives:
+      - "Tap signalement → délégué au comp-controle-signalement (E3 vers G3)"
+    intention_portee: { non_interactif: true, note: "L'item lui-même n'est pas tappable ; ses enfants portent leurs actions." }
+    couplage_etat_partage:
+      - { etat: ETAT-COMPTE-CONNECTE, role: consommateur, note: "actions de signalement désactivées si déconnecté" }
+    consequences_variabilite:
+      - "Avatar absent → fallback initiale du pseudo (palier 13)"
+      - "Contenu long → expand/collapse au-delà d'un seuil (palier 12)"
+
+  - id: comp-rangee-favori
+    nom: "Rangée favori"
+    famille: molecule
+    raison_d_etre: "Rangée combinant un item Pin ou Parcours + un contrôle favori + une action optionnelle. Pattern dominant de E-PROFIL-FAVORIS."
+    ancrage:
+      ecrans: [E-PROFIL-FAVORIS]
+      composants_qui_l_integrent: []
+    composition:
+      - { id: comp-item-liste-pin-apercu, slot: item, cardinalite: 0..1, note: "si target_type=pin (mutuellement exclusif avec parcours)" }
+      - { id: comp-item-liste-parcours-simple, slot: item, cardinalite: 0..1, note: "si target_type=parcours" }
+      - { id: comp-controle-favori, slot: favori_control, cardinalite: 1 }
+      - { id: comp-button-secondary, slot: action, cardinalite: 0..1 }
+    variants:
+      - { dimension: target_type, valeurs: [pin, parcours], registre: "détermine quel item enfant est rendu" }
+    etats_interactifs: [default, pressed, focused]
+    interactions_natives:
+      - "Tap item → ouverture (B2 ou C2 selon type)"
+      - "Tap contrôle favori → toggle (E2)"
+    intention_portee: { parametrable: true, echelle: E2_inter_composant }
+    consequences_variabilite:
+      - "Toggle favori inactif → rangée disparaît de la liste (animation palier 11)"
+
+  - id: comp-rangee-historique
+    nom: "Rangée historique"
+    famille: molecule
+    raison_d_etre: "Rangée combinant un item d'historique de visite + une action contextuelle (revisiter, supprimer)."
+    ancrage:
+      ecrans: [E-PROFIL-HISTORIQUE]
+      composants_qui_l_integrent: []
+    composition:
+      - { id: comp-item-historique-visite, slot: item, cardinalite: 1 }
+      - { id: comp-libelle-texte, slot: date, cardinalite: 1, note: "redondant avec item — peut être consolidé plus tard" }
+      - { id: comp-button-secondary, slot: action, cardinalite: 1, note: "ex. 'Revisiter', 'Supprimer'" }
+    etats_interactifs: [default, pressed, focused]
+    interactions_natives:
+      - "Tap item → ouverture (B2 ou C2)"
+      - "Tap action → E2 émet l'action (suppression locale ou navigation)"
+    intention_portee: { parametrable: true, echelle: E2_inter_composant }
+    consequences_variabilite:
+      - "Suppression d'historique → rangée retirée localement (l'historique est strictement local — I6)"
+
+  - id: comp-rangee-profil-action
+    nom: "Rangée action Profil"
+    famille: molecule
+    raison_d_etre: "Rangée d'action de l'écran Profil principal — accès aux sections favoris, historique, paramètres, compte, soumissions communautaires. Visibilité conditionnelle selon ETAT-COMPTE-CONNECTE."
+    ancrage:
+      ecrans: [E-PROFIL-PRINCIPAL]
+      composants_qui_l_integrent: [comp-layout-profil]
+    composition:
+      - { id: comp-libelle-texte, slot: label, cardinalite: 1, note: "libellé pattern PT-profil-section-{type}" }
+      - { id: comp-icone, slot: icone_leading, cardinalite: 0..1, note: "icône fonctionnelle de section (palier 13)" }
+      - { id: comp-button-secondary, slot: action, cardinalite: 1, note: "souvent un chevron directionnel + zone tactile rangée entière" }
+    variants:
+      - { dimension: type_action, valeurs: [favoris, historique, parametres, compte, soumissions], registre: "détermine icône + libellé + cible navigationnelle" }
+      - { dimension: visibilite, valeurs: [toujours, si_compte_connecte], registre: "soumissions visible uniquement si Compte connecté" }
+    etats_interactifs: [default, pressed, focused, disabled]
+    interactions_natives:
+      - "Tap rangée → E3 navigation vers la section ciblée (favoris → E-PROFIL-FAVORIS, etc.)"
+    intention_portee:
+      parametrable: false
+      echelle: E3_navigationnelle
+      intention: "navigation_section_profil"
+      cible_referencee: "écrans E-PROFIL-* selon variant type_action"
+      note: "Intention CLOSE — la cible navigationnelle est figée par le variant type_action."
+    couplage_etat_partage:
+      - etat: ETAT-COMPTE-CONNECTE
+        role: consommateur
+        note: >-
+          Variants 'compte' et 'soumissions' visibles/cachés selon présence
+          Compte. Variant 'compte' affiche 'Créer un Compte' si déconnecté
+          et 'Mon Compte' si connecté (libellé pattern PT-profil-compte palier 8).
+    consequences_variabilite:
+      - "Libellé variable selon état Compte connecté"
+
+  # ===========================================================================
+  # ENCARTS ET UTILITAIRES (5)
+  # ===========================================================================
+
+  - id: comp-encart-information
+    nom: "Encart d'information"
+    famille: molecule
+    raison_d_etre: "Bloc d'information générique avec icône + titre + contenu — conseil pédagogique, alerte, succès, erreur. Utilisé dans la zone narration, dans les formulaires, dans les états dégradés."
+    ancrage:
+      ecrans: [E-PIN-CONSULTATION-APPROFONDIE, E-COMMUNAUTE-SOUMISSION-PIN, E-PROFIL-PARAMETRES]
+      composants_qui_l_integrent: [comp-zone-narration, comp-formulaire-saisie-pin, comp-zone-vide]
+    composition:
+      - { id: comp-icone, slot: icone, cardinalite: 1, note: "icône fonctionnelle adaptée au type (palier 13)" }
+      - { id: comp-libelle-texte, slot: titre, cardinalite: 1 }
+      - { id: comp-libelle-texte, slot: contenu, cardinalite: 1, note: "libellé pattern PT-encart-{type}" }
+    variants:
+      - { dimension: type, valeurs: [info, success, warning, error], registre: "couleur + icône fonctionnelle adaptée" }
+    intention_portee: { non_interactif: true }
+    consequences_variabilite:
+      - "Contenu long → expand/collapse possible (palier 12)"
+
+  - id: comp-bloc-sources
+    nom: "Bloc sources (récap pied de Pin)"
+    famille: molecule
+    raison_d_etre: "Récapitulatif des Sources et crédits en pied de page d'une consultation Pin. Distinct de comp-zone-sources (qui est interactif et structurant) — celui-ci est purement informatif."
+    ancrage:
+      ecrans: [E-PIN-CONSULTATION-APPROFONDIE]
+      composants_qui_l_integrent: [comp-layout-consultation-pin-approfondie]
+    composition:
+      - { id: comp-libelle-texte, slot: sources, cardinalite: 1..n, note: "ligne par Source (libellé pattern PT-source-pied)" }
+      - { id: comp-libelle-texte, slot: credits, cardinalite: 0..n, note: "crédits images, contributeurs (libellé pattern PT-credit)" }
+    intention_portee: { non_interactif: true }
+    consequences_variabilite:
+      - "Aucune source (cas rare) → bloc non rendu"
+
+  - id: comp-compteur-statistique
+    nom: "Compteur statistique"
+    famille: molecule
+    raison_d_etre: "Métrique numérique affichée — nombre + libellé descriptif. Utilisé pour 'X favoris', 'Y parcours complétés', 'Z commentaires'."
+    ancrage:
+      ecrans: [E-PROFIL-PRINCIPAL, E-PARCOURS-FICHE-DETAIL]
+      composants_qui_l_integrent: [comp-layout-profil, comp-zone-statistiques]
+    composition:
+      - { id: comp-badge-nombre, slot: nombre, cardinalite: 1 }
+      - { id: comp-libelle-texte, slot: libelle, cardinalite: 1, note: "libellé pattern PT-stat-{type}" }
+    intention_portee: { non_interactif: true }
+    consequences_variabilite:
+      - "Nombre élevé → abréviation (1.2k) au-delà d'un seuil (palier 12)"
+      - "Libellé i18n divergent (FR/EN/JA) → truncate ou retour à la ligne"
+
+  - id: comp-indicateur-permission
+    nom: "Indicateur de permission absente"
+    famille: molecule
+    raison_d_etre: "Signal qu'une permission OS requise est absente (géoloc, caméra, notifications). Apparaît en bandeau ou en bloc pour expliquer la limitation."
+    ancrage:
+      ecrans: [E-CARTE-PRINCIPALE (geoloc absente), E-PIN-CONSULTATION-AR (caméra absente), E-PROFIL-PARAMETRES]
+      composants_qui_l_integrent: [comp-layout-carte-principale, comp-camera-ar]
+    composition:
+      - { id: comp-icone, slot: icone, cardinalite: 1, note: "icône fonctionnelle d'alerte permission (palier 13)" }
+      - { id: comp-libelle-texte, slot: message, cardinalite: 1, note: "libellé pattern PT-permission-{type}" }
+      - { id: comp-button-secondary, slot: action_reglages, cardinalite: 0..1, note: "ouvre les réglages OS (E3 sortie temporaire)" }
+    variants:
+      - { dimension: permission, valeurs: [geolocalisation, camera, notification], registre: "détermine icône + message" }
+    etats_interactifs: [default, pressed, focused]
+    interactions_natives:
+      - "Tap action_reglages → E3 ouvre les paramètres système OS (sortie temporaire)"
+    intention_portee:
+      parametrable: false
+      echelle: E3_navigationnelle
+      intention: "ouverture_reglages_os"
+      cible_referencee: "OS — paramètres système ; flow A6 permission juste-à-temps"
+      note: "Intention CLOSE quand action_reglages présent ; sinon non-interactif."
+    couplage_etat_partage:
+      - { etat: ETAT-PERMISSIONS-SYSTEME, role: consommateur, note: "visible si permission requise absente" }
+    consequences_variabilite:
+      - "Permission accordée pendant l'usage → composant disparaît (cascade ETAT-PERMISSIONS-SYSTEME)"
+
+  - id: comp-info-progress-etape
+    nom: "Info progression d'étape"
+    famille: molecule
+    raison_d_etre: "Synthèse compacte de la progression au sein d'un Parcours actif — badge numéro d'étape + icône d'état (terrain/canapé ou complete/courante) + libellé court 'Étape n/N'. Ancrée dans comp-surface-persistante-parcours (P2)."
+    ancrage:
+      ecrans: [E-PARCOURS-EN-COURS-TERRAIN, E-PARCOURS-EN-COURS-CANAPE]
+      composants_qui_l_integrent: [comp-surface-persistante-parcours]
+    composition:
+      - { id: comp-badge-nombre, slot: numero_etape, cardinalite: 1, note: "numéro de l'étape courante" }
+      - { id: comp-icone, slot: icone_etat, cardinalite: 1, note: "icône fonctionnelle d'état (palier 13)" }
+      - { id: comp-libelle-texte, slot: libelle, cardinalite: 1, note: "libellé pattern PT-progression-etape (palier 8) — 'Étape n/N'" }
+    intention_portee: { non_interactif: true, note: "Affichage informatif uniquement ; le tap est porté par la surface persistante parente." }
+    couplage_etat_partage:
+      - { etat: ETAT-PARCOURS-EN-COURS, role: consommateur, note: "détermine numéro courant + total" }
+    consequences_variabilite:
+      - "Parcours sans étapes (improbable) → composant non rendu"
+      - "Numéro élevé (10+) → mise en page adaptative (palier 12)"
+
+  - id: comp-carousel
+    nom: "Carousel"
+    famille: molecule
+    raison_d_etre: "Slider d'images ou de médias avec indicateur de position. Utilisé pour les médias uploadés d'un Pin communautaire, les images d'archive en zone narration, et potentiellement les paires avant/après."
+    ancrage:
+      ecrans: [E-COMMUNAUTE-SOUMISSION-PIN, E-PIN-CONSULTATION-APPROFONDIE, E-ADMIN-SAISIE-PIN-TEMPLATE]
+      composants_qui_l_integrent: [comp-formulaire-saisie-pin, comp-zone-narration, comp-formulaire-saisie-pin-admin]
+    composition:
+      - { id: comp-image-hero, slot: items, cardinalite: 1..n, note: "une image par item ; cardinalité 1..n" }
+      - { id: comp-page-indicator, slot: indicateur, cardinalite: 1, note: "atome — dots ou counter selon nombre d'items" }
+      - { id: comp-button-tertiary, slot: nav_prev, cardinalite: 0..1, note: "navigation précédente optionnelle" }
+      - { id: comp-button-tertiary, slot: nav_next, cardinalite: 0..1, note: "navigation suivante optionnelle" }
+    variants:
+      - { dimension: mode, valeurs: [consultation, edition], registre: "édition permet ajout/retrait d'items" }
+    etats_interactifs: [default, swiping, focused]
+    interactions_natives:
+      - "Swipe latéral → E1 défilement entre items"
+      - "Tap nav_prev/nav_next → E1 défilement programmatique"
+      - "Tap item (mode consultation) → E2 émet 'item_zoom' éventuel"
+    intention_portee:
+      parametrable: true
+      echelle: E1_atomique
+      note: "Défilement local au composant ; mode édition câble l'ajout/retrait par le parent."
+    patterns_attaches: [PI-DRAG-ENTRE-VARIANTS]
+    consequences_variabilite:
+      - "Un seul item → indicateur de position non rendu"
+      - "Items volumineux (médias) → chargement progressif (palier 16)"
+      - "Aucun item (mode édition vide) → affichage placeholder + invitation à ajouter (palier 8)"
+
+  - id: comp-barre-filtres
+    nom: "Barre de filtres actifs"
+    famille: molecule
+    raison_d_etre: "Affichage des filtres actuellement appliqués (chips) avec bouton de réinitialisation global. Apparaît sous la barre de recherche ou en tête de grille."
+    ancrage:
+      ecrans: [E-CARTE-RECHERCHE, E-CARTE-FILTRES-COUCHES, E-PARCOURS-PRINCIPAL]
+      composants_qui_l_integrent: [comp-recherche-surface, comp-grid-recherche, comp-filtres-couches]
+    composition:
+      - { id: comp-chip-filtre, slot: filtres_chips, cardinalite: 1..n, note: "chip retirable individuellement" }
+      - { id: comp-button-secondary, slot: reset_action, cardinalite: 1, note: "libellé pattern PT-filtres-reset" }
+    etats_interactifs: [default, pressed, focused]
+    interactions_natives:
+      - "Tap chip filtre → E2 émet 'filtre_retire' (chip individuelle dismiss)"
+      - "Tap reset → E2 émet 'filtres_reset_global'"
+    intention_portee:
+      parametrable: true
+      echelle: E2_inter_composant
+      note: "L'écran parent (recherche, grille) câble la cascade — recharge des résultats avec filtres mis à jour."
+    consequences_variabilite:
+      - "Aucun filtre actif → composant non rendu"
+      - "Nombreux filtres → scroll horizontal des chips (palier 12)"

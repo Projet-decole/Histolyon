@@ -1,0 +1,518 @@
+# =============================================================================
+# Palier 4 — Cluster 04 — Communauté
+# =============================================================================
+# Cluster qui modélise les contributions communautaires GRAND PUBLIC : ce qu'un
+# utilisateur (avec Compte) produit en réagissant au contenu existant.
+#
+# Quatre entités :
+#   - Commentaire (sur un Pin)
+#   - Retour de parcours (sur un Parcours communautaire)
+#   - Signalement (polymorphe : Pin / Parcours / Commentaire / Retour)
+#   - Trace de modération (append-only, parallèle à Trace de validation
+#     du cluster 05 — audit immuable de chaque décision de modération)
+#
+# Périmètre clarifié (arbitrage A acté) : la SOUMISSION de pin par un
+# utilisateur n'est PAS une entité distincte ici. Un pin soumis par un
+# contributeur est un Pin de provenance communautaire, modélisé en cluster 01
+# (avec attribut auteur_communautaire et statut couvrant en_revue / validé /
+# publié). Ce cluster n'a donc pas à dupliquer cette modélisation — il s'y
+# réfère.
+# =============================================================================
+
+document:
+    type: palier_donnees_cluster
+    cluster_id: C4
+    nom: "Communauté"
+    format: yaml
+
+raison_d_etre_du_cluster: >-
+    Sans contributions communautaires, l'app reste un monologue éditorial.
+    Les Commentaires transforment un Pin lu en conversation ; les Retours de
+    parcours donnent à l'auteur d'un parcours communautaire un signal de
+    qualité ressenti par ceux qui l'ont vécu ; le Signalement permet à
+    n'importe quel utilisateur d'agir — sans s'exposer — quand un contenu
+    lui semble problématique. Toutes ces contributions partagent un même
+    contrat : Compte requis (I2), modération avant visibilité publique (I3),
+    identité civile jamais collectée (I1), anonymat strict du signaleur (I5).
+
+# -----------------------------------------------------------------------------
+# Entités
+# -----------------------------------------------------------------------------
+entites:
+    # ---------------------------------------------------------------------------
+    - id: commentaire
+      nom: "Commentaire"
+
+      raison_d_etre: >-
+          Permet à un utilisateur connecté de réagir à un Pin par un texte court
+          (souvenir, précision, question). Transforme la consultation d'un Pin en
+          conversation ouverte sans confondre la réaction communautaire avec le
+          contenu éditorial validé.
+
+      attributs:
+          obligatoires:
+              - nom: identifiant
+                nature: "identifiant lisible et stable"
+
+              - nom: pin_cible
+                nature: "référence à Pin"
+                contrainte: "exactement 1"
+                note: "au palier 3 D9.1 le commentaire est rattaché à un Pin précis, pas à une Catégorie ou une Époque"
+
+              - nom: auteur
+                nature: "référence à Compte (pseudonyme)"
+                note: "I1 : seuls le pseudonyme et la représentation graphique du Compte sont exposés ; jamais l'identité civile"
+
+              - nom: contenu
+                nature: "texte court"
+                contrainte: "non vide"
+                note: "longueur précise et règles typographiques relèvent du palier 8 contenu"
+
+              - nom: statut
+                nature: "valeur parmi un ensemble (cycle de vie)"
+                valeurs: "voir cycle_de_vie ci-dessous"
+
+              - nom: créé_le
+                nature: "horodatage"
+
+              - nom: modifié_le
+                nature: "horodatage"
+                note: "mis à jour à chaque édition par l'auteur ; sert à signaler '(modifié)' au palier 7 si pertinent"
+
+          optionnels:
+              - nom: motif_de_refus
+                nature: "texte court"
+                note: "présent uniquement si statut = refusé ; transmis à l'auteur sans humiliation (D9.1 critère de réussite). Repris depuis la dernière Trace de modération applicable."
+
+      relations:
+          - "porte sur exactement 1 Pin (cluster 01)"
+          - "écrit par exactement 1 Compte (cluster 03)"
+          - "peut être cible de 0..n Signalements (entité Signalement ci-dessous)"
+          - "tracé par 0..n Traces de modération (entité Trace de modération ci-dessous) — chaque transition modérée crée une Trace"
+
+      cycle_de_vie:
+          etats: [en_attente, publié, refusé, masqué, supprimé_par_auteur]
+          transitions:
+              - "en_attente → publié (modérateur valide ou règle de modération a posteriori applique)"
+              - "en_attente → refusé (modérateur refuse, motif obligatoire)"
+              - "publié → masqué (signalement honoré ou décision éditoriale ; le Commentaire n'est plus visible mais reste tracé)"
+              - "masqué → publié (correction, levée de la décision)"
+              - "publié → supprimé_par_auteur (l'auteur retire son commentaire à tout moment)"
+              - "en_attente → supprimé_par_auteur (l'auteur retire avant modération)"
+          visibilite:
+              en_attente: >-
+                  Selon le mode de modération (a priori ou a posteriori, à arbitrer
+                  en D10.5) : soit visible uniquement par l'auteur, soit visible
+                  publiquement avec marque distinctive.
+              publié: >-
+                  Visible par tous les utilisateurs qui consultent le Pin.
+              refusé_masqué_supprimé: >-
+                  Non visible publiquement. L'auteur voit son refus avec motif
+                  (refusé) ou disparition (masqué / supprimé).
+
+      invariants:
+          - "Compte requis pour créer un Commentaire (instanciation locale de I2)"
+          - "Tout Commentaire passe par l'état en_attente avant d'atteindre publié (instanciation locale de I3)"
+          - "Un Commentaire refusé porte un motif_de_refus non vide"
+          - "L'auteur peut éditer son Commentaire publié ; une édition substantielle peut redéclencher une modération (politique à arbitrer en D10.5)"
+          - "Un Commentaire dont le Pin cible passe en retiré (cluster 01) reste tracé mais n'est plus visible publiquement"
+
+      invariants_transversaux_referenced: [I1, I2, I3]
+
+      questions_ouvertes:
+          - "Threading : un Commentaire peut-il être en réponse à un autre Commentaire ? Le brief D9.1 mentionne la question explicitement comme à arbitrer selon la charge supportable de modération. Pas modélisé ici par défaut (option simple) — si réponses adoptées, ajouter un attribut commentaire_parent (référence à Commentaire) avec contrainte 'même Pin cible'."
+          - "Cible élargie aux Parcours : un Commentaire peut-il viser un Parcours, ou les Retours de parcours suffisent-ils pour cette surface ? Position retenue : Pin uniquement (cohérent avec D9.1). À confirmer."
+          - "Modération a priori vs a posteriori : impacte la visibilité de l'état en_attente. Décision canonique attendue en D10.5 ; le modèle ici supporte les deux."
+          - "Édition après modération : redéclenche-t-elle un cycle de modération ? Ou l'édition reste-t-elle libre tant que le Commentaire n'est pas re-signalé ? À arbitrer."
+
+    # ---------------------------------------------------------------------------
+    - id: retour_de_parcours
+      nom: "Retour de parcours"
+
+      raison_d_etre: >-
+          Donne à l'utilisateur qui a vécu un Parcours communautaire un moyen de
+          laisser une évaluation et un commentaire libre, et à l'auteur du
+          Parcours un signal de qualité sans le noyer dans un score trompeur.
+          Distinct du Commentaire qui vise un Pin individuel — un Retour porte
+          sur l'expérience globale du Parcours.
+
+      attributs:
+          obligatoires:
+              - nom: identifiant
+                nature: "identifiant lisible et stable"
+
+              - nom: parcours_cible
+                nature: "référence à Parcours (cluster 02)"
+                contrainte: "exactement 1 ; provenance du Parcours = communautaire"
+                note: "I3 et D9.3 : seuls les Parcours communautaires reçoivent des Retours ; les Parcours éditoriaux ne sont pas notés par les utilisateurs"
+
+              - nom: auteur
+                nature: "référence à Compte (pseudonyme)"
+                note: "même règle d'identification visible que pour Commentaire (I1)"
+
+              - nom: évaluation
+                nature: "valeur d'évaluation parmi un ensemble"
+                note: >-
+                    Forme exacte (échelle, mots, étoiles, pouce) à arbitrer en aval
+                    (palier 7 / 8). Ce qu'on dit ici : c'est une valeur DISCRÈTE
+                    choisie dans un petit ensemble ordonné, pas un score libre.
+
+              - nom: statut
+                nature: "valeur parmi un ensemble (cycle de vie)"
+                valeurs: "voir cycle_de_vie ci-dessous"
+
+              - nom: créé_le
+                nature: "horodatage"
+
+              - nom: modifié_le
+                nature: "horodatage"
+
+          optionnels:
+              - nom: commentaire_libre
+                nature: "texte court"
+                note: "facultatif (D9.3 — le Retour fonctionne avec l'évaluation seule)"
+
+              - nom: motif_de_refus
+                nature: "texte court"
+                note: "présent uniquement si statut = refusé. Repris depuis la dernière Trace de modération applicable."
+
+      relations:
+          - "porte sur exactement 1 Parcours communautaire (cluster 02)"
+          - "écrit par exactement 1 Compte (cluster 03)"
+          - "peut être cible de 0..n Signalements"
+          - "tracé par 0..n Traces de modération"
+
+      cycle_de_vie:
+          etats: [en_attente, publié, refusé, masqué, supprimé_par_auteur]
+          transitions:
+              - "en_attente → publié (modération valide)"
+              - "en_attente → refusé (modération refuse, motif obligatoire)"
+              - "publié → masqué (signalement honoré ou décision éditoriale)"
+              - "masqué → publié (levée de la décision)"
+              - "publié → supprimé_par_auteur (l'auteur retire à tout moment)"
+              - "en_attente → supprimé_par_auteur (l'auteur retire avant modération)"
+          visibilite:
+              portée_synthese: >-
+                  Un Retour publié contribue à la SYNTHÈSE des Retours d'un Parcours
+                  uniquement si un seuil minimal de Retours publiés est atteint
+                  (D9.3 ; seuil chiffré en palier 16). En deçà du seuil, les Retours
+                  individuels restent visibles à l'auteur du Parcours dans son
+                  espace, mais pas synthétisés publiquement.
+
+      invariants:
+          - "Compte requis pour créer un Retour (instanciation locale de I2)"
+          - "Tout Retour passe par en_attente avant publié (instanciation locale de I3)"
+          - "Un Retour ne peut viser qu'un Parcours de provenance communautaire"
+          - "Un Retour refusé porte un motif_de_refus non vide"
+          - "Si l'auteur du Parcours désactive la fonctionnalité de retour sur son Parcours (préférence dans Parcours, cluster 02), aucun nouveau Retour ne peut être créé sur ce Parcours ; les Retours existants restent en l'état"
+
+      invariants_transversaux_referenced: [I1, I2, I3]
+
+      questions_ouvertes:
+          - "Forme exacte de l'évaluation (échelle 1-5, palette de mots, pouce binaire, étoiles) — palier 7 / 8 décide ; ici on dit seulement 'valeur discrète parmi un ensemble ordonné'."
+          - "Unicité par Compte par Parcours : un même utilisateur peut-il laisser PLUSIEURS Retours sur le même Parcours (ex. après une seconde visite) ou est-ce 1 Retour par Compte par Parcours, modifiable ? Position recommandée : 1 par Compte par Parcours, modifiable, mais à confirmer (le brief D9.3 ne tranche pas)."
+          - "Évaluation seule sans commentaire : compte-t-elle quand même dans le seuil minimal pour synthèse ? Recommandation : oui (l'évaluation est l'élément structuré ; le commentaire est facultatif)."
+          - "Retours signalés massivement : déclenchent-ils un retrait conservatoire automatique du Retour ou seulement une remontée prioritaire en file de modération ? Décision attendue en D10.5."
+          - "Politique sur les Parcours retirés : les Retours sont-ils archivés avec le Parcours ou conservés ? Probablement archivés en cohérence avec le cluster 02."
+
+    # ---------------------------------------------------------------------------
+    - id: signalement
+      nom: "Signalement"
+
+      raison_d_etre: >-
+          Permet à tout utilisateur connecté d'agir sur un contenu d'origine
+          communautaire qui lui semble problématique, SANS exposer son identité
+          (I5). Polymorphe par construction (arbitrage B acté) : un même type
+          d'objet 'Signalement' couvre les quatre types de cibles communautaires
+          possibles, ce qui permet à la modération (D10.5) de traiter tous les
+          signalements dans une file unique priorisée.
+
+      attributs:
+          obligatoires:
+              - nom: identifiant
+                nature: "identifiant lisible et stable"
+
+              - nom: signaleur
+                nature: "référence à Compte (jamais exposée à la cible ni à son auteur)"
+                note: "I5 : visibilité strictement réservée aux modérateurs et à des fins de modération"
+
+              - nom: type_de_cible
+                nature: "valeur parmi un ensemble"
+                valeurs: [pin, parcours, commentaire, retour_de_parcours]
+                note: "polymorphisme explicite (cf. glossaire 00-index)"
+
+              - nom: cible
+                nature: "référence polymorphe selon type_de_cible"
+                contrainte: >-
+                    type_de_cible = pin → référence à Pin de provenance communautaire ;
+                    type_de_cible = parcours → référence à Parcours de provenance communautaire ;
+                    type_de_cible = commentaire → référence à Commentaire ;
+                    type_de_cible = retour_de_parcours → référence à Retour de parcours
+
+              - nom: motif
+                nature: "valeur parmi un ensemble"
+                valeurs:
+                    [
+                        inapproprié,
+                        historiquement_faux,
+                        hors_sujet,
+                        atteinte_vie_privée,
+                        autre,
+                    ]
+                note: "jeu fini issu de D9.4 ; libellés exacts en palier 8"
+
+              - nom: statut
+                nature: "valeur parmi un ensemble (cycle de vie)"
+                valeurs: "voir cycle_de_vie ci-dessous"
+
+              - nom: créé_le
+                nature: "horodatage"
+
+          optionnels:
+              - nom: précision_libre
+                nature: "texte court"
+                note: "obligatoire si motif = autre (le signaleur explicite ce qu'il reproche) ; optionnel sinon"
+
+              - nom: masquage_local_actif
+                nature: "drapeau"
+                note: >-
+                    Indique que le signaleur a choisi de masquer la cible POUR LUI-MÊME
+                    en attendant la décision (D9.4). Le masquage local n'affecte pas
+                    la visibilité pour les autres utilisateurs. Pourrait être traité
+                    comme entité distincte 'Préférence de masquage' rattachée au
+                    Profil — voir question ouverte.
+
+      relations:
+          - "créé par exactement 1 Compte (cluster 03)"
+          - "vise exactement 1 cible polymorphe (Pin communautaire / Parcours communautaire / Commentaire / Retour de parcours)"
+          - "0..1 Compte signaleur, mais relation strictement non-exposée à la cible (cf. I5)"
+          - "tracé par 0..n Traces de modération — la décision finale (rejeté / remédié) et l'action prise sur la cible (masquage, retrait, correction) sont enregistrées comme Traces"
+
+      cycle_de_vie:
+          etats: [nouveau, en_examen, rejeté, remédié]
+          transitions:
+              - "nouveau → en_examen (modérateur prend en charge)"
+              - "en_examen → rejeté (signalement infondé ; aucune action sur la cible)"
+              - "en_examen → remédié (action prise sur la cible : masquage, retrait, demande de correction selon le type de cible)"
+              - "rejeté → en_examen (réouverture, ex. nouveau signalement convergent)"
+
+      invariants:
+          - "Compte requis pour créer un Signalement (instanciation locale de I2)"
+          - "L'identité du signaleur n'est jamais exposée à l'auteur de la cible ni à un autre utilisateur (instanciation locale de I5)"
+          - "Aucun Signalement n'est visible publiquement sur la cible (pas de compteur, pas de marqueur public — D9.4)"
+          - "Un même Compte ne peut pas créer plusieurs Signalements ouverts (statut nouveau ou en_examen) sur la même cible — un nouveau signalement du même Compte sur une cible déjà signalée par lui n'est compté qu'une fois"
+          - "Un Signalement ne peut viser qu'un objet d'origine communautaire (pas de Signalement sur un Pin éditorial directement — un Pin éditorial reposant sur des Sources se corrige par voie éditoriale ; à confirmer en D10.5)"
+          - "Le motif 'autre' impose précision_libre non vide"
+          - "Un Signalement remédié porte une action_prise_sur_la_cible explicite"
+
+      invariants_transversaux_referenced: [I1, I2, I5]
+
+      questions_ouvertes:
+          - "Signalement d'un Pin éditorial : le brief D9.4 cible 'tout contenu d'origine communautaire'. Mais Kenji 'repère une erreur factuelle dans un pin' (persona-check D9 Kenji) sans préciser provenance. Position retenue : un Signalement ne vise QUE les objets communautaires ; pour un Pin éditorial, l'utilisateur passe par un canal de correction distinct (relève du palier 14 ou d'un futur sous-domaine). À confirmer."
+
+          - "Le Compte signaleur peut-il retirer son propre Signalement avant décision ? D9.4 le suggère (recommandation 'oui'). Pas modélisé ici comme transition explicite — à ajouter si confirmé (état 'retiré_par_signaleur' ou suppression hard)."
+          - "Anonymisation rétroactive : si le Compte signaleur supprime son Compte, le Signalement reste-t-il dans la file ? Décision attendue en articulation cluster 03 / D10.5."
+          - "Masquage local : modélisé ici comme drapeau du Signalement, mais sémantiquement c'est une PRÉFÉRENCE du Profil signaleur (sa vue personnalisée). Une modélisation plus propre serait une entité 'Masquage personnel' rattachée au Profil avec référence à la cible. À arbitrer en cohérence avec cluster 03."
+
+    # ---------------------------------------------------------------------------
+    - id: trace_de_moderation
+      nom: "Trace de modération"
+
+      raison_d_etre: >-
+          Enregistrer de façon immuable chaque décision de modération prise
+          sur un Commentaire, un Retour de parcours ou un Signalement. C'est
+          l'artefact qui rend l'audit communautaire opposable : sans Trace,
+          on ne peut pas répondre à 'qui a décidé quoi sur cette contribution,
+          quand, et avec quelle action'. Parallèle à la Trace de validation
+          du cluster 05 (audit scientifique des Pins) : même posture
+          d'append-only, mais portée sur la modération communautaire.
+          Une Trace par décision : une contribution peut accumuler plusieurs
+          Traces si elle a été re-modérée (ex. publié → masqué après
+          signalement → republié après correction).
+
+      attributs:
+          obligatoires:
+              - nom: identifiant
+                nature: "identifiant lisible et stable"
+
+              - nom: type_de_cible
+                nature: "valeur parmi un ensemble"
+                valeurs:
+                    [
+                        pin_communautaire,
+                        commentaire,
+                        retour_de_parcours,
+                        signalement,
+                    ]
+                note: "polymorphisme analogue au Signalement (cf. glossaire 00-index). Inclut pin_communautaire : décision utilisateur 2026-05-05 — pour un Pin de provenance communautaire, c'est la Trace de modération qui matérialise l'unique acte d'audit (incluant la dimension validation scientifique des sources). La Trace de validation (cluster 05) reste réservée aux Pins éditoriaux."
+
+              - nom: cible
+                nature: "référence polymorphe selon type_de_cible"
+                contrainte: >-
+                    type_de_cible = pin_communautaire → référence à Pin (de provenance communautaire) ;
+                    type_de_cible = commentaire → référence à Commentaire ;
+                    type_de_cible = retour_de_parcours → référence à Retour de parcours ;
+                    type_de_cible = signalement → référence à Signalement
+
+              - nom: modérateur
+                nature: "référence à Compte (pseudonyme)"
+                note: >-
+                    Pseudonyme de la personne qui a tranché. Au démarrage du
+                    projet, peut être Anaïs elle-même (cumul des rôles édition
+                    et modération). Cf. I1 — pas d'identité civile. Le rôle
+                    'Modérateur' n'est pas modélisé comme entité séparée :
+                    c'est un Compte qui exerce une fonction tracée par la
+                    Trace elle-même.
+
+              - nom: décision
+                nature: "valeur parmi un ensemble"
+                valeurs:
+                    [
+                        publié,
+                        refusé,
+                        masqué,
+                        démasqué,
+                        rejeté,
+                        remédié,
+                        validé_sources_vérifiées,
+                        retiré_sources_insuffisantes,
+                    ]
+                note: >-
+                    publié / refusé : décisions sur Commentaire ou Retour de parcours
+                    sortant de l'état en_attente.
+                    masqué / démasqué : transitions sur Commentaire ou Retour de
+                    parcours déjà publié (signalement honoré ou levée de la décision).
+                    rejeté / remédié : décisions sur Signalement (rejeté = signalement
+                    infondé ; remédié = action prise sur la cible).
+                    validé_sources_vérifiées / retiré_sources_insuffisantes : décisions
+                    sur Pin communautaire — la modération conjugue ici la dimension
+                    validation scientifique (vérification des sources) avec la dimension
+                    modération communautaire ; une SEULE Trace est produite (cf.
+                    arbitrage 2026-05-05).
+
+              - nom: horodatage
+                nature: "horodatage"
+
+          optionnels:
+              - nom: motif
+                nature: "texte court"
+                note: >-
+                    Justification de la décision. Obligatoire de fait pour les
+                    décisions négatives (refusé, masqué) — l'auteur de la
+                    contribution doit pouvoir comprendre. La règle fonctionnelle
+                    relève de D10.5 / palier 13.
+
+              - nom: action_prise_sur_la_cible
+                nature: "valeur parmi un ensemble"
+                valeurs: [aucune, cible_masquée, cible_retirée, cible_corrigée]
+                note: >-
+                    Présent uniquement si type_de_cible = signalement et
+                    décision = remédié. Précise la nature de la remédiation
+                    sur la cible signalée.
+
+      relations:
+          - "porte sur exactement 1 cible polymorphe (Pin communautaire / Commentaire / Retour de parcours / Signalement)"
+          - "produite par exactement 1 Compte (modérateur)"
+          - "0..n Traces par cible (une cible accumule l'historique de ses modérations successives)"
+
+      cycle_de_vie:
+          etats: [créée]
+          transitions: []
+          note_sur_l_immutabilite: >-
+              Une Trace de modération est append-only — créée une fois,
+              jamais modifiée. La rectification d'une décision passe par
+              la création d'une NOUVELLE Trace (ex. un Commentaire publié
+              puis masqué après signalement porte deux Traces : la première
+              publié, la seconde masqué). Cette immutabilité est le fondement
+              de l'audit opposable, parallèle à la Trace de validation
+              (cluster 05).
+
+      invariants:
+          - "Une Trace n'est jamais modifiée après création (append-only)"
+          - "Une Trace n'est jamais supprimée — y compris si la cible est supprimée par son auteur ou retirée par modération (l'audit survit à la disparition de la cible)"
+          - "Le pseudonyme du modérateur reste tracé même si le Compte associé est ultérieurement supprimé"
+          - "action_prise_sur_la_cible n'est présent que si type_de_cible = signalement et décision = remédié"
+          - "Les transitions de cycle de vie de la cible (en_attente → publié, publié → masqué, etc.) doivent toujours être adossées à une Trace correspondante (cohérence vérifiable)"
+
+      invariants_transversaux_referenced: [I1]
+
+      questions_ouvertes:
+          - "Vue unifiée Trace de validation + Trace de modération pour audit global back-office : utile ou bruit ? Position retenue : deux entités distinctes (acteurs et processus différents), unification possible côté présentation back-office sans casser la modélisation"
+          - "Anonymisation rétroactive d'une Trace si le modérateur supprime son Compte : la Trace conserve une copie du pseudonyme (parallèle à Trace de validation cluster 05). À confirmer si conformité juridique l'exige autrement"
+          - "Pour un Pin communautaire en validation conjointe : un seul modérateur tranche-t-il pour les deux dimensions (rapide), ou faut-il deux acteurs distincts (rigueur) ? À arbitrer côté palier 13 admin"
+
+# -----------------------------------------------------------------------------
+# Persona check
+# -----------------------------------------------------------------------------
+# Le palier 4 ne fixe pas l'expérience ressentie ; il fixe ce qui est POSSIBLE
+# côté contributions communautaires. La passe ci-dessous interroge cet impact.
+persona_check:
+    kenji:
+        impact: "indirect"
+        note: >-
+            Kenji peut signaler une erreur factuelle (motif historiquement_faux,
+            D9.4) et laisser un Retour sur un Parcours communautaire qu'il a vécu.
+            La modélisation ne fait pas obstacle. Le mur d'inscription pour
+            contribuer (I2) reste un arbitrage assumé en D9 — Kenji peut continuer
+            à lire sans Compte.
+
+    mme_dupont:
+        impact: "direct"
+        note: >-
+            Mme Dupont est autrice de Parcours communautaire (sortie scolaire) et
+            destinataire des Retours de parcours sur ses propres Parcours. La
+            modélisation lui permet (a) de désactiver la réception de Retours sur
+            un Parcours expérimental — préférence portée par Parcours côté
+            cluster 02 ; (b) de signaler un Commentaire blessant sans s'exposer
+            (I5) ; (c) de voir l'ensemble des Retours sur ses Parcours, indépendamment
+            du seuil de synthèse publique.
+
+    mme_martin:
+        impact: "indirect"
+        note: >-
+            Mme Martin consomme du contenu validé en classe ; elle ne contribue
+            pas (D9 § persona_check). La pertinence du cluster pour elle se
+            résume à : aucun contenu non modéré ne lui parvient en projection
+            (I3 garantit que tout Commentaire / Retour passe par modération).
+            OK.
+
+    pere_lyonnais:
+        impact: "MAJEUR"
+        note: >-
+            Persona principal de D9. Le cluster 04 lui donne (a) un Commentaire
+            pour ajouter une anecdote familiale sur un Pin de son quartier, (b) un
+            canal de Signalement avec motif atteinte_vie_privée pour réagir vite
+            à un contenu qui révélerait une adresse, avec masquage_local_actif
+            pour se protéger immédiatement, (c) l'assurance par I5 que sa main
+            n'est pas exposée. Points de vigilance pour les paliers en aval :
+              - le flux de création de Compte (cluster 03 + D6.5) doit rester
+                ultra-court, sinon le père ne contribuera jamais ;
+              - le motif 'autre' avec précision_libre obligatoire ne doit pas
+                devenir une barrière en palier 7 ;
+              - la modération a posteriori (si retenue en D10.5) servirait
+                particulièrement le père qui veut que son commentaire apparaisse
+                immédiatement sans attendre.
+
+    anais_back_office:
+        impact: "MAJEUR"
+        note: >-
+            Anaïs (ou un modérateur dédié) reçoit ces objets dans la file de
+            modération D10.5. La modélisation ici doit lui rendre possible :
+              - un traitement uniforme grâce au polymorphisme du Signalement
+                (une seule file, priorité signalements en tête comme prévu en
+                D10.5) ;
+              - une décision tracée par objet via l'entité Trace de modération
+                (immuable, append-only, parallèle à la Trace de validation du
+                cluster 05) — comestible par D10.5 quel que soit l'outillage
+                final (templates / interface admin) ;
+              - la lecture de la cible dans son contexte (Pin / Parcours /
+                Commentaire / Retour) — la référence polymorphe explicite le
+                permet directement.
+            Points ouverts à articuler en D10.5 :
+              - délai-cible et politique de seuil pour retrait conservatoire ;
+              - éventuelle vue unifiée Trace de validation + Trace de modération
+                côté back-office, sans toucher à la modélisation.
+            Anaïs n'a pas à saisir d'identité civile pour quiconque (I1) — ni
+            auteur de Commentaire / Retour, ni signaleur, ni modérateur.
+            Cohérent avec sa frustration_a_eviter 'pas de système traçable
+            des sources' : ici aussi tout est tracé sans identité civile.

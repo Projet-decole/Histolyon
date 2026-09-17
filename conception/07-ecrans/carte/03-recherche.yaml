@@ -1,0 +1,70 @@
+# =============================================================================
+# E-CARTE-RECHERCHE — Recherche depuis la Carte
+# =============================================================================
+# Surface ponctuelle (P5.M6) qui s'ouvre depuis la Carte pour traiter une
+# intention de recherche courte. Disparaît à la sélection d'un résultat ou
+# à l'annulation. Ne déplace pas la pile de navigation.
+# =============================================================================
+
+document:
+  type: palier_ecrans_fiche
+  format: yaml
+
+ecran:
+  id: E-CARTE-RECHERCHE
+  nom: "Recherche depuis la Carte"
+
+  mode: P5.M6
+  surface_parente: P5.S1
+
+  raison_d_etre: >-
+    Permet à l'utilisateur de retrouver un Pin (et possiblement un
+    Parcours, cf. question ouverte) par texte libre, par filtres
+    Catégorie/Époque, ou par mots-clés. La recherche vit SUR la Carte
+    qui reste visible derrière (cf. D1.4) — sélectionner un résultat
+    recadre la Carte et ouvre l'aperçu rapide.
+
+  composition:
+    - zone: "champ de saisie textuelle"
+      role: "saisie libre de mots-clés ; mise à jour des résultats au fil de la frappe"
+
+    - zone: "filtres de raffinement"
+      role: "Époque, Catégorie, et autres filtres (énumération exacte palier 10) ; combinent le mot-clé pour restreindre"
+      entites_affichees: [Époque, Catégorie]
+
+    - zone: "résultats"
+      role: "liste de Pins (et possiblement Parcours) correspondant à la requête courante ; chaque résultat affiche titre, catégorie, époque, vignette éventuelle"
+      entites_affichees: [Pin, Parcours]
+
+    - zone: "état de la requête"
+      role: "compteur dynamique du nombre de résultats ; signalement si la recherche est limitée (mode hors-ligne)"
+
+  etats:
+    nominal_avec_resultats: "Requête saisie, résultats affichés, l'utilisateur peut taper un résultat ou affiner les filtres"
+    saisie_vierge: "Aucune requête saisie, surface ouverte avec champ vide ; suggestions ou contenus mis en avant à l'arbitrage palier 7/10 (à mettre en question_ouverte)"
+    chargement: "Résultats en cours de calcul (court délai si recherche serveur)"
+    aucun_resultat: "Requête sans correspondance ; message gracieux suggérant d'élargir les filtres ou de modifier les mots-clés"
+    offline_recherche_locale: "Connexion réseau indisponible ; recherche limitée au contenu téléchargé localement ; bandeau P3 visible derrière"
+    erreur_recherche: "Échec technique de la recherche ; message gracieux invitant à réessayer"
+    filtre_active: "Au moins un filtre actif est visible et désactivable individuellement"
+
+  elements_interactifs:
+    - "Saisie au clavier dans le champ de recherche"
+    - "Activation / désactivation d'un filtre (Époque, Catégorie...)"
+    - "Tap sur un résultat → la Carte recadre sur la cible et l'aperçu rapide s'ouvre (E-CARTE-APERCU-PIN ou bascule vers E-PARCOURS-FICHE-DETAIL si la cible est un Parcours)"
+    - "Effacement du champ de saisie (geste rapide pour repartir d'une requête vierge)"
+    - "Geste de fermeture (geste neutre, validation à vide, annulation explicite) → la surface se referme (P5.N5)"
+
+  flows_actifs:
+    - A4   # Recherche et filtrage
+
+  surfaces_imbriquees:
+    - E-CARTE-APERCU-PIN              # imbriqué si résultat = Pin
+    - E-PARCOURS-FICHE-DETAIL         # bascule si résultat = Parcours
+    - E-TRANSVERSES-MESSAGE-EPHEMERE  # M9 si erreur de recherche
+
+  questions_ouvertes:
+    - "La recherche couvre-t-elle uniquement les Pins ou aussi les Parcours ? Recommandation D1.4 : oui également Parcours, à articuler avec C1 (cf. flow A4 question ouverte). Question impacte directement la composition (zone résultats) et la bascule vers E-PARCOURS-FICHE-DETAIL"
+    - "Suggestions ou contenus mis en avant en saisie vierge (recommandations éditoriales, recherches récentes du Profil) — palier 7/10"
+    - "Le filtre Époque interagit-il avec le navigateur temporel de la Carte (synchronisation visuelle) ? — palier 10"
+    - "Persistance des filtres entre sessions (héritée de C2) — recommandation : non, repartir d'une requête vierge à chaque ouverture, mais à confirmer"

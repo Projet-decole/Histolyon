@@ -1,0 +1,319 @@
+# =============================================================================
+# Palier 12 — 02 Typographies
+# =============================================================================
+# Trois fontes latin par rôle distinct, échelle de 12 tokens d'usage
+# (display-xl à ui-xs), note d'évolution sur les langues à police non latine.
+#
+# Décision D8 palier 12 : pas de fonte spécifique par langue actuellement.
+# Kenji symbolise les utilisateurs étrangers — l'app est conçue pour eux —
+# mais on ne charge pas le palier 12 d'une stack typographique multilingue.
+# Si traduction future dans une langue à police non latine, alternative
+# à trouver. Le palier 8 06-i18n a déjà tranché stratégie 3 langues
+# fr/en/ja (UI traduite, contenu en français, fallback système OS pour
+# les caractères non latins éventuels).
+# =============================================================================
+
+document:
+  type: palier_tokens_typographies
+  numero: 12
+  fichier: "02-typographies.yaml"
+  version: "0.1"
+  date: "2026-05-07"
+  format: yaml
+  prerequis_de_lecture:
+    - "design/conception/12-tokens/00-index.yaml — § 5 format TOK-TYPO, § 9 décision D8 (pas de fonte par langue)"
+
+raison_d_etre: >-
+  Trois fontes, trois rôles. Jamais plus. Une fonte titre (Playfair
+  Display) qui porte la dimension narrative et historique ; une fonte
+  corps (Lora) au service du récit long ; une fonte interface (Inter)
+  qui disparaît pour laisser le contenu respirer. L'échelle typographique
+  formalise les usages — chaque texte de l'app utilise un des 12 tokens.
+
+# -----------------------------------------------------------------------------
+# 1. Fontes par rôle (3 fontes latin)
+# -----------------------------------------------------------------------------
+fontes:
+
+  - id: TOK-FONT-TITRE-EDITORIAL
+    nom: "Playfair Display"
+    famille: serif
+    role: "Titre éditorial — porte la dimension narrative et historique de l'app"
+    description: >-
+      Serif élégante avec contraste marqué entre pleins et déliés.
+      Évoque les ouvrages historiques, les éditions soignées. Utilisée
+      uniquement pour les titres — jamais pour le corps de texte
+      (sa lecture longue serait fatigante).
+    weights_utilises: [700, 800]
+    source_canonique: "Google Fonts (typeface ouverte SIL OFL)"
+    note_implementation: >-
+      L'équipe dev embarque la fonte localement (sans dépendance CDN
+      runtime). À l'implémentation, fallback chain :
+      Playfair Display → Georgia → serif système.
+
+  - id: TOK-FONT-CORPS-NARRATIF
+    nom: "Lora"
+    famille: serif
+    role: "Corps narratif — texte long de récit"
+    description: >-
+      Serif lisible conçue pour la lecture longue à l'écran. Italique
+      d'usage éditorial pour les citations (charte DA archivée
+      conservée). Plus humble que Playfair, au service du contenu.
+    weights_utilises: [400, 600]
+    italique_disponible: true
+    source_canonique: "Google Fonts (typeface ouverte SIL OFL)"
+    note_implementation: >-
+      Fallback chain : Lora → Georgia → serif système.
+
+  - id: TOK-FONT-INTERFACE
+    nom: "Inter"
+    famille: sans-serif
+    role: "Interface — labels, boutons, métadonnées, navigation"
+    description: >-
+      Sans-serif neutre conçue pour les interfaces écran. Disparaît
+      pour laisser le contenu respirer. Jamais utilisée pour les
+      titres éditoriaux (qui relèvent de Playfair).
+    weights_utilises: [400, 500]
+    note_revision_post_review: "Weight 600 retiré 2026-05-07 — non utilisé par les TOK-TYPO-UI-* actuellement (UI-LG/MD/XS = 500, UI-SM = 400). Réintroduire si un usage émerge."
+    source_canonique: "Google Fonts (typeface ouverte SIL OFL)"
+    note_implementation: >-
+      Fallback chain : Inter → -apple-system → BlinkMacSystemFont →
+      'Segoe UI' → sans-serif système.
+
+# -----------------------------------------------------------------------------
+# 2. Échelle typographique (12 tokens TOK-TYPO-X)
+# -----------------------------------------------------------------------------
+# Chaque token combine une fonte, une taille en px, un poids et un
+# line-height relatif (multiplicateur de la taille). Référencés dans les
+# composants palier 10 et les écrans palier 7.
+echelle:
+
+  display:
+
+    - id: TOK-TYPO-DISPLAY-XL
+      font_ref: TOK-FONT-TITRE-EDITORIAL
+      size_px: 32
+      weight: 800
+      line_height_relatif: 1.2
+      description: "Titre splash screen au lancement de l'app, titre de célébration de fin de Parcours"
+      usages:
+        - "Splash screen (palier 7 onboarding traversant)"
+        - "Écran de célébration de fin de Parcours (palier 7 E-PARCOURS-FIN-CELEBRATION)"
+
+    - id: TOK-TYPO-DISPLAY-LG
+      font_ref: TOK-FONT-TITRE-EDITORIAL
+      size_px: 26
+      weight: 700
+      line_height_relatif: 1.25
+      description: "Titre principal d'écran narratif (Pin hero, fiche Parcours détail)"
+      usages:
+        - "comp-image-hero slot titre (palier 10 atomes)"
+        - "Première ligne d'un M3 consultation approfondie Pin / Parcours"
+
+    - id: TOK-TYPO-DISPLAY-MD
+      font_ref: TOK-FONT-TITRE-EDITORIAL
+      size_px: 22
+      weight: 700
+      line_height_relatif: 1.3
+      description: "Titre d'aperçu rapide M2, titre de section dans un Parcours"
+      usages:
+        - "comp-apercu-rapide-pin slot titre"
+        - "Titres de sections dans le récit narratif d'un Pin"
+
+    - id: TOK-TYPO-DISPLAY-SM
+      font_ref: TOK-FONT-TITRE-EDITORIAL
+      size_px: 18
+      weight: 700
+      line_height_relatif: 1.35
+      description: "Sous-titres, libellés des chips d'Époque actifs"
+      usages:
+        - "comp-chip-epoque variant selected (le libellé d'Époque mérite une typographie éditoriale)"
+
+  body:
+
+    - id: TOK-TYPO-BODY-LG
+      font_ref: TOK-FONT-CORPS-NARRATIF
+      size_px: 17
+      weight: 400
+      line_height_relatif: 1.65
+      description: "Texte narratif principal (récit d'un Pin, description longue d'un Parcours)"
+      usages:
+        - "comp-zone-narration paragraphe principal"
+        - "Description d'un Parcours en fiche détail"
+
+    - id: TOK-TYPO-BODY-MD
+      font_ref: TOK-FONT-CORPS-NARRATIF
+      size_px: 15
+      weight: 400
+      line_height_relatif: 1.6
+      description: "Teaser, description courte, légende d'image"
+      usages:
+        - "comp-apercu-rapide-pin slot teaser"
+        - "comp-card-parcours-* slot description"
+
+    - id: TOK-TYPO-BODY-SM
+      font_ref: TOK-FONT-CORPS-NARRATIF
+      size_px: 14
+      weight: 400
+      line_height_relatif: 1.55
+      description: "Notes, légendes d'images, citations d'auteur dans la zone Sources"
+      usages:
+        - "comp-zone-sources contenu (cohérent palier 8 02-template-pin)"
+        - "Légendes d'images dans la zone narrative"
+
+    - id: TOK-TYPO-BODY-EMPHASIS
+      font_ref: TOK-FONT-CORPS-NARRATIF
+      size_px: 17
+      weight: 600
+      line_height_relatif: 1.65
+      description: "Passages importants ou mis en relief dans le récit narratif"
+      usages:
+        - "Passages clés d'un récit (souligner un nom propre, une date marquante)"
+      note: "Même size et line-height que TOK-TYPO-BODY-LG ; seul le weight change."
+
+  ui:
+
+    - id: TOK-TYPO-UI-LG
+      font_ref: TOK-FONT-INTERFACE
+      size_px: 16
+      weight: 500
+      line_height_relatif: 1.4
+      description: "Labels boutons principaux, libellés CTA"
+      usages:
+        - "comp-libelle-bouton dans comp-button-primary / -secondary / -tertiary"
+
+    - id: TOK-TYPO-UI-MD
+      font_ref: TOK-FONT-INTERFACE
+      size_px: 14
+      weight: 500
+      line_height_relatif: 1.4
+      description: "Labels chips, badges, métadonnées légèrement structurantes"
+      usages:
+        - "comp-libelle-chip dans tous les comp-chip-*"
+        - "comp-badge-statut, comp-badge-nombre"
+
+    - id: TOK-TYPO-UI-SM
+      font_ref: TOK-FONT-INTERFACE
+      size_px: 12
+      weight: 400
+      line_height_relatif: 1.4
+      description: "Métadonnées (durée, distance, date, statut)"
+      usages:
+        - "comp-item-historique-visite slot date"
+        - "comp-card-parcours-* slot durée_distance"
+
+    - id: TOK-TYPO-UI-XS
+      font_ref: TOK-FONT-INTERFACE
+      size_px: 11
+      weight: 500
+      line_height_relatif: 1.3
+      description: "Labels icônes du sélecteur de section principale, libellés très courts"
+      usages:
+        - "comp-selecteur-section-principale labels S1/S2/S3 (sous l'icône)"
+      note_a11y: >-
+        11px est le seuil bas. Acceptable car libellé court (1 mot) +
+        icône en doublure (le sens passe par l'icône, le libellé
+        confirme). À VALIDER palier 16 sur taille tactile et lisibilité
+        à distance projection (Mme Martin).
+
+# -----------------------------------------------------------------------------
+# 3. Note d'évolution — langues à police non latine
+# -----------------------------------------------------------------------------
+evolution_langues_non_latines:
+
+  decision_actuelle:
+    description: >-
+      Application mono-langue (français, palier 8 06-i18n). Les 3 fontes
+      latin ci-dessus (Playfair Display / Lora / Inter) couvrent
+      l'intégralité des besoins actuels — aucune fonte non latine n'est
+      nécessaire.
+
+  si_traduction_future:
+    cas_a_anticiper:
+      - "Traduction dans une langue utilisant un script non latin (japonais, chinois, coréen, arabe, hébreu, thaï, etc.)"
+      - "Rendu sophistiqué d'un script non latin avec fonte choisie (au-delà du fallback système OS)"
+    politique:
+      description: >-
+        Si l'app est traduite dans une langue à police non latine,
+        une alternative typographique sera trouvée. Approche probable :
+        ajouter une fonte par script (ex. Noto Sans JP pour japonais
+        dédié, Noto Sans Arabic pour arabe), avec une stack
+        font-family qui choisit la bonne fonte selon le caractère.
+        Pas une décision.
+      contrainte_de_design:
+        - "L'esprit éditorial (Playfair pour titre, Lora pour récit, Inter pour interface) doit être préservé — choisir une fonte de chaque famille pour chaque script"
+        - "Les ratios de taille/poids/line-height de l'échelle ci-dessus restent les mêmes"
+        - "Le palier 16 valide que la typographie alternative passe les contrastes et lisibilités"
+
+# -----------------------------------------------------------------------------
+# 4. Persona check
+# -----------------------------------------------------------------------------
+persona_check:
+
+  kenji:
+    impact: ÉLEVÉ
+    note: >-
+      Kenji = symbole utilisateur étranger. La décision D8 palier 12
+      (pas de fonte spécifique par langue) est cohérente avec le
+      pragmatisme : on prouve que l'app fonctionne pour les
+      étrangers via la microcopy traduite (palier 8 06-i18n) sans
+      surcharger le système typographique. La plus tard adressera le
+      rendu sophistiqué.
+
+  mme_dupont:
+    impact: faible
+    note: "Aucune contrainte spécifique."
+
+  mme_martin:
+    impact: ÉLEVÉ
+    note: >-
+      TOK-TYPO-DISPLAY-LG (titres Playfair 26px) et TOK-TYPO-BODY-LG
+      (récit Lora 17px line-height 1.65) confortables en projection
+      classe. TOK-TYPO-UI-XS (11px) au seuil bas — à VALIDER palier 16
+      pour la lisibilité du sélecteur de section depuis le fond de
+      classe (mais peu critique car les icônes priment dans ce
+      contexte).
+
+  pere_lyonnais:
+    impact: moyen
+    note: >-
+      Le Lora narratif est confortable pour la lecture en flânerie
+      (line-height 1.65 généreux pour les passages longs).
+
+  anais_back_office:
+    impact: ÉLEVÉ
+    note: >-
+      Le back-office desktop utilise principalement TOK-TYPO-UI-* et
+      TOK-TYPO-BODY-* pour les formulaires et tableaux. Cohérence
+      avec l'app mobile garantie par la même échelle.
+
+# -----------------------------------------------------------------------------
+# 5. Enjeux transversaux
+# -----------------------------------------------------------------------------
+enjeux_transversaux:
+
+  accessibilite: >-
+    TOK-TYPO-BODY-LG line-height 1.65 confortable pour la lecture
+    longue (au-dessus du minimum recommandé 1.5 pour texte long).
+    TOK-TYPO-UI-XS à 11px au seuil — réservé aux usages courts +
+    icône en doublure. Tous les textes porteurs d'information
+    critique utilisent au minimum TOK-TYPO-UI-MD (14px). Palier 16
+    valide les choix sur proxy-personas.
+
+  performance: >-
+    3 fontes embarquées localement (~150-300 KB cumulés en formats
+    woff2). Acceptable. Pas de chargement runtime depuis CDN.
+
+  vie_privee: "Aucun enjeu spécifique."
+
+  i18n: >-
+    Voir § 3 evolution_langues_non_latines : 3 fontes latin suffisent
+    pour l'application mono-langue actuelle ; typographies dédiées par
+    script à envisager seulement si une traduction future l'exige.
+
+# -----------------------------------------------------------------------------
+# 6. Questions ouvertes
+# -----------------------------------------------------------------------------
+questions_ouvertes:
+  - "TOK-TYPO-UI-XS à 11px : seuil bas. Lisibilité depuis fond de classe (Mme Martin) à VALIDER palier 16. Si insuffisant, monter à 12px (cohérent avec TOK-TYPO-UI-SM)."
+  - "Embedding local des 3 fontes au lancement de l'app vs streaming Google Fonts : décision dev (pas du palier 12). Palier 12 spécifie 'embedding local' comme préférence (pas de dépendance runtime)."

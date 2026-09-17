@@ -1,0 +1,74 @@
+# =============================================================================
+# E-PIN-MODE-PRESENTATION — Pin en mode présentation (sans chrome)
+# =============================================================================
+# Variante de la consultation approfondie en P5.M4 — sans chrome de l'app.
+# Pour Mme Martin qui projette en classe, pour Kenji en immersion narrative.
+# Toutes les surfaces persistantes (P1, P2, P3) sont en sommeil visuel (P5.C2),
+# leur état survit. Bascule réversible d'un geste vers la consultation
+# approfondie (M3) d'origine.
+# =============================================================================
+
+document:
+  type: palier_ecrans_fiche
+  format: yaml
+
+ecran:
+  id: E-PIN-MODE-PRESENTATION
+  nom: "Pin en mode présentation (sans chrome)"
+
+  mode: P5.M4
+  surface_parente: P5.S1
+
+  raison_d_etre: >-
+    Présenter le récit d'un Pin sans aucun élément de chrome de l'app —
+    pour la projection en classe (Mme Martin, test_litmus 'mode plein
+    écran propre'), pour l'immersion narrative au casque (Kenji), pour
+    la prévisualisation éditoriale (Anaïs). L'écran est volontairement
+    réduit aux contenus essentiels du Pin et à un point de retour minimal.
+
+  composition:
+    - zone: "récit principal en présentation"
+      role: "le contenu narratif du Pin occupe l'espace, sans en-tête d'app, sans surfaces persistantes affichées, sans points d'accès périphériques (favori, partage, signalement masqués)"
+      entites_affichees: [Pin, Catégorie, Époque, Média, Source]
+
+    - zone: "navigation multi-époque (si applicable)"
+      role: "présente uniquement si le Pin est multi-époque (I8) ; permet à l'enseignante de basculer entre couches temporelles devant la classe (exemple — palier 8 : Antiquité / XVIIIe / Aujourd'hui sur un même lieu)"
+      entites_affichees: [Époque]
+
+    - zone: "contextualisation des Sources"
+      role: "Sources visibles sur chaque archive et citation (engagement d'historicité I4 préservé en M4) ; pied récapitulatif des Sources reste affichable pour citation orale"
+      entites_affichees: [Source]
+
+    - zone: "point de retour minimal"
+      role: "seul élément de chrome subsistant ; sortie du mode présentation par geste neutre vers la consultation approfondie (M3) d'origine (P5.N4)"
+
+  etats:
+    nominal_charge: "Pin présenté sans chrome ; surfaces persistantes (P1, P2, P3) en sommeil visuel (P5.C2), leur état survit"
+    audio_audible_invisible: "L'audio narratif lancé en M3 continue d'être audible ; aucun contrôle audio visible (les contrôles restent dans M3 d'origine vers où l'on revient au geste de retour)"
+    parcours_en_cours_invisible: "Un Parcours en cours subsiste dans son état (P2) mais P2 n'est pas affichée pendant M4 (P5.C2) ; au retour vers M3 P2 réapparaît visuellement"
+    offline_avec_cache: "Bandeau hors-ligne (P3) en sommeil visuel pendant M4 ; au retour vers M3 le bandeau réapparaît si la condition perdure"
+    multi_epoque_active: "L'enseignante / utilisateur peut basculer entre les Époques d'un Pin multi-temporel sans sortir du mode présentation"
+    pin_communautaire_en_revue: "Marque distinctive (I3) reste visible en M4 — la transparence sur le statut des sources doit rester visible y compris en projection"
+    chargement: "Mode présentation activé alors que le contenu n'est pas encore complètement chargé ; structure visible, contenu en récupération ; comportement à acter (à priori bascule différée jusqu'au chargement nominal)"
+    sortie_imminente: "L'utilisateur initie le geste de sortie du mode présentation ; transition gracieuse vers M3 (E-PIN-CONSULTATION-APPROFONDIE) à la position antérieure"
+
+  elements_interactifs:
+    - "Tap sur une Époque alternative (si Pin multi-époque) → flow B3 (navigation entre couches temporelles), reste en M4"
+    - "Geste de défilement dans le récit principal (lecture continue à la même position que dans M3)"
+    - "Tap sur le point de retour minimal → sortie de M4, retour à E-PIN-CONSULTATION-APPROFONDIE à la position antérieure (P5.N4)"
+    - "Aucun autre point d'accès périphérique : favori, partage, signalement, commentaires sont SUSPENDUS visuellement (à reprendre depuis M3)"
+
+  flows_actifs:
+    - B2   # M4 est une variante de B2 — déclenchée par bascule explicite depuis E-PIN-CONSULTATION-APPROFONDIE (P5.N4)
+
+  surfaces_imbriquees:
+    - E-PIN-CONSULTATION-APPROFONDIE  # cible du retour gracieux
+    # Note : P1, P2, P3 ne sont PAS listées ici comme surfaces imbriquées
+    # — elles sont en sommeil visuel par C2 ; leur état survit mais elles
+    # n'apparaissent pas par-dessus M4.
+
+  questions_ouvertes:
+    - "Bascule M3 → M4 : geste explicite (long press, double tap) ou point d'accès clairement libellé ? — palier 10"
+    - "M4 doit-il SUSPENDRE l'apparition d'une notification de proximité (M7) ou la laisser se manifester de manière minimale ? — cohérent avec C2 mais à confirmer pour le scénario Mme Martin en classe"
+    - "Comportement si l'utilisateur reçoit un Lien universel (F5) pendant M4 — refus, attente du retour M3, ou bascule immédiate vers le nouveau Pin ?"
+    - "Affichage des liens externes 'pour aller plus loin' en M4 : autorisé (sortie vers navigateur système peut briser la projection) ou suspendu ?"

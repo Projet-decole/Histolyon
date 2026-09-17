@@ -1,0 +1,735 @@
+# =============================================================================
+# Palier 6 — 04-profil-compte — Profil et données personnelles
+# =============================================================================
+# Cluster qui couvre les 9 flows liés à l'espace personnel de l'utilisateur :
+# entrée dans le Profil (D1), consultation des Favoris (D2), de l'Historique
+# (D3) et son effacement (D4), accès aux Paramètres (D5), création (D6),
+# connexion (D7), synchronisation (D8) et suppression (D9) d'un Compte.
+#
+# Logique cardinale (cohérente avec I6 et le cluster 03 du palier 4) : le
+# LOCAL est le défaut, le CLOUD est l'exception consentie. Un Profil existe
+# toujours dès la première ouverture (jamais de mur d'inscription) ; un
+# Compte est une greffe optionnelle qui n'est demandée qu'au moment où
+# l'utilisateur veut publier (cf. C13, G2, G4, G6) ou synchroniser.
+# Identité civile JAMAIS collectée (I1).
+#
+# Format strict imité du pilote 03-parcours.yaml. Préfixe P5. obligatoire
+# pour les références au palier 5 (évite les conflits avec familles C, E
+# du palier 6).
+# =============================================================================
+
+document:
+  type: palier_flows_cluster
+  cluster_id: "04-profil-compte"
+  nom: "Profil et données personnelles"
+  version: "0.1"
+  date: "2026-05-05"
+  format: yaml
+
+raison_d_etre_du_cluster: >-
+  Le Profil rassemble ce qui appartient à l'utilisateur — ses Favoris,
+  son Historique de visite, ses préférences. Il existe par défaut, sans
+  inscription, sans contrepartie. Le Compte n'apparaît dans le parcours
+  que pour deux usages très ciblés : publier une contribution
+  communautaire ou synchroniser ses données entre appareils. Ce cluster
+  déroule l'accès à cet espace, sa consultation, la gestion sensible
+  des données personnelles (effacement de l'historique), et le cycle
+  de vie complet d'un Compte (création, connexion, sync, suppression).
+
+# -----------------------------------------------------------------------------
+# Flows
+# -----------------------------------------------------------------------------
+flows:
+
+  # ---------------------------------------------------------------------------
+  - id: D1
+    nom: "Accès à l'espace personnel"
+
+    declencheur: >-
+      Tap sur le sélecteur de section principale Profil (P5.S3), depuis
+      n'importe quelle autre surface top-level.
+    acteurs: [utilisateur grand public]
+
+    deroule:
+      - etape: 1
+        action: "L'utilisateur arrive sur la surface principale Profil (P5.S3 en P5.M1)"
+      - etape: 2
+        action: >-
+          La surface présente un panneau d'entrée vers les sous-sections
+          du Profil : Favoris, Historique, Paramètres, et un point d'accès
+          à la gestion du Compte (création / connexion si pas de Compte
+          rattaché ; paramètres de Compte si déjà rattaché). Si la
+          fonctionnalité D6.6 est livrée et activée par l'utilisateur,
+          une section optionnelle 'Statistiques et badges' est également
+          visible — sinon absente.
+
+    bifurcations:
+      - si: "L'utilisateur tape sur Favoris"
+        alors: "bascule vers D2"
+      - si: "L'utilisateur tape sur Historique"
+        alors: "bascule vers D3"
+      - si: "L'utilisateur tape sur Paramètres"
+        alors: "bascule vers D5"
+      - si: "L'utilisateur tape sur 'Créer un compte' (aucun Compte rattaché)"
+        alors: "bascule vers D6"
+      - si: "L'utilisateur tape sur 'Se connecter' (aucun Compte rattaché)"
+        alors: "bascule vers D7"
+      - si: "L'utilisateur tape sur la gestion du Compte (Compte rattaché)"
+        alors: "bascule vers la section paramètres de Compte (sous-cas de D5 : D8 sync, D9 suppression, déconnexion)"
+
+    sorties_normales:
+      - "Bascule vers une autre surface top-level (P5.S1 Carte ou P5.S2 Parcours) — l'état de P5.S3 est mémorisé (cf. P5.N2)"
+      - "Bascule vers un sous-flow D2/D3/D5/D6/D7"
+
+    entites_impliquees: [Profil, Compte, Favori, "Historique de visite"]
+    surfaces_et_modes: [P5.S3, P5.M1]
+    references_palier_3: [D6.1]
+    invariants_respectes: [I6]
+
+  # ---------------------------------------------------------------------------
+  - id: D2
+    nom: "Consultation des favoris"
+
+    declencheur: "Sélection de la sous-section Favoris depuis D1"
+    acteurs: [utilisateur grand public]
+
+    deroule:
+      - etape: 1
+        action: "Bascule en P5.M3 (consultation approfondie) sur la collection des Favoris au sein de P5.S3"
+        surfaces_actives: [P5.S3, P5.M3]
+      - etape: 2
+        action: >-
+          La collection est présentée chronologiquement (récents en tête
+          par défaut — confirmation palier 7). Les entrées sont POLYMORPHES :
+          un Favori vise un Pin OU un Parcours (cf. cluster 03 — Favori
+          unifié). Chaque vignette identifie clairement le type de la
+          cible (Pin / Parcours).
+      - etape: 3
+        action: >-
+          L'utilisateur peut faire défiler la liste, taper sur une entrée
+          pour la rouvrir, ou retirer un Favori d'un geste simple
+          (analogue au geste de marquage en B7 ou en C3).
+
+    bifurcations:
+      - si: "L'utilisateur tape sur un Favori dont la cible est un Pin"
+        alors: "bascule vers B2 (Consultation approfondie d'un Pin) ; au retour, P5.S3 reprend"
+      - si: "L'utilisateur tape sur un Favori dont la cible est un Parcours"
+        alors: "bascule vers C3 (Consultation de la fiche d'un Parcours) ; au retour, P5.S3 reprend"
+      - si: "L'utilisateur retire un Favori"
+        alors: "le Favori disparaît immédiatement de la collection (action réversible par re-marquage depuis B2/C3 ou par message éphémère P5.M9 si annulation rapide proposée — à confirmer palier 7)"
+
+    sorties_normales:
+      - "Retour à D1"
+      - "Bascule vers B2 ou C3 sur ouverture d'un Favori"
+
+    cas_particuliers:
+      - cas: "Favori dont la cible (Pin éditorial ou Parcours communautaire) a été retirée du contenu publié"
+        comportement: >-
+          L'entrée reste affichée avec une mention neutre indiquant que
+          le contenu n'est plus disponible (recommandation D6.2 / cluster
+          03 — conserver l'entrée comme 'archivée'). L'ouverture renvoie
+          vers un message gracieux et propose le retrait du Favori.
+      - cas: "Aucun Favori dans la collection"
+        comportement: "État vide explicite — message suggérant les gestes pour ajouter un Favori (depuis B2 ou C3)"
+
+    entites_impliquees: [Profil, Favori, Pin, Parcours]
+    surfaces_et_modes: [P5.S3, P5.M3]
+    references_palier_3: [D6.2]
+    invariants_respectes: [I6]
+
+  # ---------------------------------------------------------------------------
+  - id: D3
+    nom: "Consultation de l'historique de visite"
+
+    declencheur: "Sélection de la sous-section Historique depuis D1"
+    acteurs: [utilisateur grand public]
+
+    pre_requis_specifiques:
+      - "Profil.enregistrement_historique_actif = vrai pour les nouvelles entrées (sinon D3 reste consultable mais n'enregistre plus de nouveau)"
+
+    deroule:
+      - etape: 1
+        action: "Bascule en P5.M3 sur la vue Historique au sein de P5.S3"
+        surfaces_actives: [P5.S3, P5.M3]
+      - etape: 2
+        action: >-
+          L'historique est présenté chronologiquement (récents en tête).
+          Les entrées sont POLYMORPHES (cf. cluster 03 — Historique de
+          visite) : type_d_événement parmi { consultation_pin,
+          étape_de_parcours_visitée, parcours_engagé, parcours_terminé,
+          résultat_quiz_post_narratif }. Chaque entrée porte la cible
+          (Pin / Parcours / Étape) et son horodatage.
+      - etape: 3
+        action: >-
+          L'utilisateur peut faire défiler la liste, taper sur une entrée
+          pour rouvrir le contenu, ou effacer une entrée individuellement.
+          Un point d'accès vers l'effacement total est également présent
+          (déclenche D4).
+
+    bifurcations:
+      - si: "L'utilisateur tape sur une entrée 'consultation_pin' ou 'étape_de_parcours_visitée'"
+        alors: "bascule vers B2 sur le Pin correspondant"
+      - si: "L'utilisateur tape sur une entrée 'parcours_engagé' ou 'parcours_terminé'"
+        alors: "bascule vers C10 (relancement) si Parcours encore disponible, ou C3 (fiche) si l'utilisateur veut consulter sans relancer"
+      - si: "L'utilisateur efface une entrée individuelle"
+        alors: "l'entrée disparaît immédiatement de la collection (action atomique sur l'Historique, append-only sauf effacement)"
+      - si: "L'utilisateur active l'effacement total"
+        alors: "bascule vers D4 (Effacement de l'historique)"
+
+    sorties_normales:
+      - "Retour à D1"
+      - "Bascule vers B2, C3 ou C10 sur ouverture d'une entrée"
+      - "Bascule vers D4 sur effacement total"
+
+    cas_particuliers:
+      - cas: "Historique désactivé (Profil.enregistrement_historique_actif = faux)"
+        comportement: >-
+          La vue reste consultable et présente les entrées antérieures
+          à la désactivation. Un bandeau d'information signale que
+          l'enregistrement est en pause (renvoi possible vers D5 pour
+          réactiver).
+      - cas: "Aucune entrée dans l'historique"
+        comportement: "État vide explicite — message rappelant que l'historique se construit à l'usage, sans culpabilisation"
+      - cas: "Entrée dont la cible (Pin / Parcours) a été retirée"
+        comportement: "L'entrée reste visible avec mention neutre 'contenu indisponible' ; l'ouverture est désactivée ou renvoie vers un message gracieux (cohérent avec D2)"
+
+    entites_impliquees: [Profil, "Historique de visite", Pin, Parcours, Étape]
+    surfaces_et_modes: [P5.S3, P5.M3]
+    references_palier_3: [D6.3]
+    invariants_respectes: [I6]
+
+    questions_ouvertes:
+      - "Présentation des entrées 'résultat_quiz_post_narratif' : intégrées au flux chronologique commun ou regroupées dans une sous-vue dédiée ? — palier 7"
+      - "Profondeur temporelle conservée par défaut (illimité tant que pas d'effacement, ou rétention glissante) — cf. D6.3 question ouverte"
+
+  # ---------------------------------------------------------------------------
+  - id: D4
+    nom: "Effacement de l'historique"
+
+    declencheur: >-
+      Activation du contrôle d'effacement total depuis D3, ou depuis la
+      section Paramètres en D5 (deux entrées équivalentes vers le même
+      flow).
+    acteurs: [utilisateur grand public]
+
+    deroule:
+      - etape: 1
+        action: >-
+          Un dialogue de confirmation P5.M8 s'ouvre, expliquant que
+          l'action efface l'ensemble de l'Historique de visite stocké
+          localement (et côté cloud si la sync 'historique' est active —
+          cf. D8). Le dialogue précise que les Favoris et les
+          préférences ne sont PAS touchés, et que l'action est
+          irréversible.
+        surfaces_actives: [P5.M8]
+      - etape: 2
+        action: >-
+          L'utilisateur confirme ou annule. À la confirmation,
+          l'effacement est exécuté comme action atomique sur le Profil
+          (cf. cluster 03 — coherence_inter_entites). Un message
+          éphémère P5.M9 confirme silencieusement.
+      - etape: 3
+        action: "Retour à la surface appelante (D3 vide ou D5 paramètres)"
+
+    bifurcations:
+      - si: "L'utilisateur confirme"
+        alors: "l'historique est effacé ; retour à D3 (vue désormais vide) ou D5 selon l'origine"
+      - si: "L'utilisateur annule (ou geste de fermeture extérieur — N6 garantit que le dialogue est strictement bloquant tant qu'il n'a pas reçu de réponse)"
+        alors: "aucune action ; retour à D3 ou D5 dans son état antérieur"
+
+    sorties_normales:
+      - "Effacement effectué — retour à la surface appelante"
+      - "Annulation — retour à la surface appelante sans modification"
+
+    cas_particuliers:
+      - cas: "Compte rattaché ET sync 'historique' activée (cf. D8)"
+        comportement: >-
+          L'effacement local s'applique immédiatement. La propagation
+          côté serveur est tentée ; si la connexion réseau est
+          indisponible, l'effacement cloud est mis en attente locale.
+          Au retour de la connexion, la propagation est exécutée. Un
+          message éphémère P5.M9 informe le cas échéant. La rétention
+          serveur ne peut être plus longue que la rétention locale (cf.
+          cluster 03 — coherence_synchronisation).
+      - cas: "Compte rattaché mais sync 'historique' inactive"
+        comportement: "L'effacement n'a aucun effet côté serveur (rien n'y est) — comportement local strict"
+
+    entites_impliquees: [Profil, "Historique de visite"]
+    surfaces_et_modes: [P5.M8, P5.M9]
+    references_palier_3: [D6.3, D6.4]
+    invariants_respectes: [I6]
+
+    questions_ouvertes:
+      - "Effacement partiel par plage temporelle ou par type d'événement (ex. effacer uniquement les résultats de quiz) : option offerte ou pas actuellement ? — recommandation : effacement total uniquement actuellement, à acter (cf. cluster 03 question ouverte)"
+
+  # ---------------------------------------------------------------------------
+  - id: D5
+    nom: "Accès aux paramètres"
+
+    declencheur: "Sélection de la sous-section Paramètres depuis D1"
+    acteurs: [utilisateur grand public]
+
+    deroule:
+      - etape: 1
+        action: "Bascule en P5.M3 sur la vue Paramètres au sein de P5.S3"
+        surfaces_actives: [P5.S3, P5.M3]
+      - etape: 2
+        action: >-
+          La vue présente les rubriques de réglage couvertes par les
+          attributs du Profil et du Compte (cluster 03) — modes
+          de notification de proximité, accessibilité, gestion de
+          l'Historique, gestion du Compte si rattaché, mentions légales
+          et politique de confidentialité. La structure exacte de la vue
+          relève du palier 7.
+      - etape: 3
+        action: >-
+          L'utilisateur ajuste un paramètre par interaction directe
+          (sélection dans une liste P5.M6, bascule d'un drapeau,
+          activation d'une sous-vue). Toute modification est appliquée
+          immédiatement et persiste entre les sessions.
+
+    bifurcations:
+      - si: "L'utilisateur active le mode Surprenez-moi (alors qu'il est désactivé)"
+        alors: "vérification que la permission de notifications système est accordée ; sinon → bascule vers A6 (Demande de permission juste-à-temps) ; au retour, l'attribut Profil.mode_notification_proximité passe à surprenez_moi"
+      - si: "L'utilisateur désactive Surprenez-moi"
+        alors: "Profil.mode_notification_proximité repasse à balade_libre ; effet immédiat (cf. D6.4 — désactivation jamais différée)"
+      - si: "L'utilisateur active l'effacement total de l'Historique"
+        alors: "bascule vers D4"
+      - si: "L'utilisateur désactive l'enregistrement de l'Historique"
+        alors: "Profil.enregistrement_historique_actif passe à faux ; les entrées existantes ne sont pas effacées (cf. cluster 03 invariant)"
+      - si: "L'utilisateur active la gestion du Compte (Compte rattaché)"
+        alors: "bascule vers la sous-vue Compte (entrées : D8 sync, D9 suppression, déconnexion)"
+      - si: "L'utilisateur active la création/connexion d'un Compte (aucun Compte rattaché)"
+        alors: "bascule vers D6 ou D7 selon le choix"
+      - si: "L'utilisateur tape sur 'Politique de confidentialité' ou 'Mentions légales'"
+        alors: "ouverture d'une sous-vue P5.M3 dédiée ; pas de bascule vers un navigateur externe (cohérence ton sobre)"
+
+    sorties_normales:
+      - "Retour à D1"
+      - "Bascule vers D4, D6, D7, D8, D9 ou A6 selon l'action"
+
+    cas_particuliers:
+      - cas: "Permission système nécessaire à un paramètre (ex. notifications pour Surprenez-moi) déjà refusée définitivement par l'OS"
+        comportement: >-
+          Un message éphémère P5.M9 ou un bandeau dans la sous-vue
+          informe que la permission doit être réactivée depuis les
+          paramètres système ; un point d'accès permet d'ouvrir les
+          paramètres système (l'app n'a pas autorité — cf. cluster 03
+          permissions_systeme).
+      - cas: "Modification d'un paramètre lié à la sync alors qu'aucun Compte n'est rattaché"
+        comportement: "Le paramètre n'est pas exposé tant qu'aucun Compte n'est rattaché (cohérent avec I6 — la sync n'existe pas sans Compte)"
+
+    entites_impliquees: [Profil, Compte]
+    surfaces_et_modes: [P5.S3, P5.M3, P5.M6, P5.M9]
+    references_palier_3: [D6.4, D4.1, D4.2]
+    invariants_respectes: [I6]
+
+    questions_ouvertes:
+      - "Mode présentation (utile à Mme Martin) : préférence persistante du Profil exposée dans D5, ou raccourci contextuel depuis P5.M3 d'un Pin (cf. D2.5) ? — cf. cluster 03 question ouverte ; recommandation : raccourci contextuel, donc PAS dans D5"
+
+  # ---------------------------------------------------------------------------
+  - id: D6
+    nom: "Création d'un Compte"
+
+    declencheur: >-
+      Activation de l'option « Créer un compte ». Trois entrées possibles :
+        (a) depuis D1 ou D5 (geste explicite de l'utilisateur),
+        (b) depuis C13 (Publication d'un parcours créé) si aucun Compte
+            n'est rattaché — l'utilisateur est redirigé ici puis revient,
+        (c) depuis G2, G3, G4, G6 (contributions communautaires :
+            Commentaire, Signalement, soumission de Pin, Retour de parcours)
+            — même mécanique.
+    acteurs: [utilisateur grand public]
+
+    pre_requis_specifiques:
+      - "Aucun Compte déjà rattaché au Profil (sinon le point d'accès n'existe pas — cf. cluster 03 contrainte 0..1)"
+      - "Connexion réseau disponible (la création de Compte requiert un échange serveur)"
+
+    deroule:
+      - etape: 1
+        action: "Bascule en P5.M3 sur le formulaire de création de Compte au sein de P5.S3"
+        surfaces_actives: [P5.S3, P5.M3]
+      - etape: 2
+        action: >-
+          Le formulaire demande le minimum requis par cluster 03 (pseudonyme,
+          représentation graphique, email d'authentification, secret
+          d'authentification). Aucun champ d'identité civile (I1). Détail
+          des libellés et des contraintes de saisie en palier 8.
+      - etape: 3
+        action: >-
+          L'utilisateur saisit les valeurs. Une vérification de
+          disponibilité du pseudonyme est effectuée à la volée. La
+          politique de confidentialité est accessible depuis le
+          formulaire (texte, jamais cocher par défaut).
+      - etape: 4
+        action: >-
+          L'utilisateur valide. Un échange avec le serveur crée le
+          Compte (état 'actif'), le rattache au Profil
+          (Profil.compte_associé renseigné), et déclenche éventuellement
+          un email de vérification (selon la méthode retenue — question
+          ouverte D6.5).
+      - etape: 5
+        action: >-
+          Confirmation par message éphémère P5.M9. La synchronisation
+          reste DÉSACTIVÉE par défaut, même après création de Compte
+          (cf. cluster 03 invariant). L'utilisateur peut activer la
+          sync via D8 — non automatique.
+
+    bifurcations:
+      - si: "L'utilisateur annule avant validation"
+        alors: "abandon ; aucun Compte créé ; retour à D1, D5 ou au flow appelant (C13, G2, G4, G6) qui se termine en sortie alternative 'Compte non créé'"
+      - si: "L'utilisateur a déjà un Compte et veut s'y connecter"
+        alors: "bascule vers D7 depuis le formulaire (point d'accès 'J'ai déjà un compte')"
+      - si: "Un email de vérification est requis et l'utilisateur ne le valide pas immédiatement"
+        alors: >-
+          Le Compte est créé en état 'actif' (recommandation : pas de
+          bloquer la suite ; l'email de vérification sert à la
+          récupération future, pas à l'usage). À arbitrer selon
+          décision sécu — cf. questions ouvertes.
+      - si: "L'utilisateur arrive depuis C13 / G2 / G4 / G6 (Compte demandé pour publier)"
+        alors: "à la création réussie, retour automatique vers le flow appelant qui reprend à l'étape suivante (publication / soumission)"
+
+    sorties_normales:
+      - "Compte créé, rattaché au Profil ; retour à D1/D5 ou au flow appelant"
+      - "Annulation explicite — abandon, aucun Compte créé"
+
+    cas_particuliers:
+      - cas: "Pseudonyme indisponible (déjà pris parmi les Comptes actifs — cf. cluster 03 contrainte d'unicité)"
+        comportement: "Retour gracieux dans le formulaire avec indication ; suggestion possible (palier 7 / 8)"
+      - cas: "Email déjà associé à un Compte existant"
+        comportement: >-
+          Retour gracieux indiquant la collision ; proposition de
+          basculer vers D7 (Connexion) depuis le formulaire. Aucune
+          divulgation supplémentaire n'est faite (cohérence I1 et
+          sécurité — ne pas confirmer publiquement l'existence d'un
+          email).
+      - cas: "Connexion réseau perdue pendant la saisie ou à la validation"
+        comportement: >-
+          Si la coupure survient avant validation, le formulaire
+          conserve les valeurs saisies (P5.N7) et un message éphémère
+          P5.M9 signale la perte. Si elle survient pendant l'échange
+          serveur, l'utilisateur reçoit un message d'erreur explicite,
+          la création n'a pas eu lieu, il peut retenter.
+      - cas: "Compte tiers optionnel offert (méthode_authentification = tiers_optionnel)"
+        comportement: >-
+          Le tiers reste OPTIONNEL et coexiste avec la création par
+          email + secret. Jamais imposé (essence § ce_qu_on_refuse).
+          Le pseudonyme et la représentation graphique sont demandés
+          quand même — l'identité tiers ne devient JAMAIS l'identité
+          publique.
+
+    entites_impliquees: [Profil, Compte]
+    surfaces_et_modes: [P5.S3, P5.M3, P5.M9]
+    references_palier_3: [D6.5]
+    invariants_respectes: [I1, I2, I6]
+
+    questions_ouvertes:
+      - "Méthode d'authentification finale (email + mot de passe / lien magique / tiers optionnel) — cf. cluster 03 D6.5 question ouverte"
+      - "Vérification d'email obligatoire pour usage immédiat ou différable ? — à arbitrer avec l'équipe sécu"
+      - "Tension I6 vs sauvegardes système OS : si l'utilisateur restaure son téléphone, son Profil anonyme peut être réinstancié sans Compte. Le Profil restauré conserve-t-il les Favoris/Historique en l'absence de Compte ? Si oui, à quelle frontière respecter I6 ? — cf. cluster 03 question ouverte sur la sauvegarde système, à acter avec les devs Flutter"
+
+  # ---------------------------------------------------------------------------
+  - id: D7
+    nom: "Connexion à un Compte existant"
+
+    declencheur: >-
+      Activation de l'option « Se connecter » depuis D1, D5, ou depuis
+      le formulaire de D6 (point d'accès 'J'ai déjà un compte').
+    acteurs: [utilisateur grand public]
+
+    pre_requis_specifiques:
+      - "Aucun Compte déjà rattaché au Profil sur cet appareil (sinon il faut d'abord se déconnecter)"
+      - "Connexion réseau disponible"
+
+    deroule:
+      - etape: 1
+        action: "Bascule en P5.M3 sur le formulaire de connexion au sein de P5.S3"
+        surfaces_actives: [P5.S3, P5.M3]
+      - etape: 2
+        action: >-
+          L'utilisateur saisit son email et son secret d'authentification
+          (ou suit la méthode retenue : lien magique, tiers optionnel).
+          Un point d'accès 'Mot de passe oublié' permet la récupération.
+      - etape: 3
+        action: >-
+          L'utilisateur valide. Un échange avec le serveur authentifie ;
+          le Compte est rattaché au Profil sur cet appareil
+          (Profil.compte_associé renseigné). Profil.date_dernière_connexion
+          mis à jour côté Compte.
+      - etape: 4
+        action: >-
+          Confirmation par message éphémère P5.M9. Comme pour D6, la
+          synchronisation reste DÉSACTIVÉE par défaut sur cet appareil
+          (l'utilisateur doit l'activer via D8 si souhaité — y compris
+          s'il est connecté à ce Compte ailleurs).
+
+    bifurcations:
+      - si: "L'utilisateur active 'Mot de passe oublié'"
+        alors: "ouverture d'un sous-flow de récupération (saisie email, envoi de lien de réinitialisation — détail méthode arbitrée en D6.5)"
+      - si: "L'utilisateur n'a pas de Compte"
+        alors: "bascule vers D6 depuis le formulaire (point d'accès 'Pas encore de compte')"
+      - si: "L'utilisateur annule"
+        alors: "abandon ; retour à la surface appelante"
+
+    sorties_normales:
+      - "Compte rattaché au Profil sur cet appareil ; retour à D1/D5 ou au flow appelant"
+      - "Annulation explicite — abandon"
+
+    cas_particuliers:
+      - cas: "Compte en état 'suspendu' (cf. cluster 03 cycle de vie)"
+        comportement: >-
+          La connexion échoue avec un message explicite (motif synthétique,
+          procédure de contact si applicable — palier 8). Pas de bascule
+          silencieuse en mode 'sans Compte'.
+      - cas: "Compte en état 'supprimé'"
+        comportement: "La connexion échoue avec un message gracieux ; option de créer un nouveau Compte (D6) avec un pseudonyme distinct (le pseudonyme supprimé reste verrouillé en rétention résiduelle — cluster 03 invariant)"
+      - cas: "Authentification multi-tentatives en échec"
+        comportement: "Politique d'anti-bruteforce côté serveur (palier 16) ; côté flow, message gracieux et proposition 'Mot de passe oublié'"
+      - cas: "Conflit de Profils sur connexion (le Profil local de l'appareil contient déjà des Favoris/Historique distincts de ceux associés au Compte côté cloud)"
+        comportement: >-
+          Question de merge — recommandation D6.5 : merge avec
+          préférence à la version cloud quand conflit ; l'utilisateur
+          est informé par message éphémère P5.M9. Non-régression du
+          Profil local (rien d'effacé sans consentement).
+
+    entites_impliquees: [Profil, Compte]
+    surfaces_et_modes: [P5.S3, P5.M3, P5.M9]
+    references_palier_3: [D6.5]
+    invariants_respectes: [I1, I6]
+
+    questions_ouvertes:
+      - "Politique de merge à la connexion (cluster 03 D6.5 et cohérence_inter_entites — préférence cloud vs préférence local vs interactif) — à acter palier 6 + palier 16"
+      - "Comportement si l'utilisateur se connecte à un Compte différent de celui précédemment rattaché sur cet appareil : ré-évaluation de la granularité_synchronisation (cluster 03 ce_qui_se_synchronise) — confirmer que c'est ici (et pas en D8) que se fait la ré-évaluation"
+
+  # ---------------------------------------------------------------------------
+  - id: D8
+    nom: "Configuration de la synchronisation cloud"
+
+    declencheur: >-
+      Activation de la sous-section 'Synchronisation' depuis les
+      paramètres de Compte en D5 (Compte rattaché requis).
+    acteurs: [utilisateur grand public]
+
+    pre_requis_specifiques:
+      - "Compte rattaché au Profil (Profil.compte_associé présent)"
+      - "Connexion réseau disponible pour les opérations de sync (la configuration peut se faire offline mais l'effet réel attend la connexion)"
+
+    deroule:
+      - etape: 1
+        action: "Bascule en P5.M3 sur la vue Synchronisation au sein de P5.S3"
+        surfaces_actives: [P5.S3, P5.M3]
+      - etape: 2
+        action: >-
+          La vue présente la GRANULARITÉ par catégorie (cf. cluster 03
+          attribut Profil.granularité_synchronisation) : au minimum
+          { favoris, parcours_personnels_créés, historique, préférences }.
+          Toutes les catégories sont DÉSACTIVÉES par défaut, même si le
+          Compte vient d'être créé.
+      - etape: 3
+        action: >-
+          L'utilisateur active explicitement les catégories qu'il
+          souhaite synchroniser. Chaque bascule porte un libellé
+          explicite et la conséquence concrète (cf. palier 8). La
+          catégorie 'historique' est traitée distinctement avec une
+          mention spéciale signalant sa sensibilité (cluster 03 — politique
+          plus stricte).
+      - etape: 4
+        action: >-
+          À l'activation d'une catégorie, une synchronisation initiale
+          est tentée (upload des données locales correspondantes vers
+          le cloud, ou merge avec données cloud existantes). Un message
+          éphémère P5.M9 confirme. À la désactivation, les données
+          côté cloud peuvent être conservées (état 'sync inactif') ou
+          effacées selon le choix de l'utilisateur — cf. question
+          ouverte.
+
+    bifurcations:
+      - si: "L'utilisateur active la catégorie 'historique'"
+        alors: "un dialogue de confirmation P5.M8 expose la sensibilité particulière de cette catégorie (cf. cluster 03 invariant — historique jamais cloud sans consentement spécifique au-delà de la sync générale) ; confirmation requise pour l'activation effective"
+      - si: "L'utilisateur désactive une catégorie après l'avoir activée"
+        alors: "un dialogue P5.M8 propose : conserver les données déjà remontées côté cloud (sync mise en pause), ou effacer les données cloud de cette catégorie ; confirmation requise"
+      - si: "L'utilisateur veut tout désactiver"
+        alors: "même mécanique, appliquée à toutes les catégories (proposition agrégée pour éviter la répétition)"
+
+    sorties_normales:
+      - "Configuration enregistrée (Profil.granularité_synchronisation mis à jour) ; retour à D5"
+
+    cas_particuliers:
+      - cas: "Connexion réseau indisponible"
+        comportement: "La configuration locale prend effet immédiatement (le drapeau passe à actif) ; l'opération de sync proprement dite est mise en attente. Au retour de la connexion, la synchronisation est tentée. Un message éphémère P5.M9 informe."
+      - cas: "Conflit de données cloud lors de la synchronisation initiale d'une catégorie"
+        comportement: >-
+          Cf. politique de merge (cluster 03 et D7) — recommandation
+          merge avec préférence cloud, l'utilisateur est informé. Pour
+          l'historique, la rétention serveur s'aligne sur la rétention
+          locale (cluster 03 cohérence_synchronisation).
+      - cas: "Compte suspendu en cours de configuration"
+        comportement: "La sync est suspendue côté serveur ; un message gracieux informe l'utilisateur côté app"
+
+    entites_impliquees: [Profil, Compte, Favori, "Historique de visite", Parcours]
+    surfaces_et_modes: [P5.S3, P5.M3, P5.M8, P5.M9]
+    references_palier_3: [D6.5, D6.4]
+    invariants_respectes: [I6]
+
+    questions_ouvertes:
+      - "Catégories exactes de données synchronisables (favoris seuls / favoris + parcours créés / + historique sur consentement spécifique / + préférences) — cf. cluster 03 D6.5 question ouverte"
+      - "À la désactivation d'une catégorie : option par défaut (conserver côté cloud vs effacer) — recommandation : effacer pour cohérence vie privée, à acter"
+      - "Granularité du consentement spécifique à l'historique : drapeau séparé porté par Profil ou attribut dédié au Compte ? — cf. cluster 03 (la granularité vit côté Profil, donc drapeau côté Profil avec mention sensibilité)"
+
+  # ---------------------------------------------------------------------------
+  - id: D9
+    nom: "Suppression d'un Compte"
+
+    declencheur: >-
+      Activation du contrôle de suppression depuis la sous-section
+      Compte en D5 (Compte rattaché).
+    acteurs: [utilisateur grand public]
+
+    pre_requis_specifiques:
+      - "Compte rattaché au Profil"
+      - "Connexion réseau disponible (la suppression côté serveur requiert un échange)"
+
+    deroule:
+      - etape: 1
+        action: >-
+          Un dialogue de confirmation P5.M8 s'ouvre, expliquant la portée
+          de l'action selon les règles posées au cluster 03 (effet sur
+          le Compte côté serveur, sur les données synchronisées, sur les
+          contributions communautaires publiées qui passent en pseudonyme
+          neutre, et sur le Profil local qui reste mais dépouillé de son
+          rattachement). Libellés exacts en palier 8.
+        surfaces_actives: [P5.M8]
+      - etape: 2
+        action: >-
+          L'utilisateur confirme (saisie d'un secret d'authentification
+          recommandée pour cette action sensible — palier 16) ou annule.
+      - etape: 3
+        action: >-
+          À la confirmation : l'échange serveur passe le Compte en
+          'supprimé', exécute l'effacement effectif des données cloud
+          associées (selon délai et procédure formalisés en palier 16),
+          et supprime le rattachement local. Un message éphémère P5.M9
+          confirme.
+      - etape: 4
+        action: >-
+          L'app reprend dans son état 'sans Compte' sur cet appareil
+          (équivalent à un Profil anonyme local, cf. I6). La sync est
+          désactivée (Profil.granularité_synchronisation neutralisée).
+
+    bifurcations:
+      - si: "L'utilisateur annule"
+        alors: "aucune action ; retour à D5"
+      - si: "L'utilisateur veut SE DÉCONNECTER plutôt que SUPPRIMER (sortie alternative depuis le dialogue)"
+        alors: >-
+          bascule vers le sous-flow Déconnexion (vide
+          Profil.compte_associé localement, conserve les données cloud
+          côté serveur, conserve les données locales sur l'appareil).
+          Pas un flow distinct numéroté — cf. note finale.
+
+    sorties_normales:
+      - "Compte supprimé côté serveur, rattachement local retiré, données locales conservées par défaut — retour à D5 (vue sans Compte) ou à D1"
+      - "Annulation explicite — aucune modification"
+
+    cas_particuliers:
+      - cas: "Connexion réseau indisponible au moment de la suppression"
+        comportement: >-
+          La suppression CÔTÉ SERVEUR nécessite un échange ; l'action
+          ne peut pas être validée offline. Un message gracieux informe
+          l'utilisateur, qui peut retenter quand la connexion revient.
+          Recommandation : ne PAS faire un effacement local préalable
+          tant que le serveur n'a pas confirmé (éviter une désynchro
+          où l'app pense le Compte supprimé alors que le serveur ne
+          l'a pas pris en compte).
+      - cas: "L'utilisateur a des contributions communautaires actives (Pins, Commentaires, Retours, Parcours communautaires)"
+        comportement: >-
+          Le dialogue P5.M8 mentionne explicitement la conservation
+          neutre de ces contributions (cluster 03). Aucune perte de
+          contenu pour la communauté ; pseudonyme remplacé par une
+          mention neutre dans les vues d'autres utilisateurs (libellé
+          exact en palier 8).
+      - cas: "Connexion réseau perdue pendant l'échange de suppression"
+        comportement: "La transaction côté serveur est conçue pour être idempotente (palier 16) ; si l'échange est interrompu, l'utilisateur peut retenter sans risque de double effet"
+      - cas: "Sauvegarde système OS active (iCloud, Google) sur l'appareil"
+        comportement: >-
+          La suppression du Compte n'a PAS d'effet sur les sauvegardes
+          système (qui sont en dehors de l'autorité de l'app). Si
+          l'utilisateur restaure son téléphone, son Profil anonyme
+          peut être réinstancié — mais le Compte reste supprimé côté
+          serveur (rattachement perdu lors de la restauration).
+          Question ouverte (cf. plus bas et cluster 03).
+
+    entites_impliquees: [Profil, Compte, Favori, "Historique de visite", Parcours, Pin, Commentaire, "Retour de parcours"]
+    surfaces_et_modes: [P5.M8, P5.M9]
+    references_palier_3: [D6.5]
+    invariants_respectes: [I1, I6]
+
+    questions_ouvertes:
+      - "Délai et procédure exacts de la suppression effective côté serveur (rétention résiduelle, mention neutre dans les contributions conservées) — cluster 03 D6.5 et palier 16"
+      - "Saisie d'un secret d'authentification AU MOMENT de la suppression (réauth) : oui/non — recommandation oui pour action sensible, à acter avec sécu"
+      - "Tension I6 vs sauvegardes système OS : un Profil restauré sans Compte est cohérent avec le contrat ; mais si l'app détecte qu'un Compte de même email a été supprimé récemment, faut-il alerter l'utilisateur ? — recommandation : non (chaque appareil est indépendant, le Profil restauré est traité comme un Profil neuf)"
+      - "Sortie alternative 'Déconnexion sans suppression' : flow distinct ou sous-cas de D9 ? — choix retenu : sous-cas (plus léger, cohérent avec l'arbitrage cluster 03 : déconnexion vide Profil.compte_associé sans toucher au cloud ni au local)"
+
+# -----------------------------------------------------------------------------
+# Persona check
+# -----------------------------------------------------------------------------
+persona_check:
+
+  kenji:
+    impact: "direct"
+    note: >-
+      D5 lui sert directement : bascule de l'interface en japonais,
+      réglage des notifications. D2 et D3 servent son scénario du soir
+      à l'hôtel (retrouver les lieux aimés, consulter l'historique du
+      jour). D6 / D7 / D8 / D9 ne le concernent PAS — Kenji utilise
+      l'app tout son séjour sans Compte, ce que les flows respectent
+      (pas de mur d'inscription en D1, point d'accès Compte
+      strictement optionnel). I6 garantit que ses données ne quittent
+      jamais son terminal.
+
+  mme_dupont:
+    impact: "MAJEUR"
+    note: >-
+      D6 (Création de Compte) est cardinal pour elle — c'est l'un des
+      rares persona pour qui le Compte sert vraiment, et son
+      déclenchement principal vient de C13 (publier son parcours
+      scolaire à la communauté) ou de D8 (synchroniser entre tablette
+      de préparation et téléphone du jour J). D8 (sync granulaire)
+      sert exactement son scénario de bascule entre appareils. Le
+      cas particulier 'conflit de Profils sur connexion' (D7) est
+      crucial pour elle (politique de merge à acter pour ne PAS lui
+      faire perdre la préparation du dimanche).
+
+  mme_martin:
+    impact: "direct"
+    note: >-
+      D5 lui sert directement : options d'accessibilité (taille de
+      texte, contraste) pour la projection en classe. Pas de Compte
+      requis pour son usage en classe — confirmé par D1 (P5.S3 ouvert
+      sans inscription). Le mode présentation reste exposé hors D5
+      (raccourci contextuel depuis P5.M3 d'un Pin — cf. question
+      ouverte de D5).
+
+  pere_lyonnais:
+    impact: "MAJEUR"
+    note: >-
+      Trois flows servent son usage : D5 (couper Surprenez-moi en
+      quelques gestes — son test_litmus '2 taps'), D2 (retrouver les
+      Pins marqués pour les raconter), D3 (retrouver le Pin du
+      dimanche le mardi soir sans l'avoir marqué). L'invariant I6 et
+      le caractère strictement local de l'historique (D3, D4) sont
+      la promesse explicite qui le rassure sur la sobriété. Aucun
+      flow Compte ne le sollicite spontanément — le point d'accès D6
+      reste discret en D1.
+
+  anais_back_office:
+    impact: "indirect"
+    note: >-
+      Anaïs n'utilise PAS ce cluster dans son rôle professionnel —
+      elle opère sur les Templates et le contenu éditorial (cluster
+      05, palier 13). Indirectement, D6 / D9 la concernent en tant
+      que cycle de vie d'un Compte communautaire qu'elle pourrait
+      modérer (mais la modération vit côté back-office, palier 13 —
+      la suspension/réintégration référencées dans cluster 03 cycle
+      de vie n'est pas un flow grand public). En usage privé hors
+      travail, elle peut bien sûr avoir un Profil et un Compte
+      ordinaires comme tout le monde.

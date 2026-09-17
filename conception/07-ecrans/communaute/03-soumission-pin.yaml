@@ -1,0 +1,113 @@
+# =============================================================================
+# E-COMMUNAUTE-SOUMISSION-PIN — Soumission d'un Pin par un utilisateur
+# =============================================================================
+# Surface dédiée (P5.M3) à la soumission d'un Pin de provenance communautaire.
+# Surface dense — un seul écran avec plusieurs zones (titre, catégorie, époques,
+# localisation, contenu narratif, sources, médias, mode de crédit). À la
+# soumission, le Pin transite en en_revue avec visibilité immédiate marquée
+# distinctement (I3 nuance Pin). Compte requis (I2).
+# =============================================================================
+
+document:
+  type: palier_ecrans_fiche
+  format: yaml
+
+ecran:
+  id: E-COMMUNAUTE-SOUMISSION-PIN
+  nom: "Soumission d'un Pin par un utilisateur"
+
+  mode: P5.M3
+  surface_parente: "P5.S1 ou P5.S2"
+
+  raison_d_etre: >-
+    Permet à un utilisateur connecté de proposer un nouveau Pin au catalogue —
+    avec localisation (ou sans, si patrimoine vivant immatériel I9), Catégorie
+    (catalogue ouvert I7), ≥ 1 Époque (I8), titre, contenu narratif, ≥ 1 Source
+    documentaire, Médias optionnels, mode de crédit (anonyme / pseudonyme /
+    attribution explicite — I1 jamais d'identité civile). À la soumission le
+    Pin transite en en_revue, apparaît immédiatement dans le catalogue avec
+    une marque distinctive signalant que les sources sont en cours de
+    vérification (I3 nuance Pin communautaire — modération a posteriori).
+
+  composition:
+    - zone: "identité publique de l'auteur et mode de crédit"
+      role: "affichage du pseudonyme et représentation graphique du Compte ; choix du mode de crédit pour la publication (anonyme, pseudonyme par défaut, attribution explicite — toujours sans identité civile, I1)"
+      entites_affichees: [Compte]
+
+    - zone: "saisie du titre"
+      role: "champ de saisie courte du titre du Pin"
+      entites_affichees: [Pin]
+
+    - zone: "sélection de la Catégorie"
+      role: "choix dans le catalogue ouvert de Catégories (I7) ; possibilité de proposer une nouvelle Catégorie selon politique cluster 01"
+      entites_affichees: [Catégorie]
+
+    - zone: "sélection des Époques"
+      role: "choix d'une ou plusieurs Époques parmi le catalogue ouvert (I8 — au moins 1, plusieurs possibles pour Pin trans-époque)"
+      entites_affichees: [Époque]
+
+    - zone: "localisation"
+      role: "désignation de la position géographique sur la carte (sélection d'un point ou utilisation de la position courante si géoloc accordée) ; option d'omettre la localisation si patrimoine vivant immatériel (I9)"
+      entites_affichees: [Pin]
+
+    - zone: "contenu narratif"
+      role: "champ de saisie longue du texte narratif du Pin (longueur et règles typographiques palier 8)"
+
+    - zone: "déclaration des Sources"
+      role: "saisie d'au moins une Source documentaire (référence bibliographique, lien, témoignage daté) ; ajout / retrait dynamique"
+      entites_affichees: [Source]
+
+    - zone: "ajout de Médias"
+      role: "joindre des Médias optionnels (image, audio, autre selon cluster 01) ; les métadonnées sensibles (GPS, identifiant d'appareil) sont nettoyées avant traitement (D9.2)"
+      entites_affichees: [Média]
+
+    - zone: "actions de soumission"
+      role: "soumettre (transition vers en_revue, visibilité immédiate marquée), sauvegarder en brouillon, ou annuler (avec dialogue M8 si saisie non vide)"
+
+  etats:
+    nominal_saisie: "Éditeur ouvert, le Pin existe en état brouillon, l'utilisateur saisit ou modifie progressivement les zones ; sauvegarde de brouillon automatique selon politique palier 13"
+    saisie_incomplete_pour_soumission: "Au moins un attribut obligatoire manque (titre, catégorie, ≥ 1 époque, localisation sauf I9, contenu narratif, ≥ 1 source) ; soumission désactivée ; signalement gracieux des champs manquants"
+    saisie_complete: "Tous les attributs obligatoires sont renseignés ; soumission disponible ; sauvegarde en brouillon reste possible"
+    soumission_en_cours: "Soumission émise, en attente de confirmation serveur ; les champs sont gelés"
+    soumission_reussie: "Pin transité en en_revue, visible dans le catalogue avec marque distinctive ; H4 ouvert ; message éphémère P5.M9 confirme ; retour à la surface d'origine"
+    brouillon_sauvegarde: "Le brouillon est sauvegardé localement (et synchronisé selon politique palier 13) ; message P5.M9 confirme ; le Pin reste visible UNIQUEMENT par l'auteur depuis G5"
+    soumission_echouee: "Échec d'envoi ; message gracieux ; brouillon préservé ; possibilité de réessayer"
+    offline_avec_attente_locale: "Connexion réseau indisponible ; soumission mise en attente locale ; brouillon sauvegardé ; bandeau P5.P3 visible ; au retour de connexion la soumission est tentée"
+    compte_absent: "Aucun Compte n'est associé à l'utilisateur ; redirection préalable vers E-PROFIL-CREATION-COMPTE déclenchée par G4 ; au retour, on revient sur cette surface"
+    edition_apres_demande_complement: "Le Pin est en brouillon suite à une demande de complément de la modération (transition cluster 01) ; le motif transmis est rappelé en tête ; l'utilisateur complète et resoumet ; à la resoumission, transition brouillon → en_revue"
+    edition_depuis_brouillon_existant: "L'utilisateur revient sur un brouillon précédent (depuis G5) ; tous les champs précédemment saisis sont pré-remplis"
+    permission_geoloc_refusee: "La permission système est refusée ; le point d'usage de la position courante est désactivé ; l'utilisateur peut toujours désigner manuellement un point sur la carte ou omettre la localisation (I9)"
+    medias_metadonnees_sensibles: "Médias joints contenant des métadonnées sensibles ; nettoyage transparent appliqué avant soumission (politique D9.2)"
+    contexte_C12: "Écran ouvert depuis C12 (création de parcours personnel) ; à la sortie (soumission ou brouillon), retour à C12 avec ce nouveau Pin candidat comme étape (cf. G4 bifurcation)"
+
+  elements_interactifs:
+    - "Saisie au clavier dans les champs texte (titre, contenu narratif, source, précision)"
+    - "Sélection d'une Catégorie dans le catalogue"
+    - "Sélection d'une ou plusieurs Époques"
+    - "Désignation de la position sur la carte ou usage de la position courante"
+    - "Bascule sur omission de localisation (patrimoine immatériel)"
+    - "Ajout / retrait de Sources documentaires"
+    - "Ajout / retrait de Médias"
+    - "Choix du mode de crédit"
+    - "Soumission → flow G4 étapes 6-7"
+    - "Sauvegarde en brouillon → flow G4 étape 5 / bifurcation"
+    - "Annulation → dialogue P5.M8 si saisie non vide"
+
+  flows_actifs:
+    - G4   # Soumission d'un Pin par un utilisateur
+
+  surfaces_imbriquees:
+    - E-TRANSVERSES-DIALOGUE-CONFIRMATION   # M8 si abandon avec saisie non vide
+    - E-TRANSVERSES-MESSAGE-EPHEMERE        # M9 confirmations et erreurs
+    - E-TRANSVERSES-DIALOGUE-PERMISSION     # M8 transverse pour permission géoloc (si demandée à la volée)
+    - E-PROFIL-CREATION-COMPTE              # redirection préalable si compte_absent
+    - E-TRANSVERSES-BANDEAU-OFFLINE         # P3 si offline
+
+  entites_affichees: [Pin, Catégorie, Époque, Source, Média, Compte]
+
+  questions_ouvertes:
+    - "Un seul écran avec plusieurs zones (choix retenu ici, cohérent avec note 00-index) ou wizard multi-écrans (mieux pour mobile mais coût d'attention) — arbitrage palier 10 ; si bascule wizard, cet écran serait éclaté en plusieurs étapes liées par un état partagé"
+    - "Templates alignés sur les Templates éditoriaux (cluster 05) ou allégés ? Question ouverte cluster 04 / G4 — impacte la composition des zones obligatoires"
+    - "Catalogue ouvert de Catégorie (I7) — l'utilisateur peut-il proposer une nouvelle Catégorie depuis cet écran, ou doit-elle préexister ? Politique cluster 01 à préciser"
+    - "Aperçu du rendu du Pin (tel qu'il apparaîtra en consultation approfondie) avant soumission — utile vu la densité ; arbitrer palier 8/10"
+    - "Politique de confiance accumulée (utilisateur dont les soumissions sont régulièrement validées) — non couvert actuellement, hors périmètre écran ici"

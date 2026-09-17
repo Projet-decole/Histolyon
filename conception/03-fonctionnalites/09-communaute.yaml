@@ -1,0 +1,635 @@
+# =============================================================================
+# Palier 3 — Domaine D9 — Communauté
+# =============================================================================
+# Fonctionnalités communautaires côté GRAND PUBLIC : commentaires sur les pins,
+# soumissions de pins par les utilisateurs, retours sur les parcours
+# communautaires, et signalement / suivi côté utilisateur. La modération
+# proprement dite (file de modération, décisions, outillage) est côté
+# back-office et relève du domaine D10 (production de contenu).
+#
+# Ce domaine est marqué 'si_le_temps' dans la priorisation globale (cf.
+# 00-index § 7) — c'est-à-dire planifié et conçu, mais pas bloquant pour la
+# démonstration. Sa raison d'être doit cependant tenir : si on l'active, il
+# doit honorer les principes (historicité, sérendipité, émerveillement) sans
+# céder un centimètre.
+# =============================================================================
+
+document:
+    type: palier_fonctionnalites_domaine
+    domaine_id: D9
+    numero: 3
+    audience:
+        - "Tout agent qui rédige un palier en aval (4 à 16)"
+        - "Devs Flutter (cahier fonctionnel pour la couche communautaire mobile)"
+        - "Lead historienne et future équipe modération (pour cadrer leurs attentes)"
+    role: >-
+        Décrire fonctionnellement la couche communautaire grand public : ce que
+        les utilisateurs peuvent dire, proposer, signaler, et comment ils savent
+        où en est leur contribution. La mécanique de modération côté admin est
+        référencée mais définie en D10.
+    format: yaml
+    prerequis_de_lecture:
+        - "design/conception/intention.yaml — § 5.7 separation_des_responsabilites_entre_paliers"
+        - "design/conception/01-essence.yaml — principe historicite (validation avant publication) et ce_qu_on_refuse (pas de pins soumis sans modération)"
+        - "design/conception/02-personas.yaml — rôle moderateur_communaute, persona Anaïs"
+        - "design/conception/03-fonctionnalites/00-index.yaml — § 2 anti_perimetre_strict OBLIGATOIRE"
+        - "archives/_bmad-output/product-brief.md — § 14 (communauté) et § 9.7 (création de parcours)"
+
+# -----------------------------------------------------------------------------
+# Raison d'être du domaine
+# -----------------------------------------------------------------------------
+raison_d_etre_du_domaine: >-
+    HistoLyon repose d'abord sur un contenu éditorial validé scientifiquement
+    (cf. essence § historicite). Mais la ville est aussi un livre que ses
+    habitants écrivent : témoignages, anecdotes familiales, lieux de mémoire
+    personnels que l'institution n'a pas encore archivés. La couche
+    communautaire ouvre cette porte — sans laisser entrer n'importe quoi.
+
+    Concrètement, elle permet à un utilisateur (a) de réagir à un pin par
+    un commentaire, (b) de proposer un pin que l'historienne et son
+    équipe pourront valider et publier, (c) de donner un retour sur les
+    parcours communautaires partagés par d'autres utilisateurs, et
+    (d) d'agir si du contenu lui semble problématique, sans s'exposer.
+
+    Elle sert principalement le père lyonnais (qui connaît son quartier
+    intimement et a des choses à dire) et de manière plus ponctuelle
+    Mme Dupont (qui partage des parcours scolaires) et Kenji (qui peut
+    signaler une erreur factuelle ou laisser un retour sur un parcours
+    qu'il a vécu). Mme Martin n'est pas un usage cible direct — elle
+    consomme du contenu validé, elle n'a pas de raison de commenter
+    publiquement en tant qu'enseignante en classe.
+
+    Cette ouverture est SOUS CONTRÔLE : toute soumission de pin passe par
+    modération AVANT publication (essence § historicite, § ce_qu_on_refuse),
+    l'identité du signaleur n'est jamais révélée, et les retours sur
+    parcours communautaires sont désactivables par l'auteur du parcours.
+
+# -----------------------------------------------------------------------------
+# Sous-domaines
+# -----------------------------------------------------------------------------
+sous_domaines:
+    # ===========================================================================
+    - id: D9.1
+      nom: "Commentaires sur les pins"
+
+      raison_d_etre: >-
+          Donner aux utilisateurs un endroit pour réagir à ce qu'ils viennent
+          de lire — partager un souvenir lié au lieu, ajouter une précision,
+          poser une question. La consultation d'un pin est aujourd'hui un
+          monologue ; l'ensemble des commentaires d'un pin la transforme en
+          conversation. Cohérent avec brief § 14 (1) et avec le principe
+          d'émerveillement (les commentaires d'autres habitants peuvent
+          eux-mêmes être des découvertes).
+
+      comportement: >-
+          Depuis la consultation approfondie d'un pin (cf. D2.5), l'utilisateur
+          peut accéder à l'ensemble des commentaires du pin et en lire les
+          contributions existantes. S'il est connecté à un compte (cf. D6.5),
+          il peut écrire son propre commentaire. Avant publication, son
+          commentaire est soumis à modération selon les règles définies
+          en D10.5 — selon le mode retenu, il apparaît immédiatement avec
+          modération a posteriori, ou seulement après revue. L'utilisateur
+          voit de manière compréhensible où en est son commentaire (en
+          attente, publié, refusé). Chaque commentaire publié identifie
+          visuellement son auteur sous la forme qu'il a choisie (pseudonyme
+          éventuellement accompagné d'une représentation graphique
+          personnelle), jamais sous son identité civile. Tout utilisateur
+          peut signaler un commentaire qui lui semble problématique
+          (cf. D9.4). L'utilisateur peut modifier ou supprimer son propre
+          commentaire à tout moment.
+
+      regles_fonctionnelles:
+          - "Un compte est requis pour commenter (cf. D6.5)"
+          - "L'identification visible de l'auteur d'un commentaire est son pseudonyme et sa représentation graphique personnelle — jamais son identité civile"
+          - "Tout commentaire passe par les règles de modération définies en D10.5 avant ou peu après publication"
+          - "L'auteur d'un commentaire peut le modifier ou le supprimer à tout moment"
+          - "Tout commentaire publié peut être signalé par n'importe quel utilisateur (cf. D9.4)"
+          - "Aucun commentaire ne devient visible si son auteur a choisi de le sauvegarder en brouillon"
+          - "L'utilisateur sait à quel statut son commentaire se trouve (en attente, publié, refusé avec motif)"
+          - "Les commentaires sont rattachés à un pin précis, pas à une époque ni à une catégorie"
+          - "La consultation des commentaires reste possible sans compte ; seule l'écriture exige le compte"
+
+      capabilites:
+          - "Consulter l'ensemble des commentaires d'un pin"
+          - "Écrire un commentaire sur un pin (compte requis)"
+          - "Modifier ou supprimer son propre commentaire"
+          - "Connaître le statut de son propre commentaire (en attente, publié, refusé)"
+          - "Identifier visuellement l'auteur d'un commentaire par son pseudonyme et sa représentation graphique"
+          - "Signaler un commentaire problématique sans révéler son identité (cf. D9.4)"
+          - "Recevoir une notification de changement de statut quand l'utilisateur l'a autorisé (cf. permissions juste-à-temps, D5.5)"
+
+      ce_qu_on_ne_fait_pas:
+          - "Pas de commentaire écrit sans compte (essence § historicite — pas de saisie libre dans la nature)"
+          - "Pas d'identité civile révélée à un autre utilisateur"
+          - "Pas de réponse en cascade entre utilisateurs au-delà de ce que la modération peut absorber (le périmètre exact des réponses est à arbitrer ci-dessous)"
+          - "Pas de mise en avant éditoriale de commentaires individuels (les commentaires ne deviennent pas du contenu officiel)"
+          - "Pas de notation entre commentaires (votes, likes) — voir cas légitime D9.3 pour les parcours, mais pas ici"
+          - "Pas de message privé entre utilisateurs"
+          - "Pas de publication automatique sans aucune modération (a minima a posteriori avec règles définies en D10.5)"
+
+      criteres_de_reussite:
+          - "Le père lyonnais peut compléter un pin de son quartier avec une anecdote familiale et son commentaire est traité avec le même soin qu'un pin officiel (sans être confondu avec lui)"
+          - "Un utilisateur qui consulte un pin perçoit la différence entre le contenu éditorial (validé, sourcé) et les commentaires (contributions de la communauté)"
+          - "Un commentaire qui contient une information potentiellement fausse n'est pas publié sans avoir été vu par un modérateur"
+          - "Un utilisateur dont le commentaire est refusé comprend pourquoi sans se sentir humilié"
+
+      definition_of_done:
+          - "Depuis la consultation approfondie d'un pin, l'utilisateur peut accéder aux commentaires existants"
+          - "Un utilisateur connecté peut écrire un commentaire sur un pin"
+          - "Le commentaire écrit suit le circuit de modération défini en D10.5"
+          - "L'auteur peut modifier ou supprimer son propre commentaire"
+          - "L'auteur connaît à tout moment le statut de son commentaire"
+          - "Chaque commentaire publié affiche le pseudonyme et la représentation graphique de son auteur, sans son identité civile"
+          - "Un commentaire publié peut être signalé par tout utilisateur (cf. D9.4)"
+          - "L'écriture d'un commentaire est impossible sans compte ; la lecture reste possible sans compte"
+
+      enjeux_transversaux:
+          accessibilite: >-
+              La saisie d'un commentaire doit être navigable au clavier et
+              compatible avec les lecteurs d'écran. Le statut d'un commentaire
+              (en attente, publié, refusé) doit être communiqué de manière
+              non strictement visuelle. La distinction entre contenu éditorial
+              et commentaires communautaires doit rester perceptible pour
+              tous les profils (y compris déficience visuelle).
+          performance: >-
+              L'ouverture des commentaires d'un pin populaire ne doit pas
+              bloquer la consultation du pin lui-même. Critères chiffrés en
+              palier 16.
+          vie_privee: >-
+              Critique : l'identité civile de l'auteur d'un commentaire n'est
+              jamais exposée à un autre utilisateur. Seul le pseudonyme et la
+              représentation graphique choisis sont publics. Cohérent avec
+              D6 (profil et données personnelles).
+
+      questions_ouvertes:
+          - "Réponses entre utilisateurs (commentaire à un commentaire) : oui / non / une seule profondeur — à arbitrer avec la lead et l'équipe modération selon la charge supportable"
+          - "Modération a priori (rien ne paraît avant validation) ou a posteriori (publié immédiatement, retiré après signalement) — décision canonique en D10.5, mais à articuler ici"
+          - "Notification de réponse de la modération : push, e-mail, in-app uniquement ? — articuler avec D4 (notifications) et D6 (paramètres compte)"
+          - "Filtrage anti-spam automatique avant la file modérateur — à arbitrer avec les devs"
+
+      priorite: "si_le_temps"
+
+      personas_principaux:
+          - pere_lyonnais
+          - kenji
+          - mme_dupont
+
+      dependances:
+          - "D2.5 (consultation approfondie d'un pin — surface d'accès aux commentaires)"
+          - "D6.5 (compte utilisateur — requis pour écrire)"
+          - "D9.4 (signalement et suivi)"
+          - "D10.5 (modération côté back-office — circuit canonique)"
+
+      comportements_transverses_referenced:
+          - "Permissions juste-à-temps (canonique D5.5) — pour la notification de changement de statut du commentaire"
+
+    # ===========================================================================
+    - id: D9.2
+      nom: "Soumission d'un pin par un utilisateur"
+
+      raison_d_etre: >-
+          Permettre à un utilisateur (typiquement un habitant) de proposer un
+          lieu et une histoire que l'équipe éditoriale n'avait pas encore
+          documentés. C'est la version 'matériau brut remonté du terrain' de
+          la chaîne de production. Cohérent avec brief § 14 (2) — feature
+          planifiée si le temps le permet.
+
+          Cette mécanique est la seule entrée par laquelle un pin peut
+          devenir public sans avoir été créé par l'équipe interne. Elle est
+          donc l'endroit le plus sensible côté historicité. D'où la règle
+          absolue : aucune soumission ne devient un pin public sans
+          modération préalable.
+
+      comportement: >-
+          Un utilisateur connecté peut, depuis la carte ou depuis son profil,
+          proposer un nouveau pin. Il décrit le lieu (position
+          géographique sur la carte de Lyon), la ou les époques concernées,
+          la catégorie qui lui semble pertinente, un titre, un récit,
+          éventuellement des médias et des sources. La structure proposée
+          reprend celle des templates de pin éditorial (cf. D10.1) mais
+          avec une exigence allégée — l'équipe interne complétera et
+          vérifiera. Une fois soumise, la proposition entre dans la file
+          de modération définie en D10.5. L'utilisateur retrouve toutes ses
+          soumissions dans son profil avec leur statut (brouillon, soumise,
+          en cours d'examen, demande de complément, refusée, publiée). Une
+          soumission publiée devient un pin public à part entière, et
+          l'utilisateur en est crédité de la manière définie au moment de
+          la soumission (anonyme, pseudonyme, attribution explicite). Une
+          soumission refusée fait l'objet d'un retour compréhensible et non
+          humiliant. L'utilisateur peut retirer sa soumission tant qu'elle
+          n'est pas publiée.
+
+      regles_fonctionnelles:
+          - "Un compte est requis pour soumettre un pin (cf. D6.5)"
+          - "Aucune soumission ne devient un pin public sans validation de l'équipe (essence § historicite — règle non négociable)"
+          - "La soumission peut être enregistrée en brouillon avant envoi"
+          - "Toute soumission soumise entre dans la file de modération définie en D10.5"
+          - "L'utilisateur connaît le statut de chacune de ses soumissions (brouillon, soumise, en examen, demande de complément, refusée, publiée)"
+          - "L'utilisateur peut retirer sa soumission tant qu'elle n'est pas publiée"
+          - "Le mode de crédit (anonyme, pseudonyme, attribution explicite) est choisi par l'utilisateur au moment de la soumission, et modifiable jusqu'à publication"
+          - "Une soumission refusée fait l'objet d'un retour de la modération, transmis à l'utilisateur de manière compréhensible et non humiliante"
+          - "L'identité civile de l'utilisateur n'est jamais exposée publiquement, même en cas de publication avec attribution"
+          - "Une soumission publiée hérite du même statut éditorial qu'un pin éditorial (consultable, commentable, signalable, etc.)"
+
+      capabilites:
+          - "Proposer un nouveau pin (compte requis)"
+          - "Renseigner les éléments structurés du pin (position, époque(s), catégorie, titre, récit, médias, sources)"
+          - "Enregistrer la soumission en brouillon avant envoi"
+          - "Soumettre la proposition à la modération"
+          - "Suivre l'état de chacune de ses soumissions (brouillon, soumise, en examen, demande de complément, refusée, publiée)"
+          - "Choisir son mode de crédit (anonyme, pseudonyme, attribution explicite)"
+          - "Retirer une soumission tant qu'elle n'est pas publiée"
+          - "Recevoir le retour de la modération (changement de statut, demande de complément, motif de refus)"
+
+      ce_qu_on_ne_fait_pas:
+          - "Pas de publication directe sans passer par la modération (essence § ce_qu_on_refuse)"
+          - "Pas d'exposition publique de l'identité civile de l'auteur"
+          - "Pas de soumission sans compte (toute contribution est tracée)"
+          - "Pas de modification d'un pin éditorial existant (l'utilisateur propose un nouveau pin ; les corrections d'un pin existant passent par le signalement, cf. D9.4)"
+          - "Pas de soumission de catégorie hors du jeu défini en D2.2 (la nomenclature reste maîtrisée)"
+          - "Pas de validation automatique pour 'utilisateurs de confiance' tant qu'aucune politique de confiance n'est cadrée"
+
+      criteres_de_reussite:
+          - "Le père lyonnais peut soumettre un fait sur un mur de son quartier sans batailler avec un formulaire complexe"
+          - "Une soumission qui manque d'une source vérifiable est rapidement renvoyée à l'utilisateur avec un message qui invite à compléter, pas qui le décourage"
+          - "Une soumission publiée est indiscernable d'un pin éditorial du point de vue de l'utilisateur final qui le consulte (même rigueur, même soin) — la traçabilité de l'origine reste accessible mais n'est pas brandie"
+          - "Un utilisateur ne se demande jamais 'mais où en est ma soumission ?' — l'information est claire dans son profil"
+
+      definition_of_done:
+          - "L'utilisateur connecté peut accéder à un point de soumission depuis la carte ou depuis son profil"
+          - "Il peut renseigner la position, la ou les époques, la catégorie, le titre, le récit, les médias, les sources"
+          - "Il peut sauvegarder en brouillon avant envoi"
+          - "Une soumission envoyée entre dans la file de modération D10.5"
+          - "L'utilisateur connaît à tout moment le statut de chacune de ses soumissions"
+          - "Il peut retirer une soumission tant qu'elle n'est pas publiée"
+          - "Il peut choisir son mode de crédit, modifiable jusqu'à publication"
+          - "Une soumission refusée fait l'objet d'un retour explicite et non humiliant"
+          - "Une soumission publiée se comporte comme un pin éditorial (consultable, commentable, signalable)"
+
+      enjeux_transversaux:
+          accessibilite: >-
+              La saisie d'une soumission est une opération longue : l'interface
+              doit accommoder la déficience motrice (sauvegarde en brouillon
+              fréquente, pas de perte si interruption), la déficience visuelle
+              (saisie navigable au clavier, lecteurs d'écran), et la
+              compréhension par un utilisateur non expert (pas de jargon
+              d'historien). Le suivi de statut doit être perceptible
+              autrement que par couleur seule.
+          performance: >-
+              L'envoi d'une soumission avec médias doit gérer gracieusement
+              une connexion fluctuante (reprise, brouillon local) — le père
+              lyonnais peut soumettre depuis le terrain, pas seulement depuis
+              son canapé. Critères chiffrés en palier 16.
+          vie_privee: >-
+              Critique : l'identité civile de l'auteur n'est jamais exposée
+              publiquement, même en cas d'attribution explicite (le mode
+              'attribution explicite' utilise le nom d'auteur que
+              l'utilisateur a choisi — pas son identité civile à moins qu'il
+              ne l'ait délibérément posée comme nom d'auteur). Les médias
+              envoyés sont nettoyés des métadonnées sensibles (position
+              exacte de prise de vue, identifiant d'appareil) avant traitement.
+
+      questions_ouvertes:
+          - "Volume cible des soumissions par mois — capacité de modération à dimensionner avec la lead historienne et l'équipe contenu"
+          - "Politique de 'confiance accumulée' (un utilisateur dont les pins sont régulièrement validés peut-il bénéficier d'un circuit allégé ?) — à arbitrer plus tard si le volume le justifie"
+          - "Templates de soumission identiques aux templates éditoriaux (D10.1) ou allégés ? — recommandation : structure identique, exigence de remplissage allégée, l'équipe complète"
+          - "Gestion des doublons (deux utilisateurs proposent le même lieu en même temps) — à arbitrer avec D10.5"
+          - "Possibilité pour un utilisateur de proposer une CORRECTION d'un pin existant — recommandation : passe par D9.4 (signalement avec motif 'correction proposée'), pas par D9.2"
+
+      priorite: "si_le_temps"
+
+      personas_principaux:
+          - pere_lyonnais
+          - mme_dupont
+
+      dependances:
+          - "D2 (entité pin — la soumission produit un objet de même nature)"
+          - "D2.2 (catégorisation — l'utilisateur choisit dans le jeu défini)"
+          - "D6.5 (compte — requis pour soumettre)"
+          - "D6 (suivi des soumissions dans le profil utilisateur)"
+          - "D10.1 (templates de pin — structure de référence)"
+          - "D10.5 (modération côté back-office — circuit canonique)"
+
+      comportements_transverses_referenced:
+          - "Permissions juste-à-temps (canonique D5.5) — pour les notifications de changement de statut de soumission"
+          - "Géolocalisation (canonique D1.1) — pour aider à positionner le pin proposé"
+
+    # ===========================================================================
+    - id: D9.3
+      nom: "Retours sur les parcours communautaires"
+
+      raison_d_etre: >-
+          Les parcours communautaires (parcours créés et publiés par des
+          utilisateurs, cf. D3 et brief § 9.7) ne sont pas des parcours
+          éditoriaux : ils n'ont pas été validés scientifiquement avec la
+          même rigueur. Ils ont besoin d'un signal de qualité ressenti par
+          les utilisateurs qui les ont parcourus, à la fois pour aider les
+          autres à choisir et pour donner un retour à l'auteur. C'est aussi
+          un moyen pour Mme Dupont (qui partage des parcours scolaires) de
+          savoir si son parcours a été utile à d'autres parents.
+
+          Cette mécanique reste OPTIONNELLE : l'auteur d'un parcours peut
+          la désactiver pour son propre parcours, et un parcours qui n'a pas
+          reçu assez de retours n'affiche pas un score trompeur.
+
+      comportement: >-
+          À la fin d'un parcours communautaire (cf. D3 — fin de parcours),
+          l'utilisateur peut, s'il le souhaite, laisser une évaluation et
+          un commentaire libre sur le parcours qu'il vient de vivre. Cette
+          contribution est facultative — la fin de parcours fonctionne sans.
+          Si l'auteur du parcours a désactivé la fonctionnalité pour son
+          parcours, aucune sollicitation n'est faite. Sinon, l'utilisateur
+          peut donner une évaluation simple (de la moins enthousiaste à la
+          plus enthousiaste — la forme exacte se décide en aval) et un
+          commentaire libre. La fiche d'un parcours communautaire affiche
+          une synthèse des retours uniquement si un seuil minimal de
+          contributions est atteint, pour éviter qu'un parcours peu parcouru
+          affiche un score trompeur. Les commentaires individuels sur les
+          parcours suivent les mêmes règles que les commentaires sur les
+          pins (cf. D9.1 — modération, identification visuelle de l'auteur,
+          signalement). L'auteur du parcours peut consulter l'ensemble des
+          retours sur son propre parcours dans son profil.
+
+      regles_fonctionnelles:
+          - "Un compte est requis pour laisser un retour (cf. D6.5)"
+          - "L'auteur d'un parcours peut activer ou désactiver les retours sur son propre parcours, à tout moment"
+          - "Les retours portent uniquement sur les parcours communautaires — les parcours éditoriaux ne sont pas notés par les utilisateurs"
+          - "La synthèse des retours d'un parcours n'est affichée que si un seuil minimal de contributions est atteint (seuil à acter en palier 16)"
+          - "L'évaluation est facultative ; la fin de parcours fonctionne sans qu'on l'exige"
+          - "Les commentaires individuels sur un parcours suivent les règles de D9.1 (modération, anonymat de l'auteur, signalement)"
+          - "L'auteur du parcours accède à l'ensemble des retours sur son propre parcours dans son profil"
+          - "L'identité civile d'un contributeur n'est jamais exposée à l'auteur du parcours ni à un autre utilisateur"
+          - "Un retour signalé suit le circuit de signalement défini en D9.4"
+
+      capabilites:
+          - "Laisser un retour (évaluation et/ou commentaire) à la fin d'un parcours communautaire"
+          - "Choisir de ne pas laisser de retour"
+          - "Pour l'auteur du parcours : activer ou désactiver la possibilité de retour sur son parcours"
+          - "Consulter la synthèse des retours d'un parcours communautaire si le seuil minimal est atteint"
+          - "Pour l'auteur : consulter l'ensemble des retours sur son propre parcours"
+          - "Signaler un retour problématique (cf. D9.4)"
+          - "Modifier ou supprimer son propre retour"
+
+      ce_qu_on_ne_fait_pas:
+          - "Pas d'évaluation des parcours éditoriaux par les utilisateurs"
+          - "Pas d'affichage de score si le seuil minimal n'est pas atteint"
+          - "Pas de classement public des auteurs (le but n'est pas de créer une compétition)"
+          - "Pas d'algorithme de mise en avant fondé uniquement sur l'évaluation"
+          - "Pas de retour anonyme dans le sens 'sans compte' (le compte reste requis pour responsabiliser)"
+          - "Pas d'obligation de laisser un retour pour terminer un parcours"
+          - "Pas d'exposition de l'identité civile du contributeur à l'auteur du parcours"
+
+      criteres_de_reussite:
+          - "Mme Dupont, qui a publié un parcours scolaire, sait si d'autres parents l'ont trouvé utile, sans pour autant être exposée à un score brutal s'il n'a été parcouru qu'une ou deux fois"
+          - "Un utilisateur qui hésite entre deux parcours communautaires a un signal de qualité utile, mais comprend que c'est un retour communautaire, pas une validation éditoriale"
+          - "Un auteur qui ne veut pas être évalué peut le décider sans avoir à se justifier"
+          - "Un retour blessant ou inapproprié n'atteint pas l'auteur sans avoir été modéré"
+
+      definition_of_done:
+          - "À la fin d'un parcours communautaire dont l'auteur n'a pas désactivé la fonctionnalité, l'utilisateur peut laisser une évaluation et un commentaire libre"
+          - "Cette saisie est facultative et la fin de parcours fonctionne aussi sans"
+          - "Aucune sollicitation n'est faite si l'auteur du parcours a désactivé la fonctionnalité"
+          - "La synthèse des retours d'un parcours est affichée uniquement si le seuil minimal de contributions est atteint"
+          - "Les commentaires sur les parcours suivent les règles de modération de D9.1"
+          - "L'auteur du parcours peut consulter l'ensemble de ses retours dans son profil"
+          - "L'auteur peut activer ou désactiver la fonctionnalité sur son parcours à tout moment"
+
+      enjeux_transversaux:
+          accessibilite: >-
+              L'évaluation doit être saisissable autrement qu'à la souris ou
+              au geste tactile fin (clavier, lecteur d'écran). La synthèse
+              des retours doit être lisible autrement que par un repère
+              purement visuel. La sollicitation de fin de parcours doit
+              rester sobre et non bloquante (Mme Dupont en sortie scolaire
+              avec ses élèves ne doit pas être obligée de naviguer un
+              dialogue insistant).
+          performance: >-
+              La synthèse des retours ne doit pas retarder l'affichage de la
+              fiche d'un parcours. Critères chiffrés en palier 16.
+          vie_privee: >-
+              L'identité civile d'un contributeur n'est exposée ni à
+              l'auteur du parcours, ni aux autres utilisateurs. L'auteur du
+              parcours voit les pseudonymes et les retours, pas une liste
+              nominative.
+
+      questions_ouvertes:
+          - "Forme exacte de l'évaluation (échelle, mots, étoiles…) — décision palier en aval, mais le principe d'évaluation reste"
+          - "Seuil minimal de contributions pour afficher une synthèse — à arbitrer avec la lead et le palier 16"
+          - "L'auteur peut-il répondre publiquement à un retour reçu ? — recommandation : non actuellement, à recadrer si volume le justifie"
+          - "Politique en cas de retours massivement négatifs sur un parcours (retrait automatique ? alerte modérateur ?) — à articuler avec D10.5"
+
+      priorite: "si_le_temps"
+
+      personas_principaux:
+          - mme_dupont
+          - pere_lyonnais
+          - kenji
+
+      dependances:
+          - "D3 (parcours — surface où le retour s'attache)"
+          - "D3 fin de parcours (point de sollicitation)"
+          - "D6.5 (compte requis)"
+          - "D6 (consultation des retours sur ses propres parcours dans le profil)"
+          - "D9.1 (règles communes pour les commentaires individuels)"
+          - "D9.4 (signalement)"
+          - "D10.5 (modération côté back-office)"
+
+      comportements_transverses_referenced:
+          - "Permissions juste-à-temps (canonique D5.5) — pour les notifications éventuelles à l'auteur"
+
+    # ===========================================================================
+    - id: D9.4
+      nom: "Signalement et suivi côté utilisateur"
+
+      raison_d_etre: >-
+          Tout dispositif communautaire crée la possibilité de contenu
+          problématique (commentaire blessant, soumission de pin
+          historiquement fausse, retour inapproprié sur un parcours,
+          contenu hors charte). L'utilisateur doit pouvoir agir SANS
+          s'exposer — son identité de signaleur n'est jamais révélée. Et
+          tout signalement est tracé pour qu'aucun ne se perde.
+
+          Ce sous-domaine est le PENDANT GRAND PUBLIC de la modération
+          définie en D10.5 : ici, on dit ce que l'utilisateur peut faire
+          et voir. La file de modération elle-même, les outils du
+          modérateur, les décisions et leurs effets côté admin sont en D10.5.
+
+      comportement: >-
+          Sur tout contenu d'origine communautaire (commentaire d'un pin,
+          pin issu d'une soumission, parcours communautaire, retour sur un
+          parcours), un utilisateur peut déclencher une action de
+          signalement avec choix de motif parmi un jeu défini (contenu
+          inapproprié, information historiquement fausse, hors sujet,
+          atteinte à la vie privée, autre avec précision). Le signalement
+          est immédiatement enregistré et entre dans la file de modération
+          définie en D10.5. L'utilisateur reçoit un accusé du fait que son
+          signalement a bien été pris en compte. En attendant que la
+          modération traite, l'utilisateur peut masquer pour lui-même le
+          contenu signalé — il ne le verra plus, sans pour autant le
+          retirer pour les autres. L'identité du signaleur n'est jamais
+          révélée à l'auteur du contenu signalé. Le signalement n'est pas
+          visible publiquement (pas de compteur 'X personnes ont signalé').
+          L'utilisateur peut consulter la liste de ses propres signalements
+          et leur statut depuis son profil. Si le contenu signalé est
+          finalement retiré ou maintenu, l'utilisateur en est informé de
+          manière sobre. Tout signalement est tracé : un utilisateur ne
+          peut pas signaler plusieurs fois le même contenu sans effet, et
+          les signalements abusifs (signalement systématique de contenu
+          légitime) peuvent être pris en compte par la modération
+          (cf. D10.5).
+
+      regles_fonctionnelles:
+          - "Un compte est requis pour signaler (cf. D6.5)"
+          - "L'identité du signaleur n'est JAMAIS révélée à l'auteur du contenu signalé"
+          - "Aucun signalement n'est visible publiquement (pas de compteur, pas de marqueur 'signalé X fois')"
+          - "Tout signalement entre dans la file de modération définie en D10.5"
+          - "Le signaleur peut masquer pour lui-même le contenu signalé en attendant la décision de modération, sans que cela retire le contenu pour les autres"
+          - "Un utilisateur peut signaler tout contenu d'origine communautaire (commentaire de pin D9.1, pin issu d'une soumission D9.2, parcours communautaire D3, retour sur parcours D9.3)"
+          - "Le signaleur choisit un motif parmi un jeu fini (contenu inapproprié, information historiquement fausse, hors sujet, atteinte à la vie privée, autre avec précision)"
+          - "L'utilisateur consulte la liste de ses propres signalements et leur statut dans son profil"
+          - "Un même contenu signalé plusieurs fois par le même utilisateur n'est pris en compte qu'une fois"
+          - "L'utilisateur reçoit un retour sobre de la décision finale (contenu retiré, contenu maintenu, sans détail sur la délibération)"
+          - "Les signalements répétés et manifestement infondés peuvent être pris en compte par la modération (cf. D10.5)"
+
+      capabilites:
+          - "Déclencher une action de signalement sur un contenu communautaire avec choix de motif"
+          - "Masquer pour soi-même un contenu signalé en attendant modération"
+          - "Consulter la liste de ses propres signalements et leur statut"
+          - "Recevoir le retour sobre de la décision finale"
+          - "Signaler tout type de contenu communautaire (commentaire, pin issu de soumission, parcours communautaire, retour sur parcours)"
+
+      ce_qu_on_ne_fait_pas:
+          - "Pas de révélation de l'identité du signaleur, jamais"
+          - "Pas d'exposition publique du fait qu'un contenu a été signalé"
+          - "Pas de signalement sans compte (pour pouvoir tracer les abus)"
+          - "Pas de retrait automatique d'un contenu sur la base d'un seul signalement (la décision reste à un humain — cf. D10.5)"
+          - "Pas de communication directe entre le signaleur et l'auteur du contenu"
+          - "Pas de signalement public (pas de système de votes négatifs ou de pouce vers le bas)"
+          - "Pas de motivation détaillée transmise à l'auteur du contenu signalé (juste la décision et le motif générique)"
+
+      criteres_de_reussite:
+          - "Un utilisateur qui tombe sur un commentaire blessant peut agir en quelques gestes sans crainte de représailles"
+          - "Un signaleur sait que son signalement n'est pas perdu (accusé immédiat, statut consultable)"
+          - "Un auteur d'un contenu signalé puis retiré sait pourquoi sans pour autant savoir qui l'a signalé"
+          - "Un utilisateur qui se reconnaît dans une atteinte à sa vie privée (par exemple un pin qui mentionne son adresse) peut faire retirer rapidement, en attendant la décision finale, en masquant pour lui-même"
+
+      definition_of_done:
+          - "Sur tout contenu communautaire, l'utilisateur connecté peut déclencher une action de signalement"
+          - "Le signaleur choisit un motif parmi le jeu défini"
+          - "Le signalement entre dans la file de modération définie en D10.5"
+          - "L'identité du signaleur n'est jamais exposée à l'auteur du contenu signalé"
+          - "Aucune indication publique n'apparaît sur le contenu signalé"
+          - "Le signaleur peut masquer pour lui-même le contenu en attendant modération"
+          - "Le signaleur consulte ses signalements et leur statut dans son profil"
+          - "Le signaleur reçoit la décision finale de manière sobre"
+          - "Un signalement ne peut être déposé qu'une fois par utilisateur sur le même contenu"
+
+      enjeux_transversaux:
+          accessibilite: >-
+              L'action de signalement doit être atteignable depuis tous les
+              contenus signalables, navigable au clavier et avec lecteur
+              d'écran. Le choix du motif doit être lisible sans dépendance à
+              une représentation purement visuelle. Le retour de décision
+              doit être perceptible autrement que par couleur seule.
+          performance: >-
+              Le déclenchement d'un signalement doit être ressenti comme
+              immédiat — l'utilisateur ne doit pas hésiter à agir par
+              crainte d'une attente. Critères chiffrés en palier 16.
+          vie_privee: >-
+              Critique : c'est l'enjeu le plus sensible du domaine.
+              L'identité du signaleur n'est exposée ni à l'auteur, ni à un
+              autre utilisateur, ni dans une UI publique. Les signalements
+              ne sont pas un marqueur public sur le contenu. Le signaleur
+              peut se protéger immédiatement (masquage local) sans dépendre
+              du délai de modération.
+
+      questions_ouvertes:
+          - "Liste fermée des motifs de signalement à acter avec la lead historienne et la modération (D10.5) — la liste proposée ici est une recommandation"
+          - "Un signaleur peut-il retirer son propre signalement avant décision ? — recommandation : oui, à confirmer"
+          - "Anonymisation rétroactive : si l'utilisateur supprime son compte, les signalements qu'il a faits restent-ils dans la file ? — articuler avec D6 (suppression de compte) et D10.5"
+          - "Politique en cas de signalements multiples sur un même contenu (seuil de retrait automatique conservatoire ?) — à arbitrer avec D10.5"
+
+      priorite: "si_le_temps"
+
+      personas_principaux:
+          - pere_lyonnais
+          - kenji
+          - mme_dupont
+
+      dependances:
+          - "D2.5 (consultation approfondie d'un pin — surface depuis laquelle on signale un commentaire ou un pin issu de soumission)"
+          - "D3 (parcours communautaire — surface depuis laquelle on signale un parcours ou un retour)"
+          - "D6.5 (compte requis)"
+          - "D6 (consultation de ses signalements dans le profil)"
+          - "D9.1, D9.2, D9.3 (contenus signalables)"
+          - "D10.5 (modération côté back-office — circuit canonique, file de modération, décisions)"
+
+      comportements_transverses_referenced:
+          - "Permissions juste-à-temps (canonique D5.5) — pour la notification de décision finale au signaleur"
+
+# -----------------------------------------------------------------------------
+# Persona-check du domaine D9
+# -----------------------------------------------------------------------------
+persona_check:
+    kenji:
+        pertinence: "Modérée — touriste, peu susceptible de soumettre un pin sur Lyon, mais peut commenter, signaler une erreur factuelle, laisser un retour sur un parcours qu'il a vécu"
+        scenarios_passes:
+            - scenario: "Kenji repère une erreur factuelle dans un pin (date, nom de personnage)"
+              reponse: "Couvert par D9.4 (signalement avec motif 'information historiquement fausse'). Le motif est clair, l'identité de Kenji n'est pas exposée."
+            - scenario: "Kenji finit un parcours communautaire et veut donner un retour rapide"
+              reponse: "Couvert par D9.3 (retour facultatif en fin de parcours communautaire). Kenji peut passer son chemin si l'interaction lui semble lourde — la fin de parcours fonctionne sans."
+            - scenario: "Kenji veut commenter un pin mais n'a pas de compte"
+              reponse: "Lecture des commentaires possible sans compte (D9.1). Pour écrire, le compte est requis (cohérent avec D6.5). Pour Kenji qui n'est à Lyon que 2 jours, c'est un arbitrage assumé."
+        questions_levees:
+            - "Le flot de création de compte doit rester compatible avec un touriste (langue, vitesse) — articulé en D6"
+
+    mme_dupont:
+        pertinence: "Élevée — autrice de parcours communautaires (sortie scolaire), reçoit des retours de la part d'autres parents/enseignants"
+        scenarios_passes:
+            - scenario: "Mme Dupont publie un parcours scolaire et veut savoir s'il a été utile"
+              reponse: "Couvert par D9.3 (retours sur parcours communautaires). Elle voit la synthèse si seuil atteint, et l'ensemble des retours dans son profil."
+            - scenario: "Son parcours reçoit un commentaire blessant"
+              reponse: "Le commentaire passe par modération (D9.1 + D10.5). Mme Dupont peut signaler (D9.4) ; son identité de signaleuse n'est pas révélée."
+            - scenario: "Mme Dupont ne veut pas être évaluée pour un parcours expérimental"
+              reponse: "Couvert par D9.3 (l'auteur peut désactiver les retours sur son parcours)."
+            - scenario: "Mme Dupont propose un pin sur un personnage local oublié"
+              reponse: "Couvert par D9.2 (soumission de pin), avec validation par l'équipe avant publication. Mme Dupont, étant enseignante, est attentive à la rigueur — la nécessité de modération lui parle."
+        questions_levees:
+            - "Le délai de modération typique d'une soumission doit être communiqué — Mme Dupont prépare ses sorties à l'avance, elle a besoin d'une visibilité"
+
+    mme_martin:
+        pertinence: "Faible — usage canapé en classe, consomme du contenu validé. Pas un usage cible direct de la couche communautaire."
+        scenarios_passes:
+            - scenario: "Mme Martin tombe sur un commentaire utilisateur en cours de projection en classe"
+              reponse: "Question de visibilité des commentaires en mode présentation sans chrome (canonique D2.5) — recommandation forte : les commentaires ne sont pas affichés dans ce mode (le contenu éditorial seul est projeté). À acter en palier 7 et palier 9."
+            - scenario: "Mme Martin signale une erreur factuelle vue en classe"
+              reponse: "Possible via D9.4, mais pas en pleine projection. À acter en palier 7."
+        questions_levees:
+            - "Confirmer en palier 7 que le mode présentation sans chrome masque les commentaires (D9.1) et tout marqueur de signalement éventuel"
+            - "À l'inverse, Mme Martin pourrait être un valideur scientifique de fait pour les soumissions concernant son sujet d'enseignement — articuler avec D10.5 si le projet le souhaite, hors scope actuel"
+
+    pere_lyonnais:
+        pertinence: "Très élevée — habitant de longue date, connaît son quartier, a des choses à dire et à proposer"
+        scenarios_passes:
+            - scenario: "Le père lyonnais découvre un pin sur sa rue et veut ajouter une anecdote familiale"
+              reponse: "Couvert par D9.1 (commentaire). Compte requis — cohérent avec une contribution responsabilisée."
+            - scenario: "Le père connaît un fait historique sur un mur de son quartier qui n'a pas de pin"
+              reponse: "Couvert par D9.2 (soumission de pin). Modération avant publication — il sait pourquoi (essence § historicite)."
+            - scenario: "Le père tombe sur un commentaire qui révèle l'adresse précise d'une personne"
+              reponse: "Couvert par D9.4 (signalement, motif atteinte à la vie privée). Il peut masquer pour lui-même immédiatement et son identité n'est pas exposée."
+            - scenario: "Le père ne veut pas que son identité civile apparaisse"
+              reponse: "Couvert par D9.1 et D9.2 (pseudonyme et représentation graphique uniquement, jamais identité civile). Pour les soumissions, choix du mode de crédit (anonyme/pseudonyme/attribution explicite)."
+        questions_levees:
+            - "Le flux de création de compte (D6.5) doit rester ultra-court — sinon le père lyonnais ne contribuera jamais"
+
+    anais_back_office:
+        pertinence: "Élevée — Anaïs est l'éditrice de contenu, donc la contrepartie côté back-office des soumissions et des signalements"
+        scenarios_passes:
+            - scenario: "Une soumission utilisateur arrive dans la file de modération"
+              reponse: "Renvoi vers D10.5 (file de modération), où Anaïs (ou le modérateur dédié) traite. Le D9 ne définit pas l'outillage admin."
+            - scenario: "Plusieurs signalements convergent sur un même contenu"
+              reponse: "Renvoi vers D10.5. D9.4 garantit que les signalements sont tracés et ne se perdent pas — D10.5 les organise en file."
+            - scenario: "Un utilisateur signale abusivement un contenu légitime"
+              reponse: "Le D9.4 trace le signalement et permet à D10.5 de prendre en compte le pattern. La sanction côté abuseur (avertissement, suspension) est en D10.5."
+        questions_levees:
+            - "L'articulation D9.4 / D10.5 doit être très propre côté terminologie (motifs de signalement identiques, statuts identiques) — à confirmer lors de la rédaction de D10"

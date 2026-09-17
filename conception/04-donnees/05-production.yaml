@@ -1,0 +1,368 @@
+# =============================================================================
+# Palier 4 — Cluster 05 — Production back-office
+# =============================================================================
+# Cluster qui modélise les artefacts conceptuels de la chaîne de production
+# du contenu HistoLyon : la STRUCTURE de saisie cadrée pour Anaïs (Template)
+# et l'enregistrement immuable des décisions de validation scientifique
+# (Trace de validation).
+#
+# Ce cluster ne dit PAS comment ces artefacts sont matérialisés (tableur
+# structuré en phase 1, CMS web en phase 2, JSON, CSV) — ces choix relèvent
+# du palier 13 admin. Il dit ce qu'ils DOIVENT pouvoir saisir / tracer pour
+# que les contrats du produit (historicité, traçabilité, cohérence Pin ↔
+# Template) tiennent.
+#
+# Persona principal : Anaïs Lefèvre (cf. cluster 02-personas § 4 figure
+# principale). Le valideur scientifique (rôle complémentaire) intervient
+# sur la Trace de validation. Les 4 personas grand public sont impactés
+# uniquement par les EFFETS de ce cluster (qualité du contenu qu'ils
+# consomment, crédibilité des sources affichées).
+# =============================================================================
+
+document:
+    type: palier_donnees_cluster
+    cluster_id: C5
+    nom: "Production"
+    format: yaml
+
+raison_d_etre_du_cluster: >-
+    Sans cadre structurant pour la saisie, le contenu dérive (sources en
+    commentaire libre, époques forcées, ton dicté par l'outil) — l'historicité
+    s'effondre dès la production. Sans trace des décisions de validation, on
+    ne peut pas répondre à la question 'qui a validé quoi, quand, sur quelle
+    base ?' — ni en interne, ni face à l'institution lyonnaise (cf. palier 2
+    § acteurs_hors_personas). Ce cluster pose les deux artefacts conceptuels
+    qui rendent la rigueur scientifique opérable : un cadre de saisie qui
+    reflète fidèlement les attributs du Pin (et du Parcours), et un journal
+    immuable des décisions prises avant publication.
+
+# -----------------------------------------------------------------------------
+# Entités
+# -----------------------------------------------------------------------------
+entites:
+    # ---------------------------------------------------------------------------
+    # Choix de modélisation : Template comme ENTITÉ UNIQUE avec un attribut
+    # `type` (pin / parcours), plutôt que deux entités distinctes (Template Pin
+    # et Template Parcours). Justification :
+    #   - Même raison d'être (cadrer la saisie sans dicter le ton).
+    #   - Même cycle de vie (versions successives à mesure que les attributs
+    #     du Pin ou du Parcours évoluent).
+    #   - Même posture vis-à-vis des invariants (I4 sources obligatoires,
+    #     I7 catalogues ouverts, I8 multi-époques).
+    #   - Même surface back-office et même persona (Anaïs).
+    # Deux entités auraient dupliqué ces propriétés sans gain de précision.
+    # Si en palier 13 admin le format de fichier diverge fortement entre les
+    # deux, la séparation pourra être faite en surface — la structure
+    # conceptuelle reste une.
+    # ---------------------------------------------------------------------------
+    - id: template
+      nom: "Template"
+
+      raison_d_etre: >-
+          Donner à Anaïs (et à tout éditeur) un cadre de saisie qui garantit la
+          présence des attributs requis pour qu'un Pin (ou un Parcours) atteigne
+          l'état validé, sans dicter le ton du récit ni brider la nuance
+          narrative. Le Template est le contrat structurel entre le palier 4
+          (entités du cluster 01-contenu et 02-parcours) et la chaîne de
+          production opérationnelle : il rend lisible et opposable ce qui est
+          obligatoire, optionnel, et ce qui doit être borné par un catalogue.
+
+      attributs:
+          obligatoires:
+              - nom: identifiant
+                nature: "identifiant lisible et stable"
+
+              - nom: type
+                nature: "valeur parmi un ensemble"
+                valeurs: [pin, parcours]
+                note: >-
+                    Détermine l'entité cible que ce Template cadre la saisie. Un
+                    Template de type pin reflète les attributs de l'entité Pin
+                    (cluster 01-contenu) ; un Template de type parcours reflète
+                    ceux de l'entité Parcours (cluster 02-parcours).
+
+              - nom: version
+                nature: "identifiant de version"
+                note: >-
+                    Un Template évolue dans le temps (nouveaux attributs, nouvelles
+                    valeurs admises dans un catalogue ouvert, contraintes affinées).
+                    La version permet de savoir quel cadre s'appliquait au moment
+                    de la saisie d'un Pin donné.
+
+              - nom: champs_requis
+                nature: "liste structurée de descripteurs de champ"
+                note: >-
+                    Chaque descripteur précise : nom de l'attribut cible, nature
+                    métier, contrainte, et catalogue de référence si applicable.
+                    La liste reflète FIDÈLEMENT les attributs obligatoires de
+                    l'entité cible (cluster 01-contenu pour Pin, cluster 02 pour
+                    Parcours). Cohérence Template ↔ entité cible = invariant fort
+                    (cf. invariants ci-dessous).
+
+              - nom: champs_optionnels
+                nature: "liste structurée de descripteurs de champ"
+                note: >-
+                    Même structure que champs_requis. Reflète les attributs
+                    optionnels de l'entité cible.
+
+              - nom: statut
+                nature: "valeur parmi un ensemble (cycle de vie)"
+                valeurs: "voir cycle_de_vie ci-dessous"
+
+          optionnels:
+              - nom: description
+                nature: "texte court"
+                note: "explicite le rôle du Template, ses évolutions notables"
+
+              - nom: notes_éditoriales
+                nature: "texte long"
+                note: >-
+                    Conseils de rédaction destinés à Anaïs (ex. attentes de ton,
+                    longueurs indicatives) — le Template peut PORTER ces notes
+                    mais ne CONTRAINT pas le ton (cf. essence § ce_qu_on_refuse,
+                    'pas de templates qui dictent le ton'). Les libellés et le
+                    détail des conseils relèvent du palier 8 contenu.
+
+      relations:
+          - "cadre la saisie de 0..n Pins (si type = pin) — relation logique : un Pin saisi via ce Template porte sa version de Template"
+          - "cadre la saisie de 0..n Parcours (si type = parcours)"
+          - "référence des catalogues ouverts (Catégorie, Époque) via ses descripteurs de champ — la liste des valeurs admises est celle du catalogue à la version courante (cf. I7)"
+          - "peut succéder à 0..1 Template antérieur (chaîne de versions du même type)"
+
+      cycle_de_vie:
+          etats: [brouillon, actif, déprécié]
+          transitions:
+              - "brouillon → actif (validation par l'équipe éditoriale ; devient le Template courant pour son type)"
+              - "actif → déprécié (publication d'une nouvelle version active du même type)"
+              - "déprécié → actif (revert exceptionnel — à éviter, mais possible)"
+          note_sur_l_etat_deprecie: >-
+              Un Template déprécié n'est plus utilisé pour de nouvelles saisies,
+              mais il reste consultable pour interpréter les Pins et Parcours
+              saisis sous lui (compatibilité ascendante). Pas de suppression.
+
+      invariants:
+          - "À tout moment, il existe au plus 1 Template actif par type (pin / parcours). Plusieurs Templates en brouillon sont admis."
+          - "Les champs_requis du Template de type pin reflètent l'union des attributs obligatoires de l'entité Pin (cluster 01-contenu) — cohérence vérifiable par revue inter-clusters."
+          - "Les champs_requis du Template de type parcours reflètent les attributs obligatoires de l'entité Parcours (cluster 02-parcours)."
+          - "Le Template impose au minimum la présence d'1 Source pour un Pin (instanciation de I4 — un Pin saisi via Template ne peut être marqué prêt-à-relire sans Source rattachée)."
+          - "Le Template autorise la sélection multiple d'Époques pour un Pin et pour un Parcours (instanciation de I8)."
+          - "Le Template référence Catégorie et Époque comme catalogues ouverts (instanciation de I7) — si Anaïs a besoin d'une nouvelle entrée, le Template ne bloque pas, il s'accommode de l'addition."
+          - "La version d'un Template ne peut pas être réutilisée pour un Template différent (versions monotones)."
+
+      invariants_transversaux_referenced: [I4, I7, I8]
+
+      questions_ouvertes:
+          - "Modèle de gouvernance des évolutions du Template (qui décide d'ajouter un champ, sur quels critères, avec quelle revue d'impact sur les Pins déjà saisis) — relève du palier 13 admin"
+          - "Politique sur les Pins saisis sous une version dépréciée du Template : migration automatique vers la version active si compatible, ou conservation à l'identique avec mention de version ?"
+          - "Granularité de la version (semantic versioning par addition / breaking change, ou simple compteur) — à arbitrer en palier 13"
+          - "Le Template porte-t-il la NOMENCLATURE des médias rattachés aux Pins (D10.3), ou est-ce un cadre séparé ? Mon arbitrage actuel : la nomenclature relève du palier 13, le Template ne fait que poser que le rattachement Média → Pin existe (déjà couvert dans cluster 01)."
+          - "Faut-il une entité Catalogue distincte pour modéliser explicitement Catégorie / Époque comme catalogues ouverts évolutifs, ou la référence dans le Template suffit-elle ? Pour l'instant, suffit-elle — Catégorie et Époque sont déjà des entités du cluster 01."
+
+    # ---------------------------------------------------------------------------
+    - id: trace_de_validation
+      nom: "Trace de validation"
+
+      raison_d_etre: >-
+          Enregistrer de façon immuable chaque décision de validation
+          scientifique prise sur un Pin ÉDITORIAL entre sa soumission pour
+          relecture et sa publication. C'est l'artefact qui rend l'historicité
+          opposable : sans Trace, on ne peut pas répondre à 'qui a validé ce
+          Pin, quand, sur quelle base ?' — ni en revue interne, ni face à
+          l'institution lyonnaise. Une Trace par décision : un Pin peut
+          accumuler plusieurs Traces s'il a fait l'objet de plusieurs
+          allers-retours (demande_complément, refus puis re-soumission, etc.).
+
+          Pour les Pins de provenance COMMUNAUTAIRE, l'audit est porté par
+          la Trace de modération du cluster 04 (décision utilisateur
+          2026-05-05) — la modération communautaire conjugue alors la
+          vérification scientifique des sources et la validation de la
+          contribution en un seul acte tracé.
+
+      attributs:
+          obligatoires:
+              - nom: identifiant
+                nature: "identifiant lisible et stable"
+
+              - nom: pin_concerné
+                nature: "référence à Pin (de provenance éditoriale)"
+                contrainte: "exactement 1 ; provenance = éditorial"
+                note: >-
+                    La Trace porte sur UN Pin éditorial. Si un même validateur
+                    tranche sur plusieurs Pins en série, ce sont autant de Traces
+                    distinctes.
+
+              - nom: validateur
+                nature: "référence à Compte (pseudonyme)"
+                note: >-
+                    Pseudonyme de la personne qui a tranché. Au démarrage du projet,
+                    peut être Anaïs elle-même (auto-validation explicite — la Trace
+                    le matérialise sans le masquer). Cf. I1 — pas d'identité civile.
+                    Le palier 4 ne modélise pas un rôle 'Validateur' comme entité
+                    séparée : c'est un Compte qui exerce une fonction tracée par
+                    la Trace elle-même. Si la fonction se complexifie (plusieurs
+                    niveaux de validation, partenaires institutionnels), un
+                    cluster ultérieur pourra introduire un rôle dédié.
+
+              - nom: décision
+                nature: "valeur parmi un ensemble"
+                valeurs: [approuvé, demande_complément, refusé]
+                note: >-
+                    approuvé : sources et cohérence historique jugées suffisantes,
+                    le Pin peut transiter vers validé.
+                    demande_complément : insuffisance identifiée, le Pin retourne
+                    en brouillon avec motif.
+                    refusé : décision de ne pas valider (ex. doutes graves sur les
+                    sources) — le Pin retourne en brouillon ou est retiré.
+
+              - nom: horodatage
+                nature: "horodatage"
+                note: "moment précis de la décision"
+
+              - nom: type_de_validation
+                nature: "valeur parmi un ensemble"
+                valeurs: [auto_validation, validation_par_tiers]
+                note: >-
+                    Distingue l'auto-validation (le validateur est la même personne
+                    que l'auteur du Pin) de la validation par tiers (validateur
+                    distinct de l'auteur). Sert la transparence sur la posture
+                    assumée par l'équipe au démarrage du projet (D10.2 — l'auto-
+                    validation est admise mais tracée comme telle).
+
+          optionnels:
+              - nom: motif
+                nature: "texte long"
+                note: >-
+                    Justification ou commentaire associé à la décision. Obligatoire
+                    de fait pour décision = demande_complément ou refusé (sans
+                    motif l'auteur ne peut pas corriger) — mais le palier 4 ne
+                    durcit pas cette règle au niveau attribut, elle relève d'une
+                    règle fonctionnelle de saisie (palier 13).
+
+              - nom: annotations
+                nature: "ensemble de descripteurs (cible_dans_le_pin, commentaire)"
+                note: >-
+                    Annotations granulaires posées par le validateur sur des
+                    passages précis du Pin (ex. 'sourcer cette affirmation', 'cette
+                    date est-elle exacte ?'). Permet la relecture détaillée sans
+                    modification directe du contenu rédigé par Anaïs (D10.2). La
+                    structure interne (mode de référencement d'un passage) est
+                    précisée en palier 8 contenu et palier 13 admin.
+
+              - nom: version_template_utilisée
+                nature: "référence à Template (par version)"
+                note: >-
+                    Sert l'audit : si la décision a été prise sous un Template
+                    antérieur, on peut reconstituer le cadre qui s'appliquait alors.
+
+      relations:
+          - "porte sur exactement 1 Pin"
+          - "produite par exactement 1 Compte (validateur)"
+          - "peut référencer 1 version de Template"
+          - "0..n Traces par Pin (un Pin accumule l'historique de ses validations successives)"
+
+      cycle_de_vie:
+          note_sur_l_immutabilite: >-
+              Une Trace est append-only — créée une fois, jamais modifiée. Pas
+              d'états multiples, pas de transitions. La rectification d'une
+              décision passe par la création d'une NOUVELLE Trace (ex. un Pin
+              refusé puis re-soumis et approuvé porte deux Traces : la première
+              refusé, la seconde approuvé). Cette immutabilité est le fondement
+              de la traçabilité opposable.
+          etats: [créée]
+          transitions: []
+
+      invariants:
+          - "Une Trace n'est jamais modifiée après création (append-only)."
+          - "Une Trace n'est jamais supprimée — y compris si le Pin qu'elle concerne est retiré (l'audit survit au retrait)."
+          - "Si type_de_validation = auto_validation, alors validateur = auteur du Pin (cohérence vérifiable)."
+          - "Une décision approuvé est nécessaire pour que le Pin transite vers validé (instanciation locale du workflow scientifique D10.2)."
+          - "Le pseudonyme du validateur reste tracé même si le Compte associé est ultérieurement supprimé (la Trace conserve une copie du pseudonyme — la suppression d'un Compte n'efface pas son passage en validation)."
+
+      invariants_transversaux_referenced: [I1]
+
+      questions_ouvertes:
+          - "Faut-il modéliser plusieurs niveaux de validation (relecture historienne + relecture éditoriale, ou un seul niveau) ? Pour l'instant, une seule Trace suffit par décision — si plusieurs niveaux deviennent nécessaires, une Trace par niveau, chaînée par horodatage."
+          # Question tranchée le 2026-05-05 : pas de trace partagée. Le cluster 04
+          # introduit une entité Trace de modération distincte, parallèle à la
+          # Trace de validation ici. Une vue unifiée côté présentation back-office
+          # reste possible sans casser la modélisation.
+          - "Cas du Pin promu de communautaire à éditorial (I10) : faut-il une Trace dédiée à la promotion (distincte d'une Trace de validation classique), ou une Trace approuvé suffit-elle ? À arbitrer — pour l'instant, on considère la promotion comme une décision approuvé portant la mention spécifique en motif."
+          - "Conservation des annotations granulaires après publication du Pin (utiles pour audit) ou suppression à la publication (allègement) ? Mon avis : conservation, pour cohérence avec l'immutabilité de la Trace."
+          - "Si un Pin retiré (publié → retiré) après signalement honoré, faut-il une Trace de validation négative ex post, ou un autre artefact (Trace de modération) ? La distinction Trace de validation / Trace de modération renvoie à la question ouverte précédente — pour l'instant, la Trace de validation reste cantonnée au workflow pré-publication."
+
+# -----------------------------------------------------------------------------
+# Persona check
+# -----------------------------------------------------------------------------
+# Cluster back-office. Anaïs = MAJEUR. Valideur scientifique = direct.
+# Les 4 personas grand public sont concernés par les effets, pas par la
+# surface — impact indirect tracé pour cohérence.
+persona_check:
+    anais_back_office:
+        impact: "MAJEUR"
+        note: >-
+            Le Template est SON cadre de travail quotidien. Points de vigilance :
+              - La distinction STRUCTURE / TON est essentielle : le Template
+                impose les champs requis, jamais le ton. C'est un drapeau rouge
+                explicite de son persona ('templates qui dictent le ton'). Le
+                champ optionnel 'notes_éditoriales' reste un GUIDE, pas une
+                contrainte.
+              - L'invariant I4 (Sources obligatoires) instancié au niveau Template
+                répond à son drapeau rouge 'sources stockées comme commentaire
+                libre' — la structure même rend ce drapeau impossible à lever.
+              - L'invariant I8 (multi-époques) instancié au niveau Template
+                répond à sa frustration 'champs obligatoires aberrants' (forcer
+                une époque sur un patrimoine vivant qui traverse les siècles).
+              - Le versioning du Template prépare le palier 13 à fournir le
+                confort qu'elle attend (gestion de versions, prévisualisation),
+                sans le décider ici.
+            La Trace de validation matérialise sa demande implicite de workflow
+            tracé (drapeau rouge 'modifications qui se propagent en prod sans
+            relecture' — la Trace rend la relecture obligatoire pour atteindre
+            validé). L'auto-validation explicitement tracée comme telle assume
+            la posture de démarrage du projet sans la masquer.
+
+    valideur_scientifique:
+        impact: "direct"
+        note: >-
+            La Trace de validation est SON artefact de sortie. Trois décisions
+            possibles (approuvé / demande_complément / refusé) reflètent les
+            trois issues attendues du persona dans le palier 2 (rôle complémentaire).
+            L'attribut annotations permet la relecture sans modification directe
+            du rédactionnel — capabilité explicitement nommée dans le palier 2
+            ('Possibilité d'annoter ou de commenter sans modifier directement').
+            Le validateur est référencé via Compte (pseudonyme) — pas d'identité
+            civile (I1), même quand il s'agit d'un partenaire institutionnel.
+
+    kenji:
+        impact: "indirect"
+        note: >-
+            La qualité du contenu qu'il consomme dépend du Template (cadre de
+            saisie) et de la Trace (filet de validation). Aucun attribut ici
+            ne le concerne directement. La cohérence multi-langue (Kenji lit
+            en japonais) reste cadrée par le palier 8 contenu — ni le Template
+            ni la Trace ne fixent la langue.
+
+    mme_dupont:
+        impact: "indirect"
+        note: >-
+            Sa frustration 'contenu manifestement trop adulte pour CM1-CM2' est
+            indirectement adressée par les notes_éditoriales du Template (guide
+            Anaïs sans la contraindre) et par la Trace de validation (filet de
+            cohérence). Détail relève du palier 8 contenu.
+
+    mme_martin:
+        impact: "direct via Trace de validation"
+        note: >-
+            Sa frustration 'sources d'archives invisibles ou douteuses' est
+            directement levée par la mécanique de validation tracée : aucun Pin
+            ne devient validé sans Trace approuvé portant sur des Sources (cf.
+            I4 instancié au niveau Template). Son test_litmus 'la source est
+            crédible aux yeux d'un collègue' est garanti par cette mécanique
+            amont. Elle ne voit pas la Trace, mais elle bénéficie de son existence.
+
+    pere_lyonnais:
+        impact: "indirect"
+        note: >-
+            La fiabilité du contenu qu'il reçoit en mode Surprenez-moi dépend
+            de la rigueur du cadre (Template) et du filet de validation (Trace).
+            Aucun attribut ici ne le concerne directement.

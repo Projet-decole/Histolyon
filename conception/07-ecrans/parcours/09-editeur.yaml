@@ -1,0 +1,95 @@
+# =============================================================================
+# E-PARCOURS-EDITEUR — Éditeur d'un Parcours personnel
+# =============================================================================
+# Surface dédiée (P5.M3) à la création et l'édition d'un Parcours en
+# provenance personnelle. Inclut comme états/zones internes la gestion des
+# étapes (ajout, retrait, réordonnancement — C12 — pas un écran distinct).
+# Bifurcation vers C13 (publication communautaire, change la provenance) ou
+# vers F2 (partage privé via capability — décision 2026-05-05).
+# =============================================================================
+
+document:
+  type: palier_ecrans_fiche
+  format: yaml
+
+ecran:
+  id: E-PARCOURS-EDITEUR
+  nom: "Éditeur d'un Parcours personnel"
+
+  mode: P5.M3
+  surface_parente: P5.S2
+
+  raison_d_etre: >-
+    Permettre à un utilisateur de créer un Parcours en provenance
+    personnelle — Mme Dupont préparant sa sortie scolaire en moins de
+    30 minutes (test_litmus). Saisie des métadonnées, choix des
+    Étapes, organisation de la séquence, sauvegarde locale automatique.
+    Sert également à éditer un brouillon existant. L'éditeur est UNE
+    surface avec plusieurs zones et plusieurs états (ajout / retrait /
+    réordonnancement) plutôt qu'un wizard multi-écrans.
+
+  composition:
+    - zone: "métadonnées du parcours"
+      role: "saisie du titre, de la description optionnelle, sélection des Époques associées (multi-sélection), choix optionnel d'une image d'ouverture"
+      entites_affichees: [Parcours, Époque]
+
+    - zone: "liste des étapes"
+      role: "énumération ordonnée des Étapes en cours ; chaque entrée affiche position, titre du Pin référencé, catégorie, époque, introduction d'étape éventuelle ; permet le tap pour éditer ou retirer l'étape, et le réordonnancement par manipulation directe"
+      entites_affichees: [Étape, Pin]
+
+    - zone: "ajout d'une étape"
+      role: "point d'accès qui ouvre une surface ponctuelle (P5.M6) interne — sélection d'un Pin via recherche ou choix sur la carte ; saisie optionnelle d'une introduction d'étape ; possibilité de soumettre un nouveau Pin via G4 si le Pin n'existe pas"
+      entites_affichees: [Pin]
+
+    - zone: "récapitulatif dérivé"
+      role: "métadonnées calculées (nombre d'étapes, durée estimée, distance estimée, époques couvertes dérivées des Pins) ; signale si le Parcours n'a pas encore le minimum d'étapes (cf. invariant cluster 02 ≥ 2 étapes)"
+
+    - zone: "actions"
+      role: "regroupe la sauvegarde explicite (en plus de la sauvegarde implicite continue), le partage privé (F2 via capability), la publication communautaire (C13), la suppression du brouillon, le test du parcours (lancement immédiat C4 sans publication)"
+
+  etats:
+    creation_initiale: "Nouveau Parcours instancié en provenance personnelle, état brouillon ; aucune étape, aucun titre ; uniquement les zones d'édition vides"
+    edition_metadonnees: "L'utilisateur saisit ou modifie titre, description, époques ; sauvegarde locale implicite à chaque modification (cf. cas particulier C11 — politique de sauvegarde)"
+    selection_pin_pour_etape: "Surface ponctuelle interne d'ajout d'étape ouverte ; recherche de Pin ou sélection sur carte en cours"
+    ajout_etape_pin_inexistant: "L'utilisateur a cherché un Pin qui n'existe pas comme contenu ; option proposée de soumettre un nouveau Pin via G4 ; au retour, le Pin soumis devient une étape candidate"
+    retrait_etape: "L'utilisateur retire une étape ; les positions suivantes sont décrémentées ; pas de dialogue de confirmation pour un brouillon non lancé (cf. C12) ; un dialogue P5.M8 apparaît si l'utilisateur édite un Parcours déjà lancé"
+    reordonnancement: "Mode de manipulation directe activé ; l'utilisateur déplace les étapes ; à la sortie du mode, les nouvelles positions sont enregistrées"
+    pin_d_etape_indisponible: "Au moins un Pin référencé par une étape a été retiré côté contenu (cf. cluster 02) ; l'étape est signalée 'lien rompu' avec option de la retirer ou de la remplacer"
+    parcours_en_etat_publiable_local: "Le Parcours a au moins le minimum d'étapes ; l'utilisateur peut le considérer comme prêt à l'emploi (publié_local) et l'utiliser pour son usage propre, ou le partager en privé via F2"
+    publication_demandee_sans_compte: "L'utilisateur a tenté C13 sans Compte ; redirection vers E-PROFIL-CREATION-COMPTE (D6) ; au retour, on revient ici à l'étape suivante du flow C13"
+    publication_dialogue: "Dialogue P5.M8 (E-TRANSVERSES-DIALOGUE-CONFIRMATION) informant que la publication change la provenance en communautaire, expose le pseudonyme, soumet à modération ; si confirmé, le Parcours sort de cet écran (provenance changée)"
+    edition_apres_partage_capability: "Le Parcours a déjà été partagé via Lien universel par capability (F2) ; l'édition reste autorisée mais affecte les destinataires existants ; question ouverte sur l'invalidation des liens (cf. cluster 02)"
+    sortie_inattendue: "Perte de focus, fermeture d'app ; P5.N7 — état préservé ; au retour, l'utilisateur reprend là où il était (sauvegarde implicite continue)"
+    offline: "Réseau indisponible ; édition pleinement fonctionnelle (le Parcours personnel est local) ; la publication C13 est mise en attente locale jusqu'au retour de la connexion ; bandeau P3 visible"
+
+  elements_interactifs:
+    - "Saisie des métadonnées (titre, description, époques, image d'ouverture)"
+    - "Tap ajouter une étape → ouverture de la surface ponctuelle interne (P5.M6) de sélection de Pin"
+    - "Tap sur une étape de la liste → édition de son introduction d'étape ou retrait"
+    - "Geste de réordonnancement direct sur la liste des étapes"
+    - "Tap soumettre un nouveau Pin (depuis l'ajout d'étape) → flow G4, bascule vers E-COMMUNAUTE-SOUMISSION-PIN ; au retour, le Pin soumis est utilisable comme étape"
+    - "Tap test du parcours → flow C4, bascule vers E-PARCOURS-LANCEMENT (sans changer la provenance ni publier)"
+    - "Tap partage privé → flow F2, bascule vers E-PARTAGE-CODE-VISUEL ou partage natif (Lien universel par capability — cf. décision 2026-05-05)"
+    - "Tap publication communautaire → flow C13, ouverture E-TRANSVERSES-DIALOGUE-CONFIRMATION (P5.M8) ; si pas de Compte, bascule vers E-PROFIL-CREATION-COMPTE"
+    - "Tap suppression du brouillon → ouverture E-TRANSVERSES-DIALOGUE-CONFIRMATION (P5.M8) ; si confirmé, suppression locale"
+    - "Tap retour / fermer → sauvegarde implicite et retour à E-PARCOURS-PRINCIPAL"
+
+  flows_actifs:
+    - C11   # Création d'un parcours personnel
+    - C12   # Édition des étapes (ajout / retrait / réordonnancement — états internes)
+
+  surfaces_imbriquees:
+    - E-COMMUNAUTE-SOUMISSION-PIN          # M3 si soumission d'un nouveau Pin pendant l'ajout d'étape
+    - E-PARCOURS-LANCEMENT                 # M6 si test du parcours
+    - E-PARTAGE-CODE-VISUEL                # M6 si partage privé via Code visuel
+    - E-PROFIL-CREATION-COMPTE             # M6 si publication tentée sans Compte
+    - E-TRANSVERSES-DIALOGUE-CONFIRMATION  # M8 publication, suppression, retrait d'étape sur parcours déjà lancé
+    - E-TRANSVERSES-MESSAGE-EPHEMERE       # M9 confirmation de publication, mise en attente offline, etc.
+    - E-TRANSVERSES-BANDEAU-OFFLINE        # P3 si offline
+
+  questions_ouvertes:
+    - "Limite minimum d'étapes pour qu'un Parcours soit lançable (1, 2, 3 ?) — relève cluster 02 et palier 16. Pour l'instant on s'aligne sur ≥ 2 (invariant cluster 02)"
+    - "Sauvegarde implicite continue : à chaque frappe, à chaque champ, ou à intervalle fixe ? — politique à acter en palier 13 / 16"
+    - "Édition d'un Parcours personnel après partage via capability (F2) : invalide-t-elle les Liens universels existants ? — relève cluster 02 / cluster 06"
+    - "Édition d'un Parcours communautaire DÉJÀ publié (provenance changée par C13) : autorisée avec re-modération, ou interdite (force la création d'un nouveau Parcours) ? — relève cluster 02 question ouverte. Si autorisée, le présent éditeur doit gérer un état supplémentaire 'parcours communautaire publié en édition'"
+    - "Image d'ouverture : choix parmi les Médias des Pins étapes, upload séparé, ou bibliothèque dédiée ? — palier 8/10"

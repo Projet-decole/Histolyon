@@ -1,0 +1,510 @@
+# =============================================================================
+# Palier 11 — 01 Durées et courbes (PILOTE)
+# =============================================================================
+# Échelle de durées NOMMÉES + chiffrées (DUR-X) et catalogue de courbes
+# d'interpolation NOMMÉES + chiffrées (CRV-X) que les autres fichiers du
+# palier 11 référenceront en masse.
+#
+# Pilote — calibre le format chiffré qualifié, le ton
+# implémentation-agnostique malgré les chiffres, la politique
+# prefers-reduced-motion (la 'reduced motion' qu'un utilisateur peut
+# activer dans les paramètres système, et que l'app doit respecter).
+# =============================================================================
+
+document:
+  type: palier_reponse_parametrique_durees_courbes
+  numero: 11
+  fichier: "01-durees-et-courbes.yaml"
+  version: "0.1"
+  date: "2026-05-07"
+  format: yaml
+  pilote: true
+  prerequis_de_lecture:
+    - "design/conception/11-reponse-parametrique/00-index.yaml — § 3 typologie 6 familles, § 5 format des fiches DUR et CRV, § 9 décisions D1-D7"
+
+raison_d_etre: >-
+  Sans une échelle finie de durées et un catalogue fini de courbes,
+  chaque chorégraphie (fichier 03) et chaque mapping paramétrique
+  (fichier 04) inventerait sa propre valeur en silo, et le système
+  perdrait sa cohérence rythmique. Ici on pose 5 durées et 6 courbes
+  qui couvrent l'ensemble des situations de l'app — toute fiche
+  d'aval choisit dans cet inventaire, ne crée pas de nouvelle valeur
+  sans justification documentée.
+
+# -----------------------------------------------------------------------------
+# 1. Échelle de durées (DUR-X)
+# -----------------------------------------------------------------------------
+# Cinq durées discrètes + une notion de durée 'continue' (DUR-CONTINU) pour
+# les interpolations pilotées par geste où la durée n'a pas de sens.
+# Progression géométrique approximative entre DUR-COURT et DUR-AMPLE
+# (×1.7 environ) — perception humaine plutôt logarithmique.
+durees:
+
+  - id: DUR-INSTANT
+    nom: "Instant"
+    description: >-
+      Réaction quasi-immédiate. À la limite basse du perceptible. Pour
+      micro-feedbacks de validation (toggle d'un switch confirmant un
+      tap, retour visuel de chip sélectionné).
+    valeur_ms: 60
+    classes_evenement:
+      - "Toggle binaire confirmation (comp-toggle-switch après tap)"
+      - "Retour visuel d'un chip sélectionné en sortie d'un tap atomique"
+    enjeux_a11y: >-
+      Sous le seuil ~100ms parfois cité comme 'minimum perceptible'.
+      C'est volontaire : DUR-INSTANT est utilisé là où la causalité
+      tap→effet doit paraître instantanée. À VALIDER au palier 16.
+    questions_ouvertes: []
+
+  - id: DUR-COURT
+    nom: "Court"
+    description: >-
+      Transitions perceptibles mais brèves. Feedback de tap, micro-
+      interactions atomiques (default↔pressed), apparition/disparition
+      d'un message éphémère M9 ou d'une indication non bloquante.
+    valeur_ms: 150
+    classes_evenement:
+      - "Transition d'état atomique (default → pressed → default) sur tout atome interactif (échelle E1)"
+      - "Apparition / disparition d'un message éphémère M9 (cf. CHO-OUVERTURE-M9, CHO-DISMISS-M9 fichier 03)"
+      - "Apparition / disparition d'une indication d'onboarding non bloquante (M9)"
+      - "Hover/focus ring (a11y clavier)"
+    enjeux_a11y: "Au-dessus du seuil de perceptibilité documenté ≥ 100ms (palier 16 valide)."
+    questions_ouvertes: []
+
+  - id: DUR-STANDARD
+    nom: "Standard"
+    description: >-
+      Durée de référence des transitions de surface (M2 aperçu rapide,
+      M6 surface ponctuelle, M7 alerte ponctuelle) et du calage du
+      slider d'Époque. C'est la durée 'par défaut' quand rien d'autre
+      ne s'impose.
+    valeur_ms: 250
+    classes_evenement:
+      - "Apparition / disparition d'un aperçu rapide M2 (cf. CHO-OUVERTURE-M2, CHO-FERMETURE-M2)"
+      - "Apparition / disparition d'une surface ponctuelle M6 (recherche, filtres-couches, lancement-parcours, filtres-parcours, saut-étape)"
+      - "Apparition / disparition d'une alerte ponctuelle M7 (alerte de proximité, invitation micro-parcours)"
+      - "Calage du slider d'Époque au relâchement (cf. CHO-CALAGE-EPOQUE)"
+      - "Recadrage léger de la Carte centrant un Pin sélectionné"
+      - "Saut latéral entre surfaces top-level S1 ↔ S2 ↔ S3 (cf. CHO-SAUT-LATERAL)"
+    enjeux_a11y: "Confortable pour la perception — laisse le temps de comprendre la transition."
+    questions_ouvertes: []
+
+  - id: DUR-LONG
+    nom: "Long"
+    description: >-
+      Transitions inter-modes plus structurelles. Mode présentation M4
+      entrée/sortie (cache du chrome, ajustement du contenu), lancement
+      de Parcours avec apparition de la surface persistante P2,
+      consultation approfondie M3 ouverte depuis un aperçu M2 (avec
+      changement complet de surface).
+    valeur_ms: 400
+    classes_evenement:
+      - "Entrée mode présentation M4 — masquage du chrome + sommeil persistantes (cf. CHO-ENTREE-M4)"
+      - "Sortie mode présentation M4 (cf. CHO-SORTIE-M4)"
+      - "Ouverture consultation approfondie M3 depuis aperçu M2 (cf. CHO-OUVERTURE-M3)"
+      - "Lancement de Parcours — apparition de P2 surface persistante de parcours (cf. CHO-LANCEMENT-PARCOURS)"
+      - "Apparition / disparition d'un dialogue de confirmation M8 avec backdrop (cf. CHO-OUVERTURE-M8)"
+    enjeux_a11y: >-
+      Largement perceptible. Pourrait paraître lent si chaîné — le palier
+      16 vérifiera qu'aucune chorégraphie ne CHAÎNE deux DUR-LONG en
+      séquence.
+    questions_ouvertes: []
+
+  - id: DUR-AMPLE
+    nom: "Ample"
+    description: >-
+      Transitions exceptionnelles à valeur narrative ou cérémonielle.
+      Réservée à des événements peu fréquents qu'on veut faire
+      RESPIRER : célébration de fin de Parcours, première arrivée à
+      une étape qui révèle un Pin majeur. Usage parcimonieux.
+    valeur_ms: 600
+    classes_evenement:
+      - "Célébration de fin de Parcours (animation d'aboutissement, cf. CHO-FIN-PARCOURS)"
+      - "Réserve pour événements narratifs ponctuels — à arbitrer lors de la rédaction du fichier concerné"
+    enjeux_a11y: >-
+      Long — sujet à 'animation gênante' pour certains profils. POLITIQUE
+      prefers-reduced-motion : DUR-AMPLE → DUR-STANDARD systématiquement.
+    questions_ouvertes:
+      - "Limiter formellement DUR-AMPLE à ≤ 1 occurrence par chorégraphie ? À acter plus tard."
+
+  - id: DUR-CONTINU
+    nom: "Continu (piloté par geste)"
+    description: >-
+      Pas une durée fixe — l'animation est PILOTÉE par un geste continu
+      de l'utilisateur (drag du slider d'Époque, drag du comparateur
+      avant/après, pinch-zoom de la Carte). La 'durée' est celle du
+      geste lui-même. Le mapping position→sortie est défini dans le
+      fichier 04 (MAP-SLIDER-VERS-AXES-CARTE notamment).
+    valeur_ms: null   # null assumé — pas de durée fixe applicable
+    classes_evenement:
+      - "Drag du slider d'Époque (entrée d'un mapping paramétrique vers les 5 axes carte)"
+      - "Drag du comparateur avant/après (comp-avant-apres palier 10 fonctionnels)"
+      - "Pan / pinch-zoom de la Carte (manipulation directe)"
+    enjeux_a11y: "Le throttle d'échantillonnage du drag est défini en TMP fichier 05 (TMP-THROTTLE-DRAG-SLIDER)."
+    questions_ouvertes: []
+
+# -----------------------------------------------------------------------------
+# 2. Catalogue de courbes (CRV-X)
+# -----------------------------------------------------------------------------
+# Six courbes — quatre cubic-bezier standard + deux springs physiques.
+# Les valeurs cubic-bezier sont le langage canonique cross-plateforme
+# (CSS, Flutter, Compose, SwiftUI…). Les springs sont paramétrés en
+# (mass, stiffness, damping) — formulation physique standard react-spring,
+# Flutter SpringDescription, SwiftUI animation(.spring(...)).
+courbes:
+
+  - id: CRV-LINEAIRE
+    nom: "Linéaire"
+    description: >-
+      Vitesse constante. Usage rare — réservé aux indicateurs de
+      progression continus (barres de chargement) et aux interpolations
+      paramétriques pilotées par geste où la 'courbe' n'a pas de sens
+      (DUR-CONTINU).
+    cubic_bezier: [0.0, 0.0, 1.0, 1.0]
+    classes_evenement:
+      - "Indicateur de chargement déterminé (comp-indicateur-progression)"
+      - "Interpolation paramétrique du slider d'Époque PENDANT le geste (la courbe est dictée par la position du doigt, pas par le temps)"
+      - "Mode prefers-reduced-motion — fallback pour les chorégraphies dont l'easing est désactivé mais la durée conservée"
+    questions_ouvertes: []
+
+  - id: CRV-EASE-OUT
+    nom: "Décélération"
+    description: >-
+      Démarrage rapide, ralentissement vers la fin. Sortie naturelle
+      d'une transition — la valeur arrive et se pose. Courbe canonique
+      pour les APPARITIONS (l'élément entre vif et se stabilise
+      doucement).
+    cubic_bezier: [0.0, 0.0, 0.2, 1.0]
+    classes_evenement:
+      - "Apparition d'une surface (M2, M6, M7, M9)"
+      - "Apparition d'une surface persistante (P1, P2, P3)"
+      - "Calage du slider d'Époque (la valeur cible se pose)"
+      - "Recadrage de la Carte vers un Pin sélectionné"
+    questions_ouvertes: []
+
+  - id: CRV-EASE-IN
+    nom: "Accélération"
+    description: >-
+      Démarrage lent, accélération vers la fin. Sortie d'écran d'un
+      élément — il s'éloigne et disparaît. Courbe canonique pour les
+      DISPARITIONS.
+    cubic_bezier: [0.4, 0.0, 1.0, 1.0]
+    classes_evenement:
+      - "Disparition d'une surface (M2, M6, M7, M9)"
+      - "Disparition d'une surface persistante (P1, P2, P3)"
+      - "Sortie de mode présentation M4 (le chrome revient et la consultation approfondie M3 reprend ses droits)"
+    questions_ouvertes: []
+
+  - id: CRV-EASE-IN-OUT
+    nom: "Décélération-accélération symétrique"
+    description: >-
+      Démarrage et fin lents, accélération au milieu. Pour les
+      transitions où ni l'arrivée ni le départ ne dominent — typique
+      des bascules entre deux états également valables (bascule
+      entre Époques alternatives d'un Pin multi-époque, transition
+      M3↔M4 mode présentation).
+    cubic_bezier: [0.4, 0.0, 0.2, 1.0]
+    classes_evenement:
+      - "Bascule entre deux états également valables (chip-epoque sélectionné dans la frise chronologique d'un Pin multi-époque)"
+      - "Entrée/sortie mode présentation M4 (transition symétrique)"
+      - "Saut latéral entre surfaces top-level S1↔S2↔S3"
+    questions_ouvertes: []
+
+  - id: CRV-SPRING-DOUX
+    nom: "Spring doux (sans rebond)"
+    description: >-
+      Amortissement physique sans dépassement. Donne une qualité tactile
+      naturelle aux transitions de surfaces qui doivent paraître
+      'matérielles'. Utilisé pour l'apparition/disparition des aperçus
+      rapides M2 et des surfaces persistantes — leur arrivée a une
+      qualité 'physique' sans le côté ludique d'un overshoot.
+    spring:
+      mass: 1
+      stiffness: 170
+      damping: 26
+    note_de_durree_indicative: >-
+      Une spring n'a pas de durée fixe — la durée effective dépend des
+      paramètres. Ces valeurs convergent en ~250-300ms (proche de
+      DUR-STANDARD). À VALIDER au palier 16.
+    classes_evenement:
+      - "Apparition d'un aperçu rapide M2 (alternative à CRV-EASE-OUT — choix de la chorégraphie)"
+      - "Apparition d'une surface persistante P1 ou P2 (qualité tactile importante)"
+    questions_ouvertes:
+      - "Choix CRV-EASE-OUT vs CRV-SPRING-DOUX par chorégraphie : trancher lors de la rédaction du fichier concerné — préférence est de RÉSERVER le spring aux transitions matérielles importantes."
+
+  - id: CRV-SPRING-NET
+    nom: "Spring net (léger overshoot)"
+    description: >-
+      Amortissement physique AVEC dépassement léger (overshoot ~5-8%).
+      Réservé à un usage parcimonieux : confirmation d'une action
+      réussie (favori activé), feedback haptique visuel sur élément
+      sélectionné. L'overshoot signale 'c'est fait, c'est franc'.
+    spring:
+      mass: 1
+      stiffness: 300
+      damping: 20
+    note_de_durree_indicative: "Convergence en ~200ms (proche de DUR-COURT prolongé par l'oscillation)."
+    classes_evenement:
+      - "Activation d'un favori (comp-controle-favori passe à activé)"
+      - "Confirmation visuelle d'un calage du slider (alternative à CRV-EASE-OUT — uniquement si on veut un calage 'franc')"
+    questions_ouvertes:
+      - "Calage du slider : EASE-OUT sobre ou SPRING-NET franc ? Test_litmus Mme Martin (projection en classe — un overshoot est-il distrayant ?). Trancher lors de la rédaction du fichier concerné CHO-CALAGE-EPOQUE."
+
+# -----------------------------------------------------------------------------
+# 3. Mapping classes d'événement ↔ DUR / CRV (vue récapitulative)
+# -----------------------------------------------------------------------------
+# Synthèse des affectations par classe d'événement. Sert de référence
+# rapide pour le rédacteur des chorégraphies (fichier 03) et des
+# mappings paramétriques (fichier 04). Les exceptions documentées
+# dans une CHO ou une MAP priment sur cette table.
+mapping_classes_evenement:
+
+  transition_etat_atomique:
+    description: "Tout atome interactif change d'état (default↔pressed↔selected↔focused↔disabled)"
+    duree: DUR-COURT
+    courbe: CRV-EASE-OUT  # apparition de l'état
+    courbe_retour: CRV-EASE-IN  # retour à default
+    composants_concernes: "tous les atomes interactifs du fichier 01-atomes (palier 10)"
+
+  apparition_surface_M2_M6_M7_M9:
+    description: "Surfaces ponctuelles ou éphémères qui apparaissent en réponse à une action"
+    duree: DUR-STANDARD
+    courbe_apparition: CRV-EASE-OUT
+    courbe_disparition: CRV-EASE-IN
+    note: "M2 aperçu rapide peut alternativement utiliser CRV-SPRING-DOUX (qualité tactile) — à arbitrer fichier 03"
+
+  apparition_surface_persistante_P1_P2:
+    description: "Apparition / disparition / sommeil M4 / réveil des surfaces persistantes TACTILES (audio, parcours)"
+    duree_apparition: DUR-STANDARD
+    duree_sommeil_M4: DUR-LONG
+    duree_reveil_apres_M4: DUR-STANDARD
+    courbe_apparition: CRV-SPRING-DOUX  # qualité tactile importante
+    courbe_disparition: CRV-EASE-IN
+    note: "Détails dans CHO-APPARITION-P1, CHO-APPARITION-P2 et CHO-SOMMEIL-PERSISTANTES-EN-M4 (fichier 03)"
+
+  apparition_bandeau_systeme_P3:
+    description: "Apparition / disparition du bandeau d'information système offline — pas une surface tactile, pas de qualité matérielle à signaler"
+    duree_apparition: DUR-COURT
+    courbe_apparition: CRV-EASE-OUT
+    courbe_disparition: CRV-EASE-IN
+    note: "Distinct de P1/P2 ci-dessus. Détails dans CHO-APPARITION-P3 (fichier 03)"
+
+  transition_inter_modes_M3_M4:
+    description: "Bascule entrée/sortie mode présentation M4"
+    duree: DUR-LONG
+    courbe: CRV-EASE-IN-OUT
+    note: "Symétrique car aucune des deux directions ne 'domine' fonctionnellement"
+
+  ouverture_M3_depuis_M2:
+    description: "Consultation approfondie ouverte depuis un aperçu rapide"
+    duree: DUR-LONG
+    courbe: CRV-EASE-OUT  # le M3 arrive et se pose
+    note: "La fermeture du M2 est concurrente — séquence détaillée dans CHO-OUVERTURE-M3"
+
+  dialogue_M8:
+    description: "Apparition / disparition d'un dialogue de confirmation"
+    duree: DUR-LONG
+    courbe_apparition: CRV-EASE-OUT
+    courbe_disparition: CRV-EASE-IN
+    note: "Backdrop apparaît concurrent au dialogue. Détail dans CHO-OUVERTURE-M8 / CHO-FERMETURE-M8"
+
+  saut_lateral_S1_S2_S3:
+    description: "Bascule entre surfaces top-level via comp-selecteur-section-principale"
+    duree: DUR-STANDARD
+    courbe: CRV-EASE-IN-OUT  # symétrique, aucune section ne 'gagne' sur l'autre
+    note: "Préservation de la pile interne de chaque section (P5.N2)"
+
+  retour_gracieux_N1:
+    description: "Retour gracieux par bouton-back ou geste système"
+    duree: DUR-STANDARD
+    courbe: CRV-EASE-IN  # la surface courante part
+    note: "La surface parente revient avec CRV-EASE-OUT en parallèle"
+
+  calage_slider_epoque:
+    description: "Snap du slider à la fin du drag"
+    duree: DUR-STANDARD
+    courbe: CRV-EASE-OUT  # par défaut sobre
+    courbe_alternative: CRV-SPRING-NET  # si on veut un calage 'franc'
+    note: "Question ouverte — fichier 03 CHO-CALAGE-EPOQUE tranche"
+
+  interpolation_paramétrique_pendant_geste:
+    description: "Drag continu du slider d'Époque, du comparateur avant/après, pan/pinch Carte"
+    duree: DUR-CONTINU
+    courbe: CRV-LINEAIRE  # pas d'easing temporel — la 'courbe' est dictée par le geste
+    note: "Le mapping position→sortie est défini fichier 04 (MAP-SLIDER-VERS-AXES-CARTE notamment, avec courbes d'interpolation entre ANCRES qui ne sont PAS du même ordre que les CRV temporelles ici)"
+
+  micro_feedback_validation:
+    description: "Toggle d'un switch confirmation, sélection d'un chip"
+    duree: DUR-INSTANT
+    courbe: CRV-EASE-OUT
+    note: "Quasi-instantané — la causalité tap→effet doit paraître immédiate"
+
+  celebration_fin_parcours:
+    description: "Animation d'aboutissement de Parcours"
+    duree: DUR-AMPLE
+    courbe: CRV-EASE-IN-OUT
+    note: "Usage cérémoniel — désactivé en prefers-reduced-motion"
+
+# -----------------------------------------------------------------------------
+# 4. Politique prefers-reduced-motion
+# -----------------------------------------------------------------------------
+# Le système d'exploitation expose un paramètre 'reduce motion' qu'un
+# utilisateur peut activer (a11y, sensibilité au mouvement, ou simple
+# préférence). L'app DOIT respecter ce paramètre. Trois niveaux de
+# traitement selon la nature de l'animation.
+prefers_reduced_motion:
+
+  principe: >-
+    On préserve la STRUCTURE FONCTIONNELLE des transitions (l'utilisateur
+    doit toujours percevoir la causalité de son geste) tout en supprimant
+    les EFFETS DÉCORATIFS et en raccourcissant les durées non essentielles.
+
+  traitement_A_preserver_inchange:
+    description: "Animations où la suppression nuirait à la compréhension"
+    cas:
+      - "Transition d'état atomique (default→pressed) — feedback de causalité, indispensable"
+      - "Apparition/disparition des messages éphémères M9 (DUR-COURT préservé)"
+      - "Apparition/disparition des dialogues M8 (DUR-LONG préservé — un dialogue qui apparaît instantanément serait perturbant)"
+      - "Indication de chargement (CRV-LINEAIRE conserve son rythme)"
+      - "Apparition d'une alerte de proximité M7 (l'utilisateur doit voir qu'elle arrive)"
+    courbes_substituees: "Aucune — les courbes restent identiques"
+
+  traitement_B_raccourcir:
+    description: "Animations où la durée pleine est confortable mais pas essentielle"
+    regle: "DUR-AMPLE → DUR-STANDARD ; DUR-LONG → DUR-STANDARD ; DUR-STANDARD → DUR-COURT"
+    note_revision_post_review: >-
+      Règle révisée 2026-05-07 — précédemment 'DUR-LONG → DUR-COURT'
+      jugé trop agressif (l'utilisateur perdait le sens de la transition).
+      Nouvelle règle plus prudente : un cran en dessous suffit. À VALIDER
+      au palier 16 sur retour utilisateurs sensibles.
+    cas:
+      - "Entrée/sortie mode présentation M4 (DUR-LONG → DUR-STANDARD)"
+      - "Lancement de Parcours apparition P2 (DUR-LONG → DUR-STANDARD)"
+      - "Ouverture M3 depuis M2 (DUR-LONG → DUR-STANDARD)"
+      - "Saut latéral S1/S2/S3 (DUR-STANDARD → DUR-COURT)"
+    courbes_substituees: "Springs (CRV-SPRING-*) → CRV-EASE-OUT (suppression de l'overshoot et de l'oscillation)"
+
+  traitement_C_desactiver_ou_simplifier:
+    description: "Animations purement décoratives ou mouvements amples"
+    regle: "Désactivation ou substitution par cross-fade simple (opacité 0→1 sans transformation spatiale)"
+    cas:
+      - "Célébration de fin de Parcours (DUR-AMPLE) → cross-fade DUR-COURT"
+      - "Pulsations qualifiées (si retenues fichier 04 MAP-CONTEXTE-PARCOURS-VERS-PIN étape courante) → désactivées"
+      - "Slide-in spatial des aperçus rapides M2 → cross-fade pur"
+      - "Recadrage automatique de la Carte vers un Pin → instantané (pas de pan animé)"
+
+  cas_particulier_slider_epoque:
+    description: "L'interpolation paramétrique pendant le drag est ESSENTIELLE — c'est le voyage temporel"
+    politique: >-
+      L'interpolation des 5 axes du fond carte pendant le drag (DUR-CONTINU,
+      cf. fichier 04 MAP-SLIDER-VERS-AXES-CARTE) est CONSERVÉE en
+      prefers-reduced-motion — sans elle, le slider devient un simple
+      sélecteur discret et l'app perd sa promesse d'essence. Seule
+      simplification : suppression d'un éventuel rebond du calage
+      (CRV-SPRING-NET → CRV-EASE-OUT).
+    note: "Position contraire à la pratique habituelle qui désactive les transformations spatiales — justifiée par la centralité de cette interpolation dans le produit."
+
+  test_de_validation_palier_16:
+    description: "Le palier 16 valide les substitutions ci-dessus contre des proxy-personas"
+    proxies:
+      - "Mme Martin en classe (peut activer reduce-motion pour limiter les distractions des élèves) — vérifier que l'expérience reste compréhensible"
+      - "Utilisateur sensible au mouvement (vestibulaire) — vérifier qu'aucune animation ne provoque d'inconfort"
+
+# -----------------------------------------------------------------------------
+# 5. Note d'implémentation-agnosticisme
+# -----------------------------------------------------------------------------
+# Les valeurs ci-dessus sont CHIFFRÉES mais NEUTRES quant à l'implémentation.
+# Aucun nom de widget Flutter, aucune API plateforme. À l'implémentation,
+# l'équipe mappe :
+#   - cubic-bezier(...) → Curves.cubic(...) en Flutter / cubic-bezier() en CSS / .easeOut, .easeIn, .easeInOut, .linear partagent les valeurs canoniques avec les bibliothèques modernes
+#   - spring(mass, stiffness, damping) → SpringDescription en Flutter / .spring(...) en SwiftUI / Animations API en Compose
+#   - prefers-reduced-motion → MediaQuery.disableAnimations en Flutter / @media (prefers-reduced-motion) en CSS / UIAccessibility.isReduceMotionEnabled en iOS / Settings.Global.TRANSITION_ANIMATION_SCALE en Android
+#
+# Le palier 11 ne nomme aucune de ces APIs — il ne se trompera pas si Flutter
+# change ses noms ou si l'app bascule vers une autre techno.
+note_implementation: >-
+  Ce fichier est strictement implémentation-agnostique. Les valeurs
+  chiffrées (cubic-bezier, spring) sont cross-plateforme. À
+  l'implémentation, mapper sur les APIs natives de chaque framework.
+
+# -----------------------------------------------------------------------------
+# 6. Persona check
+# -----------------------------------------------------------------------------
+persona_check:
+
+  kenji:
+    impact: moyen
+    note: >-
+      DUR-INSTANT et DUR-COURT au service de la causalité tap→effet
+      (sans tutoriel, l'utilisateur comprend ce qui se passe parce que
+      ça réagit immédiatement). CRV-EASE-OUT sur l'apparition d'un M2
+      laisse le temps de saisir. Aucun obstacle linguistique.
+
+  mme_dupont:
+    impact: faible
+    note: >-
+      Aucun impact spécifique — les durées et courbes ici servent les
+      flows de création et de sortie scolaire sans contrainte particulière.
+
+  mme_martin:
+    impact: ÉLEVÉ
+    note: >-
+      Test_litmus 'projection en classe, lecture depuis le fond' :
+      les chorégraphies doivent rester PERCEPTIBLES à distance. DUR-LONG
+      et DUR-STANDARD sont confortables. Question ouverte CRV-SPRING-NET
+      (overshoot distractif en projection ?) tracée — à arbitrer fichier
+      03 CHO-CALAGE-EPOQUE. prefers-reduced-motion peut être activé en
+      classe — politique B (raccourcir) garantit que l'app reste pleinement
+      utilisable. Test_litmus 'défilement entre 3 époques en 30 secondes'
+      → DUR-CONTINU pendant le drag + DUR-STANDARD au calage = ~750ms
+      par bascule × 3 = 2.25s + temps de drag. Compatible avec 30s.
+
+  pere_lyonnais:
+    impact: moyen
+    note: >-
+      DUR-COURT pour les feedbacks de tap (il flâne, doit pouvoir tapoter
+      sans attente). DUR-STANDARD pour l'apparition d'une alerte de
+      proximité M7 — assez vif pour qu'il la voie, pas assez intrusif
+      pour qu'il sursaute.
+
+  anais_back_office:
+    impact: faible
+    note: >-
+      Le back-office desktop utilise principalement DUR-COURT pour les
+      feedbacks d'atomes et DUR-STANDARD pour les apparitions de modales
+      desktop. Pas de chorégraphies inter-modes au sens du palier 5 ici.
+
+# -----------------------------------------------------------------------------
+# 7. Enjeux transversaux
+# -----------------------------------------------------------------------------
+enjeux_transversaux:
+
+  accessibilite: >-
+    DUR-INSTANT à 60ms est sous le seuil de 100ms parfois cité comme
+    'minimum perceptible' — volontaire pour les micro-feedbacks de
+    causalité. Le palier 16 valide ce choix.
+    prefers-reduced-motion respecté par les 3 traitements A/B/C
+    documentés § 4.
+
+  performance: >-
+    Toutes les valeurs choisies sont compatibles avec un rendu 60fps.
+    DUR-CONTINU pour l'interpolation paramétrique du slider est le
+    point le plus exigeant — la fluidité est CRITIQUE (palier 9 § 7
+    enjeux_transversaux performance). Le palier 16 valide les seuils
+    chiffrés.
+
+  vie_privee: "Pas d'enjeu spécifique."
+
+  i18n: >-
+    Les durées sont indépendantes de la locale. Cas spécial : un texte
+    long en japonais peut nécessiter d'allonger TMP-AUTO-DISMISS-M9
+    (fichier 05) — mais c'est une question de TMP, pas de DUR.
+
+# -----------------------------------------------------------------------------
+# 8. Questions ouvertes (récapitulatif)
+# -----------------------------------------------------------------------------
+questions_ouvertes:
+  - "DUR-AMPLE — limiter formellement à ≤ 1 occurrence par chorégraphie ? À acter lors de la rédaction du fichier concerné."
+  - "M2 aperçu rapide — CRV-EASE-OUT sobre ou CRV-SPRING-DOUX tactile ? À acter CHO-OUVERTURE-M2."
+  - "Calage du slider d'Époque — CRV-EASE-OUT sobre ou CRV-SPRING-NET franc ? Test_litmus Mme Martin (projection). À acter CHO-CALAGE-EPOQUE."
+  - "DUR-INSTANT à 60ms — sous le seuil de perceptibilité usuel. À VALIDER au palier 16 (proxy-personas)."

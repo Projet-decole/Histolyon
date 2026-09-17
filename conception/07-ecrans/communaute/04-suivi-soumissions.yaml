@@ -1,0 +1,91 @@
+# =============================================================================
+# E-COMMUNAUTE-SUIVI-SOUMISSIONS — Suivi des soumissions de l'utilisateur
+# =============================================================================
+# Surface dédiée (P5.M3) accueillie dans le Profil (P5.S3). Liste des
+# contributions de l'utilisateur : Pins soumis (G4), Commentaires soumis (G2),
+# Retours de parcours soumis (G6), avec leur statut courant et le motif
+# transmis si retiré ou demande de complément. Compte requis (I2 — sans Compte
+# aucune soumission n'a pu être créée, la section est absente).
+# =============================================================================
+
+document:
+  type: palier_ecrans_fiche
+  format: yaml
+
+ecran:
+  id: E-COMMUNAUTE-SUIVI-SOUMISSIONS
+  nom: "Suivi des soumissions"
+
+  mode: P5.M3
+  surface_parente: P5.S3
+
+  raison_d_etre: >-
+    Donne à l'utilisateur la visibilité sur le sort de ses contributions —
+    Pins soumis, Commentaires en modération, Retours de parcours en attente,
+    avec leur état courant et le motif transmis par la modération si retiré
+    ou demande de complément. Permet l'action sur les soumissions actives :
+    reprise d'un brouillon, complément après demande, consultation d'une
+    soumission visible, retrait d'une soumission en cours.
+
+  composition:
+    - zone: "regroupement par type"
+      role: "trois groupes — Pins, Commentaires, Retours de parcours — chacun consolidé pour cet utilisateur"
+      entites_affichees: [Pin, Commentaire, "Retour de parcours"]
+
+    - zone: "liste des soumissions"
+      role: "pour chaque entrée : titre ou extrait identifiant, horodatage, état courant (brouillon, en_attente, en_revue, validé, publié, refusé, retiré, demande_complément), marque distinctive si en_revue, motif transmis si retiré ou demande_complément"
+      entites_affichees: [Pin, Commentaire, "Retour de parcours"]
+
+    - zone: "détail d'une soumission"
+      role: "consultation détaillée d'une entrée — métadonnées, statut, motif modération si applicable ; point de bascule vers édition (G4) ou consultation publique (B2) selon état"
+
+    - zone: "actions par soumission"
+      role: "selon l'état : reprendre un brouillon → G4 ; compléter après demande → G4 (Pin pré-rempli avec motif rappelé) ; consulter une soumission visible → B2 ; retirer une soumission en cours → dialogue M8 puis bascule en brouillon ou retiré_par_auteur"
+
+  etats:
+    nominal_charge: "Liste chargée, regroupements affichés, l'utilisateur peut filtrer par type ou par statut, taper sur une entrée pour consulter le détail"
+    chargement: "Données en cours de récupération depuis le serveur"
+    vide: "L'utilisateur n'a aucune soumission dans aucun des trois types ; état vide gracieux invitant sans pression à explorer G2/G4/G6 (cf. G5 cas particulier)"
+    type_vide: "Un type donné (ex. aucun Pin soumis) est vide tandis que les autres ont du contenu ; le groupe correspondant affiche un message bref"
+    notification_atterrissage: "Atterrissage suite à une notification système (P5.E3 type modération — validation, refus, demande de complément) ; la liste est positionnée sur l'élément concerné, le détail peut s'ouvrir directement (cf. G5 cas particulier)"
+    detail_ouvert_pin_en_revue: "Détail d'un Pin en en_revue avec marque distinctive ; bascule possible vers B2 pour consultation publique (la marque distinctive y reste visible)"
+    detail_ouvert_pin_demande_complement: "Détail d'un Pin retourné en brouillon avec motif transmis ; action de complément disponible → bascule vers E-COMMUNAUTE-SOUMISSION-PIN avec Pin pré-rempli"
+    detail_ouvert_pin_retire: "Détail d'un Pin passé en retiré ; motif consultable ; pas de bascule vers B2 (le Pin n'est plus accessible publiquement)"
+    detail_ouvert_commentaire_en_attente: "Détail d'un Commentaire en état en_attente ; pas de bascule vers G1 (Commentaire pas encore visible publiquement) ; l'auteur peut éventuellement éditer ou retirer (politique cluster 04)"
+    detail_ouvert_commentaire_refuse: "Détail d'un Commentaire refusé avec motif ; pas de bascule vers G1"
+    detail_ouvert_retour_en_attente: "Détail d'un Retour de parcours en attente de modération ; pas de bascule vers la consultation publique des retours"
+    retrait_en_cours: "Action de retrait d'une soumission active ; dialogue P5.M8 affiché ; à confirmation, le Pin repasse en brouillon ou est marqué retiré_par_auteur (politique cluster 01 / question ouverte G5)"
+    offline_avec_cache: "Connexion indisponible ; les soumissions précédemment consultées restent visibles depuis le cache ; toute action de complément est mise en attente locale ; bandeau P5.P3 visible"
+    offline_sans_cache: "Aucun cache disponible ; surface dégradée invitant à se reconnecter"
+    erreur: "Échec de chargement ; message gracieux invitant à réessayer"
+    compte_absent: "Aucun Compte associé ; section absente — l'écran n'existe pas dans cet état (la navigation depuis le Profil ne propose pas l'accès)"
+    compte_en_cours_de_suppression: "Compte en cours de suppression ; politique d'anonymisation rétroactive en arbitrage (cf. G5 cas particulier) ; comportement à confirmer"
+
+  elements_interactifs:
+    - "Filtrage par type de soumission (Pin / Commentaire / Retour)"
+    - "Filtrage par statut (en cours / publié / refusé / retiré)"
+    - "Tap sur une entrée → ouverture du détail"
+    - "Tap sur un brouillon → bascule vers E-COMMUNAUTE-SOUMISSION-PIN (G4 reprise)"
+    - "Tap sur une demande de complément → bascule vers E-COMMUNAUTE-SOUMISSION-PIN avec Pin pré-rempli et motif rappelé"
+    - "Tap sur une soumission visible (en_revue / validé / publié) → bascule vers E-PIN-CONSULTATION-APPROFONDIE (B2)"
+    - "Action de retrait d'une soumission → dialogue P5.M8 puis transition d'état"
+    - "Retour à E-PROFIL-PRINCIPAL"
+
+  flows_actifs:
+    - G5   # Suivi du statut d'une soumission
+
+  surfaces_imbriquees:
+    - E-COMMUNAUTE-SOUMISSION-PIN           # bascule pour reprise brouillon ou complément
+    - E-PIN-CONSULTATION-APPROFONDIE        # bascule pour consultation d'une soumission visible
+    - E-TRANSVERSES-DIALOGUE-CONFIRMATION   # M8 pour retrait d'une soumission
+    - E-TRANSVERSES-MESSAGE-EPHEMERE        # M9 sur action effectuée
+    - E-TRANSVERSES-BANDEAU-OFFLINE         # P3 si offline
+
+  entites_affichees: [Pin, Commentaire, "Retour de parcours", Compte, Profil]
+
+  questions_ouvertes:
+    - "Inclusion des Commentaires et Retours dans cette même surface (choix retenu ici, cohérent avec esprit Profil) ou écran séparé par type ? Le brief 00-index mentionne G5 sur Pins seuls — extension proposée ici, à arbitrer"
+    - "Cycle de vie demande_complément : retour à brouillon avec motif (position retenue G5) ou statut distinct ? À confirmer"
+    - "Retrait d'une soumission après publication (Pin déjà publié) : autorisé avec dépublication, ou interdit (passe par signalement) ? Cluster 01 question ouverte"
+    - "Politique d'anonymisation rétroactive si Compte supprimé (G5 cas particulier) — soumissions conservées avec auteur 'compte supprimé' ou retirées ?"
+    - "Notifications de changement d'état (P5.E3 type modération) — granularité par soumission ou regroupée ? Articulation avec D5 paramètres notification"

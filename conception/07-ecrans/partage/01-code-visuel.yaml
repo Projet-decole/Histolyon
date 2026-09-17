@@ -1,0 +1,73 @@
+# =============================================================================
+# E-PARTAGE-CODE-VISUEL — Génération et présentation du Code visuel
+# =============================================================================
+# Surface ponctuelle (P5.M6) qui présente le Code visuel généré pour un Pin ou
+# un Parcours. Encode le Lien universel canonique de la cible (cluster 06) ;
+# permet l'enregistrement, l'impression, ou un partage via le système natif.
+# Apparence invariante, sans variante décorative par catégorie (palier 9/12).
+# =============================================================================
+
+document:
+  type: palier_ecrans_fiche
+  format: yaml
+
+ecran:
+  id: E-PARTAGE-CODE-VISUEL
+  nom: "Génération et présentation du Code visuel"
+
+  mode: P5.M6
+  surface_parente: "P5.S1 ou P5.S2"
+
+  raison_d_etre: >-
+    Donner aux utilisateurs un artefact scannable pour le partage non
+    numérique (feuille distribuée, panneau, affiche en classe). Le Code
+    visuel encode le Lien universel canonique de la cible (Pin ou
+    Parcours) — son scan se comporte exactement comme l'ouverture du
+    Lien (F5). C'est ICI que Mme Dupont prépare la feuille pour les
+    parents accompagnateurs et que l'institution prépare les supports
+    physiques.
+
+  composition:
+    - zone: "représentation du Code visuel"
+      role: "représentation du Code visuel scannable encodant le Lien universel de la cible (cluster 06 invariant — pas de variante par catégorie ; détail visuel sobre relève palier 9/12)"
+      entites_affichees: ["Code visuel", "Lien universel"]
+
+    - zone: "rappel de la cible"
+      role: "rappel discret de la cible (titre du Pin ou du Parcours) pour que l'utilisateur sache ce qu'il s'apprête à partager"
+      entites_affichees: [Pin, Parcours]
+
+    - zone: "point d'accès enregistrement"
+      role: "déclenche l'enregistrement local du Code visuel (image) en vue d'une impression ultérieure"
+
+    - zone: "point d'accès impression"
+      role: "déclenche le mécanisme d'impression natif du système (mise en œuvre exacte hors palier 7)"
+
+    - zone: "point d'accès partage natif"
+      role: "remet la main au mécanisme de partage natif système (équivalent F1/F2 appliqué au Code visuel)"
+
+  etats:
+    nominal_charge: "Code visuel généré et affiché, points d'accès enregistrement / impression / partage actifs"
+    chargement_generation: "Génération en cours (court délai si Lien universel à instancier à la volée) ; points d'accès en sommeil le temps de la génération"
+    erreur_generation: "Échec de génération du Code visuel ; message gracieux invitant à réessayer ; le partage du Lien universel seul reste éventuellement proposable en alternative"
+    offline_avec_lien_existant: "Connexion réseau indisponible mais Lien universel déjà existant pour la cible ; génération purement locale, surface pleinement fonctionnelle"
+    offline_sans_lien_existant: "Connexion réseau indisponible et Lien universel non encore instancié ; comportement dépend de la politique de génération du Lien (cf. cluster 06 question ouverte) — message gracieux si la génération exige le réseau"
+    cible_sans_localisation: "Cas particulier Pin sans localisation (I9) : la génération réussit normalement ; la localisation n'est pas requise pour le Lien universel encodé"
+    retour_de_partage_systeme: "Au retour du système après partage natif, la surface reprend son état précédent (P5.N7 préservation d'état) ; le Code reste affiché"
+
+  elements_interactifs:
+    - "Tap sur le point d'accès enregistrement → enregistrement local du Code visuel"
+    - "Tap sur le point d'accès impression → mécanisme d'impression natif système"
+    - "Tap sur le point d'accès partage natif → remise de main au système (cf. F1 étapes 2-4 appliquées au Code visuel)"
+    - "Geste de fermeture (geste neutre, validation à vide, annulation explicite) → retour à la surface parente E-PIN-CONSULTATION-APPROFONDIE ou E-PARCOURS-FICHE-DETAIL ; le Code visuel reste persisté côté app (cluster 06 — Code visuel persistant tant que sa cible existe)"
+
+  flows_actifs:
+    - F4   # Génération d'un Code visuel
+
+  surfaces_imbriquees:
+    - E-TRANSVERSES-MESSAGE-EPHEMERE  # M9 si erreur de génération ou confirmation d'enregistrement
+
+  questions_ouvertes:
+    - "Le Code visuel généré est-il accompagné d'une mention textuelle imprimable du Lien universel (lisibilité au clavier, accessibilité) ? — D11.3 enjeu accessibilité, palier 8"
+    - "Une note d'instruction ('Scannez avec votre téléphone') accompagne-t-elle le code lors du partage ou de l'impression ? — D11.3 question ouverte, palier 8"
+    - "L'écran propose-t-il une prévisualisation à l'échelle d'impression (vérifier la lisibilité avant d'imprimer) ou se contente-t-il du rendu écran ? — palier 7/10"
+    - "Comportement précis si la cible (Pin ou Parcours) passe en retiré pendant que la surface est ouverte — message éphémère informant que le code reste valide mais que la résolution sera gracieuse ? — palier 7"

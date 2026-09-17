@@ -1,0 +1,455 @@
+# =============================================================================
+# Palier 4 — Cluster 02 — Parcours
+# =============================================================================
+# Cluster centré sur le fil narratif structuré : un Parcours est une suite
+# ordonnée d'Étapes, chaque Étape référençant un Pin du cluster 01. Trois
+# provenances cohabitent (éditorial / communautaire / personnel) avec des
+# règles de visibilité, de modération et de cycle de vie distinctes.
+#
+# Ce cluster ne modélise PAS la progression utilisateur (étape en cours,
+# étapes complétées, statistiques de fin) : c'est une donnée de session/
+# d'historique qui vit dans le cluster 03 (Profil → Historique de visite).
+# Ici on décrit le contenu Parcours en tant qu'objet métier persistant.
+# =============================================================================
+
+document:
+    type: palier_donnees_cluster
+    cluster_id: C2
+    nom: "Parcours"
+    format: yaml
+
+raison_d_etre_du_cluster: >-
+    Là où le Pin (cluster 01) sert la sérendipité ponctuelle, le Parcours
+    sert le fil rouge. Mme Dupont prépare une sortie scolaire, Mme Martin
+    projette un cours en classe, Anaïs signe un parcours éditorial sur les
+    Canuts, le père lyonnais suit un parcours communautaire dominical : tous
+    ces usages reposent sur une même structure — une suite ordonnée d'Étapes
+    qui pointent chacune sur un Pin déjà existant, plus une couche de
+    contextualisation propre au parcours (titre, teaser, conclusion,
+    introductions d'étape). Le Parcours ne duplique JAMAIS la narration des
+    Pins — il les met en séquence et tisse un liant entre eux.
+
+# -----------------------------------------------------------------------------
+# Entités
+# -----------------------------------------------------------------------------
+entites:
+    # ---------------------------------------------------------------------------
+    - id: parcours
+      nom: "Parcours"
+
+      raison_d_etre: >-
+          Suite ordonnée d'Étapes (chacune liée à un Pin) accompagnée d'une
+          mise en condition narrative (teaser d'ouverture, conclusion,
+          transitions narratives entre étapes pour les éditoriaux). Porte
+          les métadonnées qui permettent à un utilisateur de décider s'il
+          veut le démarrer (durée, distance, époques traversées, densité,
+          auteur). Trois provenances cohabitent — la provenance détermine
+          la visibilité, le cycle de vie et les capacités d'édition.
+
+      attributs:
+          obligatoires:
+              - nom: identifiant
+                nature: "identifiant lisible et stable"
+                note: "lisibilité utile pour les Liens universels (cluster 06)"
+
+              - nom: titre
+                nature: "texte court"
+                contrainte: "non vide"
+
+              - nom: provenance
+                nature: "valeur parmi un ensemble"
+                valeurs: [éditorial, communautaire, personnel]
+                note: >-
+                    La provenance est posée à la création et reste stable. Pas
+                    de promotion automatique communautaire → éditorial pour
+                    l'instant (cf. questions ouvertes ; analogue à I10 pour Pin
+                    mais non acté ici).
+
+              - nom: étapes
+                nature: "liste ordonnée de références à Étape"
+                contrainte: "≥ 2 (un parcours sans au moins deux étapes n'a pas de sens narratif)"
+                note: >-
+                    Les Étapes appartiennent au Parcours (composition stricte,
+                    cf. entité Étape). L'ordre est porté par leur position dans
+                    la liste, pas par un attribut séparé.
+
+              - nom: époques
+                nature: "ensemble de références à Époque"
+                contrainte: "≥ 1 (multi-époques admis, cf. I8)"
+                note: >-
+                    Dérivable des Époques des Pins référencés par les Étapes,
+                    mais STOCKÉ explicitement parce que l'auteur peut choisir
+                    de mettre en avant un sous-ensemble (un parcours qui pioche
+                    dans 3 siècles peut narrativement ne thématiser que 2 époques).
+                    La règle de cohérence (les époques mises en avant ⊆ union
+                    des époques des Pins étapes) est laissée en question ouverte.
+
+              - nom: statut
+                nature: "valeur parmi un ensemble (cycle de vie)"
+                valeurs: "voir cycle_de_vie ci-dessous"
+
+          optionnels:
+              - nom: teaser_narratif
+                nature: "texte court"
+                note: >-
+                    Présentation conteur affichée sur la fiche parcours.
+                    Obligatoire pour éditorial et communautaire (règle métier
+                    ci-dessous, instanciée comme contrainte de transition vers
+                    publié) ; optionnel pour personnel.
+
+              - nom: conclusion_narrative
+                nature: "texte court"
+                note: >-
+                    Phrase de conclusion affichée au moment de fin/célébration
+                    (D3.9). Rédigée par Anaïs pour les éditoriaux ; par l'auteur
+                    pour les communautaires ; absente pour les personnels.
+
+              - nom: transitions_narratives
+                nature: "ensemble de fragments narratifs entre étapes consécutives"
+                note: >-
+                    Réservées aux Parcours de provenance éditoriale (cf. D3.5 :
+                    qualité non garantie pour communautaires). Chaque fragment
+                    a une étape_amont et une étape_aval (deux étapes consécutives
+                    du même Parcours). Structure interne et longueurs fixées en
+                    palier 8 contenu. Contenu narratif distinct des introductions
+                    d'Étape (cf. entité Étape) : la transition se lit ENTRE deux
+                    étapes, l'introduction se lit AU début d'une étape.
+
+              - nom: badge
+                nature: "référence à Badge (cluster 01)"
+                note: >-
+                    Un Parcours éditorial peut porter le badge officiel ; un
+                    Parcours communautaire peut porter un badge en avant-première
+                    ou partenaire si l'équipe le décerne. Catalogue contrôlé
+                    par l'équipe (cf. fiche Badge cluster 01).
+
+              - nom: image_d_ouverture
+                nature: "référence à Média (cluster 01) ou ressource visuelle dédiée"
+                note: >-
+                    Image atmosphérique de la fiche parcours (D3.3). Question
+                    ouverte : faut-il une entité Média élargie au Parcours, ou
+                    une ressource visuelle séparée — pour l'instant on autorise
+                    la référence à un Média existant.
+
+              - nom: auteur_communautaire
+                nature: "référence à Compte (cluster 03)"
+                note: >-
+                    Présent si provenance = communautaire (compte requis pour
+                    publier, cf. I2). Reste tracé en crédit même après
+                    modération. Le pseudonyme s'affiche sur la fiche.
+
+              - nom: auteur_personnel
+                nature: "référence à Profil (cluster 03)"
+                note: >-
+                    Présent si provenance = personnel. Pas un Compte —
+                    simplement le Profil local qui a créé le parcours
+                    (cf. I6 : Profil strictement local). Aucune publication
+                    possible tant qu'un Compte n'est pas associé via D6.5.
+
+              - nom: signature_éditoriale
+                nature: "texte court"
+                note: >-
+                    Présent si provenance = éditorial. Crédit collectif (équipe
+                    HistoLyon, partenaire institutionnel, etc.) — pas une
+                    identité civile (cf. I1). Affiché sur la fiche parcours.
+
+              - nom: durée_estimée
+                nature: "expression de durée"
+                note: >-
+                    Métadonnée affichée sur la fiche. Calculable automatiquement
+                    à partir des Étapes (D3.7 — auto-calcul à la création
+                    communautaire/personnelle), ou saisie pour les éditoriaux
+                    si l'auteur veut affiner. L'algorithme de calcul ne relève
+                    pas du palier 4 — voir question ouverte.
+
+              - nom: distance_estimée
+                nature: "expression de longueur"
+                note: "Mêmes règles que durée_estimée."
+
+              - nom: densité_du_contenu
+                nature: "valeur parmi un ensemble"
+                valeurs: [légère, intermédiaire, dense]
+                note: >-
+                    3 niveaux affichés sur la fiche (D3.3). Pour un parcours
+                    éditorial, posé par l'auteur ; pour un communautaire ou
+                    personnel, dérivable du nombre d'Étapes et du volume
+                    narratif des Pins référencés (algorithme palier 13 ou
+                    saisi par l'auteur — question ouverte).
+
+              - nom: retours_actifs
+                nature: "drapeau"
+                note: >-
+                    Pour les Parcours communautaires uniquement. Permet à
+                    l'auteur d'activer ou désactiver les retours sur SON
+                    parcours (D9.3). Absent / sans objet pour éditorial et
+                    personnel.
+
+          derives_non_stockes:
+              - nom: nombre_d_étapes
+                nature: "compteur"
+                note: "Dérivé de la liste étapes — affiché sur la fiche."
+              - nom: catégories_couvertes
+                nature: "ensemble de références à Catégorie"
+                note: >-
+                    Dérivé des Catégories des Pins référencés par les Étapes —
+                    affiché en filtre (D3.2) et utilisé pour le filtrage du
+                    catalogue.
+
+      relations:
+          - "compose 2..n Étapes (composition stricte — une Étape n'existe pas hors d'un Parcours parent)"
+          - "associé à ≥ 1 Époques (n-n)"
+          - "peut référencer 0..1 Badge (cluster 01)"
+          - "peut référencer 0..1 Média comme image d'ouverture (cluster 01)"
+          - "appartient à exactement 1 auteur — Compte si communautaire / Profil si personnel / signature éditoriale si éditorial (polymorphisme selon provenance)"
+          - "peut être favorisé par 0..n Profils (cluster 03)"
+          - "peut être référencé dans 0..n entrées d'Historique de visite (cluster 03)"
+          - "peut recevoir 0..n Retours de parcours (cluster 04 — uniquement si provenance = communautaire)"
+          - "peut être cible de 0..n Signalements (cluster 04 — uniquement si provenance = communautaire)"
+          - "peut être référencé par 0..n Liens universels (cluster 06)"
+          - "peut être référencé par 0..n Images partageables (cluster 06 — pour l'image de fin de parcours)"
+
+      cycle_de_vie:
+          note: >-
+              Le cycle de vie diffère par provenance. On modélise un ensemble
+              d'états couvrant les trois cas, avec des transitions
+              spécifiques. Pas d'état "en cours" ou "complété" — la
+              progression utilisateur vit dans le cluster 03 (Historique de
+              visite), pas ici.
+          etats: [brouillon, en_revue, validé, publié, retiré]
+          transitions:
+              editorial:
+                  - "brouillon → en_revue (auteur soumet pour validation interne)"
+                  - "en_revue → brouillon (validateur demande complément)"
+                  - "en_revue → validé (validateur approuve : Étapes et transitions narratives revues)"
+                  - "validé → publié (mise en ligne)"
+                  - "publié → retiré (signalement honoré ou décision éditoriale)"
+                  - "retiré → publié (réouverture après correction)"
+              communautaire:
+                  - "brouillon → publié (auteur clique 'publier'. Le parcours devient visible AVEC une marque distinctive 'communautaire' permanente, distincte de la marque 'officiel' des éditoriaux. Cf. I3 — analogue au Pin communautaire mais sans bascule en validé : un parcours communautaire reste communautaire à vie, sauf promotion explicite vers éditorial qui est une question ouverte.)"
+                  - "publié → retiré (par l'auteur lui-même OU par modération suite à signalement honoré)"
+                  - "retiré → publié (réouverture par l'auteur, ou après correction validée par modération)"
+              personnel:
+                  - "brouillon → brouillon (sauvegarde automatique pendant la création — D3.7)"
+                  - "brouillon → publié_local (l'auteur considère son parcours prêt et l'utilise — pour son usage propre uniquement, jamais visible aux autres)"
+                  - "publié_local → brouillon (l'auteur reprend l'édition)"
+                  - "publié_local → personnel_archivé (l'auteur ne souhaite plus l'utiliser sans le supprimer ; question ouverte sur l'utilité de cet état)"
+              note_sur_etat_publie_local: >-
+                  État interne au cycle personnel — n'apparaît jamais à un autre
+                  utilisateur. On l'introduit pour distinguer un parcours
+                  personnel "prêt à utiliser" d'un brouillon en cours d'édition.
+                  Si cette distinction se révèle inutile en palier 7, fusionner
+                  avec brouillon.
+          visibilite_selon_provenance:
+              editorial: >-
+                  Visibilité publique à partir de l'état publié uniquement.
+                  États brouillon / en_revue / validé restent côté équipe
+                  de production.
+              communautaire: >-
+                  Visibilité publique dès l'état publié, AVEC une marque
+                  distinctive permanente "communautaire" (différente de la
+                  marque "officiel" des éditoriaux). Pas d'état "en_revue" :
+                  la modération est a posteriori (cf. D9.4 + I3 nuancé).
+              personnel: >-
+                  Aucune visibilité publique. Strictement local au terminal
+                  (cf. I6 — analogue au Profil). Une exception : si l'auteur
+                  partage le parcours par lien universel direct (D11), le
+                  destinataire accède à une vue lecture seule sans que le
+                  parcours apparaisse jamais dans le catalogue communautaire.
+          capacites_d_edition_selon_provenance:
+              editorial: "Édition par l'équipe éditoriale via le workflow validé."
+              communautaire: >-
+                  Édition libre par l'auteur tant que le parcours est en
+                  brouillon. Après publication, modifications mineures
+                  autorisées (titre, teaser, conclusion, retraits/ajouts
+                  d'étapes) — chaque modification re-passe en file de
+                  modération si elle touche les étapes (question ouverte
+                  sur le périmètre exact).
+              personnel: >-
+                  Édition libre par l'auteur à tout moment, tant que le
+                  parcours n'a pas été partagé par lien (question ouverte :
+                  édition après partage = invalidation des liens existants ?).
+
+      invariants:
+          - "Un Parcours a toujours ≥ 2 Étapes (un singleton n'est pas un parcours)"
+          - "L'union des Époques des Pins référencés par les Étapes contient au moins une Époque commune au champ époques du Parcours (les époques affichées sont attestées par les étapes)"
+          - "Un Parcours de provenance éditoriale ne peut atteindre publié sans teaser_narratif et conclusion_narrative renseignés (engagement narratif)"
+          - "Un Parcours de provenance communautaire ne peut être publié sans Compte associé (instanciation locale de I2)"
+          - "Un Parcours de provenance personnelle ne peut JAMAIS être publié au catalogue communautaire sans une transition explicite provenance personnel → communautaire (qui requiert un Compte ; question ouverte sur sa modélisation)"
+          - "Les transitions_narratives ne sont autorisées que si provenance = éditorial (cohérent avec D3.5)"
+          - "Le badge est compatible avec la provenance (un badge 'officiel' ne peut être attaché qu'à un Parcours éditorial — règle d'attribution dans la fiche Badge cluster 01)"
+          - "Un retrait (publié → retiré) ne supprime pas les Étapes ni les références aux Pins ; il rend juste le Parcours invisible"
+          - "Un Parcours communautaire qui pointe sur des Pins ultérieurement retirés reste affichable, mais les Étapes pointant sur des Pins retirés sont signalées (question ouverte sur le rendu — palier 7)"
+
+      invariants_transversaux_referenced: [I1, I2, I3, I6, I8]
+
+      questions_ouvertes:
+          - "Promotion communautaire → éditorial pour Parcours : analogue à I10 pour Pin, ou exclu ? (recommandation : exclu actuellement, l'équipe peut s'inspirer pour produire un éditorial mais c'est alors un nouveau Parcours)"
+          - "Conversion personnel → communautaire : transition de provenance autorisée (avec compte, modération) ou faut-il créer un nouveau Parcours communautaire ? (recommandation : conversion explicite, plus simple pour Mme Dupont qui crée d'abord pour sa classe puis veut partager publiquement)"
+          - "Algorithme exact de calcul de durée et distance estimées — relève de l'implémentation (palier 13 ou backend), pas du palier 4. Le palier 4 ne fait que dire qu'elles existent."
+          - "Cohérence entre époques affichées et époques des Pins étapes : strict (sous-ensemble) ou laxiste (sélection éditoriale libre) ?"
+          - "Édition d'un Parcours communautaire après publication : touche aux étapes = re-modération obligatoire ? Ou seulement modification du teaser/conclusion sans re-modération ?"
+          - "Étapes pointant sur des Pins retirés : marquage 'lien rompu' affiché à l'utilisateur, ou Étape masquée silencieusement ? (palier 7)"
+          - "Limite max d'Étapes par Parcours (D3.7 suggère ~20 ; à fixer en palier 16)"
+          - "Quiz de fin de parcours et badges décernés à la complétion (D3.9) : entités à part entière ou attributs dérivés ? — laissé hors palier 4 par décision utilisateur 2026-05-04, à reprendre quand le besoin se précisera"
+
+    # ---------------------------------------------------------------------------
+    - id: etape
+      nom: "Étape"
+
+      raison_d_etre: >-
+          Maillon ordonné d'un Parcours. Une Étape référence un Pin (1-1 à la
+          cible) et porte une couche de contextualisation propre au Parcours :
+          sa position dans la séquence, une éventuelle introduction d'étape
+          qui prépare la lecture du Pin dans le fil narratif, et — pour les
+          parcours personnels et communautaires — une note personnelle
+          éventuelle de l'auteur. L'Étape ne duplique JAMAIS le contenu
+          narratif du Pin : c'est une charnière, pas une copie.
+
+      attributs:
+          obligatoires:
+              - nom: identifiant
+                nature: "identifiant lisible et stable (au moins unique au sein du Parcours)"
+
+              - nom: position
+                nature: "compteur"
+                contrainte: "entier ≥ 1, contigus et uniques au sein du Parcours parent"
+                note: >-
+                    La position est l'ordre dans la séquence (1, 2, 3...).
+                    La numérotation affichée à l'utilisateur (D3.4 — pins
+                    numérotés sur la carte) en dérive directement.
+
+              - nom: pin
+                nature: "référence à Pin (cluster 01)"
+                contrainte: "exactement 1"
+                note: >-
+                    Le contenu principal de l'Étape est celui du Pin. L'Étape
+                    ne réplique ni le titre, ni le récit, ni les médias —
+                    elle pointe.
+
+          optionnels:
+              - nom: introduction_d_étape
+                nature: "texte court"
+                note: >-
+                    Phrase qui contextualise l'Étape DANS le parcours (« Avant
+                    d'entrer dans la traboule, regarde le linteau qui... »).
+                    Distincte des transitions_narratives du Parcours (qui se
+                    lisent ENTRE deux étapes) : l'introduction se lit AU début
+                    d'une étape, après que l'utilisateur soit arrivé. Réservée
+                    aux Parcours éditoriaux et communautaires (un parcours
+                    personnel n'en a typiquement pas besoin, mais c'est
+                    autorisé).
+
+              - nom: note_personnelle
+                nature: "texte court"
+                note: >-
+                    Annotation libre de l'auteur (D3.7 : « Pause goûter ici »).
+                    Réservée aux Parcours personnels et communautaires.
+                    Visibilité dans le parcours partagé : question ouverte
+                    (cf. D3.7 questions ouvertes — recommandation provisoire :
+                    visible au destinataire d'un partage par lien direct,
+                    invisible au catalogue communautaire — à arbitrer).
+
+      relations:
+          - "appartient à exactement 1 Parcours (composition stricte — l'Étape n'a pas de vie hors de son Parcours)"
+          - "référence exactement 1 Pin (cluster 01)"
+          - "peut être référencée par 0..n entrées d'Historique de visite (cluster 03 — la complétion d'une étape est tracée côté utilisateur, pas côté Étape)"
+
+      cycle_de_vie:
+          note: >-
+              L'Étape n'a pas de cycle de vie autonome — elle suit celui
+              de son Parcours parent. On ne distingue pas non plus
+              "étape complétée" / "étape sautée" ici : ces états
+              appartiennent à la session de l'utilisateur (Historique de
+              visite, cluster 03), pas à l'objet métier Étape.
+          mutabilité_de_la_position: >-
+              L'ordre des Étapes (donc leur position) est mutable tant
+              que le Parcours parent est en brouillon (provenance
+              éditoriale ou communautaire) ou en édition (personnel).
+              Une fois le Parcours en publié (éditorial/communautaire) ou
+              publié_local (personnel), un changement de position est
+              considéré comme une modification du Parcours et suit ses
+              règles (re-modération communautaire, re-validation éditoriale).
+
+      invariants:
+          - "Une Étape ne peut pas exister hors d'un Parcours (suppression du Parcours → suppression des Étapes)"
+          - "Les positions au sein d'un Parcours sont contigus et uniques (pas de trou : si on retire l'Étape de position 3, les positions 4..n se décalent en 3..n-1)"
+          - "Une Étape pointe sur un Pin existant ; si le Pin référencé passe à retiré, l'Étape signale un lien rompu (cf. invariant Parcours sur Pins retirés)"
+          - "Le même Pin peut apparaître plusieurs fois dans la liste des Étapes d'un même Parcours (cas légitime : revenir sur un lieu en fin de parcours pour une mise en perspective ; pas un bug). Chaque occurrence est une Étape distincte avec sa propre position."
+
+      invariants_transversaux_referenced: [I8, I9]
+
+      questions_ouvertes:
+          - "Une Étape peut-elle être 'optionnelle' (cf. D3.10 — saut d'étape libre côté utilisateur, mais l'auteur peut-il marquer une étape comme bonus dès la conception) ? Recommandation : non actuellement, le saut reste un choix utilisateur, pas une propriété de l'Étape."
+          - "Un Pin référencé par une Étape n'a pas forcément de localisation (cf. I9 : Pin sans coordonnées légitime pour patrimoine vivant immatériel). Faut-il interdire l'absence de coordonnées pour les Pins référencés en Étape (un parcours suppose un déplacement) ? Recommandation : autoriser, mais signaler à l'auteur en création (D3.7) ; un Parcours mixte 'lieu physique + patrimoine vivant immatériel' a un sens narratif."
+          - "Réutilisation d'une introduction_d_étape entre Parcours différents : non — l'introduction est propre à l'Étape, donc à un Parcours unique. Si la même intro narrative se justifie dans deux parcours, c'est qu'elle a sa place dans le Pin lui-même (cluster 01) ou dans une transition. À surveiller en palier 8."
+
+# -----------------------------------------------------------------------------
+# Persona check
+# -----------------------------------------------------------------------------
+# Le cluster Parcours touche surtout les personas pédagogiques et l'éditrice.
+persona_check:
+    kenji:
+        impact: "indirect"
+        note: >-
+            Kenji suit principalement des parcours éditoriaux. La structure
+            Étape → Pin (1-1) garantit qu'il accède au contenu intégral du
+            Pin (audio compris) sans perte. Les transitions_narratives
+            réservées aux éditoriaux préparent la qualité narrative qui
+            sert son test_litmus n°2 (audio + marche). OK.
+
+    mme_dupont:
+        impact: "MAJEUR"
+        note: >-
+            C'est SON cluster. La provenance personnel (visible par elle
+            seule) lui permet de créer un parcours pour sa sortie sans le
+            publier ; la conversion personnel → communautaire (si retenue
+            en question ouverte) couvre le cas où elle voudrait partager
+            ensuite publiquement. La note_personnelle par Étape couvre
+            explicitement son besoin (« Pause goûter ici »). La contrainte
+            ≥ 2 Étapes est cohérente avec un parcours scolaire (jamais
+            mono-étape). Reste critique : que la création (D3.7) reste
+            simple — palier 13 admin. Atteint test_litmus n°1 (parcours
+            en moins de 30 min) côté modélisation.
+
+    mme_martin:
+        impact: "direct"
+        note: >-
+            Mme Martin projette en classe (mode canapé). La modélisation
+            Multi-Époques (I8) et la liste ordonnée d'Étapes garantissent
+            que les transitions d'époque (D3.6 : 'wow' du mode canapé)
+            ont un substrat de données fiable — chaque Étape référence un
+            Pin qui a ses propres époques. Les transitions_narratives
+            éditoriales lui donnent du grain pour commenter en cours.
+            Pas d'identité civile collectée (I1) : la signature_éditoriale
+            reste collective (« Équipe HistoLyon, en partenariat avec les
+            Archives départementales »), conforme à ce que ses élèves
+            verraient projetés. OK.
+
+    pere_lyonnais:
+        impact: "indirect"
+        note: >-
+            Le père lyonnais est plutôt sur la balade libre que sur les
+            parcours formels. Il peut suivre un parcours communautaire
+            dominical : la provenance communautaire et les retours_actifs
+            lui donnent un signal éditorial sur la qualité (sans en faire
+            une mécanique de classement, cf. D9.3). OK.
+
+    anais_back_office:
+        impact: "MAJEUR"
+        note: >-
+            C'est elle qui produit les Parcours éditoriaux. Points clés :
+              - teaser_narratif et conclusion_narrative obligatoires pour
+                atteindre publié — cohérent avec son rapport au métier
+                (rigueur narrative).
+              - transitions_narratives réservées aux éditoriaux : Anaïs a
+                la matière pour signer ce que les communautaires n'ont pas.
+              - Étape référence un Pin existant : pas de duplication de
+                narration, ce qui évite la frustration de réécrire le même
+                contenu sous deux formes.
+              - signature_éditoriale collective (pas d'identité civile, I1)
+                conforme à I1 et au § acteurs_hors_personas (institution
+                créditée sans personnalisation).
+            Reste ouvert : le workflow exact de création/validation d'un
+            Parcours éditorial (palier 13 admin), notamment l'articulation
+            entre le brouillon initial, la revue par un valideur, et la
+            mise en ligne.

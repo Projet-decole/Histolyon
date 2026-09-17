@@ -1,0 +1,450 @@
+# =============================================================================
+# Palier 8 — 02-template-pin — Structure narrative du contenu d'un Pin
+# =============================================================================
+# Affine la STRUCTURE INTERNE de l'attribut `contenu_narratif` du Pin
+# (cluster 04 cluster 01) que le palier 4 a posé comme « texte structuré
+# (teaser + narration + post-narratif) » — sans dire ce que CHAQUE segment
+# contient. Ce fichier le dit : rôle narratif, voix, longueur qualifiée,
+# pattern de rédaction, anti-patterns, exemples canoniques.
+#
+# Ce fichier ne dit PAS quel format de fichier porte ces segments
+# (tableur, JSON, CMS) — relève du palier 13. Il ne livre PAS de matière
+# historique réelle — relève d'Anaïs et de la lead historienne.
+#
+# Cohérence stricte avec le pilote 01-strategie-narrative (ton conteur,
+# voix du récit / voix de l'app, longueurs qualifiées, principes P1-P7,
+# patterns PT1-PT7, anti-patterns).
+# =============================================================================
+
+document:
+  type: palier_contenu_template
+  cible: pin
+  version: "0.1"
+  date: "2026-05-05"
+  format: yaml
+
+# -----------------------------------------------------------------------------
+# 1. Périmètre
+# -----------------------------------------------------------------------------
+perimetre:
+
+  inclus:
+    - "Structure interne du contenu_narratif d'un Pin (teaser + narration + post-narratif)"
+    - "Rôle narratif, voix, longueur qualifiée et patterns de chaque segment"
+    - "Tissage des Sources et Médias dans la narration"
+    - "Sous-types de la zone post-narrative (pins liés, quiz, énigme, citation, le saviez-vous)"
+    - "Cas particuliers (provenance communautaire en revue, sans localisation, multi-époques)"
+
+  exclus:
+    - "Structure du Template Parcours et de ses Étapes — voir 03-template-parcours"
+    - "Microcopy UI grand public (boutons, dialogues, messages éphémères) — voir 04-microcopy-grand-public"
+    - "Microcopy admin et notes éditoriales du Template (cadre Anaïs) — voir 05-microcopy-admin"
+    - "Stratégie i18n et déclinaisons par locale — voir 06-i18n"
+    - "Format de fichier des Pins (tableur, CMS, JSON) — palier 13"
+    - "Mesures chiffrées (caractères, mots, secondes) — palier 12"
+    - "Composants UI (BottomSheet, lecteur audio, etc.) — paliers 7, 9, 10"
+    - "Matière historique réelle des Pins — production éditoriale (Anaïs + lead historienne)"
+
+  test_de_purete: >-
+    Si demain on bascule de Flutter à du natif, ou on remplace le format
+    de stockage du Pin (tableur Anaïs → CMS web), la structure narrative
+    posée ici reste-t-elle valide ? Si oui, c'est bon.
+
+# -----------------------------------------------------------------------------
+# 2. Structure générale
+# -----------------------------------------------------------------------------
+# Trois segments narratifs en cascade + un appareil de Sources qui
+# soutient l'ensemble. Chaque segment a une fonction distincte ; la
+# qualité d'un Pin tient autant à la NETTETÉ des frontières qu'à la
+# qualité de chaque segment isolé.
+structure_generale:
+
+  vue_d_ensemble: >-
+    Un Pin se lit en trois temps : une PORTE D'ENTRÉE (teaser) qui se
+    lit en quelques secondes et donne envie d'entrer, un RÉCIT
+    (narration) qui se déploie pleinement et incarne la promesse
+    d'historicité, une ZONE D'APRÈS (post-narratif) qui prolonge
+    l'engagement sans imposer la suite. Sous l'ensemble, l'appareil
+    des Sources rend la rigueur lisible.
+
+  segments:
+    - id: teaser
+      role_court: "porte d'entrée — accroche en quelques secondes"
+      surfaces: "aperçu rapide Carte (E-CARTE-APERCU-PIN), notification de proximité, mode Surprenez-moi"
+
+    - id: narration
+      role_court: "récit principal — ce qui se passe ICI vraiment"
+      surfaces: "consultation approfondie (E-PIN-CONSULTATION-APPROFONDIE), mode présentation, narration audio"
+
+    - id: post_narratif
+      role_court: "zone d'après — prolongements, jeu, liens"
+      surfaces: "fin de la consultation approfondie, juste après la narration"
+
+    - id: sources
+      role_court: "appareil documentaire — crédibilité lisible"
+      surfaces: "pied de page de la consultation approfondie + incrustations inline ponctuelles dans la narration"
+
+  pourquoi_cette_structure: >-
+    Trois rythmes qui répondent au triptyque d'essence : teaser pour
+    la SÉRENDIPITÉ (attraper en une respiration sans poids posé),
+    narration pour l'HISTORICITÉ et le ton CONTEUR (le frisson se
+    déploie, les Sources s'incrustent), post-narratif pour
+    l'ÉMERVEILLEMENT prolongé (la curiosité ouverte trouve une porte
+    sans qu'on impose la suite). L'appareil de Sources soutient la
+    confiance sans rompre la fluidité (P6).
+
+# -----------------------------------------------------------------------------
+# 3. Le teaser
+# -----------------------------------------------------------------------------
+teaser:
+
+  role: >-
+    Première impression, lecture rapide. Faire sentir qu'il y a
+    QUELQUE CHOSE ici — un fait, une étrangeté, une bascule — et
+    donner envie d'entrer sans tout dire. Promesse d'un récit, pas
+    son résumé.
+
+  voix: "voix du récit (tu narratif) — cf. pilote § conteur.voix"
+
+  longueur_qualifiee:
+    nominale: "phrase"
+    rare: "paragraphe court (admis quand un lieu disparu ou un usage éteint demande une mise en condition rapide ; au-delà, c'est la narration qui commence)"
+
+  pattern_principal: >-
+    Amorce d'un fait + un pourquoi qui donne envie. « Voilà ce qui
+    se cache ici » + « voilà pourquoi ça vaut la peine de regarder ».
+    Le pourquoi n'est pas une morale — c'est ce qui rend le fait
+    vivant.
+
+  patterns_satellites:
+    - "Question rhétorique sobre (« Tu vois ce mur ? »)"
+    - "Détail saillant nommé (« le médaillon est encore là »)"
+    - "Chiffre ou date tissés dans la phrase (P1) — jamais posés en début"
+
+  anti_patterns_specifiques:
+    - "Résumé technique (« Pin sur la traboule des Voraces, époque XIXe ») → fiche, pas teaser"
+    - "Énumération de faits (« Construite en 1840, restaurée en 1995 ») → rompt P1"
+    - "Adjectifs valorisants à vide (« incroyable », « magique ») → anti-pattern promotionnel touristique"
+    - "Tout-dévoiler dans le teaser → la narration n'a plus rien à raconter"
+
+  exemples_canoniques:
+    - contexte: "Pin médaillon mural sculpté (exemple — palier 8)"
+      texte: "Tu marches le long de cette rue depuis vingt ans, et tu n'as jamais remarqué le médaillon. Pourtant il est là, au-dessus de la porte."
+      note: "Une phrase un peu longue, mais une seule respiration. Le pourquoi est implicite : si tu ne l'as jamais vu, c'est qu'il a quelque chose à te dire."
+
+    - contexte: "Pin traboule (exemple — palier 8)"
+      texte: "Cette traboule traversait toute la maison. Les canuts l'utilisaient pour sortir leurs pièces de soie sans les abîmer dans la pluie."
+      note: "Repris du pilote § exemples_canoniques. Une phrase, un fait, un pourquoi. Le lecteur peut s'arrêter là ou approfondir."
+
+    - contexte: "Pin patrimoine vivant immatériel — pas de localisation (exemple — palier 8)"
+      texte: "Il y a une chanson qu'on apprend encore à la Croix-Rousse, et personne ne sait vraiment d'où elle vient."
+      note: "Pas de lieu fixe (cf. cluster 04 I9) — le teaser fait exister le Pin par sa matière, pas par son point sur la carte."
+
+# -----------------------------------------------------------------------------
+# 4. La narration
+# -----------------------------------------------------------------------------
+narration:
+
+  role: >-
+    Le récit principal, ce qui se passe ICI vraiment. La narration
+    porte la promesse d'historicité — Sources s'incrustent, Médias
+    prennent place, ton conteur tenu dans la durée. Une seule voix
+    d'un bout à l'autre, même si plusieurs paragraphes la structurent
+    (cf. pilote § longueurs_qualifiees.récit).
+
+  voix: "voix du récit (tu narratif) — tenue tout le long, sans bascule vers la voix de l'app"
+
+  longueur_qualifiee:
+    nominale: "récit (plusieurs paragraphes)"
+    note: "pas de plafond éditorial, mais un Pin long doit RESPIRER — pas de pavés sans transition"
+
+  structure_interne:
+
+    ouverture:
+      role: "mise en condition — installer le lieu, le moment, la situation"
+      pattern: "ancrage sensoriel ou spatial (« en levant les yeux », « en passant la porte », « il y a deux cents ans, exactement ici »)"
+      note: "peut reprendre le teaser textuellement ou le prolonger ; la cohérence de voix prime sur la non-redite"
+
+    coeur_narratif:
+      role: "le récit lui-même — ce qui s'est passé, ce qu'on en sait, ce qu'on en comprend"
+      pattern: "succession de respirations qui font progresser le récit ; alterner faits, citations sourcées, médias, mises en perspective sans céder à l'énumération"
+
+    transitions:
+      role: "passage d'une respiration à l'autre sans rompre la voix"
+      pattern: "connecteurs sobres (« et puis », « ce qui change tout », « ce qu'on ne voit plus aujourd'hui ») ; pas de marqueurs scolaires"
+
+    cloture:
+      role: "fin du récit — pas une morale, pas une conclusion académique"
+      pattern: "phrase qui referme sans verrouiller ; ouvre éventuellement vers le post-narratif sans le pré-écrire"
+      anti: "« Voilà l'histoire fascinante » → émotion forcée ; « En conclusion » → posture académique"
+
+  tissage_des_sources:
+
+    principe: >-
+      Les Sources rendent le récit crédible (P6). Elles s'incrustent
+      là où elles servent l'argument, pas systématiquement. Le tissage
+      suit le rythme du récit — pas l'inverse.
+
+    patterns_d_incrustation:
+      - id: citation_inline
+        usage: "parole d'archive ou témoignage qui porte mieux qu'une reformulation"
+        forme: "guillemets dans le fil + crédit court à proximité"
+        exemple: "(exemple — palier 8) « Les pièces partaient à l'aube, par la traboule, pour ne pas être abîmées par la pluie. » C'est un canut qui le racontait, en 1840, dans un mémoire conservé aux archives municipales."
+
+      - id: archive_situee
+        usage: "Média (image, archive colorisée) qui appuie un passage précis"
+        forme: "le récit appelle l'archive (« cette photo, prise en 1890, montre... »), l'archive se loge dans le fil"
+
+      - id: comparaison_temporelle
+        usage: "contraste avant/après (état d'aujourd'hui vs antérieur)"
+        forme: "le récit nomme l'écart (« là où il y a un parking, il y avait... ») ; le Média vient en appui"
+
+      - id: source_referee_a_distance
+        usage: "fait factuel qui ne mérite pas de citation inline"
+        forme: "le fait est posé dans le récit ; le pied de page Sources porte la référence"
+
+    anti_patterns:
+      - "Source en tampon administratif (« Selon AML 3SAT127, le médaillon date de 1672. ») → casse la voix"
+      - "Sources reléguées invisibles → rompt P6"
+      - "Citation longue plaquée sans tissage → la voix du conteur disparaît"
+
+  tissage_des_medias:
+
+    principe: >-
+      Un Média s'inscrit comme une respiration — jamais comme un
+      ornement, jamais comme un quota. Le récit doit pouvoir le NOMMER
+      ou le PRÉPARER pour qu'il ne tombe pas du ciel.
+
+    patterns_d_inscription:
+      - id: media_appele_par_le_recit
+        usage: "image, archive, schéma appelés explicitement"
+        forme: "« cette photo, prise depuis le quai en 1890, montre... » suivi du Média"
+
+      - id: media_d_ambiance
+        usage: "fragment musical, ambiance sonore — coloration sans appel explicite"
+        forme: "joue en fond pendant la lecture audio, sans mention textuelle obligatoire"
+        note: "réservé à la consultation audio ; ne contamine pas la lecture silencieuse"
+
+      - id: media_interactif_tisse
+        usage: "avant/après, frise mini, citation à dévoiler qui complète une respiration"
+        forme: "le récit mène à l'interaction (« regarde ce qu'il y avait avant »), l'interactif prend le relais, le récit reprend"
+
+    anti_patterns:
+      - "Galerie d'images sans lien avec le récit → ornement vide"
+      - "Audio d'ambiance déclenché sur la lecture textuelle silencieuse → contamination"
+      - "Interactif posé comme récompense (« débloque l'image ! ») → anti-pattern Duolingo"
+
+  anti_patterns_specifiques:
+    - "Chronologie sèche (« 1492 : ... | 1503 : ... ») → fiche, rompt P1"
+    - "Énumération encyclopédique (« construite en 1840, restaurée en 1995... ») → anti-pattern Wikipedia"
+    - "Mystique ARTE solennel (« Et c'est ainsi que dans le silence des siècles... ») → anti-pattern voix-off"
+    - "Surexplication des termes connus du contexte → rompt P3 (faire confiance au lecteur)"
+    - "Conclusion morale (« Cela nous rappelle que... ») → posture pédant"
+
+  exemples_canoniques:
+
+    - contexte: "Narration courte d'un médaillon mural (exemple — palier 8)"
+      texte: |
+        En levant les yeux à hauteur du second étage, tu le vois : un
+        visage de pierre, à demi effacé par les pluies. C'est un
+        médaillon de saint, posé là par un compagnon tailleur de
+        pierre qui voulait laisser une trace de son passage. La
+        maison qu'il a aidé à construire est encore debout — lui,
+        on ne sait plus son nom.
+
+        Ces médaillons, on en compte une quarantaine dans le quartier.
+        Chacun est la signature d'un atelier. À l'époque, le
+        compagnonnage protégeait ses signes ; aujourd'hui, ce sont
+        presque les seuls témoins de ces artisans qui n'ont pas été
+        écrits dans les livres.
+      note: "Deux respirations. Ouverture sensorielle, fait porté, mise en perspective qui ouvre. Le ton conteur tient sur les deux paragraphes."
+
+    - contexte: "Narration d'une traboule (exemple — palier 8)"
+      texte: |
+        Tu pousses la porte cochère et tu te retrouves dans une cour.
+        Une autre porte, au fond, mène à l'immeuble suivant. Et une
+        autre encore. Cette traboule traversait quatre immeubles d'un
+        seul tenant — les canuts y faisaient passer leurs pièces de
+        soie sans les abîmer dans la pluie.
+
+        Au XIXe siècle, quand les ouvriers de la Croix-Rousse se sont
+        soulevés, ce sont ces passages qui leur ont permis de circuler
+        sans être vus de la rue. La police montait à cheval ; eux
+        passaient par les cours.
+      note: "Tisse usage technique (soie) et usage politique (insurrections) sans souligner. Le lecteur fait le lien."
+
+# -----------------------------------------------------------------------------
+# 5. Le post-narratif
+# -----------------------------------------------------------------------------
+post_narratif:
+
+  role: >-
+    Zone d'engagement APRÈS le récit. Prolonge la curiosité ouverte
+    sans imposer la suite. Frontière nette avec le récit principal.
+    Si un Parcours actif pilote la consultation, remplacée par
+    l'accès à l'étape suivante (D2.7 — palier 7).
+
+  voix:
+    pour_les_invitations: "voix de l'app (vous) — c'est l'app qui propose, pas le conteur"
+    pour_le_contenu_lui_meme: "voix du récit (tu) — citation, énoncé d'énigme, saviez-vous restent conteur"
+    note: "tout ce qui INVITE à agir → voix de l'app ; tout ce qui RACONTE → voix du récit. Le doute se tranche en faveur du vouvoiement (cf. pilote § conteur.voix.regle_de_bascule)."
+
+  longueur_qualifiee:
+    note: "varie selon sous-type — voir patterns"
+
+  patterns_par_sous_type:
+
+    - id: pins_lies
+      role: "renvois éditoriaux vers d'autres Pins thématiquement proches (cf. cluster 04 pin.pins_liés)"
+      voix: "invitation = voix de l'app sobre ; titres des Pins liés tels qu'ils sont rédigés (voix du récit)"
+      longueur: "haïku pour l'invitation, phrase pour chaque légende"
+      pattern: "« Pour aller plus loin » + liste de titres avec ancrage thématique court"
+      exemple_canonique: |
+        (exemple — palier 8)
+        Pour aller plus loin :
+        - Les autres traboules du quartier
+        - Les insurrections des canuts (1831, 1834)
+      anti: "« Cliquez ici pour découvrir d'autres trésors cachés ! » → promotionnel"
+
+    - id: quiz
+      role: "vérification ludique sobre, sans gamification posée comme objectif"
+      voix: "invitation = voix de l'app ; question = voix du récit"
+      longueur: "phrase pour la question, haïku pour les options"
+      pattern: "question qui revient sur un point du récit ; pas de score affiché ; juste PT1 (confirmation discrète) en cas de réussite"
+      exemple_canonique: |
+        (exemple — palier 8)
+        Une petite question pour voir.
+        À quoi servait surtout cette traboule ?
+        - À éviter la pluie sur les pièces de soie
+        - À fuir la police pendant les insurrections
+        - Les deux, à des époques différentes
+      note_litmus: "Mme Dupont — quiz attrapable par des CM1-CM2 sans humilier qui se trompe (PT7, P4)"
+      anti: "« Bravo champion ! +10 points ! » → anti-pattern Duolingo ; « Mauvaise réponse, recommencez » → rompt P4"
+
+    - id: enigme
+      role: "défi de lecture attentive ou d'observation du lieu réel"
+      voix: "invitation = voix de l'app ; énoncé = voix du récit"
+      longueur: "phrase à paragraphe selon complexité"
+      pattern: "énoncé qui pointe quelque chose à chercher (dans le récit ou dans le lieu) + révélation différée à la demande"
+      exemple_canonique: |
+        (exemple — palier 8)
+        Une énigme.
+        Sur la façade en face, il y a quatre médaillons. Trois représentent
+        des saints. Le quatrième n'en est pas un. Sauras-tu deviner ce qu'il
+        représente ?
+      note: "l'énigme RACONTE — elle ne pose pas un QCM ; la résolution est une suite du récit, pas un score"
+      anti: "« Énigme niveau 3 — résous pour débloquer un badge » → gamification forcée"
+
+    - id: citation_historique
+      role: "archive ou témoignage qui prolonge le récit autrement (registre d'époque)"
+      voix: "voix du récit pour le contexte ; contenu cité tel quel"
+      longueur: "haïku à paragraphe selon source"
+      pattern: "introduction sobre du conteur + citation entre guillemets + crédit court"
+      exemple_canonique: |
+        (exemple — palier 8)
+        Voilà comment un canut le racontait, en 1840 :
+        « On partait avant l'aube, par la traboule. La pluie ne touchait
+        pas la soie, et les pièces arrivaient sèches chez le négociant. »
+        — Mémoire d'ouvrier, Archives municipales de Lyon
+      anti: "citation sans introduction → cassure de voix ; citation tronquée pour effet → rompt P6"
+
+    - id: le_saviez_vous
+      role: "fait annexe qui prolonge le récit — anecdote, détail, écho contemporain"
+      voix: "voix du récit"
+      longueur: "phrase à court paragraphe"
+      pattern: "ouverture marquée (« Le saviez-vous ») + fait + résonance avec le récit"
+      exemple_canonique: |
+        (exemple — palier 8)
+        Le saviez-vous.
+        Le mot « traboule » vient probablement du latin « trans-ambulare »
+        — passer à travers. Dans le quartier, on dit encore « trabouler »
+        comme un verbe.
+      note: "PROLONGEMENT, pas résumé — ajouter, pas répéter"
+      anti: "« Le saviez-vous : cette traboule a été construite en 1840 » → reformulation vide"
+
+  anti_patterns_specifiques:
+    - "Gamification forcée (badges, points, niveaux affichés en valeur ludique) → anti-pattern Duolingo"
+    - "Reconnaissance peppy (« Bravo ! Tu as terminé ce Pin ! ») → infantilisant"
+    - "Empilement de prolongements (quiz + énigme + saviez-vous + 5 pins liés) → la zone devient un sas de captation"
+    - "Invitation marketing (« Découvrez 100 autres pins exclusifs ! ») → anti-pattern marketing déguisé"
+
+# -----------------------------------------------------------------------------
+# 6. Sources (présentation)
+# -----------------------------------------------------------------------------
+sources:
+
+  cohérence_avec_palier_4: >-
+    Cluster 04 cluster 01 — Source = entité à part entière (type,
+    référence, crédit, lien optionnel). Invariant I4 : ≥ 1 Source
+    pour qu'un Pin atteigne validé. Le palier 8 dit comment les
+    Sources se MONTRENT, pas leur structure.
+
+  voix: "voix de l'app (factuel) — appareil documentaire, pas récit"
+
+  patterns_d_affichage:
+
+    - id: citation_inline_dans_le_recit
+      contexte: "citation directe ou affirmation forte qui appelle son crédit à proximité"
+      forme: "crédit court immédiatement après la citation, dans le fil ; voix de l'app discrète (pas de tampon)"
+      exemple: "(exemple — palier 8) « ... ne pas être abîmées par la pluie. » — Mémoire d'ouvrier, AML"
+
+    - id: pied_de_page_recapitulatif
+      contexte: "récapitulatif de toutes les Sources à la fin de la consultation approfondie"
+      forme: "liste sobre : type + référence + crédit ; lien si disponible"
+      exemple: |
+        (exemple — palier 8)
+        Sources :
+        - Archive — Mémoire d'un ouvrier en soie, 1840, Archives municipales de Lyon (4FI 712)
+        - Article — « Les traboules de la Croix-Rousse », revue Lyon Patrimoine, 2015
+        - Photo — Cour intérieure, vers 1890, collection BM Lyon
+      note: "trois types, trois crédits, pas d'enrobage. La crédibilité parle par sa sobriété."
+
+    - id: lien_externe_consultable
+      contexte: "Source disponible en ligne (numérisée, page web)"
+      forme: "crédit prioritaire ; lien secondaire signalé comme sortant"
+      anti: "« Cliquez ici pour voir la source ! » → hors ton ; lien sans crédit → perte de l'engagement droits"
+
+# -----------------------------------------------------------------------------
+# 7. Cas particuliers
+# -----------------------------------------------------------------------------
+cas_particuliers:
+
+  pin_communautaire_en_revue:
+    declenchement: "provenance communautaire, état en_revue, marque distinctive visible (cf. cluster 04 I3)"
+    impact_sur_la_narration: >-
+      Aucun changement dans la STRUCTURE (teaser, narration,
+      post-narratif, sources fonctionnent comme un Pin éditorial). Ce
+      qui change, c'est l'AFFICHAGE d'une marque distinctive
+      (« sources en cours de vérification ») dont le LIBELLÉ relève
+      de 04-microcopy-grand-public.
+    voix_de_la_marque: "voix de l'app, sobre, sans dramatiser"
+    note: "le récit est rédigé avec le même soin qu'un Pin éditorial ; la marque le situe dans son cycle de vie, ne le disqualifie pas"
+
+  pin_sans_localisation:
+    declenchement: "patrimoine vivant immatériel sans coordonnées (cf. cluster 04 I9)"
+    impact_sur_la_narration: >-
+      Le teaser ne peut s'appuyer sur l'ancrage spatial (« tu vois ce
+      mur ? »). Il s'appuie alors sur l'ancrage TEMPOREL ou
+      COMMUNAUTAIRE (« il y a une chanson qu'on apprend encore... »).
+      La narration reste un récit, pas une fiche détachée du sol. Le
+      post-narratif privilégie Pins liés et citations sur les énigmes
+      spatiales (sans sens sans lieu).
+    note: "accessibles depuis la recherche, pas la Carte (cf. E-PIN-CONSULTATION-APPROFONDIE § sans_localisation)"
+
+  pin_multi_epoques:
+    declenchement: "Pin associé à ≥ 2 Époques (cf. cluster 04 I8 ; navigation multi-époque dans E-PIN-CONSULTATION-APPROFONDIE)"
+    arbitrage_principal: >-
+      DEUX MODÈLES POSSIBLES :
+      - (A) narration UNIQUE qui traverse les époques explicitement
+        (« au XVIIe c'était... ; au XIXe ça devient... ; aujourd'hui... »).
+        Cohérence de voix maximale, lecture linéaire.
+      - (B) VARIANTES par Époque (la narration bascule selon l'époque
+        sélectionnée). Profondeur par couche, mais multiplie le contenu
+        et complique la cohérence éditoriale.
+    decision: >-
+      Modèle A par défaut. Modèle B réservé aux Pins où la BASCULE
+      entre époques est elle-même le sujet (transformation radicale
+      du lieu). Le palier 4 autorise les deux ; tranchage cas par cas
+      par Anaïs et la lead historienne.
+    impact_structurel: "si modèle B, la structure (teaser + narration + post-narratif) reste la même par variante ; chaque variante est un contenu narratif complet"
+    question_ouverte: "À quel niveau le modèle B se déclare-t-il dans la fiche du Pin ? Attribut explicite ou inférence ? Relève du palier 13."

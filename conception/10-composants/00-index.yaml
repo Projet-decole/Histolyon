@@ -1,0 +1,725 @@
+# =============================================================================
+# Palier 10 — Composants ET sémantique d'interaction — INDEX
+# =============================================================================
+# Le palier 10 livre l'inventaire des composants UI réutilisables ET la
+# SÉMANTIQUE D'INTERACTION qu'ils portent.
+#
+# Une réflexion approfondie le 2026-05-06 (brainstorming 3 rédacteurs :
+# consultant solo, party-mode BMAD, spécialiste UX-architecte) a établi
+# que la sémantique d'interaction (où un geste pointe, ce qu'il déclenche,
+# selon quel contrat) appartient au COMPOSANT qui la porte — pas à un
+# palier 11 réduit au timing. Voir intention.yaml § 11 retours_d_experience
+# (entrée 2026-05-06) pour l'historique de la décision.
+#
+# Cinq raisons d'exister d'un composant (cf. § 3) :
+#   1. Centraliser et standardiser un fragment d'UI réutilisé (DRY)
+#   2. Encapsuler une INTERACTION (état/variant qui change, overlay)
+#   3. Réifier un mapping fonctionnel posé en amont (palier 9, 5, 4)
+#   4. Porter une INTENTION SÉMANTIQUE close (bouton retour qui fait pop,
+#      navbar qui switch S1/S2/S3) — non paramétrable
+#   5. Encapsuler un ÉTAT APPLICATIF PARTAGÉ comme producteur ou
+#      consommateur (slider d'Époque irrigue le palier 9)
+#
+# Contrainte forte : tout composant utilisé dans un écran du palier 7
+# (48 écrans) DOIT exister dans cet inventaire, AVEC son intention
+# portée et son échelle d'interaction.
+# =============================================================================
+
+document:
+  type: palier_composants_index
+  numero: 10
+  version: "0.3"
+  date: "2026-05-06"
+  audience:
+    - "Tout agent qui rédige les fichiers de contenu 01-05"
+    - "relecture"
+    - "Auteurs des paliers 11, 12, 13, 16"
+  role: "Index, format de fiche enrichi, anti-périmètre par palier aval, conventions, échelles d'interaction E1-E5, état applicatif partagé, patterns d'interaction"
+  format: yaml
+  prerequis_de_lecture:
+    - "design/conception/intention.yaml — § 5.7 separation, § 11 retour 2026-05-06 sur la sémantique d'interaction"
+    - "design/conception/05-architecture-info.yaml — modes M1-M9, surfaces S1-S3, persistantes P1-P3, règles N1-N7 et C1-C6"
+    - "design/conception/07-ecrans/00-index.yaml + 48 fiches — composants utilisés en composition de chaque écran"
+    - "design/conception/09-cartographie/ — mappings à réifier en variants des composants"
+    - "design/conception/04-donnees/ — entités affichées par les composants"
+    - "design/conception/08-contenu/ — patterns de microcopy à respecter"
+
+# -----------------------------------------------------------------------------
+# 1. Rôle du palier 10 — composants + sémantique d'interaction
+# -----------------------------------------------------------------------------
+role:
+
+  ce_qu_il_livre:
+    - "Inventaire exhaustif des composants UI (atomes, molécules, fonctionnels, shell, back-office)"
+    - "Pour chaque composant : id, famille, raison d'être, ancrage écrans, composition (composants enfants avec slots nommés), variants, états interactifs"
+    - "INTENTION PORTÉE par chaque composant interactif (close ou ouverte) avec son ÉCHELLE (E1-E5) et sa cible référencée au palier 5 (N/M/S) ou palier 6 (flow)"
+    - "Conséquences de variabilité (truncate, taille adaptative, placeholder image, état vide)"
+    - "Pour les 5-7 composants à machine d'état riche : section machine_etats explicite (états + transitions)"
+    - "Inventaire de l'ÉTAT APPLICATIF PARTAGÉ avec producteurs/consommateurs et cascades (cf. § 4)"
+    - "Catalogue des PATTERNS D'INTERACTION récurrents (cf. § 5)"
+
+  ce_qu_il_ne_livre_pas:
+    - "Durées précises, courbes d'easing, vibrations haptiques — palier 11 (réponse temporelle)"
+    - "Valeurs hex, tailles px, radius — palier 12 (tokens)"
+    - "Icônes concrètes (mapping Catégorie → icône) — palier 13"
+    - "Microcopy exacte — palier 8 (fait)"
+    - "Mesures techniques chiffrées — palier 16"
+
+  pourquoi_la_semantique_d_interaction_vit_au_palier_10: >-
+    Un bouton retour sans la mention « fait pop » n'est pas un bouton
+    retour — c'est un bouton générique avec une apparence trompeuse.
+    La sémantique EST une part de l'identité du composant. La placer
+    au palier 11 (timing) reviendrait à dire que le bouton ne sait
+    pas ce qu'il fait jusqu'à ce qu'on lui donne une durée d'animation —
+    ce qui est faux.
+
+# -----------------------------------------------------------------------------
+# 2. Périmètre et anti-périmètre strict
+# -----------------------------------------------------------------------------
+perimetre:
+
+  inclus:
+    - "Anatomie du composant (composition, slots, variants, états)"
+    - "Intention portée (close/ouverte, échelle, cible référencée)"
+    - "Interactions natives (gestes acceptés, signaux émis)"
+    - "Conséquences de variabilité (truncate, image absente, etc.)"
+    - "Machine d'état pour composants à comportement complexe"
+    - "Couplage à l'état applicatif partagé (producteur/consommateur)"
+
+  exclus:
+    - "Durée des transitions, courbes d'easing — palier 11"
+    - "Vibrations haptiques précises — palier 11"
+    - "Chorégraphie d'apparition/disparition fine — palier 11"
+    - "Valeurs visuelles — palier 12"
+    - "Icônes concrètes — palier 13"
+
+  test_de_purete: |
+    Trois tests à passer fiche par fiche :
+
+    (1) Si on remplace toutes les valeurs par des marqueurs abstraits,
+        la fiche reste valide ? Si oui : palier 10. Sinon : glissement P12.
+
+    (2) Si un dev Flutter lit cette fiche, sait-il :
+        (a) DANS QUEL WIDGET INTERNE l'interaction se gère (E1/E2) ?
+        (b) DANS L'ARCHITECTURE NAVIGATION qu'il faut router (E3) ?
+        (c) DANS UN STATE MANAGER global qu'il faut consommer/produire (E4) ?
+        Si oui : palier 10. Si la fiche est ambiguë : il manque le champ
+        intention_portee.echelle.
+
+    (3) Si on bascule de Flutter à du natif iOS, la fiche reste valide ?
+        Si oui : palier 10. Sinon : contamination implémentation.
+
+  anti_perimetre_par_palier_aval:
+
+    palier_11:
+      titre: "Réponse temporelle aux changements d'état"
+      pas_au_palier_10:
+        - "Durée précise des transitions"
+        - "Courbe d'easing"
+        - "Vibration haptique précise"
+        - "Chorégraphie temporelle d'apparition/disparition"
+      ce_que_le_palier_10_dit:
+        - "QUE le composant a un état pressed (sans durée du pressed)"
+        - "QU'une transition de variant existe (sans courbe)"
+        - "QU'un feedback tactile a lieu au snap (sans préciser quel feedback)"
+
+    palier_12:
+      titre: "Tokens"
+      pas_au_palier_10:
+        - "Couleurs hex, tailles px, radius, spacing, ombres"
+        - "Cibles tactiles chiffrées"
+      reformulations:
+        - "AU LIEU DE 'fond #B85220' → DIRE 'fond couleur primaire'"
+        - "AU LIEU DE 'cible 48px' → DIRE 'cible tactile généreuse'"
+
+    palier_13:
+      titre: "Icônes"
+      pas_au_palier_10:
+        - "Mapping Catégorie → icône concrète"
+        - "Style graphique des icônes (Lucide, etc.)"
+      ce_que_le_palier_10_dit:
+        - "QUE le composant intègre un slot d'icône fonctionnel (icône de favori, icône de retour, icône de catégorie)"
+
+    palier_16:
+      titre: "Validation"
+      pas_au_palier_10:
+        - "Cibles tactiles chiffrées (≥ 44px)"
+        - "Ratios de contraste WCAG"
+        - "Seuils de truncate, perceptibilité de combinaisons extrêmes"
+
+# -----------------------------------------------------------------------------
+# 3. Typologie des échelles d'interaction (E1-E5)
+# -----------------------------------------------------------------------------
+# Cadre commun obligatoire. Toute interaction décrite dans une fiche de
+# composant porte une étiquette d'échelle parmi E1-E5. Ces étiquettes
+# guident l'implémentation Flutter (Listener interne / Navigator / state
+# manager global) et balisent la frontière avec le palier 11 (timing pur).
+echelles_d_interaction:
+
+  - id: E1
+    nom: "Atomique — interaction intrinsèque au composant"
+    description: >-
+      Le composant manipule sa propre apparence en réponse à un geste,
+      sans effet observable hors de lui. Bascule pressed/default,
+      focus ring, expansion/collapse local d'accordéon.
+    exemples_histolyon:
+      - "comp-button-* default → pressed au tap"
+      - "comp-champ-saisie default → focused au focus clavier"
+    proprietaire_modelisation: "Palier 10 (états et transitions qualifiées) + palier 11 (durée, courbe, feedback haptique)"
+    architecture_flutter_indicative: "Listener / GestureDetector / InkWell internes au widget"
+
+  - id: E2
+    nom: "Inter-composant — signal vers composants frères ou parent"
+    description: >-
+      Le composant émet un SIGNAL en réponse à un geste. Il ne sait pas
+      qui réagit — l'écran qui l'orchestre câble la cible. Distinct de
+      la navigation : l'effet reste dans la même surface.
+    exemples_histolyon:
+      - "comp-chip-epoque tapé → émet 'epoque sélectionnée X' (la Carte derrière réagit)"
+      - "comp-controle-favori tapé → émet 'toggle favori' (le Profil et l'Historique se mettent à jour)"
+      - "comp-button-primary 'Soumettre' → émet 'soumission demandée' (l'écran déclenche le flow)"
+    proprietaire_modelisation: "Palier 10 (signal émis, qualifié) + palier 7 (câblage côté écran via elements_interactifs déjà fait)"
+    architecture_flutter_indicative: "Callback onPressed / ValueChanged exposé par le widget, écouté par le parent"
+
+  - id: E3
+    nom: "Navigationnelle — changement de surface (palier 5)"
+    description: >-
+      Le geste manipule la TOPOLOGIE des surfaces — push une nouvelle
+      surface, pop la courante, ouvre une surface ponctuelle (M6/M7/M8/M9),
+      bascule entre surfaces top-level (S1/S2/S3). Cible exprimée en
+      vocabulaire palier 5 (N1-N7, M1-M9, S1-S3).
+    exemples_histolyon:
+      - "comp-button-back → N1 retour gracieux (intention close)"
+      - "comp-selecteur-section-principale → N2 saut latéral S1/S2/S3 (intention close, paramétrée par section cible)"
+      - "comp-aperçu-rapide-pin (M2) point d'accès 'approfondir' → bascule M3 (flow B2)"
+    proprietaire_modelisation: "Palier 10 (intention navigationnelle déclarée) + palier 11 (chorégraphie de transition)"
+    architecture_flutter_indicative: "Navigator.push/pop, GoRouter, Modal route — architecturé HORS du widget"
+
+  - id: E4
+    nom: "Systémique — cascade sur état applicatif partagé"
+    description: >-
+      Le geste modifie un ÉTAT GLOBAL qui pilote plusieurs composants
+      ou surfaces distants. C'est l'échelle la plus subtile. Liaison
+      paramétrique continue (slider d'Époque interpole le fond carte
+      du palier 9) ou événementielle (lancement de Parcours active P2,
+      reconfigure S2). Inventaire en § 4.
+    exemples_histolyon:
+      - "comp-slider-epoque drag → modifie 'Époque courante' → cascade fond carte + Pins + Tracés (palier 9 D8)"
+      - "comp-button-primary 'Lancer le parcours' → modifie 'Parcours en cours' → P2 apparaît, S2 reconfigurée"
+      - "comp-rangee-profil-action 'Se déconnecter' → vide Compte → S3 reconfigurée, P1 éteint si audio en cours"
+    proprietaire_modelisation: "Palier 10 (composant déclaré comme producteur/consommateur d'un état partagé nommé) + § 4 (inventaire des états)"
+    architecture_flutter_indicative: "Provider / Riverpod / Bloc — état partagé géré au niveau application"
+
+  - id: E5
+    nom: "Entrée externe — déjà couverte par le palier 5"
+    description: >-
+      Deep-link (Lien universel reçu), notification système, retour
+      d'arrière-plan. Couvert par palier 5 § entrees_externes (E1-E3).
+      Ne nécessite PAS de re-modélisation au palier 10 sauf si un
+      composant spécifique gère l'atterrissage.
+    proprietaire_modelisation: "Palier 5 (cf. P5.E1-E3)"
+
+# Note d'utilisation des échelles E1-E5 dans les fiches de composant.
+# Sortie de la liste echelles_d_interaction pour respecter la grammaire
+# YAML (mélange liste/clé sœur interdit) — corrigé 2026-05-07.
+utilisation_des_echelles_dans_les_fiches: |
+  Chaque fiche de composant interactif doit préciser, dans son
+  champ intention_portee, l'échelle dominante (E1, E2, E3 ou E4).
+  Pour les composants qui opèrent à plusieurs échelles (rare mais
+  possible — ex. comp-pin tap = E2 émet 'pin sélectionné',
+  long-press = E2 émet 'pin signalé'), lister toutes les échelles
+  avec leur intention respective.
+
+# -----------------------------------------------------------------------------
+# 4. État applicatif partagé — inventaire
+# -----------------------------------------------------------------------------
+# Liste des états transversaux qui sont LUS et/ou ÉCRITS par plusieurs
+# composants/surfaces de l'app. Ils n'appartiennent à aucun composant
+# en particulier — ils sont l'infrastructure invisible qui rend l'app
+# cohérente. Documenter ici permet aux fiches de composant de déclarer
+# proprement leur couplage (producteur / consommateur).
+#
+# Cet inventaire est NORMATIF — toute fiche de composant à échelle E4
+# doit référencer un état listé ici. Si un état manquant émerge en
+# rédaction, l'ajouter ici puis référencer.
+etat_applicatif_partage:
+
+  - id: ETAT-EPOQUE-COURANTE
+    description: "Position du slider d'Époque (Antiquité → Aujourd'hui)"
+    producteurs: ["comp-slider-epoque (E4 producteur primaire)", "comp-trace-parcours (lors du pilotage automatique par Parcours en cours)"]
+    consommateurs: ["comp-carte (interpolation des 5 axes paramétriques palier 9 D8)", "comp-pin (visibilité selon Époque sauf 'Aujourd'hui' qui cumule)", "comp-cluster-densite", "comp-trace-parcours (étapes hors-Époque atténuées)"]
+    cascades: "Modification → recalcul fond carte (palier 9 axes paramétriques continus) + recharge Pins à la fin du geste (palier 3 D1.2) + recalcul cluster"
+    references_amont: "palier 3 D1.2, palier 9 décision D8 et fichier 01-fond-et-epoques"
+
+  - id: ETAT-PARCOURS-EN-COURS
+    description: "Parcours actuellement entrepris par l'utilisateur (terrain ou canapé), avec étape courante"
+    producteurs: ["comp-button-primary 'Lancer' depuis E-PARCOURS-FICHE-DETAIL (E4)", "comp-dialogue-confirmation 'Abandonner' (E4 termine)"]
+    consommateurs: ["comp-surface-persistante-parcours (P2 visible si parcours actif)", "comp-pin (variant 'pin du parcours actif' / 'étape courante' / 'hors-parcours')", "comp-trace-parcours (visible si parcours actif)", "comp-slider-epoque (peut être piloté par étape courante)"]
+    cascades: "Lancement → P2 apparaît + Pins reconfigurés (étape courante en relief, autres atténués) + tracé visible + éventuel pilotage du slider"
+    references_amont: "palier 5 P2, palier 6 C5/C6/C7, palier 9 02-pins variantes"
+
+  - id: ETAT-AUDIO-EN-COURS
+    description: "Lecture audio narrée en cours (un Pin)"
+    producteurs: ["comp-lecteur-audio play (E4 producteur)", "comp-button-tertiary 'play' depuis E-PIN-CONSULTATION-APPROFONDIE (E4)"]
+    consommateurs: ["comp-surface-persistante-audio (P1 visible si audio actif)"]
+    cascades: "Démarrage → P1 apparaît avec lien retour vers le Pin de la narration"
+    references_amont: "palier 5 P1, palier 3 D7, palier 6 B2"
+
+  - id: ETAT-COMPTE-CONNECTE
+    description: "Présence ou absence d'un Compte connecté (le Profil est toujours présent — I6)"
+    producteurs: ["comp-formulaire-creation-compte (E4 crée le Compte)", "comp-formulaire-connexion (E4 connecte)", "comp-button-secondary 'Déconnexion' / 'Suppression' (E4 retire)"]
+    consommateurs: ["comp-rangee-profil-action (variants : visible/caché selon présence Compte)", "comp-button-primary 'Publier' sur les surfaces communautaires (désactivé si pas de Compte)", "comp-bandeau-* (synchronisation potentielle)"]
+    cascades: "Création/connexion → fonctionnalités communautaires accessibles (I2). Déconnexion → favoris locaux conservés (I6) mais publication désactivée"
+    references_amont: "palier 4 I1 I2 I6, palier 6 D6 D7 D8 D9"
+
+  - id: ETAT-MODE-NOTIFICATION
+    description: "Mode actif parmi {balade libre, Surprenez-moi, En parcours} (cluster 03 préférence Profil)"
+    producteurs: ["comp-toggle-switch 'Surprenez-moi' depuis E-PROFIL-PARAMETRES (E4)", "Activation automatique 'En parcours' au lancement de Parcours (E4)"]
+    consommateurs: ["comp-alerte-proximite (apparition conditionnelle selon mode)"]
+    cascades: "Surprenez-moi activé → notifications de proximité M7 actives. Parcours lancé → mode bascule en 'En parcours'"
+    references_amont: "palier 3 D4, palier 4 cluster 03, palier 5 M7"
+
+  - id: ETAT-CONNEXION-RESEAU
+    description: "Présence ou absence de connexion réseau"
+    producteurs: ["système OS (non un composant)"]
+    consommateurs: ["comp-bandeau-information-offline (P3 visible si offline)", "comp-recherche-surface (recherche limitée local si offline)", "comp-carte (tuiles préchargées uniquement si offline)"]
+    cascades: "Perte → P3 apparaît + recherche limitée + tuiles non préchargées indisponibles"
+    references_amont: "palier 5 P3, palier 7 E-CARTE-PRINCIPALE états offline_*"
+
+  - id: ETAT-PERMISSIONS-SYSTEME
+    description: "Statut des permissions OS (géolocalisation, caméra, notification)"
+    producteurs: ["système OS (via comp-dialogue-permission qui demande)"]
+    consommateurs: ["comp-camera-ar (utilisable si caméra accordée)", "comp-alerte-proximite (Surprenez-moi requiert géoloc + notifs)"]
+    cascades: "Refus géoloc → Me localiser désactivé, Surprenez-moi désactivable mais sans déclenchement"
+    references_amont: "palier 3 D5.5 permissions juste-à-temps, palier 6 A6"
+
+# Note d'évolution de l'inventaire des états applicatifs partagés.
+# Sortie de la liste etat_applicatif_partage pour respecter la grammaire
+# YAML (mélange liste/clé sœur interdit) — corrigé 2026-05-07.
+etat_applicatif_partage_note_d_evolution: >-
+  Liste à compléter au fil de l'usage si un état émerge.
+  Tout ajout doit être validé par l'utilisateur (impact transversal).
+
+# -----------------------------------------------------------------------------
+# 5. Patterns d'interaction — catalogue
+# -----------------------------------------------------------------------------
+# Patterns réutilisables qui s'attachent à plusieurs composants. Ne sont
+# ni des composants (transverses) ni du timing (pur). Nommer une fois,
+# référencer depuis chaque fiche concernée. À enrichir en cours d'inventaire.
+patterns_d_interaction:
+
+  - id: PI-TAP-HORS
+    nom: "Tap hors pour fermer"
+    description: "Surface ouverte (M6 ponctuelle, M2 aperçu rapide, M8 dialogue) se ferme au tap dans la zone hors composant"
+    composants_concernes: ["comp-apercu-rapide-pin (M2)", "comp-recherche-surface (M6)", "comp-filtres-couches (M6)", "comp-surface-ponctuelle-saut-etape (M6)"]
+    note_palier_5: "Cohérent avec règle N5 — fermeture implicite par interaction extérieure"
+
+  - id: PI-DRAG-ENTRE-VARIANTS
+    nom: "Drag continu pour interpoler entre variants"
+    description: "Geste continu qui interpole en temps réel un état du composant"
+    composants_concernes: ["comp-slider-epoque (drag → interpolation E4 cascade carte)", "comp-avant-apres (drag → handle entre deux états visuels)"]
+    note: "Ce pattern est CONSTITUTIF des composants concernés (pas optionnel)"
+
+  - id: PI-SWIPE-DISMISS
+    nom: "Swipe latéral pour rejeter"
+    description: "Geste horizontal pour rejeter une notification, un message, un item"
+    composants_concernes: ["comp-message-ephemere (potentiellement)", "comp-alerte-proximite"]
+    pertinence_v3: "Tap de fermeture dispo dans tous ces composants ; swipe-dismiss optionnel."
+
+  - id: PI-FOCUS-TRAP-DIALOGUE
+    nom: "Piège de focus dans dialogue bloquant"
+    description: "Tant qu'un dialogue M8 est ouvert, le focus clavier ne sort pas du dialogue (a11y)"
+    composants_concernes: ["comp-dialogue-confirmation", "comp-dialogue-permission"]
+    note_palier_5: "Cohérent avec règle N6 — bloquant strict"
+
+# Note d'évolution du catalogue de patterns d'interaction.
+# Sortie de la liste patterns_d_interaction pour respecter la grammaire
+# YAML (mélange liste/clé sœur interdit) — corrigé 2026-05-07.
+patterns_d_interaction_note_d_evolution: >-
+  Catalogue à enrichir au fil de l'usage si un pattern récurrent
+  émerge. Validation utilisateur pour tout ajout.
+
+# -----------------------------------------------------------------------------
+# 6. Découpage en 5 fichiers de contenu
+# -----------------------------------------------------------------------------
+# L'inventaire ci-dessous applique la grille intention close/ouverte +
+# échelle d'interaction à chaque composant (y compris le bouton retour,
+# qui a une intention close de navigation).
+fichiers:
+
+  - id: "01"
+    nom: "Atomes"
+    fichier: "01-atomes.yaml"
+    cible_volume_estime: "~700-1000 lignes"
+    role: "Éléments indivisibles (button, chip, libellé, icône, champ saisie, switch, séparateur, badge, avatar). Inclut les atomes à intention close (button-back, button-fab-creation)"
+
+  - id: "02"
+    nom: "Molécules"
+    fichier: "02-molecules.yaml"
+    cible_volume_estime: "~600-900 lignes"
+    role: "Combinaisons d'atomes (header titre+action, item de liste, card, encart, action bar compacte). Slots nommés explicites"
+
+  - id: "03"
+    nom: "Composants fonctionnels"
+    fichier: "03-fonctionnels.yaml"
+    cible_volume_estime: "~800-1100 lignes"
+    pilote: true
+    role: >-
+      Réifient les concepts métier (Pin, Tracé, Cluster, Slider d'Époque,
+      Carte, Lecteur audio, Viewer 3D, Caméra AR, Quiz, Avant/après, Image
+      hero). Inclut les composants à machine d'état riche (slider, viewers,
+      lecteurs, formulaire saisie Pin) avec section machine_etats explicite.
+    note: >-
+      PILOTE du palier — calibre le format et la réification palier 9 +
+      la modélisation des couplages E4 + les machines d'état, repris par
+      les 4 autres fichiers de famille.
+
+  - id: "04"
+    nom: "Composants shell"
+    fichier: "04-shell.yaml"
+    cible_volume_estime: "~600-900 lignes"
+    role: >-
+      Surfaces top-level et templates de mode — Sélecteur de section
+      principale (E3 navigationnelle close), Aperçu rapide M2, Surface
+      ponctuelle M6, Alerte ponctuelle M7, Dialogue M8, Message éphémère
+      M9, Surfaces persistantes P1/P2/P3, Indication onboarding,
+      Invitation micro-parcours.
+
+  - id: "05"
+    nom: "Back-office"
+    fichier: "05-back-office.yaml"
+    cible_volume_estime: "~500-700 lignes"
+    role: "Composants admin desktop (file de modération, formulaire saisie Pin avec machine d'état, validation scientifique, dashboard, etc.)"
+
+# Note de volume cumulé du palier 10. Sortie de la liste fichiers pour
+# respecter la grammaire YAML (mélange liste/clé sœur interdit).
+fichiers_total_estime: "~3200-4600 lignes pour le palier 10"
+
+# -----------------------------------------------------------------------------
+# 6bis. Décompte final par famille (vérifié contre la maquette Figma)
+# -----------------------------------------------------------------------------
+# Décompte des fiches de CE dossier (design/conception/10-composants/), et
+# statut de matérialisation en composant Figma réutilisable dans la maquette
+# (design/maquette/, page « 05 · Composants »). Une fiche non matérialisée
+# comme composant Figma distinct reste une spécification valide — elle
+# documente une intention, un contrat de slots ou une décision d'architecture
+# que le développement doit respecter, même si Figma ne porte pas d'artefact
+# dédié pour elle.
+decompte_final:
+  atomes: { fiches: 40, materialisees_figma: 39, note: "comp-icone (40e) n'a pas d'artefact Figma propre — il est résolu par le système d'icônes (palier 13)." }
+  molecules: { fiches: 30, materialisees_figma: 29, note: "comp-header-retour-titre reste à consolider comme variant de comp-header-retour-titre-action (non tranché)." }
+  fonctionnels: { fiches: 24, materialisees_figma: 24 }
+  shell: { fiches: 20, materialisees_figma: 14, note: "comp-surface-ponctuelle-recherche et comp-surface-ponctuelle-filtres-couches sont ABSORBÉES par leur fonctionnel (voir statut_maquette_palier_5 dans 04-shell.yaml) ; les 4 comp-layout-* sont des contrats de slots pour la composition d'écran (palier 7), pas des composants Figma réutilisables — leurs fiches restent la référence pour l'implémentation de ces écrans." }
+  back_office: { fiches: 8, materialisees_figma: 8 }
+  total_fiches: 122
+  total_composants_figma_par_famille: 114
+  composants_figma_hors_fiche_conception: { nombre: 2, ids: [comp-shell-admin-sidebar, comp-shell-admin-topbar], note: "shell desktop admin construits côté maquette (page 08 · Admin desktop) sans fiche de conception dédiée — à documenter ici si le développement en a besoin." }
+  total_composants_figma_reutilisables: 116
+
+# -----------------------------------------------------------------------------
+# 7. Format de fiche enrichi
+# -----------------------------------------------------------------------------
+format_des_fiches:
+
+  champs_obligatoires:
+    - id                          # snake_case, préfixe comp-
+    - nom
+    - famille                     # atome | molecule | fonctionnel | shell | back-office
+    - raison_d_etre
+    - ancrage                     # ecrans + composants_qui_l_integrent
+    - composition                 # composants enfants avec slots nommés et cardinalité, [] si atome pur
+
+  champs_obligatoires_si_interactif:
+    - intention_portee            # close/ouverte, échelle E1-E4, cible référencée
+    - etats_interactifs           # default, pressed, focused, disabled, expanded, collapsed, selected, etc.
+    - interactions_natives        # gestes acceptés et signaux émis
+
+  champs_recommandes:
+    - variants                    # variants visuels (provenance, taille, etc.)
+    - consequences_variabilite    # truncate / adaptatif / placeholder
+    - couplage_etat_partage       # producteur / consommateur de quel état (référence § 4)
+    - patterns_attaches           # patterns d'interaction depuis § 5
+    - machine_etats               # pour composants à comportement riche (5-7 cas)
+    - dependances_palier_amont    # mappings P9, modes P5, entités P4, patterns P8
+    - questions_ouvertes
+    - anti_perimetre_specifique
+
+  exemple_canonique_intention_close:
+    code: |
+      - id: comp-button-back
+        nom: "Bouton retour"
+        famille: atome
+        raison_d_etre: "Cible navigationnelle de retour gracieux (P5.N1) présente sur tout écran de niveau 2 ou 3."
+
+        ancrage:
+          ecrans: ["la quasi-totalité des écrans M3", "écrans M6 ponctuelles", "templates M8"]
+          composants_qui_l_integrent: ["comp-header-titre-action (variant avec retour)"]
+
+        composition:
+          - id: comp-icone
+            slot: "icone"
+            cardinalite: 1
+            note: "icône fonctionnelle de retour ; concrète au palier 13"
+
+        intention_portee:
+          parametrable: false
+          echelle: E3_navigationnelle
+          intention: "retour_gracieux"
+          cible_referencee: "P5.N1 — un seul geste vers le niveau immédiatement supérieur"
+          cas_deep_link: "Si l'écran a été atteint via Lien universel sans pile constituée, le retour mène à la surface principale logique de la cible (cf. P5.E2). Précision IMPORTANTE — sans elle, les devs feront faux."
+          note: >-
+            Composant à INTENTION CLOSE — non surchargeable. L'écran qui
+            l'instancie n'a pas à câbler son comportement. Si un cas
+            métier nécessite une autre cible, utiliser comp-button-tertiary
+            avec onPressed exposé (intention ouverte).
+
+        etats_interactifs:
+          - default: "état de repos"
+          - pressed: "tap en cours"
+          - disabled: "non interactif (rare — typiquement quand pas de niveau supérieur)"
+          - focused: "focus clavier/lecteur d'écran (a11y)"
+
+        interactions_natives:
+          - "Tap → déclenche le retour gracieux (intention close)"
+
+        consequences_variabilite:
+          - "Pas de texte variable (icône uniquement)"
+
+        questions_ouvertes:
+          - "Variant 'retour avec libellé' (ex. 'Retour' visible) pour certains contextes a11y ? — palier 13 et palier 16."
+
+  exemple_canonique_intention_ouverte:
+    code: |
+      - id: comp-button-primary
+        nom: "Bouton primaire"
+        famille: atome
+        raison_d_etre: "Cible d'action principale dans toute surface, affirmée visuellement."
+
+        ancrage:
+          ecrans: [E-CARTE-RECHERCHE, E-PARCOURS-LANCEMENT, E-PROFIL-CREATION-COMPTE, ...]
+          composants_qui_l_integrent: [comp-dialogue-confirmation, comp-dialogue-permission, comp-message-ephemere, ...]
+
+        composition:
+          - id: comp-libelle-bouton
+            slot: "label"
+            cardinalite: 1
+          - id: comp-icone
+            slot: "icone"
+            cardinalite: 0..1
+            note: "icône optionnelle"
+
+        intention_portee:
+          parametrable: true
+          echelle: variable   # E2 / E3 / E4 selon contexte
+          intention: "action_principale"
+          contrats:
+            - "L'écran qui l'intègre DOIT définir la cible (flow palier 6 ou intention P5)"
+            - "Voir elements_interactifs des écrans palier 7 pour les câblages concrets"
+          note: "Composant à INTENTION OUVERTE — câblage par le parent."
+
+        etats_interactifs:
+          - default
+          - pressed
+          - disabled
+          - loading: "action en cours (pendant un appel asynchrone)"
+          - focused
+
+        interactions_natives:
+          - "Tap → émet signal d'action (callback parent)"
+
+        variants:
+          - dimension: taille
+            valeurs: [standard, compact]
+          - dimension: pleine_largeur
+            valeurs: [oui, non]
+
+        consequences_variabilite:
+          - "Texte variable → truncate avec ellipse à partir d'un seuil (palier 12)"
+          - "i18n : longueurs FR / EN / JA divergent ; vérifier perceptibilité de l'intention en palier 16"
+
+  consigne_intention_portee: |
+    Champ OBLIGATOIRE pour tout composant interactif. Trois sous-cas :
+
+    (a) Intention CLOSE (ex. button-back, selecteur-section, alerte-proximite) :
+        parametrable: false
+        echelle: E1 | E2 | E3 | E4
+        intention: <nom court de l'intention>
+        cible_referencee: <référence palier 5 (N/M/S) ou palier 6 (flow)>
+        + note explicative
+
+    (b) Intention OUVERTE (ex. button-primary, button-tertiary) :
+        parametrable: true
+        echelle: variable (selon usage par l'écran)
+        intention: <nom de la classe d'intention, ex. action_principale>
+        contrats: liste des contrats que l'écran appelant doit respecter
+
+    (c) Composant non-interactif (libellé, séparateur) :
+        intention_portee: { non_interactif: true }
+
+  consigne_couplage_etat_partage: |
+    Pour les composants à échelle E4 (système), déclarer explicitement :
+      couplage_etat_partage:
+        - etat: ETAT-EPOQUE-COURANTE
+          role: producteur | consommateur | les_deux
+          note: "..."
+
+    Référencer un état listé en § 4. Si manquant, l'ajouter en § 4
+    avec validation utilisateur.
+
+  consigne_machine_etats: |
+    Pour les 5-7 composants à comportement riche (slider, viewers,
+    lecteurs, formulaires complexes), section dédiée :
+      machine_etats:
+        etats: [...]
+        transitions:
+          - de: <etat>
+            vers: <etat>
+            sur: <evenement>
+            condition: <optionnelle>
+
+    Pour les composants simples (atomes interactifs typiques), la liste
+    plate des etats_interactifs suffit — pas de machine_etats.
+
+  consigne_slots: |
+    Le champ composition utilise des SLOTS NOMMÉS pour les composants
+    qui en ont besoin (molécules, shell, back-office) :
+      composition:
+        - id: comp-libelle-texte
+          slot: "titre"
+          cardinalite: 1
+          note: "variante 'titre' (cf. dimension variante_semantique de comp-libelle-texte en 01-atomes)"
+        - id: comp-button-primary
+          slot: "issue_confirmation"
+          cardinalite: 1
+        - id: comp-button-secondary
+          slot: "issue_annulation"
+          cardinalite: 1
+
+    Pour les atomes purs : composition: []
+
+  vocabulaire_a_eviter:
+    - "valeurs en pixels, hex, ms, % avec valeur"
+    - "noms de widgets Flutter (TextButton, Container, etc.)"
+    - "noms d'icônes concrètes (heart, share, etc.)"
+    - "courbes d'animation (ease-out, spring)"
+    - "microcopy exacte entre guillemets"
+
+  vocabulaire_admis:
+    - "qualifié : 'cible tactile généreuse', 'arrondi modéré'"
+    - "fonctionnel : 'tap', 'long-press', 'drag', 'focus'"
+    - "directionnel : 'plus grand que', 'priorité supérieure'"
+    - "sémantique d'interaction : 'intention close', 'cible navigationnelle', 'producteur d'état'"
+
+# -----------------------------------------------------------------------------
+# 8. Conventions de référencement
+# -----------------------------------------------------------------------------
+conventions:
+  ecrans: "Référence par id E-XXX-YYY (palier 7)"
+  modes_et_surfaces: "Préfixe P5. (P5.M1-M9, P5.S1-S3, P5.P1-P3, P5.N1-N7, P5.C1-C6, P5.E1-E3) — convention canonique des paliers 6, 7, 9"
+  flows: "Référence par id court (A1, B2, C5, D6, E1, F5, G3, H1) — palier 6"
+  entites: "Nom métier (Pin, Parcours, Étape, Profil, Compte, Trace de modération…) — palier 4"
+  invariants: "Format Ix (I1-I10) — palier 4"
+  mappings_palier_9: "Référence au fichier (09-cartographie/02-pins.yaml dimension provenance) ou à la décision (palier 9 décision D3)"
+  echelles_d_interaction: "Format Ex (E1-E5) — § 3 ci-dessus"
+  etats_partages: "Format ETAT-XXX (§ 4)"
+  patterns_d_interaction: "Format PI-XXX (§ 5)"
+
+# -----------------------------------------------------------------------------
+# 9. Composants pivots
+# -----------------------------------------------------------------------------
+# Liste effective des pivots auto-identifiés par les fiches d'atomes
+# (chacun annonçant explicitement « Pivot du palier 10 » dans sa raison_d_etre).
+composants_pivots:
+  - id: comp-button-primary
+    note: "≥8 intégrations recensées dans les 48 écrans palier 7 et dans plusieurs molécules/dialogues"
+  - id: comp-libelle-texte
+    note: "≥40 intégrations — toute composition contient du texte (titres, corps, métadonnées, captions)"
+  - id: comp-icone
+    note: "≥30 intégrations — utilisée par la quasi-totalité des composants atomes interactifs et plusieurs fonctionnels"
+  - id: comp-libelle-bouton
+    note: "transverse — utilisé par tous les boutons textuels (primary, secondary, tertiary, fab)"
+  - id: comp-chip-categorie
+    note: "≥10 intégrations — cards, items de liste, fiches Pin et Parcours, formulaire de saisie"
+
+# -----------------------------------------------------------------------------
+# 10. Décisions structurelles prises
+# -----------------------------------------------------------------------------
+decisions_structurelles_prises:
+
+  - id: D1
+    decision: "Découpage en 5 fichiers (atomes, molécules, fonctionnels, shell, back-office)"
+    pourquoi: "Structure naturelle par nature du composant (atome/molécule/fonctionnel/shell/back-office)."
+
+  - id: D2
+    decision: "Composants polymorphes vs spécifiques — décidé AU CAS PAR CAS dans les fiches"
+    pourquoi: "Pas de règle universelle. Justification à tracer par fiche."
+
+  - id: D3
+    decision: "Distinction badge / étiquette de statut / indicateur de chargement CONSERVÉE"
+    pourquoi: "Sémantiques disjointes."
+
+  - id: D4
+    decision: "Composants Pin et Tracé : composant unique avec PROPS ORTHOGONALES (provenance × multi-époque × vérification × contexte parcours × déjà visité)"
+    pourquoi: "Réification directe de la posture B palier 9."
+
+  - id: D5
+    decision: "INTERACTIONS portées par les composants explicitement listées au palier 10"
+    pourquoi: "Insistance utilisateur 2026-05-06."
+
+  - id: D6
+    decision: "Champ consequences_variabilite OBLIGATOIRE pour tout composant à contenu variable"
+    pourquoi: "Insistance utilisateur 2026-05-06."
+
+  - id: D7
+    decision: "SÉMANTIQUE D'INTERACTION élevée au palier 10 (intention close vs ouverte, échelle E1-E4)"
+    pourquoi: >-
+      Le bouton retour FAIT pop par nature ; la navbar SWITCH par nature.
+      Cette sémantique appartient au composant, pas à un palier 11 réduit
+      au timing.
+
+  - id: D8
+    decision: "Palier 11 RECADRÉ en 'réponse temporelle aux changements d'état'"
+    pourquoi: >-
+      L'ancienne formulation 'interactions et motion' mélangeait gestes
+      primitifs, micro-motion, chorégraphies, liaisons paramétriques.
+      Le palier 11 se restreint au timing. cf. intention.yaml.
+
+  - id: D9
+    decision: "Inventaire de l'ÉTAT APPLICATIF PARTAGÉ dans le palier 10 (§ 4)"
+    pourquoi: >-
+      Slider d'Époque, Parcours en cours, audio, Compte, etc. — états
+      transversaux qui pilotent plusieurs composants à distance.
+      Sans inventaire, les devs Flutter improvisent un state-management
+      qui ne ressemble à rien à la conception.
+
+  - id: D10
+    decision: "TYPOLOGIE 5 ÉCHELLES E1-E5 inscrite dans l'index palier 10 (§ 3)"
+    pourquoi: >-
+      Cadre commun obligatoire pour toute interaction. Conditionne
+      l'architecture Flutter (Listener interne / Navigator / state
+      manager global)."
+
+# -----------------------------------------------------------------------------
+# 11. Persona check global
+# -----------------------------------------------------------------------------
+persona_check_global:
+
+  kenji:
+    impact: "élevé"
+    note: "Composants i18n-aware (texte variable JA / FR / EN). Conséquences variabilité critiques. Intention close de comp-selecteur-section-principale doit fonctionner sans tutoriel."
+
+  mme_dupont:
+    impact: "moyen"
+    note: "Composants Parcours doivent permettre de créer en moins de 30 minutes. Lien universel reçu via E-PARCOURS-FICHE-DETAIL atterrit sans Compte (intention close E3 préservée)."
+
+  mme_martin:
+    impact: "élevé"
+    note: "Mode présentation (M4) : composants persistants P1/P2/P3 ont un état 'minimized' (sommeil visuel). Lisibilité de tous les composants depuis le fond de classe."
+
+  pere_lyonnais:
+    impact: "élevé"
+    note: "comp-alerte-proximite (M7), comp-message-ephemere, comp-controle-favori sont sa surface principale. Intention close de comp-button-back garantit sa navigation intuitive."
+
+  anais_back_office:
+    impact: "MAJEUR"
+    note: "Tout 05-back-office.yaml. Formulaire saisie Pin = composant à machine d'état riche. Intention close (validation, soumission, retrait, promotion). Drapeaux rouges persona (templates rigides, pas de prévisualisation, pas de versioning) à adresser."

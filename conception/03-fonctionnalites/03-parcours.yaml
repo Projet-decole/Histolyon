@@ -1,0 +1,1096 @@
+# =============================================================================
+# Palier 3 — Domaine D3 — Parcours
+# =============================================================================
+# Les parcours offrent un fil narratif structuré là où les pins isolés (D2)
+# offrent la sérendipité. Pour Mme Dupont qui prépare une sortie scolaire,
+# pour Mme Martin qui projette un cours en classe (mode canapé), pour Kenji
+# qui suit un parcours éditorial 'Sur les traces des Canuts', pour le père
+# lyonnais qui suit un parcours communautaire dominical — les parcours
+# donnent un cap, une intention, une cohérence narrative.
+#
+# C'est le domaine le plus riche fonctionnellement : 10 sous-domaines qui
+# couvrent la totalité du cycle de vie d'un parcours, de sa publication
+# jusqu'à sa célébration finale en passant par son lancement, son déroulement
+# géolocalisé ou en canapé, et ses nombreux edge cases.
+# =============================================================================
+
+document:
+    type: palier_fonctionnalites_domaine
+    domaine_id: D3
+    numero: 3
+    audience:
+        - "Tout agent qui rédige un palier en aval (4 à 16)"
+        - "Devs Flutter (cahier des charges fonctionnel pour les parcours)"
+    role: >-
+        Décrire fonctionnellement le système de parcours : types, catalogue,
+        fiche, lancement, déroulement, mode canapé, création, partage, fin,
+        edge cases.
+    format: yaml
+    prerequis_de_lecture:
+        - "design/conception/intention.yaml — § 5.7 et § 11"
+        - "design/conception/01-essence.yaml"
+        - "design/conception/02-personas.yaml"
+        - "design/conception/03-fonctionnalites/00-index.yaml v1.1 — § 2 anti_perimetre_strict OBLIGATOIRE"
+        - "design/conception/03-fonctionnalites/01-carte-exploration-temporelle.yaml v1.1 (pilote)"
+
+# -----------------------------------------------------------------------------
+# Raison d'être du domaine
+# -----------------------------------------------------------------------------
+raison_d_etre_du_domaine: >-
+    Là où les pins isolés (D2) sont le mode 'flânerie' de l'app, les parcours
+    sont le mode 'fil rouge'. Ils ne sont pas au cœur (les piliers de l'essence
+    sont la sérendipité géographique, pas l'itinéraire balisé), mais ils sont
+    un usage à part entière, particulièrement pour les personas pédagogiques
+    (Mme Dupont, Mme Martin) et pour tout utilisateur en quête d'une cohérence
+    narrative.
+
+    Ce domaine sert également directement le principe d'émerveillement (un
+    parcours bien construit est un voyage, avec une mise en condition, un
+    déroulé, une fin) et l'historicité (les parcours éditoriaux portent la
+    rigueur scientifique).
+
+# -----------------------------------------------------------------------------
+# Sous-domaines
+# -----------------------------------------------------------------------------
+sous_domaines:
+    # ===========================================================================
+    - id: D3.1
+      nom: "Types de parcours"
+
+      raison_d_etre: >-
+          Distinguer trois types de parcours répondant à trois usages clairs :
+          (1) éditoriaux signés par l'équipe HistoLyon avec rigueur narrative
+          et historique, (2) communautaires créés et publiés par les
+          utilisateurs, (3) personnels privés à un utilisateur (créés mais
+          non publiés). Cette typologie est la clé du catalogue (D3.2) et
+          des règles de publication.
+
+      comportement: >-
+          Trois types distincts cohabitent : (1) Parcours éditoriaux —
+          conçus par l'équipe / la lead historienne, narrativement riches,
+          portent une marque distinctive 'Officiel', démarrent avec un seul
+          parcours actuellement ; (2) Parcours communautaires — créés par les
+          utilisateurs (D3.7), publiés à la communauté après publication
+          explicite par leur auteur (compte requis, cf. D6.5), peuvent
+          recevoir des retours (D9.3) ; (3) Parcours personnels — créés
+          par l'utilisateur mais NON publiés, restent privés et accessibles
+          uniquement à leur auteur dans son espace personnel. Mme Dupont
+          l'illustre : elle crée un parcours pour sa sortie, peut le partager
+          via lien direct (D11) sans le publier à la communauté.
+
+      regles_fonctionnelles:
+          - "3 types : éditorial / communautaire / personnel"
+          - "Éditoriaux : marque distinctive officielle visible — actuellement, démarrer avec 1 seul parcours éditorial"
+          - "Communautaires : publication explicite par l'auteur, compte requis (D6.5), modération possible (D9.4 + D10.5)"
+          - "Personnels : privés, accessibles uniquement à l'auteur dans son espace personnel"
+          - "Un parcours communautaire peut être partagé par lien direct (D11) sans être publié à la communauté"
+          - "Pas de hiérarchie de qualité automatique (un parcours communautaire bien noté reste communautaire, pas officiel)"
+
+      capabilites:
+          - "Distinguer un parcours selon son origine (éditorial / communautaire / personnel)"
+          - "Apposer une marque officielle sur les parcours éditoriaux"
+          - "Distinguer visuellement chaque type dans le catalogue (D3.2)"
+          - "Filtrer le catalogue par type (D3.2)"
+
+      ce_qu_on_ne_fait_pas:
+          - "Pas de promotion automatique d'un parcours communautaire en éditorial"
+          - "Pas de parcours communautaire visible avant publication explicite par l'auteur"
+          - "Pas de parcours personnel visible aux autres utilisateurs"
+          - "Pas de plus de 3 types (la typologie reste figée )"
+
+      criteres_de_reussite:
+          - "L'utilisateur reconnaît immédiatement un parcours éditorial via sa marque distinctive"
+          - "Mme Dupont peut créer un parcours pour sa sortie sans le publier à la communauté"
+          - "La rigueur scientifique des éditoriaux (essence § historicité) est garantie par leur statut"
+
+      definition_of_done:
+          - "Les 3 types sont supportés"
+          - "La marque officielle est appliquée automatiquement aux parcours éditoriaux"
+          - "Le filtrage par type fonctionne dans le catalogue"
+          - "Un parcours personnel est invisible aux autres utilisateurs"
+
+      enjeux_transversaux:
+          accessibilite: >-
+              La marque officielle a un label vocal explicite signalant le
+              statut officiel (libellé exact en palier 8) pour les lecteurs
+              d'écran.
+          performance: "Pas d'enjeu spécifique."
+          vie_privee: >-
+              Un parcours personnel ne doit jamais fuiter (pas d'index public,
+              pas de référence dans des résultats de recherche cross-utilisateurs).
+
+      questions_ouvertes:
+          - "Un seul parcours éditorial à la livraison ? À confirmer avec la lead/historienne (cf. brief § 9.1)"
+          - "Promotion future d'un parcours communautaire en éditorial : quel processus ? (recommandation : décision éditoriale humaine)"
+
+      priorite: "important"
+
+      personas_principaux:
+          - mme_dupont
+          - mme_martin
+          - kenji
+          - pere_lyonnais
+          - anais_back_office
+
+      dependances: []
+
+    # ===========================================================================
+    - id: D3.2
+      nom: "Catalogue parcours"
+
+      raison_d_etre: >-
+          Donner aux utilisateurs un point d'entrée pour découvrir les
+          parcours disponibles, qu'ils soient éditoriaux, communautaires
+          ou personnels. C'est la surface Parcours, l'une des trois
+          surfaces principales de l'app (Carte / Parcours / Profil) — la
+          forme exacte de la navigation entre ces surfaces relève du
+          palier 5.
+
+      comportement: >-
+          La surface Parcours s'organise en trois zones (cf. brief § 9.2) :
+          une zone éditoriale mettant en avant les parcours signés par
+          l'équipe, une zone communautaire regroupant les parcours publiés
+          par les utilisateurs, et un espace personnel rassemblant les
+          parcours créés, sauvegardés, en cours ou terminés. Une bascule
+          permet de passer entre l'exploration (zones éditoriale +
+          communautaire) et l'espace personnel. Un système de recherche
+          et filtres est disponible : type, durée, distance, époque,
+          catégorie de pins. Un filtre de proximité est activé par défaut
+          si la géoloc est disponible. Un point d'accès permanent à la
+          création de parcours est offert (D3.7).
+
+      regles_fonctionnelles:
+          - "3 zones : éditoriale / communautaire / espace personnel (via bascule)"
+          - "Filtres disponibles : type, durée, distance, époque, catégorie de pins"
+          - "Filtre de proximité activé par défaut si géoloc disponible"
+          - "Point d'accès permanent à la création (D3.7)"
+          - "Distinction visuelle nette éditoriaux vs communautaires"
+          - "Évaluation moyenne sur communautaires affichée seulement si l'auteur l'a activée et seuil minimal atteint (cf. D9.3)"
+
+      capabilites:
+          - "Présenter les parcours en 3 zones distinctes"
+          - "Filtrer par type, durée, distance, époque, catégorie via les filtres"
+          - "Trier par proximité géographique si géoloc disponible"
+          - "Naviguer vers la fiche parcours (D3.3) à l'activation"
+          - "Lancer la création d'un parcours via le point d'accès dédié"
+          - "Basculer entre l'exploration et l'espace personnel"
+
+      ce_qu_on_ne_fait_pas:
+          - "Pas de mélange éditoriaux et communautaires dans la même zone"
+          - "Pas de tri imposé par popularité des communautaires (essence § ce_qu_on_refuse implicite — pas de growth hack)"
+          - "Pas de promotion sponsorisée"
+          - "Pas de catalogue infini sans filtres (forcer la pertinence)"
+
+      criteres_de_reussite:
+          - "Mme Dupont trouve un parcours éditorial sur le Vieux Lyon rapidement"
+          - "Le père lyonnais retrouve facilement ses parcours sauvegardés / créés (test_litmus pere_lyonnais)"
+          - "La distinction éditoriaux / communautaires est immédiate visuellement"
+
+      definition_of_done:
+          - "Les 3 zones (éditoriale, communautaire, espace personnel) s'affichent"
+          - "Les filtres fonctionnent (au moins 5 types de filtres)"
+          - "Le point d'accès création lance D3.7"
+          - "La bascule exploration / espace personnel fonctionne"
+          - "Le tri par proximité est actif par défaut quand géoloc disponible"
+
+      enjeux_transversaux:
+          accessibilite: >-
+              Le catalogue doit être navigable au clavier. Le nombre de
+              résultats doit être annoncé par lecteurs d'écran. Les
+              distinctions visuelles éditoriaux/communautaires ne doivent
+              pas reposer uniquement sur la couleur.
+          performance: >-
+              Le catalogue doit se charger rapidement à l'ouverture de la
+              surface. L'application des filtres doit être perçue comme
+              immédiate.
+          vie_privee: "Pas d'enjeu spécifique."
+
+      questions_ouvertes:
+          - "Politique d'éditorialisation de la zone éditoriale : algorithmique ou manuelle ? (recommandation : manuelle pour l'instant)"
+
+      priorite: "important"
+
+      personas_principaux:
+          - mme_dupont
+          - kenji
+          - pere_lyonnais
+          - mme_martin
+
+      dependances:
+          - "D3.1 (types de parcours)"
+          - "D3.3 (fiche parcours — accessible au tap)"
+          - "D3.7 (création — déclenchée par le point d'accès)"
+          - "D9.3 (évaluations communautaires — affichage)"
+
+    # ===========================================================================
+    - id: D3.3
+      nom: "Fiche parcours"
+
+      raison_d_etre: >-
+          Donner à l'utilisateur tout ce qu'il faut pour décider de démarrer
+          ou non un parcours, en restant dans le ton conteur. La fiche est
+          l'écran qui s'ouvre depuis le catalogue (D3.2) et propose le
+          contexte, l'intention narrative, les contraintes pratiques (durée,
+          distance, étapes) et l'accès au démarrage.
+
+      comportement: >-
+          La fiche parcours s'ouvre en surface dédiée depuis le catalogue.
+          Elle présente : (1) une mise en condition visuelle d'ouverture
+          (image atmosphérique avec titre du parcours et marque officielle
+          ou identification visuelle de l'auteur) ; (2) les métadonnées —
+          durée estimée à pied, distance, nombre d'étapes, époque(s)
+          traversée(s), indication de densité du contenu (3 niveaux,
+          libellés exacts en palier 8) ; (3) un teaser narratif court en
+          ton conteur ; (4) un aperçu de l'itinéraire avec étapes
+          numérotées, agrandissable ; (5) la liste des étapes — numéro,
+          nom du lieu, teaser court, activation permettant d'ouvrir
+          l'aperçu du pin (D2.4) ; (6) un accès au démarrage qui adapte
+          son libellé selon le contexte (3 variantes selon que l'utilisateur
+          est à proximité du départ, éloigné, ou en mode canapé — libellés
+          exacts en palier 8) ; (7) une zone secondaire — auteur, date,
+          nombre de complétions, accès au partage (référence D11.5) et à
+          la sauvegarde.
+
+      regles_fonctionnelles:
+          - "Présentation en surface dédiée (pas un aperçu superposé)"
+          - "Mise en condition visuelle obligatoire (titre + identification de l'auteur ou marque officielle)"
+          - "Métadonnées : durée, distance, étapes, époque(s), indication de densité (3 niveaux)"
+          - "Teaser narratif obligatoire (court, ton conteur)"
+          - "Aperçu de l'itinéraire avec étapes numérotées"
+          - "Liste des étapes : activation → aperçu du pin (D2.4)"
+          - "Accès au démarrage avec libellé contextuel (3 variantes selon proximité)"
+          - "Accès au partage (référence D11.5) et à la sauvegarde dans l'espace personnel (D6.2)"
+
+      capabilites:
+          - "Présenter la fiche complète d'un parcours"
+          - "Adapter le libellé du démarrage selon la proximité du départ (3 variantes contextuelles)"
+          - "Permettre l'aperçu d'une étape sans démarrer (référence D2.4)"
+          - "Présenter l'auteur (équipe pour éditorial / utilisateur pour communautaire)"
+          - "Permettre le partage (référence D11.5)"
+          - "Permettre la sauvegarde dans l'espace personnel (D6.2)"
+          - "Permettre l'agrandissement de l'aperçu de l'itinéraire"
+
+      ce_qu_on_ne_fait_pas:
+          - "Pas d'ouverture en aperçu superposé (surface dédiée obligatoire)"
+          - "Pas de teaser narratif absent (la mise en condition narrative est clé)"
+          - "Pas d'accès au démarrage avant que les métadonnées et le teaser soient consultables"
+          - "Pas d'indication de difficulté physique (essence § ce_qu_on_refuse — pas de gamification fitness)"
+
+      criteres_de_reussite:
+          - "Mme Dupont décide rapidement si le parcours convient à sa classe"
+          - "Le teaser narratif donne envie sans tout révéler (essence § émerveillement)"
+          - "L'auteur (équipe / communautaire) est immédiatement reconnaissable"
+
+      definition_of_done:
+          - "Tous les blocs (1-7) s'affichent et sont fonctionnels"
+          - "Le libellé de démarrage adapte son texte selon la proximité"
+          - "Les étapes sont consultables en aperçu pin"
+          - "L'aperçu de l'itinéraire est agrandissable"
+          - "Le partage et la sauvegarde fonctionnent"
+
+      enjeux_transversaux:
+          accessibilite: >-
+              La fiche est navigable au clavier et lue par lecteurs d'écran.
+              Le démarrage doit avoir un focus stable. Les étapes sont
+              navigables individuellement.
+          performance: >-
+              Chargement rapide à l'ouverture. L'aperçu de l'itinéraire ne
+              doit pas bloquer le rendu de la fiche.
+          vie_privee: "Pas d'enjeu spécifique."
+
+      questions_ouvertes:
+          - "Définition opérationnelle de 'à proximité' pour le libellé du démarrage (rayon ?) — palier 7"
+          - "Format de l'indication de densité du contenu (icônes ? texte ?) — palier 13"
+
+      priorite: "important"
+
+      personas_principaux:
+          - mme_dupont
+          - kenji
+          - mme_martin
+          - pere_lyonnais
+
+      dependances:
+          - "D3.2 (catalogue — point d'entrée)"
+          - "D2.4 (aperçu pin — accessible via les étapes)"
+          - "D3.4 (lancement — déclenché par le démarrage)"
+          - "D6.2 (favoris — sauvegarde)"
+          - "D9.3 (évaluations communautaires — affichage)"
+
+      comportements_transverses_referenced:
+          - "Partage natif système (canonique D11.5) — accès au partage de la fiche"
+          - "Géolocalisation (canonique D1.1) — détermine le libellé du démarrage"
+
+    # ===========================================================================
+    - id: D3.4
+      nom: "Lancement de parcours"
+
+      raison_d_etre: >-
+          Faire le pont entre 'décider de faire un parcours' et 'le vivre'.
+          Le lancement est un MOMENT D'ÉMERVEILLEMENT — la carte se recadre,
+          l'itinéraire apparaît, les pins s'organisent autour du parcours.
+          C'est une transition chorégraphiée qui signale à l'utilisateur
+          'tu rentres dans une histoire'.
+
+      comportement: >-
+          Au démarrage depuis la fiche (D3.3), l'app bascule sur la
+          surface Carte — le parcours se vit SUR la carte, pas dans un
+          écran séparé. La carte se recadre sur l'ensemble de
+          l'itinéraire, puis se rapproche de la première étape. Pendant
+          cette transition, l'itinéraire apparaît — une ligne reliant les
+          pins dans l'ordre, avec une distinction visuelle entre segments
+          parcourus et non parcourus. Les pins HORS parcours sont
+          visuellement atténués (cf. D2.1) mais restent cliquables. Les
+          pins du parcours sont mis en avant et numérotés. Une présence
+          persistante en pied d'écran s'affiche : titre du parcours,
+          étape en cours, indication de progression, accès aux contrôles
+          (pause, quitter, liste des étapes). Le slider d'époques (D1.2)
+          se positionne automatiquement sur l'époque de la première étape.
+          Si le démarrage initial était la variante "rejoindre le départ"
+          (utilisateur éloigné), l'app ouvre l'application de navigation
+          système pour amener l'utilisateur au point de départ.
+
+      regles_fonctionnelles:
+          - "Bascule automatique sur la surface Carte au démarrage"
+          - "Recadrage de la carte sur l'itinéraire complet, puis approche de l'étape 1"
+          - "Itinéraire visible avec distinction parcouru / non parcouru"
+          - "Pins hors parcours atténués (cf. D2.1)"
+          - "Pins du parcours mis en avant et numérotés"
+          - "Présence persistante en pied d'écran avec contrôles du parcours"
+          - "Slider d'époques (D1.2) auto-positionné sur l'époque de l'étape 1"
+          - "Si variante 'rejoindre le départ' (utilisateur éloigné) : ouverture de l'application de navigation système"
+
+      capabilites:
+          - "Basculer sur la surface Carte au démarrage"
+          - "Recadrer la carte sur l'itinéraire complet puis sur l'étape 1"
+          - "Présenter l'itinéraire avec distinction parcouru / non parcouru"
+          - "Modifier la présentation des pins selon parcours actif (cf. D2.1)"
+          - "Numéroter les pins du parcours"
+          - "Maintenir une présence persistante avec les contrôles du parcours"
+          - "Positionner le slider d'époques automatiquement"
+          - "Ouvrir l'application de navigation système quand l'utilisateur démarre éloigné"
+
+      ce_qu_on_ne_fait_pas:
+          - "Pas d'écran 'Lancement' dédié (la carte est l'écran)"
+          - "Pas de turn-by-turn GPS (essence § ce_qu_on_refuse)"
+          - "Pas de tutoriel ou de pop-up explicatif au lancement"
+
+      criteres_de_reussite:
+          - "Le moment 'Démarrer' produit un effet visuel marquant (essence § émerveillement)"
+          - "L'utilisateur comprend immédiatement où il doit aller (étape 1 mise en avant)"
+          - "Mme Dupont en sortie scolaire voit immédiatement le tracé"
+
+      definition_of_done:
+          - "La bascule sur Carte fonctionne au démarrage"
+          - "Le recadrage et l'approche de l'étape 1 fonctionnent"
+          - "L'itinéraire est visible et stylisé"
+          - "Les pins du parcours sont numérotés, les pins hors parcours sont atténués"
+          - "La présence persistante apparaît"
+          - "Le slider est auto-positionné"
+          - "'S'y rendre' ouvre l'application de navigation système"
+
+      enjeux_transversaux:
+          accessibilite: >-
+              Le lecteur d'écran annonce le démarrage du parcours. La
+              présence persistante est accessible (les contrôles ont des
+              labels vocaux).
+          performance: >-
+              L'animation de lancement doit être fluide. Le recadrage et
+              l'approche doivent être perçus comme une seule transition,
+              pas comme deux étapes saccadées.
+          vie_privee: "Pas d'enjeu spécifique."
+
+      questions_ouvertes:
+          - "Faut-il une voix-off de bienvenue lue par l'audio au lancement ? (recommandation : non par défaut)"
+
+      priorite: "important"
+
+      personas_principaux:
+          - mme_dupont
+          - kenji
+          - mme_martin
+          - pere_lyonnais
+
+      dependances:
+          - "D3.3 (fiche parcours — point de départ)"
+          - "D1.1 (carte de base)"
+          - "D1.2 (slider — auto-positionné)"
+          - "D2.1 (pins — présentation modifiée)"
+          - "D3.5 (vivre le parcours — destination)"
+          - "D3.6 (mode canapé — variant si pas à Lyon)"
+
+      comportements_transverses_referenced:
+          - "Géolocalisation (canonique D1.1)"
+
+    # ===========================================================================
+    - id: D3.5
+      nom: "Vivre un parcours étape par étape"
+
+      raison_d_etre: >-
+          Accompagner l'utilisateur de l'étape 1 à la dernière, sans
+          friction et sans turn-by-turn GPS — l'app est un compagnon de
+          balade, pas un GPS. Ce sous-domaine décrit ce qui se passe ENTRE
+          le lancement (D3.4) et la fin (D3.9) : l'arrivée à une étape, la
+          navigation entre étapes, les transitions narratives, l'audio en
+          marche, la progression visuelle.
+
+      comportement: >-
+          L'utilisateur marche vers la première étape. Quand la géoloc
+          détecte son entrée à proximité du pin, un signal discret le
+          prévient et la consultation approfondie du pin (D2.5) s'ouvre
+          automatiquement. Si la géoloc est imprécise, un déclenchement
+          manuel d'arrivée est disponible (le fameux fallback). Un accès
+          au passage à l'étape suivante est toujours disponible pour
+          sauter une étape. Pour la navigation entre étapes : direction
+          et distance simples sont affichées dans la présence persistante
+          — pas de turn-by-turn. Le tracé sur la carte fait le reste. Un
+          accès au déport vers l'application de navigation système est
+          offert si l'utilisateur veut un vrai GPS. Pendant la marche,
+          des transitions narratives (texte ou audio court, parcours
+          éditoriaux uniquement) peuvent s'afficher pour faire le LIEN
+          entre deux étapes. L'audio (D7) peut continuer en arrière-plan
+          même quand la consultation est fermée — mains libres. La
+          présence persistante affiche la progression (étape courante /
+          total) avec une indication de l'étape en cours.
+
+      regles_fonctionnelles:
+          - "La géoloc déclenche l'arrivée à proximité du pin"
+          - "Signal discret + ouverture automatique de la consultation à l'arrivée"
+          - "Déclenchement manuel d'arrivée disponible (fallback en cas de géoloc imprécise)"
+          - "Accès au passage à l'étape suivante toujours accessible (saut volontaire)"
+          - "Direction et distance simples, pas turn-by-turn (essence § ce_qu_on_refuse)"
+          - "Déport vers l'application de navigation système disponible (renvoi externe)"
+          - "Transitions narratives entre étapes : parcours éditoriaux uniquement (qualité non garantie pour les communautaires)"
+          - "Audio peut continuer en arrière-plan (référence D7.4)"
+          - "Présence persistante affiche : titre, étape en cours, progression (courant / total), accès aux contrôles"
+
+      capabilites:
+          - "Détecter l'arrivée à une étape via géoloc"
+          - "Déclencher signal discret + ouverture de la consultation à l'arrivée"
+          - "Permettre le déclenchement manuel d'arrivée (fallback)"
+          - "Permettre le saut volontaire vers l'étape suivante"
+          - "Présenter direction et distance vers la prochaine étape"
+          - "Déporter vers l'application de navigation système pour navigation détaillée"
+          - "Présenter des transitions narratives entre étapes (éditoriaux)"
+          - "Maintenir la lecture audio en arrière-plan"
+          - "Présenter la progression (étape courante / total) avec indication de l'étape"
+
+      ce_qu_on_ne_fait_pas:
+          - "Pas de turn-by-turn GPS (essence § ce_qu_on_refuse)"
+          - "Pas d'ouverture forcée de la consultation si l'utilisateur l'a explicitement fermée auparavant (respect)"
+          - "Pas de transitions narratives sur les parcours communautaires"
+          - "Pas de pénalité pour saut d'étape (pas de jugement)"
+
+      criteres_de_reussite:
+          - "Kenji marche les yeux sur la ville, l'audio démarre à l'arrivée, il vit sans regarder son écran (test_litmus n°2)"
+          - "Mme Dupont en sortie scolaire est rassurée par la présence persistante (progression et direction visibles)"
+          - "Le père lyonnais saute une étape sans culpabiliser (UX bienveillante)"
+
+      definition_of_done:
+          - "La détection géoloc à l'arrivée fonctionne"
+          - "Signal + ouverture automatique de la consultation à l'arrivée"
+          - "Le déclenchement manuel d'arrivée fonctionne en fallback"
+          - "Le saut volontaire à l'étape suivante fonctionne"
+          - "Direction et distance affichées dans la présence persistante"
+          - "Le déport vers l'application de navigation système fonctionne"
+          - "Les transitions narratives s'affichent (éditoriaux)"
+          - "L'audio en arrière-plan fonctionne (cf. D7.4)"
+          - "La progression (étape courante / total) est correctement incrémentée"
+
+      enjeux_transversaux:
+          accessibilite: >-
+              Le signal discret à l'arrivée doit pouvoir être désactivé dans
+              les paramètres (D6.4). L'audio = alternative à la lecture
+              (cf. D7). La présence persistante est lue par lecteurs d'écran
+              à chaque changement d'étape.
+          performance: >-
+              La détection d'arrivée doit être rapide après entrée dans le
+              rayon. Le signal et l'ouverture doivent être synchronisés.
+          vie_privee: >-
+              La position est utilisée localement pour la détection ; pas
+              de transmission serveur (cohérent avec D1.1).
+
+      questions_ouvertes:
+          - "Rayon exact de déclenchement à 'proximité' — à mesurer terrain"
+          - "Comportement si plusieurs pins du parcours sont dans le rayon en même temps (ordre forcé ou choix utilisateur ?)"
+
+      priorite: "important"
+
+      personas_principaux:
+          - kenji
+          - mme_dupont
+          - pere_lyonnais
+
+      dependances:
+          - "D3.4 (lancement — précédent)"
+          - "D2.5 (consultation approfondie — ouverte à l'arrivée)"
+          - "D7 (audio en arrière-plan)"
+          - "D1.1 (géoloc canonique)"
+          - "D3.9 (fin de parcours — destination)"
+
+      comportements_transverses_referenced:
+          - "Géolocalisation (canonique D1.1)"
+          - "Lecture audio en arrière-plan (canonique D7.4)"
+
+    # ===========================================================================
+    - id: D3.6
+      nom: "Mode canapé"
+
+      raison_d_etre: >-
+          Le mode canapé n'est PAS un mode dégradé — c'est un usage à part
+          entière (essence § ce_qu_on_refuse : 'Le mode canapé comme mode
+          dégradé'). Mme Martin en classe, Kenji à l'hôtel, le père qui
+          browse le soir : tous méritent le même soin que l'utilisateur
+          sur le terrain. Ce sous-domaine décrit comment vivre un parcours
+          sans géoloc, avec le contenu intégral et des transitions
+          d'époques mises en scène pour le 'wow'.
+
+      comportement: >-
+          Si l'utilisateur démarre un parcours sans être à proximité de la
+          première étape (détecté via géoloc, ou via choix explicite de
+          l'exploration depuis sa position actuelle), l'app bascule
+          automatiquement en mode canapé — sans rien demander. Un
+          indicateur discret signale le mode exploration dans la présence
+          persistante. La navigation devient manuelle : pins numérotés
+          sur la carte, accès au passage à l'étape précédente ou suivante
+          au lieu de la direction. L'utilisateur
+          peut naviguer dans l'ordre qu'il veut. Le contenu reste IDENTIQUE
+          — consultation approfondie, audio, quiz, archives. Seule la
+          couche de navigation physique (direction, distance, géodéclenchement)
+          est retirée. Quand on passe d'une étape à l'autre, les TRANSITIONS
+          D'ÉPOQUE sont mises en scène : la carte effectue sa transition
+          d'époque visiblement (cf. D1.3) — c'est le 'wow' du mode canapé.
+          Le MODE PRÉSENTATION SANS CHROME (référence canonique D2.5) est
+          promu particulièrement ici, pour Mme Martin qui projette en classe.
+
+      regles_fonctionnelles:
+          - "Bascule automatique en mode canapé si pas à proximité (sans demande à l'utilisateur)"
+          - "Indicateur discret signalant le mode exploration dans la présence persistante"
+          - "Navigation manuelle : passage à l'étape précédente ou suivante"
+          - "Pas de géoloc déclenchée"
+          - "Contenu intégral (essence § principe : citoyen de première classe)"
+          - "Transitions d'époque mises en scène entre étapes (animation D1.3 visible)"
+          - "Mode présentation sans chrome promu (référence D2.5)"
+          - "Pas de message signalant un mode dégradé ou la non-présence à Lyon"
+
+      capabilites:
+          - "Détecter automatiquement le mode canapé (pas à proximité)"
+          - "Présenter l'indicateur du mode exploration"
+          - "Permettre la navigation manuelle entre étapes"
+          - "Mettre en scène les transitions d'époque"
+          - "Activer le mode présentation sans chrome depuis la consultation approfondie"
+          - "Maintenir audio, quiz, archives — contenu intégral"
+
+      ce_qu_on_ne_fait_pas:
+          - "Pas de message signalant un mode dégradé ou la non-présence à Lyon (essence § ce_qu_on_refuse)"
+          - "Pas de fonctionnalités amputées par rapport au mode terrain"
+          - "Pas de turn-by-turn (cohérent avec D3.5)"
+          - "Pas de bascule manuelle utilisateur (auto-détection prime — éviter friction)"
+
+      criteres_de_reussite:
+          - "Mme Martin projette un parcours en classe en mode présentation sans chrome (test_litmus mme_martin n°1 transposé)"
+          - "Kenji explore un parcours depuis l'hôtel sans se sentir 'puni'"
+          - "Le père lyonnais 'fait' un parcours communautaire le dimanche soir sans bouger — expérience complète"
+          - "La transition d'époque entre 2 étapes est ressentie comme un 'voyage' (essence § émerveillement)"
+
+      definition_of_done:
+          - "La bascule automatique en mode canapé fonctionne sans friction"
+          - "L'indicateur du mode exploration est visible"
+          - "La navigation manuelle (précédente / suivante) fonctionne"
+          - "Les transitions d'époque sont visibles entre étapes"
+          - "Le mode présentation sans chrome est activable et fonctionnel"
+          - "Le contenu est identique au mode terrain"
+
+      enjeux_transversaux:
+          accessibilite: >-
+              Les accès navigation manuelle doivent avoir des cibles
+              suffisantes. Le mode présentation sans chrome reste accessible
+              aux lecteurs d'écran (cf. D2.5).
+          performance: >-
+              Les transitions d'époque doivent être fluides — c'est le
+              'wow' du mode canapé. Le passage entre étapes doit être perçu
+              comme une seule transition.
+          vie_privee: "Pas d'enjeu spécifique."
+
+      questions_ouvertes:
+          - "Faut-il un mode 'auto-play' du parcours en canapé (avancement auto) ? — recommandation : non par défaut, optionnel"
+          - "En classe (Mme Martin) : faut-il un mode 'présentation' avec contrôles visibles uniquement à l'enseignante ? — à arbitrer"
+
+      priorite: "important"
+
+      personas_principaux:
+          - mme_martin
+          - kenji
+          - pere_lyonnais
+
+      dependances:
+          - "D3.4 (lancement — variante exploration depuis position actuelle)"
+          - "D3.5 (vivre — sans géoloc)"
+          - "D1.3 (transitions d'époque — mises en scène)"
+          - "D2.5 (consultation approfondie et mode présentation sans chrome)"
+
+      comportements_transverses_referenced:
+          - "Mode présentation sans chrome (canonique D2.5) — promu en mode canapé pour Mme Martin"
+
+    # ===========================================================================
+    - id: D3.7
+      nom: "Création de parcours"
+
+      raison_d_etre: >-
+          Permettre à un utilisateur (Mme Dupont en tête) de créer son
+          propre parcours — pour une sortie scolaire, pour un thème
+          personnel, pour partager à la communauté. Le brief précise
+          (§ 9.7) que Mme Dupont n'est pas designer : le flux DOIT être
+          simple.
+
+      comportement: >-
+          L'utilisateur active le point d'accès création (depuis le
+          catalogue D3.2 ou un raccourci). Un écran de création s'ouvre
+          avec un titre éditable et la carte en fond. Il ajoute des étapes
+          de deux manières : (a) sur la carte — il navigue, tap un pin,
+          l'aperçu du pin (D2.4) propose un accès à l'ajout au parcours
+          en construction ; le pin se numérote automatiquement. (b) Via
+          la recherche — un
+          champ disponible, des résultats avec accès d'ajout par résultat.
+          Il peut RÉORDONNER les étapes par manipulation directe ; la carte
+          met à jour l'itinéraire en temps réel. Un accès optionnel
+          'Optimiser l'itinéraire' propose de réarranger pour minimiser la
+          distance — accepter ou garder l'ordre pédagogique. Des notes
+          personnelles par étape ('Pause goûter ici') sont possibles.
+          Les MÉTADONNÉES sont AUTO-CALCULÉES (durée, distance, époques)
+          — rien à saisir. Sauvegarde automatique en BROUILLON. Choix de
+          publier à la communauté (compte requis, cf. D6.5) ou de garder
+          privé (parcours personnel).
+
+      regles_fonctionnelles:
+          - "Ouverture via le point d'accès création du catalogue (D3.2)"
+          - "Écran de création : titre + carte + recherche"
+          - "Ajout d'étape par tap sur un pin de la carte (référence D2.4)"
+          - "Ajout d'étape par recherche (résultat + accès d'ajout)"
+          - "Numérotation automatique au fur et à mesure"
+          - "Réordonnancement par manipulation directe ; carte mise à jour en temps réel"
+          - "'Optimiser l'itinéraire' : accès optionnel (jamais auto-appliqué)"
+          - "Notes personnelles par étape (champ texte court)"
+          - "Métadonnées auto-calculées (durée, distance, époques)"
+          - "Sauvegarde brouillon automatique"
+          - "Publication explicite (compte requis pour publier à la communauté)"
+          - "Pas de création de pins custom (uniquement pins existants, cf. brief § 9.7)"
+          - "Pas d'édition du contenu des pins"
+          - "Pas de transitions narratives custom (réservé aux éditoriaux)"
+
+      capabilites:
+          - "Créer un parcours avec un titre"
+          - "Ajouter un pin existant comme étape (par carte ou recherche)"
+          - "Numéroter automatiquement les étapes"
+          - "Réordonner les étapes par manipulation directe"
+          - "Optimiser l'ordre des étapes (suggestion non-imposée)"
+          - "Ajouter une note personnelle par étape"
+          - "Calculer durée, distance, époques traversées automatiquement"
+          - "Sauvegarder en brouillon automatiquement"
+          - "Publier à la communauté (compte requis)"
+          - "Garder privé (parcours personnel)"
+
+      ce_qu_on_ne_fait_pas:
+          - "Pas de création de pins custom (utilise uniquement les pins existants)"
+          - "Pas d'édition du contenu d'un pin par l'utilisateur"
+          - "Pas de transitions narratives custom (réservé aux éditoriaux)"
+          - "Pas de paywall ou abonnement pour créer (essence § ce_qu_on_refuse)"
+          - "Pas de validation préalable obligatoire pour publier (mais modération a posteriori, cf. D9.4)"
+
+      criteres_de_reussite:
+          - "Mme Dupont prépare un parcours du Vieux Lyon en moins de 30 minutes (test_litmus n°1)"
+          - "L'ajout d'une étape se fait en peu d'actions"
+          - "Le réordonnancement par manipulation directe est fluide et lisible"
+          - "Les métadonnées auto-calculées sont fiables"
+
+      definition_of_done:
+          - "L'écran de création est accessible via le point d'accès création"
+          - "L'ajout par carte et par recherche fonctionnent"
+          - "La numérotation automatique est correcte"
+          - "Le réordonnancement par manipulation directe fonctionne"
+          - "L'optimisation d'itinéraire produit une suggestion utilisable"
+          - "Les notes personnelles sont enregistrées"
+          - "Les métadonnées sont auto-calculées"
+          - "La sauvegarde brouillon est automatique"
+          - "Publication / privé fonctionne"
+
+      enjeux_transversaux:
+          accessibilite: >-
+              Le réordonnancement par manipulation directe doit avoir une
+              alternative au clavier. Les notes personnelles : champ texte
+              accessible.
+          performance: >-
+              L'ajout d'étape doit être perçu comme immédiat. Le recalcul
+              des métadonnées ne doit pas bloquer l'interaction.
+          vie_privee: >-
+              Un parcours personnel reste local par défaut, ne fuite jamais.
+              Les notes personnelles d'un parcours partagé deviennent visibles
+              aux destinataires — à signaler à l'utilisateur lors du partage.
+
+      questions_ouvertes:
+          - "Algorithme exact d'optimisation d'itinéraire — palier 4 / dev"
+          - "Limite max d'étapes par parcours (recommandation : ~20 max)"
+          - "Notes personnelles partagées ou privées ? (cf. brief § 9.7 : visibles dans le parcours partagé)"
+
+      priorite: "important"
+
+      personas_principaux:
+          - mme_dupont
+          - pere_lyonnais
+
+      dependances:
+          - "D3.2 (catalogue — point d'entrée)"
+          - "D2.4 (aperçu — accès à l'ajout au parcours en construction)"
+          - "D1.4 (recherche — pour ajouter par recherche)"
+          - "D1.2 (slider d'époques — pour saisir un parcours multi-époques, l'auteur navigue entre les époques pertinentes)"
+          - "D3.1 (types — choix publier/privé)"
+          - "D6.5 (compte — requis pour publication)"
+
+    # ===========================================================================
+    - id: D3.8
+      nom: "Partage de parcours"
+
+      raison_d_etre: >-
+          Permettre à un utilisateur de partager un parcours créé ou
+          découvert — Mme Dupont envoie son parcours aux parents
+          accompagnateurs, Kenji partage un parcours qui lui a plu,
+          l'office du tourisme imprime un code visuel pour son comptoir.
+          Le partage est un nœud de viralité douce (essence : pas de growth
+          hack, mais permettre la diffusion organique).
+
+      comportement: >-
+          Depuis la fiche parcours (D3.3) ou depuis la vue carte d'un
+          parcours actif, un accès 'Partager' déclenche le partage natif
+          système (référence D11.5) qui propose : (1) un lien universel
+          court envoyable par messagerie ; (2) un code visuel imprimable
+          (référence D11.3) — utile pour impression (feuille parents,
+          panneau office du tourisme) ; (3) une option de copie du lien.
+          Si l'app EST INSTALLÉE chez le destinataire → ouvre directement
+          la fiche du parcours dans l'app. Sinon → version web responsive
+          (D11.2) en lecture seule avec proposition de téléchargement de
+          l'app. Pas de code alphanumérique (essence § ce_qu_on_refuse
+          implicite : friction inutile).
+
+      regles_fonctionnelles:
+          - "Accès 'Partager' sur la fiche parcours (D3.3) et sur la vue carte d'un parcours actif"
+          - "Partage natif système (référence D11.5)"
+          - "Lien universel pour ouvrir l'app si installée, la version web sinon"
+          - "Code visuel imprimable (référence D11.3) disponible dans le partage"
+          - "Pas de code alphanumérique (cf. brief § 9.8)"
+
+      capabilites:
+          - "Générer un lien universel pour un parcours"
+          - "Générer un code visuel imprimable à la volée"
+          - "Déclencher le partage natif système"
+          - "Détecter si l'app est installée chez le destinataire (via lien universel)"
+          - "Rediriger vers la version web responsive en fallback"
+
+      ce_qu_on_ne_fait_pas:
+          - "Pas de code alphanumérique (cf. brief § 9.8)"
+          - "Pas d'inscription forcée pour ouvrir un lien partagé"
+          - "Pas de tracking abusif des partages"
+
+      criteres_de_reussite:
+          - "Mme Dupont envoie le lien aux parents accompagnateurs et tous l'ouvrent rapidement (test_litmus n°2)"
+          - "L'office du tourisme peut imprimer un code visuel de qualité presse"
+          - "Le partage produit toujours un résultat (lien fonctionnel ou version web)"
+
+      definition_of_done:
+          - "L'accès 'Partager' déclenche le partage natif système"
+          - "Le lien universel est généré"
+          - "Le code visuel est généré et exportable"
+          - "Le lien universel ouvre l'app si installée"
+          - "La version web responsive est en fallback"
+
+      enjeux_transversaux:
+          accessibilite: >-
+              L'accès 'Partager' a un label vocal explicite. Le code visuel
+              peut être agrandi pour utilisateurs malvoyants.
+          performance: >-
+              La génération du code visuel doit être perçue comme rapide.
+              Le lien universel est instantané.
+          vie_privee: >-
+              Pas de tracking abusif des partages — un partage est un acte
+              utilisateur, pas une mesure analytique.
+
+      questions_ouvertes:
+          - "Faut-il une expiration du lien (recommandation : pas par défaut)"
+          - "Statistiques de partage exposées à l'auteur (parcours communautaires) ? — palier 6 / D9"
+
+      priorite: "important"
+
+      personas_principaux:
+          - mme_dupont
+          - kenji
+          - pere_lyonnais
+
+      dependances:
+          - "D3.3 (fiche parcours — point d'entrée)"
+          - "D11.1 (lien universel)"
+          - "D11.2 (version web responsive)"
+          - "D11.3 (code visuel imprimable)"
+          - "D11.5 (partage natif — référence canonique)"
+
+      comportements_transverses_referenced:
+          - "Partage natif système (canonique D11.5)"
+
+    # ===========================================================================
+    - id: D3.9
+      nom: "Fin et célébration"
+
+      raison_d_etre: >-
+          Marquer la fin d'un parcours par un MOMENT DE GRATIFICATION qui
+          donne envie de raconter, de partager, et éventuellement de
+          recommencer. La fin n'est pas une chute brutale — c'est un
+          mini-spectacle qui célèbre l'effort et fixe la mémoire (essence
+          § émerveillement).
+
+      comportement: >-
+          Quand la dernière étape est complétée, un moment de célébration
+          en surface dédiée s'affiche avec : (1) une phrase narrative de
+          conclusion liée au parcours ; (2) des statistiques — distance
+          parcourue, temps passé, étapes complétées, quiz réussis ; (3)
+          la trace du trajet effectué avec étapes cochées ; (4) un accès
+          au partage qui génère une image partageable (référence D11.4)
+          pour les réseaux sociaux ; (5) un badge collectionnable visuel
+          lié au parcours, visible sur le profil (D6.6 si activé). Après
+          la célébration, le parcours apparaît comme complété dans
+          l'espace personnel (D6.2 / D6.3) avec date et statistiques.
+          Relançable à tout moment.
+
+      regles_fonctionnelles:
+          - "Moment de célébration en surface dédiée à la complétion de la dernière étape"
+          - "Phrase narrative de conclusion (rédigée par Anaïs pour les éditoriaux, par l'auteur pour les communautaires)"
+          - "Statistiques affichées : distance, temps, étapes, quiz réussis"
+          - "Trace du trajet avec étapes cochées"
+          - "Accès au partage générant une image partageable (référence D11.4)"
+          - "Badge collectionnable visuel (lié au parcours, optionnel)"
+          - "Parcours marqué comme complété dans l'espace personnel avec date et statistiques"
+          - "Relançable à tout moment"
+
+      capabilites:
+          - "Détecter la complétion de la dernière étape"
+          - "Présenter le moment de célébration"
+          - "Calculer et présenter les statistiques du parcours"
+          - "Présenter la trace du trajet effectué"
+          - "Générer une image partageable (référence D11.4)"
+          - "Décerner un badge collectionnable"
+          - "Marquer le parcours comme complété dans le profil"
+          - "Permettre de relancer un parcours déjà complété"
+
+      ce_qu_on_ne_fait_pas:
+          - "Pas de gamification XP/classement (essence § ce_qu_on_refuse — pas de growth hack)"
+          - "Pas de sollicitation de notation de l'app à la fin"
+          - "Pas de fermeture automatique du moment de célébration"
+          - "Pas d'obligation de partager (essence § respect)"
+
+      criteres_de_reussite:
+          - "L'utilisateur sourit à la fin (essence § émerveillement)"
+          - "La phrase narrative de conclusion fait écho au début du parcours"
+          - "L'image partageable est visuellement réussie sans effort de l'utilisateur"
+          - "Le badge donne envie d'en collectionner d'autres (sans devenir une mécanique compulsive)"
+
+      definition_of_done:
+          - "La détection de complétion fonctionne"
+          - "Le moment de célébration s'affiche"
+          - "Les statistiques sont calculées correctement"
+          - "La trace du trajet est rendue avec étapes cochées"
+          - "L'image partageable est générée"
+          - "Le badge est décerné et visible sur profil (D6.6)"
+          - "Le parcours est marqué comme complété dans l'espace personnel"
+
+      enjeux_transversaux:
+          accessibilite: >-
+              Le moment de célébration est lu dans son intégralité par
+              lecteurs d'écran. L'image partageable a une description
+              alternative texte. Le badge a un label vocal.
+          performance: >-
+              La génération de l'image partageable ne doit pas faire
+              attendre. L'apparition du moment de célébration doit être
+              rapide.
+          vie_privee: >-
+              Les statistiques de complétion sont stockées localement par
+              défaut (cf. D6.3). Synchronisation cloud uniquement si compte
+              + sync activée.
+
+      questions_ouvertes:
+          - "Format exact du badge (icône simple ou illustration riche ?) — palier 13 / 9"
+          - "Les badges sont-ils visibles aux autres utilisateurs sur un profil public ? (recommandation : opt-in)"
+          - "Faut-il un signal sonore à l'apparition du moment de célébration ? — recommandation : non par défaut"
+
+      priorite: "important"
+
+      personas_principaux:
+          - kenji
+          - mme_dupont
+          - pere_lyonnais
+
+      dependances:
+          - "D3.5 (vivre — précédent)"
+          - "D3.6 (mode canapé — variant complétion canapé)"
+          - "D6.2 (favoris)"
+          - "D6.3 (historique)"
+          - "D6.6 (badges si activé)"
+          - "D11.4 (image partageable — référence)"
+
+    # ===========================================================================
+    - id: D3.10
+      nom: "Edge cases"
+
+      raison_d_etre: >-
+          Anticiper les cas atypiques qui se produisent en réalité : l'enfant
+          qui fatigue et fait dévier le parcours, la pause forcée, le saut
+          d'étape, la classe à 28 téléphones, le parcours qui traverse
+          plusieurs époques. Si on ne les pense pas au palier 3, ils
+          apparaissent comme bugs en production.
+
+      comportement: >-
+          DÉVIATION : pas de recalcul d'itinéraire (pas un GPS). La présence
+          persistante continue d'afficher direction et distance. Si
+          l'utilisateur s'éloigne nettement du tracé, un message discret
+          l'en informe avec un accès au recentrage de la carte. Pas de
+          stress.
+          PAUSE ET REPRISE : parcours actif persiste en arrière-plan.
+          Réouverture de l'app → invitation à reprendre le parcours en
+          cours. Progression sauvegardée étape par étape. Une mise en pause
+          manuelle désactive le tracking géoloc (économie batterie). Si
+          pause prolongée → notification de rappel douce.
+          SAUTER UNE ÉTAPE : depuis la liste des étapes (accessible via la
+          présence persistante), activation de n'importe quelle étape pour
+          y sauter. Étape sautée = état distinct de complétée. Récap final :
+          étapes complétées sur total, pas de jugement.
+          28 ÉLÈVES SIMULTANÉS : chaque téléphone est indépendant. Un mode
+          groupé (déclenchement coordonné par un appareil maître) est
+          ENVISAGEABLE plus tard (cf. brief § 9.11) — questionné comme
+          ouverture future.
+          PARCOURS MULTI-ÉPOQUES : le slider d'époques (D1.2) BOUGE au fil
+          des étapes — chaque étape impose son époque. La transition est
+          un moment de narration fort. Sur la fiche parcours (D3.3), les
+          époques traversées sont listées dans les métadonnées. Un message
+          discret indique l'époque imposée par l'étape en cours à chaque
+          changement automatique.
+
+      regles_fonctionnelles:
+          - "Pas de recalcul d'itinéraire en cas de déviation"
+          - "Message discret signalant l'éloignement + accès au recentrage au-delà d'une distance significative du tracé"
+          - "Persistance arrière-plan + invitation à reprendre à la réouverture"
+          - "Pause manuelle désactive géoloc (batterie)"
+          - "Notification de rappel douce après une pause prolongée"
+          - "Saut d'étape libre via la liste des étapes"
+          - "Récap final sans jugement"
+          - "Mode groupé : envisagé pour une évolution future, hors scope actuel"
+          - "Slider auto-piloté par l'étape en cours (cf. D1.2 et brief § 9.10)"
+          - "Slider non verrouillé (l'utilisateur peut explorer une autre époque manuellement, et le slider revient auto à l'époque de l'étape suivante)"
+          - "Message discret indiquant l'époque imposée à chaque transition automatique"
+
+      capabilites:
+          - "Détecter une déviation significative du tracé"
+          - "Présenter un message discret signalant l'éloignement avec accès au recentrage"
+          - "Sauvegarder la progression d'un parcours en arrière-plan"
+          - "Proposer une invitation à reprendre à la réouverture"
+          - "Envoyer une notification de rappel après une pause prolongée"
+          - "Permettre le saut d'étape via la liste"
+          - "Différencier visuellement étape complétée / sautée / non vue"
+          - "Piloter le slider d'époques selon l'étape en cours"
+          - "Présenter un message à chaque transition d'époque automatique"
+
+      ce_qu_on_ne_fait_pas:
+          - "Pas de recalcul d'itinéraire (essence § ce_qu_on_refuse — pas un GPS)"
+          - "Pas de message agressif ou culpabilisant en cas de déviation"
+          - "Pas de mode groupé actuellement"
+          - "Pas de blocage du slider d'époques pendant un parcours (l'utilisateur reste libre)"
+
+      criteres_de_reussite:
+          - "Mme Dupont voit un enfant fatiguer, dévie pour une pause, l'app ne stresse pas"
+          - "Le père lyonnais ferme l'app et la rouvre 2 jours plus tard : reprend où il en était"
+          - "Mme Martin saute des étapes en classe sans que l'app la juge"
+          - "Le message indiquant l'époque imposée renforce le sentiment de voyage temporel"
+
+      definition_of_done:
+          - "La détection de déviation fonctionne"
+          - "Le message d'éloignement et l'accès au recentrage fonctionnent"
+          - "La persistance du parcours arrière-plan fonctionne"
+          - "L'invitation à reprendre à la réouverture fonctionne"
+          - "La pause manuelle désactive la géoloc"
+          - "La notification après pause prolongée fonctionne"
+          - "Le saut d'étape fonctionne (état distinct)"
+          - "Le slider est auto-piloté par l'étape en cours"
+          - "Le message indiquant l'époque apparaît à chaque changement"
+
+      enjeux_transversaux:
+          accessibilite: >-
+              Les messages discrets sont lus par lecteurs d'écran. Le
+              message 'Reprendre' est navigable au clavier.
+          performance: >-
+              La détection de déviation ne doit pas trop solliciter la
+              batterie (vérification régulière, pas continue).
+          vie_privee: >-
+              La position est utilisée localement pour la détection de
+              déviation. Pas de transmission serveur.
+
+      questions_ouvertes:
+          - "Seuil exact de déviation — à valider terrain"
+          - "Mode groupé (évolution future) : architecture (un téléphone maître ?) — à anticiper côté palier 4"
+          - "Notification de rappel : peut-elle être désactivée par l'utilisateur dans D6.4 ? (recommandation : oui)"
+
+      priorite: "important"
+
+      personas_principaux:
+          - mme_dupont
+          - mme_martin
+          - kenji
+          - pere_lyonnais
+
+      dependances:
+          - "D3.5 (vivre — base)"
+          - "D3.6 (mode canapé)"
+          - "D1.2 (slider piloté)"
+          - "D4.3 (notifications de proximité en parcours)"
+
+# -----------------------------------------------------------------------------
+# Persona-check du domaine D3
+# -----------------------------------------------------------------------------
+persona_check:
+    kenji:
+        pertinence: "Élevée — suit des parcours éditoriaux, particulièrement audio en marche"
+        scenarios_passes:
+            - scenario: "Marcher avec casque, vivre 80% sans regarder l'écran"
+              reponse: "Couvert par D3.5 (audio en arrière-plan canonique D7.4), D3.4 (lancement clair), D2.5 (consultation avec audio). Critique pour ce persona."
+            - scenario: "Plus de data, continuer un parcours préchargé"
+              reponse: "Question ouverte (cf. tracker) — le mode hors-ligne s'applique aux parcours, étendue à trancher avec les devs."
+        questions_levees: []
+
+    mme_dupont:
+        pertinence: "Très élevée — c'est SON domaine. Création + sortie + partage."
+        scenarios_passes:
+            - scenario: "Préparer un parcours en moins de 30 min, l'envoyer aux parents"
+              reponse: "Couvert par D3.7 (création simple) + D3.8 (partage). Atteint test_litmus n°1 et n°2."
+            - scenario: "Un parent ouvre le lien le jour J sans formation"
+              reponse: "Couvert par D3.8 (lien universel) + D3.3 (fiche). Aussi D11.2 (version web si pas d'app)."
+            - scenario: "Un enfant fatigue, le parcours est-il abandonnable ?"
+              reponse: "Couvert par D3.10 (déviation tolérée, pause possible). Pas de stress."
+        questions_levees:
+            - "Mode de suivi des accompagnateurs (Mme Dupont voit où sont les autres groupes) — évolution future (mode groupé)"
+
+    mme_martin:
+        pertinence: "Très élevée pour D3.6 (mode canapé) et D2.5 (mode présentation référencé)"
+        scenarios_passes:
+            - scenario: "Projeter un parcours en classe en mode présentation sans chrome"
+              reponse: "Couvert par D3.6 (promu pour Mme Martin) + D2.5 (référence canonique du mode présentation). Atteint test_litmus n°1 transposé au parcours."
+            - scenario: "Défiler entre étapes en classe avec transitions d'époque fluides"
+              reponse: "Couvert par D3.6 (transitions mises en scène) + D1.3 (apparences par époque). 'Wow' du mode canapé."
+        questions_levees: []
+
+    pere_lyonnais:
+        pertinence: "Moyenne — peut suivre un parcours communautaire le dimanche"
+        scenarios_passes:
+            - scenario: "Recevoir une anecdote au bon moment pendant un parcours"
+              reponse: "Couvert par D3.5 (arrivée géoloc + ouverture consultation + audio en arrière-plan)."
+        questions_levees: []
+
+    anais_back_office:
+        pertinence: "Élevée pour D3.1 et D3.5 (production des éditoriaux + transitions narratives)"
+        scenarios_passes:
+            - scenario: "Produire un parcours éditorial avec transitions narratives entre étapes"
+              reponse: "Couvert par D3.5 (transitions = éditoriaux uniquement) + D10.1 (templates). Détaillé en palier 13 admin."
+        questions_levees: []

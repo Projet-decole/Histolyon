@@ -1,0 +1,68 @@
+# =============================================================================
+# E-TRANSVERSES-DIALOGUE-CONFIRMATION — Dialogue de confirmation (template M8)
+# =============================================================================
+# TEMPLATE GÉNÉRIQUE pour toute prise de décision sensible : abandon de
+# parcours (C7), publication d'un Parcours personnel (C13), effacement de
+# l'Historique (D4), suppression de Compte (D9), abandon d'une soumission
+# en cours, etc. Cette fiche décrit le PATRON ; les instances ne sont pas
+# modélisées comme des écrans à part — elles diffèrent par la microcopy
+# (palier 8) et la cible de l'action confirmée.
+# =============================================================================
+
+document:
+  type: palier_ecrans_fiche
+  format: yaml
+
+ecran:
+  id: E-TRANSVERSES-DIALOGUE-CONFIRMATION
+  nom: "Dialogue de confirmation (template M8)"
+
+  mode: P5.M8
+  surface_parente: "transverse"
+
+  raison_d_etre: >-
+    Garantir qu'aucune action à conséquence non triviale (suppression,
+    abandon, publication, déconnexion) n'est effectuée par accident.
+    Le focus exclusif (P5.N6) impose à l'utilisateur de répondre AVANT
+    toute autre interaction. Réservé aux décisions VRAIMENT sensibles —
+    la parcimonie est explicite (P5.M8 propriétés).
+
+  composition:
+    - zone: "zone titre"
+      role: "annonce de manière directe la décision en jeu (microcopy palier 8) — pas un titre décoratif, un libellé d'action"
+
+    - zone: "zone description"
+      role: "court contexte qui aide à décider : ce qui sera fait, ce qui sera perdu, l'éventuelle réversibilité (microcopy palier 8)"
+
+    - zone: "issue de confirmation"
+      role: "valide l'action sensible — point d'accès marqué pour signaler la conséquence (palier 8 / 10)"
+
+    - zone: "issue d'annulation"
+      role: "renonce à l'action — l'utilisateur revient à l'état antérieur sans aucune trace, le contexte d'appel est préservé"
+
+  etats:
+    nominal_ouvert: "Dialogue affiché, focus exclusif actif (P5.N6) — aucune autre interaction possible dans l'app"
+    en_cours_de_traitement: "L'utilisateur a confirmé ; l'action est en cours d'exécution (suppression, publication, etc.) ; le dialogue peut afficher un indicateur transitoire avant de se fermer"
+    erreur_d_execution: "L'action confirmée a échoué (réseau, serveur, validation tardive) ; le dialogue surface l'erreur et offre soit une nouvelle tentative, soit la fermeture (le contexte d'appel reste intact)"
+    annulation: "L'utilisateur a choisi l'issue d'annulation ; le dialogue se ferme, retour exact à la surface qui l'a ouvert (P5.N6 + cluster 02 abandon idem)"
+
+  elements_interactifs:
+    - "Tap sur l'issue de confirmation → exécute l'action sensible et ferme le dialogue"
+    - "Tap sur l'issue d'annulation → ferme le dialogue sans rien faire"
+    - "Aucun geste de contournement (P5.N6) — pas de tap hors du dialogue qui le ferme silencieusement"
+
+  flows_actifs:
+    - C7    # Abandon de Parcours en cours
+    - C13   # Publication d'un Parcours personnel
+    - D4    # Effacement de l'Historique de visite
+    - D9    # Suppression de Compte
+    # + tout flow palier 6 qui invoque un dialogue de confirmation
+    # (abandon de soumission communautaire, déconnexion de Compte D8, etc.)
+
+  surfaces_imbriquees: []   # M8 ne s'imbrique rien : il EST la couche bloquante au sommet
+
+  questions_ouvertes:
+    - "Inventaire exhaustif des instances qui invoquent ce template — à consolider en palier 7 fin pour vérifier qu'aucune confirmation oubliée ne traîne, et inversement aucune confirmation superflue"
+    - "Politique sur les confirmations en cascade (P5.C5 question ouverte) — si une action confirmée déclenche un autre besoin de confirmation, file ou refus immédiat ?"
+    - "Pour les actions à effet réversible (ex. effacement avec corbeille), faut-il vraiment un M8 ou un M9 + bouton 'annuler' suffit ? — relève palier 6 / 8"
+    - "Variantes nécessaires du template (bouton de confirmation marqué 'destructive' vs 'neutre', triple choix exceptionnel) — palier 10"

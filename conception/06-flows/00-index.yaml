@@ -1,0 +1,433 @@
+# =============================================================================
+# Palier 6 — Flows — INDEX
+# =============================================================================
+# Le palier 6 livre le DÉROULÉ pas à pas de chaque parcours utilisateur. Il
+# s'appuie sur les fonctionnalités du palier 3, les entités du palier 4, et
+# les surfaces / modes / règles du palier 5. Il ne réinvente rien — il
+# ASSEMBLE.
+#
+# Granularité : flows ATOMIQUES. Un flow = un déclencheur clair, une
+# séquence, une sortie nette. Les enchaînements vers un autre flow se font
+# par référence (« bascule vers Cx ») — pas par imbrication.
+#
+# Sources de référence STRICTEMENT limitées au palier 3, palier 4 et palier 5
+# de design/conception/. Le fichier archives/_bmad-output/design/user-flows.md
+# n'est PAS utilisé (décision utilisateur 2026-05-05 — confiance insuffisante).
+# =============================================================================
+
+document:
+  type: palier_flows_index
+  numero: 6
+  version: "0.1"
+  date: "2026-05-05"
+  role: "Index et conventions du palier 6"
+  format: yaml
+  prerequis_de_lecture:
+    - "design/conception/03-fonctionnalites/00-index.yaml + les 11 domaines D1-D11"
+    - "design/conception/04-donnees/00-index.yaml + les 6 fichiers de cluster"
+    - "design/conception/05-architecture-info.yaml"
+
+# -----------------------------------------------------------------------------
+# 1. Périmètre
+# -----------------------------------------------------------------------------
+perimetre:
+
+  inclus:
+    - "Déroulé pas à pas de chaque flow utilisateur (étapes, états, bifurcations)"
+    - "Cas particuliers (offline, permission refusée, abandon, conflit)"
+    - "Sorties (normales et exceptionnelles)"
+    - "Articulation avec les surfaces et modes du palier 5"
+    - "Articulation avec les entités et invariants du palier 4"
+    - "Renvoi aux fonctionnalités du palier 3 par identifiant Dx.y"
+
+  exclus:
+    - "Écrans spécifiques, mise en page, position spatiale — palier 7"
+    - "Composants UI nommés (BottomSheet, FAB, TabBar) — palier 10"
+    - "Microcopy, libellés exacts — palier 8"
+    - "Animations, courbes, timings — palier 11"
+    - "Couleurs, opacités, valeurs visuelles — paliers 9, 12"
+    - "Mesures techniques chiffrées — palier 16"
+
+  test_de_purete: >-
+    Si demain on bascule de Flutter à du natif iOS, ou d'un router
+    à un autre, est-ce que la fiche reste valide ? Si oui, c'est
+    bon. Si non, elle a contaminé l'implémentation ou la couche
+    écran (palier 7).
+
+# -----------------------------------------------------------------------------
+# 2. Découpage en 7 fichiers
+# -----------------------------------------------------------------------------
+fichiers:
+
+  - id: 01
+    nom: "Découverte et exploration"
+    fichier: "01-decouverte.yaml"
+    role: "Premier lancement, exploration de la carte, recherche, activation des modes, demande de permission"
+    flows: [A1, A2, A3, A4, A5, A6]
+
+  - id: 02
+    nom: "Consultation d'un Pin"
+    fichier: "02-consultation-pin.yaml"
+    role: "Aperçu rapide, consultation approfondie, navigation multi-époque, 3D/AR, post-narratif, favori"
+    flows: [B1, B2, B3, B4, B5, B6, B7]
+
+  - id: 03
+    nom: "Parcours"
+    fichier: "03-parcours.yaml"
+    role: "Catalogue, fiche, lancement, déroulé terrain et canapé, déviations, fin, création, publication"
+    flows: [C1, C2, C3, C4, C5, C6, C7, C8, C9, C10, C11, C12, C13]
+    pilote: true
+    note: "Pilote — sert d'exemple canonique de format pour les autres fichiers"
+
+  - id: 04
+    nom: "Profil et données personnelles"
+    fichier: "04-profil-compte.yaml"
+    role: "Espace personnel, favoris, historique, paramètres, Compte (création / connexion / sync / suppression)"
+    flows: [D1, D2, D3, D4, D5, D6, D7, D8, D9]
+
+  - id: 05
+    nom: "Notifications de proximité"
+    fichier: "05-notifications.yaml"
+    role: "Déclenchement Surprenez-moi, arrivée à étape de parcours, fallback manuel"
+    flows: [E1, E2, E3]
+
+  - id: 06
+    nom: "Partage et entrées externes"
+    fichier: "06-partage.yaml"
+    role: "Déclenchement de partage, fin de parcours partageable, code visuel, Lien universel reçu"
+    flows: [F1, F2, F3, F4, F5]
+
+  - id: 07
+    nom: "Communauté"
+    fichier: "07-communaute.yaml"
+    role: "Commentaires, signalements, soumission de pin, suivi de soumission, Retour de parcours"
+    flows: [G1, G2, G3, G4, G5, G6]
+
+  - id: 08
+    nom: "Back-office et production"
+    fichier: "08-back-office.yaml"
+    role: "Saisie pin éditorial, validation scientifique, modération, promotion communautaire, retrait/réouverture"
+    flows: [H1, H2, H3, H4, H5, H6]
+
+# -----------------------------------------------------------------------------
+# 3. Inventaire complet des flows (55 flows en 8 familles)
+# -----------------------------------------------------------------------------
+# Liste exhaustive pour vue d'ensemble et référencement croisé. Le déroulé
+# détaillé vit dans les fichiers de famille.
+flows_inventaire:
+
+  - id: A1
+    nom: "Premier lancement de l'app"
+    declencheur: "Ouverture initiale de l'application"
+  - id: A2
+    nom: "Invitation au micro-parcours découverte"
+    declencheur: "Premier lancement après affichage de la carte"
+  - id: A3
+    nom: "Navigation cartographique et sélection d'époque"
+    declencheur: "Manipulation du slider d'époque ou pan/zoom sur la carte"
+  - id: A4
+    nom: "Recherche et filtrage sur la carte"
+    declencheur: "Activation du point d'accès recherche"
+  - id: A5
+    nom: "Activation du mode Surprenez-moi"
+    declencheur: "Tap sur le sélecteur de mode notification"
+  - id: A6
+    nom: "Demande de permission juste-à-temps"
+    declencheur: "Action utilisateur qui requiert une permission non encore accordée"
+    note: "Flow transverse référencé par d'autres flows (A3, A5, B5, E1, E2, etc.)"
+
+  - id: B1
+    nom: "Aperçu rapide d'un Pin"
+    declencheur: "Tap sur un Pin de la carte"
+  - id: B2
+    nom: "Consultation approfondie d'un Pin"
+    declencheur: "Action explicite d'approfondissement depuis B1, ou réception d'un Lien universel ciblant un Pin (F5)"
+  - id: B3
+    nom: "Navigation entre couches temporelles d'un Pin multi-époque"
+    declencheur: "Sélection d'une époque alternative depuis l'aperçu ou la consultation d'un Pin associé à plusieurs Époques"
+  - id: B4
+    nom: "Accès à la consultation 3D/AR d'un Pin"
+    declencheur: "Tap sur le point d'accès 3D depuis la consultation approfondie d'un Pin doté d'un Modèle 3D"
+  - id: B5
+    nom: "Consultation 3D immersive et basculement AR"
+    declencheur: "Activation du mode immersif 3D ou de la superposition AR"
+  - id: B6
+    nom: "Engagement post-narratif"
+    declencheur: "Atteinte de la zone post-narrative d'un Pin (quiz, énigme, pins liés)"
+  - id: B7
+    nom: "Marquage d'un Pin en favori"
+    declencheur: "Tap sur le contrôle favori durant la consultation d'un Pin"
+
+  - id: C1
+    nom: "Découverte du catalogue des parcours"
+    declencheur: "Sélection de la section Parcours (P5.S2)"
+  - id: C2
+    nom: "Filtrage du catalogue"
+    declencheur: "Activation des filtres dans le catalogue"
+  - id: C3
+    nom: "Consultation de la fiche d'un parcours"
+    declencheur: "Tap sur un Parcours du catalogue, ou réception d'un Lien universel ciblant un Parcours (F5)"
+  - id: C4
+    nom: "Lancement d'un parcours depuis la fiche"
+    declencheur: "Tap sur le contrôle de démarrage depuis la fiche d'un Parcours"
+  - id: C5
+    nom: "Vivre un parcours en terrain (avec géoloc)"
+    declencheur: "Lancement d'un parcours en mode terrain (proximité de la première étape)"
+  - id: C6
+    nom: "Mode canapé d'un parcours"
+    declencheur: "Lancement d'un parcours en l'absence de proximité géographique, ou bascule explicite vers ce mode"
+  - id: C7
+    nom: "Gestion des déviations et pauses en parcours"
+    declencheur: "Éloignement du tracé ou action de pause utilisateur pendant un parcours en cours"
+  - id: C8
+    nom: "Saut d'étape dans un parcours en cours"
+    declencheur: "Activation manuelle depuis la liste des étapes ou depuis la surface persistante de progression"
+  - id: C9
+    nom: "Fin de parcours et célébration"
+    declencheur: "Complétion de la dernière étape d'un parcours en cours"
+  - id: C10
+    nom: "Relancement d'un parcours déjà complété"
+    declencheur: "Sélection d'un parcours depuis l'historique de visite"
+  - id: C11
+    nom: "Création d'un parcours personnel"
+    declencheur: "Tap sur le point d'accès création depuis la section Parcours"
+  - id: C12
+    nom: "Édition des étapes pendant la création"
+    declencheur: "Action d'ajout, retrait, ou réordonnancement d'étapes dans un parcours en cours de création"
+  - id: C13
+    nom: "Publication d'un parcours créé (provenance personnelle → communautaire)"
+    declencheur: "Action explicite de publication depuis l'éditeur de Parcours, sur un Parcours en provenance personnelle"
+
+  - id: D1
+    nom: "Accès à l'espace personnel"
+    declencheur: "Tap sur le sélecteur de la section Profil (P5.S3)"
+  - id: D2
+    nom: "Consultation des favoris"
+    declencheur: "Sélection de la section Favoris depuis le Profil"
+  - id: D3
+    nom: "Consultation de l'historique de visite"
+    declencheur: "Sélection de la section Historique depuis le Profil"
+  - id: D4
+    nom: "Effacement de l'historique"
+    declencheur: "Activation du contrôle d'effacement"
+  - id: D5
+    nom: "Accès aux paramètres"
+    declencheur: "Sélection de la section Paramètres depuis le Profil"
+  - id: D6
+    nom: "Création d'un Compte"
+    declencheur: "Activation de l'option « Créer un compte »"
+  - id: D7
+    nom: "Connexion à un Compte existant"
+    declencheur: "Activation de l'option « Se connecter »"
+  - id: D8
+    nom: "Configuration de la synchronisation cloud"
+    declencheur: "Activation de la synchronisation depuis les paramètres de Compte"
+  - id: D9
+    nom: "Suppression d'un Compte"
+    declencheur: "Activation du contrôle de suppression depuis les paramètres de Compte"
+
+  - id: E1
+    nom: "Déclenchement d'une notification en mode Surprenez-moi"
+    declencheur: "Passage à proximité d'un Pin tandis que le mode Surprenez-moi est activé"
+  - id: E2
+    nom: "Déclenchement de l'arrivée à une étape en parcours"
+    declencheur: "Géolocalisation à proximité d'une étape d'un Parcours en cours en mode terrain"
+  - id: E3
+    nom: "Déclenchement manuel de l'arrivée à une étape (fallback)"
+    declencheur: "Activation manuelle quand la géoloc est imprécise ou indisponible"
+
+  - id: F1
+    nom: "Partage d'un Pin via partage natif système"
+    declencheur: "Tap sur le contrôle de partage depuis l'aperçu rapide ou la consultation approfondie d'un Pin"
+  - id: F2
+    nom: "Partage d'une fiche de parcours"
+    declencheur: "Tap sur le contrôle de partage depuis la fiche d'un Parcours"
+  - id: F3
+    nom: "Partage d'une fin de parcours (image partageable)"
+    declencheur: "Tap sur le contrôle de partage à la fin d'un parcours"
+  - id: F4
+    nom: "Génération d'un code visuel"
+    declencheur: "Tap sur le contrôle de génération d'un Code visuel depuis une fiche de Pin ou de Parcours"
+  - id: F5
+    nom: "Réception d'un Lien universel"
+    declencheur: "Tap sur un Lien universel reçu via un canal externe (messagerie, mail, navigateur, scan d'un Code visuel)"
+
+  - id: G1
+    nom: "Consultation des commentaires d'un Pin"
+    declencheur: "Activation de la section Commentaires depuis la consultation approfondie d'un Pin"
+  - id: G2
+    nom: "Soumission d'un Commentaire"
+    declencheur: "Activation du contrôle de rédaction depuis la section Commentaires"
+  - id: G3
+    nom: "Signalement d'un contenu (polymorphe)"
+    declencheur: "Activation du contrôle de signalement sur un Pin / Parcours / Commentaire / Retour"
+  - id: G4
+    nom: "Soumission d'un Pin par un utilisateur"
+    declencheur: "Activation du point d'accès « Proposer un pin »"
+  - id: G5
+    nom: "Suivi du statut d'une soumission"
+    declencheur: "Consultation de ses soumissions depuis le Profil"
+  - id: G6
+    nom: "Soumission d'un Retour de parcours"
+    declencheur: "Activation du contrôle de retour à l'issue d'un parcours communautaire vécu"
+
+  - id: H1
+    nom: "Saisie d'un nouveau Pin éditorial via Template"
+    declencheur: "Création d'un nouveau Pin par un éditeur dans l'environnement back-office"
+  - id: H2
+    nom: "Validation scientifique d'un Pin"
+    declencheur: "Prise en charge d'un Pin en état en_revue par un validateur"
+  - id: H3
+    nom: "Modération d'un Commentaire ou Retour communautaire"
+    declencheur: "Prise en charge d'un Commentaire ou Retour en attente par un modérateur"
+  - id: H4
+    nom: "Modération d'une soumission communautaire (Pin de provenance communautaire ou Parcours communautaire)"
+    declencheur: "Prise en charge d'une contribution en attente de vérification par un modérateur"
+  - id: H5
+    nom: "Promotion communautaire → éditorial"
+    declencheur: "Décision éditoriale de promouvoir un Pin de provenance communautaire en provenance éditoriale"
+  - id: H6
+    nom: "Retrait ou réouverture d'un Pin publié"
+    declencheur: "Décision éditoriale ou signalement honoré entraînant retrait, ou correction permettant réouverture"
+
+# -----------------------------------------------------------------------------
+# 4. Format d'une fiche de flow
+# -----------------------------------------------------------------------------
+# Format strict. Le pilote 03-parcours.yaml l'illustre concrètement.
+format_des_fiches:
+
+  champs_obligatoires:
+    - id
+    - nom
+    - declencheur
+    - acteurs
+    - deroule
+    - sorties_normales
+
+  champs_recommandes:
+    - pre_requis_specifiques     # voir consigne ci-dessous — UNIQUEMENT non triviaux
+    - bifurcations
+    - cas_particuliers
+    - entites_impliquees
+    - surfaces_et_modes
+    - references_palier_3
+    - invariants_respectes
+    - questions_ouvertes
+
+  consigne_pre_requis: |
+    Les pre_requis_specifiques ne contiennent QUE des conditions
+    NON TRIVIALES qui pourraient être vraies ou fausses au moment
+    du déclenchement et qui CONDITIONNENT le déroulé.
+
+    À NE PAS écrire :
+      - "Le Pin existe" (s'il est tapé, c'est qu'il existe)
+      - "L'utilisateur a un Profil" (toujours vrai, cf. cluster 03 I6)
+      - "L'app est lancée" (évident)
+      - "La Carte est affichée" (sauf si c'est précisément la condition discriminante)
+
+    À écrire (exemples valides) :
+      - "Permission de géolocalisation accordée" (peut être refusée)
+      - "Au moins un Compte créé" (condition I2 pour publier)
+      - "Mode Surprenez-moi activé dans les préférences du Profil"
+      - "Connexion réseau disponible" (si la fonctionnalité requiert)
+      - "Au moins un Parcours en provenance personnelle existant" (pour relancer)
+      - "Pin doté d'un Modèle 3D" (pour le flow 3D/AR)
+      - "Parcours dans l'état en cours" (pour la pause / saut d'étape)
+
+    Si un flow n'a aucun pré-requis non trivial, omettre le champ.
+
+  consigne_deroule: |
+    Le déroulé décrit la séquence d'actions du flow normal (chemin
+    nominal). Chaque étape comporte au moins une action ; un état
+    d'app est précisé quand il aide à comprendre.
+
+    Exemple :
+      deroule:
+        - etape: 1
+          action: "..."
+          surfaces_actives: [P5.S1, P5.M2]    # facultatif
+        - etape: 2
+          action: "..."
+
+    Les variations et chemins alternatifs vont dans `bifurcations`,
+    pas dans le déroulé.
+
+    VARIANTE — déroulé en sous-cas nommés (pour flows à plusieurs
+    branches structurellement distinctes) :
+      deroule:
+        cas_xxx:
+          - etape: 1
+            action: "..."
+        cas_yyy:
+          - etape: 1
+            action: "..."
+
+    Cette variante est utilisée par C7, C12, G3, H4, H6 quand un
+    flow couvre plusieurs branches de même nature (ex. cas_pin /
+    cas_parcours pour H4, cas_ajout / cas_retrait / cas_reordonnancement
+    pour C12). Réservée aux cas où la séparation rend la lecture plus
+    claire qu'une succession de bifurcations.
+
+  consigne_bifurcations: |
+    Format : `si <condition utilisateur ou système> → <conséquence>`
+    Conséquence typique : « bascule vers le flow Xy » ou « le flow
+    se termine en sortie alternative Z ».
+
+    Une bifurcation ne décrit pas le détail de ce qui se passe
+    après la bascule — la cible (autre flow, sortie) le décrit.
+
+  consigne_cas_particuliers: |
+    Cas où le déroulé nominal est altéré par une condition
+    extérieure : offline, permission refusée, erreur réseau,
+    conflit avec un autre flow actif, etc. Format :
+      cas_particuliers:
+        - cas: "..."
+          comportement: "..."
+
+    Distincts des bifurcations qui sont des choix utilisateur
+    explicites.
+
+  consigne_references:
+    surfaces_et_modes: "Préfixe P5. (ex. P5.S1, P5.M3, P5.P1, P5.N4, P5.C2, P5.E2) pour éviter les conflits de naming avec les familles de flows (C, E)."
+    references_palier_3: "Format Dx.y (ex. D1.1, D2.5)"
+    entites_impliquees: "Nom métier de l'entité (Pin, Parcours, Étape, Profil, Compte, Trace de modération…) — pas d'identifiant numérique"
+    invariants_respectes: "Format Ix (ex. I1, I3, I9)"
+
+  derogations_admises:
+    - portee: "Famille H (back-office)"
+      derogation: "Le champ surfaces_et_modes peut être absent — les flows H1-H6 opèrent sur des surfaces back-office hors du palier 5 (qui ne couvre que l'app grand public). La structure des surfaces back-office relève du palier 13 admin."
+    - portee: "Toute entité immuable (append-only)"
+      derogation: "Le cycle_de_vie peut être réduit à `etats: [créée]` + `transitions: []` + une note d'immutabilité. Cf. cluster 04 Trace de modération et cluster 05 Trace de validation pour le précédent palier 4."
+
+# -----------------------------------------------------------------------------
+# 5. Conventions de naming et référencement
+# -----------------------------------------------------------------------------
+conventions_naming:
+
+  flows: "Lettre de famille (A à H) + numéro (ex. A1, B2, C13)"
+
+  references_inter_flows: >-
+    Au sein d'un déroulé ou d'une bifurcation, on cite un autre
+    flow par son identifiant entre parenthèses : « bascule vers
+    B1 » ou « le flow B1 est appelé pour traiter ce cas ». La
+    bascule signifie que le flow appelant cesse et que le flow
+    appelé prend le relais.
+
+  references_palier_5: >-
+    Toutes les références au palier 5 sont préfixées P5. — surfaces
+    P5.S1/S2/S3, modes P5.M1 à P5.M9, surfaces persistantes
+    P5.P1/P2/P3, règles de navigation P5.N1 à P5.N7, règles de
+    coexistence P5.C1 à P5.C6, entrées externes P5.E1 à P5.E3.
+    Ce préfixe évite l'ambiguïté avec les familles C et E du
+    palier 6.
+
+  references_palier_3: "Format Dx.y simple, sans préfixe (déjà sans ambiguïté)"
+
+  references_palier_4: >-
+    Les entités sont citées par leur nom métier (Pin, Parcours,
+    Étape, Profil, Compte, Favori, Historique de visite, Commentaire,
+    Retour de parcours, Signalement, Trace de validation, Trace de
+    modération, Template, Lien universel, Image partageable, Code
+    visuel, Catégorie, Époque, Source, Média, Badge, Modèle 3D,
+    Fragment musical, Couche cartographique). Les invariants par
+    identifiant Ix.

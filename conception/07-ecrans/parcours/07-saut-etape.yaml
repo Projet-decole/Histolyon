@@ -1,0 +1,72 @@
+# =============================================================================
+# E-PARCOURS-SAUT-ETAPE — Sélecteur de saut d'étape
+# =============================================================================
+# Surface ponctuelle (P5.M6) qui permet à l'utilisateur dans un Parcours en
+# cours de sauter manuellement à une autre étape (suivante, ou n'importe quelle
+# étape non complétée). L'étape sautée est marquée implicitement non complétée
+# (cf. arbitrage J du cluster 02). Sortie depuis E-PARCOURS-EN-COURS-TERRAIN ou
+# E-PARCOURS-EN-COURS-CANAPE.
+# =============================================================================
+
+document:
+  type: palier_ecrans_fiche
+  format: yaml
+
+ecran:
+  id: E-PARCOURS-SAUT-ETAPE
+  nom: "Sélecteur de saut d'étape"
+
+  mode: P5.M6
+  surface_parente: P5.S2
+
+  raison_d_etre: >-
+    Surface courte pour choisir explicitement une étape vers laquelle
+    sauter sans suivre l'ordre proposé. Sert quand l'utilisateur veut
+    avancer plus vite (zapper une étape qui ne l'intéresse pas, sauter
+    une étape inaccessible momentanément), ou quand il veut atteindre
+    directement la dernière étape (ce qui déclenche la fin et la
+    célébration avec mention 'parcours partiellement complété').
+
+  composition:
+    - zone: "rappel du parcours en cours"
+      role: "titre, auteur, étape courante actuelle ; permet de retrouver le contexte sans ambiguïté"
+      entites_affichees: [Parcours, Étape]
+
+    - zone: "liste des étapes sélectionnables"
+      role: "énumération ordonnée des Étapes du Parcours ; les étapes déjà complétées et l'étape courante sont visibles mais non sélectionnables comme cible (revenir à une étape complétée n'est pas un saut, cf. cas particulier C8) ; les étapes futures non complétées sont sélectionnables ; chaque entrée affiche position, titre du Pin, époque, état (à venir, sautée précédemment)"
+      entites_affichees: [Étape, Pin]
+
+    - zone: "résumé de l'impact"
+      role: "indique combien d'étapes seront marquées implicitement non complétées si la cible choisie est confirmée, et si la cible est la dernière étape (auquel cas mention de fin de parcours partiellement complété)"
+
+    - zone: "validation"
+      role: "action explicite de saut qui marque les étapes intermédiaires non complétées et fait de la cible l'étape courante"
+
+  etats:
+    nominal_charge: "Liste des étapes affichée, sélection en cours"
+    aucune_cible_eligible: "Toutes les étapes restantes sont l'étape courante elle-même ou complétées ; le saut n'a pas de sens ; message gracieux et fermeture proposée (ne devrait normalement pas se produire car le pré-requis du flow C8 vérifie qu'il y a au moins une étape non complétée après l'étape courante)"
+    cible_selectionnee_intermediaire: "L'utilisateur a sélectionné une étape future qui n'est pas la dernière ; le résumé d'impact indique le nombre d'étapes intermédiaires qui seront marquées non complétées"
+    cible_selectionnee_derniere: "L'utilisateur a sélectionné la dernière étape ; le résumé d'impact mentionne explicitement que la confirmation déclenchera la fin du Parcours (C9) avec mention de complétion partielle"
+    chargement: "Liste en cours de chargement (rare puisque le Parcours en cours est déjà résident en local)"
+    offline_avec_cache: "Réseau indisponible mais Parcours préchargé ; saut pleinement fonctionnel ; bandeau P3 visible"
+    offline_sans_cache_cible: "La cible souhaitée pointe vers un Pin non préchargé et le réseau est indisponible ; message éphémère P5.M9 prévu, l'utilisateur peut tout de même sauter (le contenu sera accessible une fois le réseau rétabli)"
+
+  elements_interactifs:
+    - "Sélection d'une étape cible dans la liste"
+    - "Validation du saut → l'étape cible devient courante, étapes intermédiaires marquées non complétées dans l'Historique ; la surface se ferme et l'utilisateur retourne à E-PARCOURS-EN-COURS-TERRAIN ou E-PARCOURS-EN-COURS-CANAPE selon mode actif"
+    - "Validation d'un saut vers la dernière étape → bascule directe vers E-PARCOURS-FIN-CELEBRATION (C9) avec mention de complétion partielle ; P5.P2 disparaît"
+    - "Annulation explicite ou geste neutre de fermeture → la surface se ferme sans modifier la progression (P5.N5)"
+
+  flows_actifs:
+    - C8   # Saut d'étape dans un parcours en cours
+
+  surfaces_imbriquees:
+    - E-PARCOURS-EN-COURS-TERRAIN          # M3 retour après saut
+    - E-PARCOURS-EN-COURS-CANAPE           # M3 retour après saut
+    - E-PARCOURS-FIN-CELEBRATION           # M3 si saut vers dernière étape
+    - E-TRANSVERSES-MESSAGE-EPHEMERE       # M9 récurrent (cible offline, etc.)
+
+  questions_ouvertes:
+    - "Confirmation explicite (P5.M8) si le saut implique de marquer plusieurs étapes non complétées d'un coup, ou validation directe ? Le flow C8 ne prévoit pas de M8 ; à arbitrer en palier 8/10 selon le poids ressenti"
+    - "Visibilité dans la liste des étapes déjà sautées lors de sauts précédents : doit-on offrir la possibilité de revenir dessus depuis ce sélecteur, ou rester strictement orienté avant ? — cf. cas particulier C8 sur la re-consultation d'étape déjà complétée, qui est traitée hors C8 (B2 sur le Pin)"
+    - "Comportement si la cible sélectionnée pointe vers un Pin retiré entre-temps (lien rompu — cf. invariant cluster 02) : autoriser le saut, le bloquer, le signaler ?"

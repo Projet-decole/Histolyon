@@ -1,0 +1,92 @@
+# =============================================================================
+# E-ADMIN-VALIDATION-SCIENTIFIQUE — Validation scientifique d'un Pin éditorial
+# =============================================================================
+# Surface de relecture et de décision sur un Pin éditorial en en_revue. Combine
+# une PRÉVISUALISATION conforme au rendu grand public et un panneau d'annotations
+# granulaires (sans modification du rédactionnel). 3 décisions possibles
+# (approuvé / demande_complément / refusé). Crée une Trace de validation
+# immuable. RÉSERVÉ aux Pins éditoriaux (cluster 05 v0.3, décision 2026-05-05).
+# =============================================================================
+
+document:
+  type: palier_ecrans_fiche
+  format: yaml
+
+ecran:
+  id: E-ADMIN-VALIDATION-SCIENTIFIQUE
+  nom: "Validation scientifique d'un Pin éditorial"
+
+  mode: "back-office"
+  surface_parente: "back-office"
+
+  raison_d_etre: >-
+    Permettre au validateur (Anaïs en auto-validation au démarrage, ou un
+    partenaire institutionnel ultérieurement) de relire un Pin éditorial en
+    en_revue tel qu'il sera vu côté grand public, de poser des annotations
+    granulaires sans modifier le rédactionnel, puis de trancher entre approuvé,
+    demande_complément ou refusé. La décision crée une Trace de validation
+    immuable (cluster 05) — c'est l'artefact qui rend l'historicité opposable.
+
+  composition:
+    - zone: "file de validation"
+      role: "liste des Pins éditoriaux en en_revue, classés par ancienneté ou priorité ; permet de naviguer d'un Pin à l'autre"
+      entites_affichees: [Pin]
+
+    - zone: "prévisualisation conforme grand public"
+      role: "affiche le Pin tel qu'il sera vu en mode P5.M3 (consultation approfondie) côté grand public — répond au test_litmus n°3 d'Anaïs ; lecture seule, le rédactionnel n'est PAS modifiable depuis cet écran"
+      entites_affichees: [Pin, Catégorie, Époque, Média, Source]
+
+    - zone: "Sources structurées"
+      role: "panneau dédié affichant chaque Source rattachée au Pin (type, référence, crédit, lien si présent) pour vérifier la traçabilité"
+      entites_affichees: [Source]
+
+    - zone: "annotations granulaires"
+      role: "le validateur pose des annotations sur des passages précis du Pin (exemples palier 8 : demande de source sur une affirmation, vérification d'une date, suggestion de reformulation) sans modifier le rédactionnel ; les annotations sont conservées comme attribut de la Trace de validation à venir"
+      entites_affichees: ["Trace de validation"]
+
+    - zone: "audit — Traces antérieures"
+      role: "historique des Traces de validation précédentes sur ce même Pin (si refusé puis re-soumis, ou si demande_complément puis amendé) ; immutabilité préservée"
+      entites_affichees: ["Trace de validation"]
+
+    - zone: "panneau de décision"
+      role: "trois décisions possibles (approuvé / demande_complément / refusé) ; motif obligatoire pour les décisions négatives ; type_de_validation (auto_validation / validation_par_tiers) déterminé par cohérence validateur=auteur"
+
+    - zone: "métadonnées d'audit"
+      role: "version de Template utilisée à la saisie, auteur du Pin, horodatages clés ; servent l'audit"
+      entites_affichees: [Template, Compte, Pin]
+
+  etats:
+    nominal_charge: "Pin chargé en prévisualisation, Sources affichées, file consultable, annotations vierges ou en cours"
+    annotations_en_cours: "Le validateur a posé des annotations qui ne sont pas encore figées dans une Trace ; aucune Trace n'est créée tant que la décision n'est pas tranchée (immutabilité)"
+    decision_prise_approuve: "Décision approuvé enregistrée, Trace immuable créée, Pin transitionne en_revue → validé"
+    decision_prise_demande_complement: "Décision demande_complément enregistrée avec motif, Trace immuable créée, Pin retourne en brouillon (l'éditeur reprend H1)"
+    decision_prise_refuse: "Décision refusé enregistrée avec motif, Trace immuable créée, Pin retourne en brouillon ou est marqué comme refusé selon politique palier 13"
+    auto_validation_signalee: "validateur = auteur du Pin → type_de_validation = auto_validation, signalement explicite à l'écran (la posture est assumée, pas masquée)"
+    file_vide: "Aucun Pin en en_revue — message gracieux"
+    interruption: "Le validateur ferme l'écran sans avoir tranché ; les annotations sont conservées comme brouillon de Trace, aucune Trace n'est créée (cf. H2 cas particulier)"
+    chargement: "Pin et Sources en cours de chargement"
+    erreur_chargement: "Impossible de charger le Pin ou ses Sources ; la décision est bloquée"
+    permission_insuffisante: "L'utilisateur n'a pas le rôle validateur — accès en lecture seule de la file"
+
+  elements_interactifs:
+    - "Sélection d'un Pin dans la file de validation"
+    - "Pose, modification, suppression d'annotations granulaires sur des passages du Pin"
+    - "Consultation des Sources structurées rattachées"
+    - "Consultation des Traces de validation antérieures sur ce Pin"
+    - "Saisie du motif de décision (texte long, obligatoire pour négatif)"
+    - "Tranchage de la décision : approuvé, demande_complément, refusé → création de la Trace de validation immuable"
+    - "Navigation vers le Pin suivant dans la file après décision"
+
+  flows_actifs:
+    - H2
+
+  surfaces_imbriquees:
+    - E-ADMIN-CATALOGUE-PINS  # retour ou saut latéral
+    - E-ADMIN-SAISIE-PIN-TEMPLATE  # si l'éditeur reprend après demande_complément (ouvert depuis le catalogue)
+    - E-ADMIN-MODERATION-SOUMISSIONS  # frontière éditorial/communautaire — orientation si l'opérateur réalise que la cible relève de la modération communautaire (pin de provenance communautaire H4 plutôt qu'H2)
+
+  questions_ouvertes:
+    - "Mode de référencement d'un passage par une annotation (sélection de texte, ancre numérotée, autre) — palier 8 contenu + palier 13"
+    - "Plusieurs niveaux de validation chaînés (relecture historienne + relecture éditoriale) gérés sur cet écran (Traces multiples successives) ou sur des écrans distincts par niveau ? — cluster 05 question ouverte + palier 13"
+    - "Politique de publication après approuvé : automatique (validé → publié immédiat) ou étape distincte explicite gérée par un autre écran ? — palier 13"
+    - "Affichage explicite et alerte sur l'auto-validation (signaler visuellement que validateur = auteur) — palier 13 + palier 8"

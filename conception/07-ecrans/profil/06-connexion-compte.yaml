@@ -1,0 +1,82 @@
+# =============================================================================
+# E-PROFIL-CONNEXION-COMPTE — Connexion à un Compte existant
+# =============================================================================
+# Surface ponctuelle (P5.S3 en P5.M6) d'authentification d'un Compte
+# existant. Distincte de la création (E-PROFIL-CREATION-COMPTE). Peut être
+# atteinte depuis E-PROFIL-PRINCIPAL, E-PROFIL-PARAMETRES, ou depuis le
+# formulaire de création (point d'accès 'J'ai déjà un compte').
+# =============================================================================
+
+document:
+  type: palier_ecrans_fiche
+  format: yaml
+
+ecran:
+  id: E-PROFIL-CONNEXION-COMPTE
+  nom: "Connexion à un Compte existant"
+
+  mode: P5.M6
+  surface_parente: P5.S3
+
+  raison_d_etre: >-
+    Permet à l'utilisateur déjà titulaire d'un Compte de l'authentifier
+    sur cet appareil — typiquement Mme Dupont qui passe de la tablette
+    de préparation au téléphone du jour J. La sync reste désactivée par
+    défaut après connexion (cluster 03 invariant — l'utilisateur active
+    via D8 si souhaité).
+
+  composition:
+    - zone: "saisie email"
+      role: "demande l'adresse électronique du Compte"
+      entites_affichees: [Compte]
+
+    - zone: "saisie secret d'authentification"
+      role: "demande le secret selon la méthode retenue (mot de passe / lien magique / tiers optionnel)"
+      entites_affichees: [Compte]
+
+    - zone: "tiers d'authentification optionnel"
+      role: "si méthode_authentification = tiers_optionnel et que l'utilisateur s'est inscrit via tiers, expose la connexion tiers ; jamais imposé"
+
+    - zone: "point d'accès 'Mot de passe oublié'"
+      role: "ouvre le sous-flow de récupération (saisie email, envoi de lien de réinitialisation — méthode arbitrée en D6.5/cluster 03)"
+
+    - zone: "point d'accès 'Pas encore de compte'"
+      role: "bascule vers E-PROFIL-CREATION-COMPTE (D6)"
+
+  etats:
+    nominal_saisie: "Formulaire vierge ou en cours de saisie"
+    chargement_validation: "Échange serveur en cours après validation"
+    succes: "Authentification réussie, Compte rattaché au Profil sur cet appareil ; message éphémère P5.M9 ; retour à D1/D5 ou au flow appelant"
+    echec_authentification: "Identifiants invalides ; message gracieux générique (sans divulguer si l'email existe — cohérence I1 et sécurité) ; proposition 'Mot de passe oublié'"
+    multi_tentatives: "Politique d'anti-bruteforce côté serveur (palier 16) ; côté écran, message gracieux après plusieurs échecs et proposition 'Mot de passe oublié'"
+    compte_suspendu: "Compte en état 'suspendu' (cluster 03 cycle de vie) ; message explicite avec motif synthétique et procédure de contact si applicable (palier 8) ; pas de bascule silencieuse sans Compte (D7 cas particulier)"
+    compte_supprime: "Compte en état 'supprimé' ; message gracieux et option de créer un nouveau Compte avec pseudonyme distinct (le pseudonyme supprimé reste verrouillé en rétention — cluster 03 invariant)"
+    conflit_de_profils: "Le Profil local de l'appareil contient déjà des Favoris/Historique distincts de ceux associés au Compte côté cloud — politique de merge appliquée (recommandation D6.5/D7 : préférence cloud) ; un message éphémère P5.M9 informe ; non-régression du Profil local (rien d'effacé sans consentement)"
+    recuperation_secret_en_cours: "Sous-flow 'Mot de passe oublié' ouvert ; saisie d'email, envoi de lien"
+    erreur_reseau_pendant_echange: "Coupure pendant la validation ; message gracieux ; les valeurs saisies sont conservées (P5.N7) ; possibilité de retenter"
+    erreur_reseau_avant_validation: "Coupure pendant la saisie ; valeurs préservées ; bandeau E-TRANSVERSES-BANDEAU-OFFLINE visible ; validation indisponible jusqu'au retour"
+    annulation: "Fermeture sans validation ; retour à la surface appelante"
+
+  elements_interactifs:
+    - "Saisie / édition email et secret"
+    - "Validation du formulaire → échange serveur → authentification"
+    - "Tap sur 'Mot de passe oublié' → ouverture du sous-flow de récupération (sous-vue P5.M6 ou nouvelle surface ponctuelle, à préciser palier 7)"
+    - "Tap sur 'Pas encore de compte' → bascule vers E-PROFIL-CREATION-COMPTE (D6)"
+    - "Tap sur un tiers d'authentification optionnel (si offert)"
+    - "Annulation / fermeture (P5.N5 — annulation implicite)"
+
+  flows_actifs:
+    - D7   # Connexion à un Compte existant
+
+  surfaces_imbriquees:
+    - E-PROFIL-CREATION-COMPTE          # bascule via 'Pas encore de compte'
+    - E-TRANSVERSES-MESSAGE-EPHEMERE    # succès, conflit de profils, perte connexion
+    - E-TRANSVERSES-BANDEAU-OFFLINE
+
+  entites_affichees: [Profil, Compte]
+
+  questions_ouvertes:
+    - "Politique de merge à la connexion (préférence cloud / préférence local / interactif) — cluster 03 D6.5 et D7 question ouverte ; à acter palier 6 + palier 16"
+    - "Comportement si l'utilisateur se connecte à un Compte différent de celui précédemment rattaché sur cet appareil : ré-évaluation de la granularité_synchronisation ici ou dans D8 ? — D7 question ouverte"
+    - "Sous-flow 'Mot de passe oublié' : surface dédiée distincte (E-PROFIL-RECUPERATION-SECRET) ou sous-vue intégrée dans E-PROFIL-CONNEXION-COMPTE ? — palier 7 ; recommandation : sous-vue intégrée pour limiter le nombre d'écrans"
+    - "Affichage du Profil restauré (sauvegarde système OS) qui contient déjà un Compte rattaché : bypasser l'écran de connexion ou redemander une authentification ? — sécu, devs Flutter"

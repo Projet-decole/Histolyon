@@ -1,0 +1,64 @@
+# =============================================================================
+# E-TRANSVERSES-DIALOGUE-PERMISSION — Dialogue de demande de permission
+# =============================================================================
+# Surface qui matérialise le flow A6 (demande de permission juste-à-temps).
+# Distincte du dialogue de confirmation générique (E-TRANSVERSES-DIALOGUE-
+# CONFIRMATION) car elle porte une EXPLICATION CONTEXTUELLE de la permission
+# demandée AVANT le prompt système OS. Les permissions concernées :
+# géolocalisation, notifications, caméra (AR), micro (le cas échéant).
+# =============================================================================
+
+document:
+  type: palier_ecrans_fiche
+  format: yaml
+
+ecran:
+  id: E-TRANSVERSES-DIALOGUE-PERMISSION
+  nom: "Dialogue de demande de permission juste-à-temps"
+
+  mode: P5.M8
+  surface_parente: "transverse"
+
+  raison_d_etre: >-
+    Expliquer à l'utilisateur POURQUOI une permission système est demandée
+    AVANT que l'OS ne déclenche son propre prompt — pour qu'il prenne une
+    décision éclairée et qu'un éventuel refus ne ferme pas définitivement
+    la fonctionnalité par incompréhension. Sert directement A6 et tous les
+    flows appelants (A3, A5, B5, C4, C5, E1, E2).
+
+  composition:
+    - zone: "zone titre"
+      role: "annonce la permission demandée et la fonctionnalité qui l'appelle (microcopy palier 8 ; ex. localisation pour la Carte, caméra pour l'AR)"
+
+    - zone: "zone explication contextuelle"
+      role: "phrase brève qui rattache la permission à un BÉNÉFICE concret pour l'utilisateur (cluster 03 + flow A6 § cas_jamais_demandee) ; pas de culpabilisation, pas d'insistance"
+
+    - zone: "issue d'acceptation contextuelle"
+      role: "déclenche le prompt système OS (étape 2 de A6 cas_jamais_demandee) — à partir de ce moment l'OS prend la main"
+
+    - zone: "issue de report"
+      role: "ferme le dialogue sans déclencher le prompt système ; le flow appelant continue en mode dégradé documenté (A6 cas_particuliers de chaque flow)"
+
+  etats:
+    nominal_premiere_demande: "Permission jamais demandée pour ce Profil (A6 cas_jamais_demandee) ; les deux issues sont disponibles, l'OS n'a pas encore été sollicité"
+    nominal_apres_acceptation_contextuelle: "L'utilisateur a confirmé en contexte ; le prompt système OS est en cours ou vient d'apparaître ; cette surface peut s'effacer pendant le dialogue OS"
+    deja_refusee_au_systeme: "A6 cas_deja_refusee — l'app ne re-déclenche PAS le prompt système (politique D5.5 + OS qui peut le bloquer) ; le contenu de la surface devient une orientation discrète vers les paramètres système, sans insistance ni culpabilisation"
+    impossible_re_demande_par_os: "L'OS bloque toute nouvelle demande de prompt (cas iOS / Android selon palier 16) ; seule l'orientation vers les paramètres système est proposée"
+    erreur_systeme: "Le prompt système n'a pas pu être ouvert (cas rare) ; surface une indication gracieuse et permet la fermeture ; le flow appelant continue en mode dégradé"
+
+  elements_interactifs:
+    - "Tap sur l'issue d'acceptation contextuelle → l'app déclenche le prompt système OS (A6 étape 2)"
+    - "Tap sur l'issue de report → ferme le dialogue, retour au flow appelant en mode dégradé (A6 bifurcations 'Utilisateur refuse')"
+    - "(état déjà refusée) Tap sur l'orientation paramètres → l'OS prend la main et ouvre les paramètres système (A6 bifurcations 'Utilisateur va dans les paramètres')"
+    - "Aucun geste de contournement — focus exclusif (P5.N6 + P5.M8)"
+
+  flows_actifs:
+    - A6   # Demande de permission juste-à-temps (transverse)
+
+  surfaces_imbriquees: []   # M8 — pas d'imbrication ; le prompt OS prend la main au-dessus, hors périmètre app
+
+  questions_ouvertes:
+    - "Forme exacte distinguant ce dialogue de E-TRANSVERSES-DIALOGUE-CONFIRMATION : même template stylé différemment, ou écran réellement distinct au sens composant ? — palier 10"
+    - "Doit-on systématiquement passer par cette surface AVANT le prompt OS, ou la déclencher directement quand le contexte d'appel est limpide (ex. tap sur point d'accès localisation = explication implicite) ? — palier 7 fin"
+    - "Comportement précis dans le cas 'permission déjà refusée et OS bloque la re-demande' : un message éphémère M9 suffit-il ou ce dialogue M8 reste-t-il pertinent ? — palier 6 / 7 fin"
+    - "Microcopy par permission (géoloc, notifs, caméra, micro) avec bénéfice concret rattaché à un test_litmus de persona — palier 8"

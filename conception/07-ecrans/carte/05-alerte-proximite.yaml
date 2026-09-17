@@ -1,0 +1,67 @@
+# =============================================================================
+# E-CARTE-ALERTE-PROXIMITE — Alerte de proximité sur la Carte
+# =============================================================================
+# Surface en P5.M7 (alerte ponctuelle) qui surgit sur la Carte quand un Pin
+# proche est détecté en mode Surprenez-moi (E1) ou quand l'utilisateur
+# arrive à une étape d'un Parcours en cours en mode terrain (E2). Non
+# bloquante (P5.C4).
+# =============================================================================
+
+document:
+  type: palier_ecrans_fiche
+  format: yaml
+
+ecran:
+  id: E-CARTE-ALERTE-PROXIMITE
+  nom: "Alerte de proximité (Surprenez-moi ou arrivée à étape)"
+
+  mode: P5.M7
+  surface_parente: P5.S1
+
+  raison_d_etre: >-
+    Signal entrant transitoire qui informe l'utilisateur d'une opportunité
+    de proximité — soit un Pin éligible en Surprenez-moi (sérendipité du
+    père lyonnais), soit une étape de Parcours en cours en mode terrain
+    (test_litmus de Kenji avec son casque). Non bloquante : l'utilisateur
+    peut accepter (tap), refuser (geste de fermeture), ou laisser passer
+    (l'alerte disparaît seule après un délai — délai exact en palier 11).
+
+  composition:
+    - zone: "indicateur de mode"
+      role: "signale visuellement que l'alerte vient du mode Surprenez-moi (E1) ou d'un Parcours en cours en mode terrain (E2) — distinction utile pour Mme Dupont qui peut être en parcours scolaire"
+
+    - zone: "titre de la cible"
+      role: "titre du Pin (E1) ou titre de l'étape (E2) avec son numéro dans le Parcours"
+      entites_affichees: [Pin, Étape]
+
+    - zone: "teaser ou indication d'arrivée"
+      role: "court extrait pour E1 ; pour E2, indication 'vous êtes arrivé à l'étape X' (microcopy palier 8)"
+
+    - zone: "points d'accès actions courtes"
+      role: "tap = consultation (B1 aperçu rapide pour E1, B2 consultation approfondie pour E2) ; geste de fermeture"
+
+  etats:
+    nominal_emise: "Alerte affichée, signal sensoriel paramétrable selon les préférences du Profil et les paramètres système (silencieux, ne pas déranger respectés)"
+    expiration: "L'alerte disparaît seule après son délai sans intervention de l'utilisateur"
+    tap_accepte: "L'utilisateur a tapé l'alerte ; bascule vers la consultation (E-CARTE-APERCU-PIN pour E1, E-PIN-CONSULTATION-APPROFONDIE pour E2)"
+    geste_de_fermeture: "L'utilisateur a refermé l'alerte sans la consulter ; le Pin (E1) ou l'étape (E2) est marqué 'déjà notifié dans la session' pour empêcher un rejeu"
+    en_arriere_plan: "L'app n'est pas au premier plan ; l'OS gère la présentation (notification système) ; le tap atterrit en aperçu rapide (E1) ou consultation approfondie (E2) — cf. P5.E3"
+    mode_silencieux_systeme: "Paramètres système silencieux ou Ne pas déranger actifs ; l'alerte est émise mais sans son ni vibration selon la politique OS"
+
+  elements_interactifs:
+    - "Tap sur l'alerte → bascule vers E-CARTE-APERCU-PIN (E1) ou E-PIN-CONSULTATION-APPROFONDIE (E2)"
+    - "Geste de fermeture (rejet explicite) → l'alerte disparaît"
+    - "Aucune interaction → l'alerte disparaît seule après son délai"
+
+  flows_actifs:
+    - E1   # Notification de proximité Surprenez-moi
+    - E2   # Notification d'arrivée à étape de Parcours en cours
+
+  surfaces_imbriquees:
+    - E-CARTE-APERCU-PIN                  # bascule depuis E1
+    - E-PIN-CONSULTATION-APPROFONDIE      # bascule depuis E2
+
+  questions_ouvertes:
+    - "Une seule alerte simultanée même si plusieurs Pins éligibles dans le rayon (cf. E1 cas particulier) — modélisation à confirmer (priorité par distance ou par ordre du Parcours pour E2)"
+    - "Distinction visuelle E1 vs E2 — palier 9 / 10 (intensité du signal, libellé...)"
+    - "Re-notification d'un même Pin entre sessions (E1) : non par défaut intra-session, politique inter-sessions — D4.2 question ouverte"

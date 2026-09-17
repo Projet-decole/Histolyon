@@ -1,0 +1,86 @@
+# =============================================================================
+# E-PARCOURS-PRINCIPAL — Surface Parcours (catalogue + mes parcours)
+# =============================================================================
+# Surface principale (P5.S2 en P5.M1) qui rassemble TOUT ce qui concerne les
+# parcours : catalogue éditorial+communautaire d'une part, parcours personnels
+# et suivi des parcours en cours/complétés d'autre part. L'agencement précis
+# des deux vues internes relève du palier 10 — ici, description fonctionnelle.
+# =============================================================================
+
+document:
+  type: palier_ecrans_fiche
+  format: yaml
+
+ecran:
+  id: E-PARCOURS-PRINCIPAL
+  nom: "Surface Parcours (catalogue + mes parcours)"
+
+  mode: P5.M1
+  surface_parente: P5.S2
+
+  raison_d_etre: >-
+    Surface centrale dédiée aux parcours. Donne accès au catalogue
+    éditorial + communautaire pour découvrir, et à l'espace personnel
+    pour retrouver les parcours créés, en cours, complétés et abandonnés.
+    Sert également de point de départ pour la création d'un nouveau
+    Parcours personnel.
+
+  composition:
+    - zone: "vue catalogue"
+      role: "présente les Parcours de provenance éditoriale et communautaire sous forme d'une liste défilable de vignettes ; chaque vignette indique titre, durée estimée, distance estimée, époques principales, badge éventuel, marque distinctive si provenance communautaire (instanciation locale de I3) ou si en cours de vérification"
+      entites_affichees: [Parcours, Badge, Époque]
+
+    - zone: "vue mes parcours"
+      role: "regroupe les Parcours personnels (brouillons et publié_local), les parcours en cours de l'utilisateur (lancés, pas encore complétés ni abandonnés) et l'historique récent (complétés, abandonnés) ; chaque entrée indique l'état du Parcours et permet de reprendre, de relancer ou de continuer l'édition"
+      entites_affichees: [Parcours, "Historique de visite", Étape]
+
+    - zone: "point d'accès filtres"
+      role: "ouvre la surface ponctuelle E-PARCOURS-FILTRES (flow C2) — agit sur la vue catalogue"
+
+    - zone: "point d'accès création"
+      role: "ouvre l'éditeur d'un nouveau Parcours personnel (flow C11) — bascule vers E-PARCOURS-EDITEUR"
+
+    - zone: "bascule entre les deux vues"
+      role: "permet de passer du catalogue à l'espace personnel et inversement ; mémorise l'état de défilement de chaque vue (cf. P5.N2)"
+
+  etats:
+    nominal_charge: "Catalogue chargé, vignettes visibles ; vue mes parcours peuplée si l'utilisateur a déjà des parcours"
+    chargement: "Catalogue en cours de chargement ; squelettes ou indicateur d'attente"
+    catalogue_vide: "Aucun Parcours dans le catalogue (improbable en production mais possible en cas de filtre ultra-restrictif appliqué) ; message gracieux"
+    mes_parcours_vide: "L'utilisateur n'a encore créé ni lancé aucun Parcours ; invitation à explorer le catalogue ou à créer un Parcours personnel"
+    filtre_actif: "Un ou plusieurs filtres sont appliqués sur le catalogue ; leur résumé est visible et désactivable rapidement"
+    offline_avec_cache: "Réseau indisponible ; le catalogue se limite aux Parcours préchargés (cf. préférence hors-ligne du Profil) ; bandeau E-TRANSVERSES-BANDEAU-OFFLINE visible ; les parcours personnels restent intégralement disponibles (locaux)"
+    offline_sans_cache: "Réseau indisponible et aucun Parcours préchargé ; vue catalogue dégradée avec invitation à se reconnecter ; vue mes parcours pleinement fonctionnelle si parcours locaux"
+    erreur: "Échec de chargement du catalogue ; message gracieux invitant à réessayer ; vue mes parcours reste accessible"
+    parcours_en_cours: "Surface persistante E-TRANSVERSES-PARCOURS-PERSISTANT (P2) visible ; le parcours en cours est également surfacé en haut de la vue mes parcours pour reprise rapide"
+    audio_en_cours: "Surface persistante E-TRANSVERSES-AUDIO-PERSISTANT (P1) visible ; aucun effet sur les vues internes"
+
+  elements_interactifs:
+    - "Défilement de la liste du catalogue ou de la vue mes parcours"
+    - "Bascule entre vue catalogue et vue mes parcours"
+    - "Tap sur une vignette de Parcours → flow C3 (Consultation de la fiche) — bascule vers E-PARCOURS-FICHE-DETAIL"
+    - "Tap sur un parcours en cours dans la vue mes parcours → reprise directe en mode terrain ou canapé selon état (E-PARCOURS-EN-COURS-TERRAIN ou E-PARCOURS-EN-COURS-CANAPE)"
+    - "Tap sur un parcours complété ou abandonné → flow C10 (Relancement) via E-PARCOURS-FICHE-DETAIL"
+    - "Tap sur le point d'accès filtres → ouverture E-PARCOURS-FILTRES (P5.M6, flow C2)"
+    - "Tap sur le point d'accès création → flow C11, bascule vers E-PARCOURS-EDITEUR"
+    - "Bascule vers une autre surface top-level (P5.S1 Carte ou P5.S3 Profil) via le sélecteur de section principale (P5.N2)"
+
+  flows_actifs:
+    - C1   # Découverte du catalogue (et porte d'entrée vers C2, C3, C11, C5/C6 pour reprise)
+
+  surfaces_imbriquees:
+    - E-PARCOURS-FILTRES                # M6 imbriqué via point d'accès filtres
+    - E-PARCOURS-FICHE-DETAIL           # M3 quand l'utilisateur tape sur un Parcours
+    - E-PARCOURS-EDITEUR                # M3 quand création d'un Parcours personnel
+    - E-PARCOURS-EN-COURS-TERRAIN       # M3 reprise d'un parcours en cours mode terrain
+    - E-PARCOURS-EN-COURS-CANAPE        # M3 reprise d'un parcours en cours mode canapé
+    - E-TRANSVERSES-AUDIO-PERSISTANT    # P1 si audio en cours
+    - E-TRANSVERSES-PARCOURS-PERSISTANT # P2 si parcours en cours
+    - E-TRANSVERSES-BANDEAU-OFFLINE     # P3 si mode hors-ligne
+    - E-TRANSVERSES-MESSAGE-EPHEMERE    # M9 récurrent
+
+  questions_ouvertes:
+    - "Articulation des deux vues internes (sous-onglets, sections empilées, bascule par geste, écran scindé) — relève du palier 10"
+    - "Surfaçage spécifique des parcours partagés via Lien universel reçu (E2 fiche d'un Parcours partagé par un tiers) : doivent-ils apparaître dans la vue mes parcours, et avec quelle distinction ?"
+    - "Critères et ordre de surfaçage du catalogue par défaut (récents, populaires, éditoriaux d'abord, mix algorithmique) — relève du palier 10 ou décision éditoriale"
+    - "Doit-on distinguer visuellement parcours brouillon (en cours d'édition) et parcours publié_local (prêt à l'emploi) dans la vue mes parcours ? — cf. cluster 02 questions ouvertes sur l'utilité de ces deux états distincts"

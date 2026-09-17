@@ -1,0 +1,602 @@
+# =============================================================================
+# Palier 3 — Domaine D11 — Surfaces hors-app
+# =============================================================================
+# Ce domaine couvre tout ce qui sort de l'app : un lien envoyable, une page
+# web qui s'ouvre dans un navigateur, un code visuel qu'on imprime ou qu'on
+# colle, une image qu'on partage sur les réseaux sociaux, et le mécanisme
+# système qui orchestre l'envoi vers la destination choisie.
+#
+# Ces surfaces ne sont pas des features secondaires : elles sont le moyen
+# par lequel un parcours créé par Mme Dupont arrive à six parents
+# accompagnateurs sans qu'ils aient à comprendre l'app, et le moyen par
+# lequel une découverte de Kenji devient une story Instagram pour ses amis.
+# Sans elles, l'app reste une île.
+#
+# Périmètre fonctionnel pur (cf. 00-index § 2 anti_perimetre_strict). Aucune
+# spec technique de format, de taille, de microcopy ; aucune description
+# d'écran. On dit ce que les surfaces FONT — pas comment elles sont faites.
+# =============================================================================
+
+document:
+    type: palier_fonctionnalites_domaine
+    domaine_id: D11
+    numero: 3
+    audience:
+        - "Tout agent qui rédige un palier en aval (4 à 16)"
+        - "Devs Flutter (cahier fonctionnel des surfaces hors-app)"
+        - "Relecture du palier 3 (vérification de la pureté fonctionnelle)"
+    role: >-
+        Décrire fonctionnellement les surfaces qui sortent de l'app : lien
+        universel, version web responsive, code visuel imprimable, image
+        partageable de fin de parcours, et déclenchement du partage natif
+        système. Ce domaine est aussi la RÉFÉRENCE CANONIQUE du comportement
+        "Partage natif système" référencé depuis D2.4, D2.5, D3.3 et D3.9.
+    format: yaml
+    prerequis_de_lecture:
+        - "design/conception/intention.yaml — § 5.7 separation_des_responsabilites_entre_paliers"
+        - "design/conception/01-essence.yaml — § ce_qu_on_refuse (pas de city branding)"
+        - "design/conception/02-personas.yaml — kenji et mme_dupont en priorité"
+        - "design/conception/03-fonctionnalites/00-index.yaml — § 2 anti_perimetre_strict est OBLIGATOIRE"
+        - "design/conception/03-fonctionnalites/01-carte-exploration-temporelle.yaml — modèle pilote"
+
+# -----------------------------------------------------------------------------
+# Raison d'être du domaine
+# -----------------------------------------------------------------------------
+raison_d_etre_du_domaine: >-
+    HistoLyon doit pouvoir se prolonger hors de l'app pour servir deux usages
+    vitaux :
+
+    (1) Mme Dupont prépare un parcours et l'envoie à six parents accompagnateurs
+    qui n'ont pas l'app et ne veulent pas créer de compte ; le parcours doit
+    arriver chez eux sous une forme qui s'ouvre toute seule, qui leur permet
+    de comprendre quoi faire en quelques secondes, et qui propose discrètement
+    l'app si elle facilite l'usage le jour J.
+
+    (2) Kenji vit une découverte qui le marque — une anecdote, une fin de
+    parcours — et veut la raconter à ses amis sur Instagram en quelques
+    secondes, sans avoir à expliquer l'app. Le partage doit produire une
+    trace belle, sobre, qui parle pour elle-même.
+
+    Ces deux usages exigent des surfaces qui sortent du téléphone qui a
+    l'app : un lien envoyable, une page web autonome, un code visuel pour
+    les supports physiques, une image pour les réseaux sociaux, et le
+    mécanisme système qui orchestre l'envoi vers la destination choisie.
+
+    Ce domaine sert directement Kenji (partage social) et Mme Dupont
+    (envoi de parcours aux parents). Il sert aussi indirectement
+    Mme Martin (panneau imprimé en classe) et le père lyonnais (partage
+    ponctuel d'une découverte). Il respecte strictement l'essence
+    § ce_qu_on_refuse — pas de city branding, pas de promotion, le ton
+    conteur tient même hors de l'app.
+
+# -----------------------------------------------------------------------------
+# Sous-domaines
+# -----------------------------------------------------------------------------
+sous_domaines:
+    # ===========================================================================
+    - id: D11.1
+      nom: "Lien universel"
+
+      raison_d_etre: >-
+          Permettre à un utilisateur d'envoyer une référence à un pin, un
+          parcours ou une découverte par n'importe quel canal de messagerie,
+          en un seul lien qui se débrouille tout seul à l'arrivée — qu'il
+          tombe sur un téléphone qui a l'app ou non. Sans ce mécanisme,
+          Mme Dupont serait obligée de demander aux parents d'installer
+          l'app avant la sortie, ce qui ferait tomber le scénario.
+
+      comportement: >-
+          Depuis un pin, un parcours, ou une fin de parcours, l'utilisateur
+          peut générer un lien qui pointe vers cet élément précis. Ce lien
+          est conçu pour que, quand un destinataire le tape sur son
+          téléphone : si l'app est installée, l'app s'ouvre directement sur
+          l'élément concerné ; si l'app n'est pas installée, c'est la
+          version web responsive (D11.2) qui s'ouvre dans le navigateur.
+          Le lien est court et lisible, conçu pour passer dans n'importe
+          quelle messagerie, mail ou copier-coller, sans déformation. Il
+          reste valide tant que l'élément référencé existe.
+
+      regles_fonctionnelles:
+          - "Un seul lien par élément référencé (pas de variante 'lien app' vs 'lien web')"
+          - "Le lien sait s'il doit ouvrir l'app ou la version web selon la présence de l'app sur le téléphone qui le reçoit"
+          - "Pas de code alphanumérique parallèle — le lien et le code visuel (D11.3) suffisent (cf. brief § 9.8)"
+          - "Le lien reste valide tant que l'élément référencé existe ; sa désactivation est gracieuse si l'élément disparaît"
+          - "Aucune information personnelle de l'expéditeur n'est encodée dans le lien"
+          - "Le lien est lisible (forme courte, pas une suite obscure de caractères)"
+
+      capabilites:
+          - "Générer un lien universel pour un pin, un parcours ou une fin de parcours"
+          - "Diriger automatiquement vers l'app si elle est installée sur le téléphone qui ouvre le lien"
+          - "Diriger automatiquement vers la version web sinon"
+          - "Maintenir la validité du lien sur la durée de vie de l'élément référencé"
+          - "Fournir un retour gracieux si l'élément référencé n'existe plus"
+
+      ce_qu_on_ne_fait_pas:
+          - "Pas de code alphanumérique à recopier (friction inutile — brief § 9.8)"
+          - "Pas de lien personnalisé qui exposerait l'identité de l'expéditeur"
+          - "Pas de variantes de lien 'pour l'app' vs 'pour le web' à choisir manuellement"
+          - "Pas de lien qui force l'installation de l'app — la version web doit toujours être accessible"
+
+      criteres_de_reussite:
+          - "Atteint le test_litmus de Mme Dupont (un parent ouvre le lien le jour J sans formation, sans compte, et sait quoi faire en moins de 30 secondes)"
+          - "Atteint le test_litmus de Kenji (partage en quelques secondes, sans qu'il ait à comprendre une UI française)"
+          - "Le destinataire qui n'a pas l'app n'a aucun blocage — il accède au contenu, et l'app lui est proposée discrètement"
+
+      definition_of_done:
+          - "Un lien peut être généré pour un pin, un parcours et une fin de parcours"
+          - "Le lien ouvre l'app sur l'élément concerné quand l'app est installée sur le téléphone qui le reçoit"
+          - "Le lien ouvre la version web sur l'élément concerné quand l'app n'est pas installée"
+          - "Aucun code alphanumérique alternatif n'est exposé à l'utilisateur"
+          - "Le lien est court et lisible"
+          - "Le lien reste valide tant que l'élément référencé existe ; en cas d'élément disparu, le retour est gracieux"
+
+      enjeux_transversaux:
+          accessibilite: >-
+              Le lien doit être lisible quand un lecteur d'écran le restitue
+              (pas une suite incompréhensible de caractères). Le destinataire
+              doit pouvoir l'ouvrir au clavier comme au tap.
+          performance: >-
+              L'ouverture du lien doit être perçue comme directe, sans étape
+              intermédiaire visible quand l'app est installée. Critères
+              chiffrés en palier 16.
+          vie_privee: >-
+              Critique : le lien ne doit pas encoder l'identité de
+              l'expéditeur ni de données traçantes. Cohérent avec D6
+              (profil — tout local) et l'essence § ce_qu_on_refuse (pas de
+              growth hack).
+
+      questions_ouvertes:
+          - "Schéma exact du lien (domaine, structure du chemin) — à acter avec les devs Flutter et l'équipe back"
+          - "Comportement précis quand l'élément référencé est privé/non publié (parcours brouillon par exemple) — à arbitrer en palier 6 flows"
+          - "Étendue des éléments partageables au-delà de pin / parcours / fin de parcours (favoris ? recherches ?) — à arbitrer"
+
+      priorite: "important"
+
+      personas_principaux:
+          - mme_dupont
+          - kenji
+          - pere_lyonnais
+
+      dependances:
+          - "D2 (les pins partageables existent)"
+          - "D3 (les parcours partageables existent)"
+          - "D11.2 (version web — destination quand l'app n'est pas installée)"
+          - "D11.5 (partage natif système — point de départ du flow d'envoi)"
+
+    # ===========================================================================
+    - id: D11.2
+      nom: "Version web responsive"
+
+      raison_d_etre: >-
+          Permettre à un destinataire qui reçoit un lien (D11.1) sans avoir
+          l'app d'accéder au contenu — pas une version dégradée, pas un
+          mur 'téléchargez l'app pour voir', mais une vraie surface de
+          lecture autonome. Sans elle, le scénario Mme Dupont s'effondre
+          sur les six parents qui n'ont pas l'app. La version web doit
+          aussi pouvoir vivre comme point d'entrée tiède : quelqu'un qui
+          tombe dessus via un partage peut découvrir HistoLyon sans
+          pression d'installation.
+
+      comportement: >-
+          Quand un lien universel est ouvert sur un téléphone ou un
+          navigateur sans l'app installée, la version web s'ouvre sur
+          l'élément référencé. Le contenu est accessible en lecture seule :
+          texte du pin ou du parcours, médias visibles, ton conteur
+          préservé. La page s'adapte aux écrans (téléphone, tablette,
+          desktop). Une proposition de téléchargement de l'app est
+          présente, sobre, sans intrusion — l'utilisateur peut consulter
+          le contenu en entier sans la voir s'imposer. Le ton, le rythme
+          et l'esprit conteur de l'app restent les mêmes : la version
+          web n'est pas une vitrine marketing, c'est la même histoire
+          racontée sur une autre surface.
+
+      regles_fonctionnelles:
+          - "Lecture seule — aucun mécanisme de création, de favoris, ou de compte"
+          - "Adaptation aux écrans (téléphone, tablette, desktop)"
+          - "Proposition de téléchargement de l'app présente mais discrète, jamais bloquante"
+          - "Le contenu est consultable en entier sans installation requise"
+          - "Le ton conteur et la sobriété visuelle de l'app sont préservés"
+          - "Pas de city branding ni de promotion (essence § ce_qu_on_refuse)"
+          - "Pas de demande de compte, de cookie publicitaire, ou de tracking marketing"
+
+      capabilites:
+          - "Afficher un pin en lecture sur un navigateur"
+          - "Afficher un parcours en lecture sur un navigateur"
+          - "Afficher une fin de parcours partagée en lecture sur un navigateur"
+          - "S'adapter à la taille de l'écran (téléphone, tablette, desktop)"
+          - "Proposer le téléchargement de l'app de façon non intrusive"
+          - "Préserver le ton conteur et l'esprit de sobriété de l'app"
+
+      ce_qu_on_ne_fait_pas:
+          - "Pas de mur 'installez l'app pour lire' — le contenu est accessible sans installation"
+          - "Pas de version dégradée 'pour donner envie d'installer' — c'est la même histoire, juste ailleurs"
+          - "Pas de city branding, pas de promotion, pas de ton marketing"
+          - "Pas de création, pas de favoris, pas de compte sur la version web"
+          - "Pas de tracking marketing, pas de cookies non essentiels"
+          - "Pas de monétisation, pas de partenariat commercial glissé dans le contenu"
+
+      criteres_de_reussite:
+          - "Un parent accompagnateur de Mme Dupont ouvre le lien le jour J et accède au parcours sans friction (atteint test_litmus mme_dupont)"
+          - "Le ton conteur est immédiatement reconnaissable — pas un sentiment de 'site marketing' (cohérence essence § principes_essentiels)"
+          - "Quelqu'un qui découvre HistoLyon par la version web a une vraie expérience de lecture, pas une frustration"
+
+      definition_of_done:
+          - "Un pin, un parcours et une fin de parcours s'affichent en lecture sur un navigateur sans app installée"
+          - "L'affichage s'adapte aux écrans téléphone, tablette et desktop"
+          - "La proposition de téléchargement de l'app est présente sans bloquer la lecture"
+          - "Le ton et l'esprit de la version web sont alignés avec l'app (sobriété, ton conteur)"
+          - "Aucun mécanisme de création, de favoris ou de compte n'est exposé sur la version web"
+          - "Aucun tracking marketing n'est mis en œuvre"
+
+      enjeux_transversaux:
+          accessibilite: >-
+              Critique : la version web peut être lue par des personnes très
+              diverses, y compris des parents accompagnateurs peu à l'aise
+              avec le numérique. Lecteurs d'écran, navigation clavier,
+              contraste suffisant, taille de texte ajustable. Critères
+              chiffrés en palier 16.
+          performance: >-
+              La page doit se charger rapidement même sur réseau dégradé
+              (parents en mobilité le jour J). Critères chiffrés en palier 16.
+          vie_privee: >-
+              Critique : pas de tracking marketing, pas de cookies non
+              essentiels, pas de collecte d'identité. Cohérent avec essence
+              § ce_qu_on_refuse et avec D6 (profil — tout local).
+
+      questions_ouvertes:
+          - "Étendue exacte du contenu disponible côté web (audio ? archives ? 3D/AR ?) — à arbitrer avec les devs et la lead"
+          - "Hébergement et infrastructure de la version web — à acter avec les devs"
+          - "Comportement de la version web hors-ligne (PWA ? simple cache ?) — à arbitrer"
+          - "Langues supportées sur la version web (suivre l'app, ou subset ?) — à arbitrer"
+
+      priorite: "important"
+
+      personas_principaux:
+          - mme_dupont
+          - kenji
+
+      dependances:
+          - "D11.1 (lien universel — la version web est la destination quand l'app n'est pas installée)"
+          - "D2 (contenu pin)"
+          - "D3 (contenu parcours)"
+
+    # ===========================================================================
+    - id: D11.3
+      nom: "Code visuel imprimable"
+
+      raison_d_etre: >-
+          Permettre le partage non-numérique : impression sur une feuille
+          distribuée aux parents, panneau de l'office du tourisme, affiche
+          en classe, flyer associatif. Sans ce mécanisme, tout partage est
+          condamné à transiter par une messagerie numérique — ce qui exclut
+          les supports physiques qui sont pourtant un canal vivant pour
+          Mme Dupont (feuille d'information aux parents) et pour
+          l'institution (panneau OT, affiche de quartier).
+
+      comportement: >-
+          Pour tout élément déjà partageable par lien (un pin, un parcours,
+          une fin de parcours), un code visuel peut être généré. Ce code
+          visuel encode le même lien universel que D11.1 — il est donc
+          lisible par n'importe quel téléphone qui sait scanner ce type
+          de code. Le scan ouvre l'app si elle est installée, ou la
+          version web sinon. Le code visuel est conçu pour rester lisible
+          à l'impression, et reste sobre visuellement (cohérent avec le
+          ton de l'app, pas un objet promotionnel chargé).
+
+      regles_fonctionnelles:
+          - "Le code visuel encode le même lien universel que D11.1"
+          - "Le scan se comporte exactement comme l'ouverture du lien (app si installée, web sinon)"
+          - "Le code visuel reste lisible une fois imprimé"
+          - "Le code visuel est sobre — pas de logo géant, pas de slogan promotionnel"
+          - "Pas de code alphanumérique alternatif (cohérence avec D11.1 — brief § 9.8)"
+
+      capabilites:
+          - "Générer un code visuel pour un pin, un parcours ou une fin de parcours"
+          - "Encoder le même lien universel que D11.1"
+          - "Rester lisible à l'impression"
+          - "Conserver une apparence sobre cohérente avec le ton de l'app"
+
+      ce_qu_on_ne_fait_pas:
+          - "Pas de code visuel chargé de promotion ou de city branding"
+          - "Pas de code alphanumérique parallèle (brief § 9.8)"
+          - "Pas de variantes décoratives par catégorie de contenu (la sobriété prime)"
+          - "Pas de code dont le scan déclencherait un comportement différent du lien (cohérence stricte avec D11.1)"
+
+      criteres_de_reussite:
+          - "Mme Dupont peut imprimer une feuille pour les parents avec le code et le lien — les deux fonctionnent indifféremment"
+          - "Le code reste scannable même imprimé en petit format ou photocopié une fois"
+          - "Un panneau de l'office du tourisme peut afficher un code et il fonctionne sans information complémentaire"
+
+      definition_of_done:
+          - "Un code visuel peut être généré pour un pin, un parcours et une fin de parcours"
+          - "Le scan du code se comporte exactement comme l'ouverture du lien universel"
+          - "Le code reste lisible quand il est imprimé"
+          - "L'apparence du code respecte la sobriété visuelle de l'app"
+          - "Aucun code alphanumérique alternatif n'est exposé"
+
+      enjeux_transversaux:
+          accessibilite: >-
+              Le lien universel doit toujours accompagner le code visuel
+              quand le support physique le permet — un utilisateur qui ne
+              peut pas scanner (déficience visuelle, téléphone sans appareil
+              photo) doit pouvoir taper le lien.
+          performance: >-
+              Pas d'enjeu spécifique — le code est statique une fois généré.
+          vie_privee: >-
+              Le code n'encode aucune information traçante (cohérent avec
+              D11.1).
+
+      questions_ouvertes:
+          - "Format de génération côté app (export image ? export depuis le partage natif ?) — à arbitrer en palier 7"
+          - "Le code est-il généré à la demande ou pré-stocké côté serveur ? — à acter avec les devs"
+          - "Une note d'instruction est-elle ajoutée près du code à l'impression (ex. 'Scannez avec votre téléphone') ou laisse-t-on le contexte le faire ? — à arbitrer en palier 8"
+
+      priorite: "important"
+
+      personas_principaux:
+          - mme_dupont
+
+      dependances:
+          - "D11.1 (lien universel — le code l'encode)"
+          - "D11.5 (partage natif système — point d'accès à la génération du code)"
+
+    # ===========================================================================
+    - id: D11.4
+      nom: "Image partageable de fin de parcours"
+
+      raison_d_etre: >-
+          Permettre à un utilisateur qui termine un parcours de partager
+          la trace de son expérience sur les réseaux sociaux, sous une
+          forme qui parle pour elle-même — sans qu'il ait à expliquer
+          l'app, sans qu'il ait à composer un texte. C'est ce qui permet
+          à Kenji de partager une fin de parcours sur Instagram en
+          quelques secondes (test_litmus). C'est aussi ce qui rend la
+          découverte transmissible — sans cette image, la fin de parcours
+          reste un événement intime sans trace partageable.
+
+          L'image doit être belle ET sobre — atmosphérique, fidèle au ton
+          conteur, pas un objet marketing. Pas de gros logo, pas de slogan,
+          les statistiques de parcours présentes mais discrètes. Le but
+          est qu'elle ait sa place dans le flux Instagram d'un utilisateur
+          sans détonner — pas qu'elle crie 'téléchargez l'app'.
+
+      comportement: >-
+          À la fin d'un parcours (référencée depuis D3.9), l'utilisateur
+          peut générer une image partageable qui synthétise visuellement
+          son expérience : la trace du parcours sur une carte stylisée,
+          les statistiques discrètes du parcours (étapes complétées,
+          distance, durée), un titre sobre. L'image est au format vertical
+          adapté aux stories des réseaux sociaux. Elle est ensuite
+          proposée au partage natif (D11.5) — l'utilisateur choisit où
+          l'envoyer. L'image inclut une référence discrète à HistoLyon
+          (pas un gros logo, juste une signature reconnaissable) pour
+          permettre à un viewer de retrouver l'app si elle l'intrigue.
+
+      regles_fonctionnelles:
+          - "Générée à la demande à la fin d'un parcours (référencée depuis D3.9)"
+          - "Format vertical adapté aux stories des réseaux sociaux"
+          - "Trace stylisée du parcours sur une carte, fidèle au ton de l'app"
+          - "Statistiques de parcours présentes mais discrètes (pas un panneau d'affichage)"
+          - "Signature HistoLyon discrète (pas de gros logo, pas de slogan promotionnel)"
+          - "Pas de partage automatique — l'utilisateur déclenche et choisit la destination"
+          - "Pas de city branding, pas de ton marketing — l'image est atmosphérique, conteuse"
+
+      capabilites:
+          - "Générer une image visuelle synthétisant une fin de parcours"
+          - "Tracer le parcours effectué sur une carte stylisée"
+          - "Afficher les statistiques de parcours de façon discrète"
+          - "Apposer une signature HistoLyon sobre et reconnaissable"
+          - "Proposer l'image au partage natif système (D11.5)"
+          - "Conserver la cohérence visuelle avec le ton conteur de l'app"
+
+      ce_qu_on_ne_fait_pas:
+          - "Pas de partage automatique sans déclenchement utilisateur"
+          - "Pas de gros logo HistoLyon ni de slogan promotionnel sur l'image"
+          - "Pas de tonalité marketing ('Découvrez Lyon !', 'Téléchargez !')"
+          - "Pas d'incitation au partage forcée (pas de gamification du partage)"
+          - "Pas de personnalisation excessive (pas d'avatar, pas de nom d'utilisateur en gros)"
+
+      criteres_de_reussite:
+          - "Atteint le test_litmus de Kenji (partage en quelques secondes une image jolie et lisible, sans avoir à comprendre une UI française)"
+          - "L'image trouve sa place dans un flux Instagram sans détonner — atmosphérique, pas marketing"
+          - "Quelqu'un qui voit l'image dans un flux comprend qu'il s'agit d'un parcours dans Lyon, sans avoir à lire un texte explicatif"
+
+      definition_of_done:
+          - "Une image partageable peut être générée à la fin d'un parcours"
+          - "L'image est au format vertical adapté aux stories"
+          - "L'image montre une trace stylisée du parcours sur une carte"
+          - "Les statistiques du parcours sont présentes de façon discrète"
+          - "Une signature HistoLyon discrète est présente"
+          - "L'image est proposée au partage natif système après génération"
+          - "Le ton de l'image est cohérent avec le ton conteur de l'app (atmosphérique, sobre)"
+
+      enjeux_transversaux:
+          accessibilite: >-
+              Pour les utilisateurs qui partagent l'image, un texte
+              alternatif descriptif accompagne l'image quand le canal de
+              partage le supporte. La lisibilité des statistiques sur
+              l'image elle-même reste suffisante — cohérent avec une
+              consultation en miniature (story qui défile).
+          performance: >-
+              La génération de l'image doit être perçue comme rapide à la
+              fin d'un parcours — pas un temps d'attente qui rompt le moment
+              de célébration. Critères chiffrés en palier 16.
+          vie_privee: >-
+              Critique : pas de localisation précise de l'utilisateur sur
+              l'image, pas d'avatar identifiant, pas de métadonnées
+              traçantes. La trace du parcours est partageable parce qu'elle
+              concerne un parcours public, pas la position privée de
+              l'utilisateur. Cohérent avec D6.
+
+      questions_ouvertes:
+          - "Le tracé du parcours dans l'image partageable est par défaut la TRAJECTOIRE IDÉALE du parcours (celle de la fiche), pas le tracé GPS réellement parcouru — pour ne jamais exposer la trajectoire personnelle de l'utilisateur. À confirmer explicitement en palier 7."
+          - "Quelles statistiques précisément (étapes complétées, distance, durée, époques traversées) — à arbitrer en palier 8 contenu"
+          - "Variantes par parcours (ex. badge associé visible discrètement) — à arbitrer en palier 9 cartographie / palier 13 icônes"
+          - "L'image est-elle aussi générable depuis une fin de parcours passée (depuis l'historique) ? — à arbitrer en palier 6 flows"
+
+      priorite: "important"
+
+      personas_principaux:
+          - kenji
+          - pere_lyonnais
+
+      dependances:
+          - "D3.9 (fin de parcours — point de génération de l'image)"
+          - "D11.5 (partage natif système — destination après génération)"
+
+    # ===========================================================================
+    - id: D11.5
+      nom: "Partage natif système"
+
+      raison_d_etre: >-
+          Quand l'utilisateur déclenche un partage (depuis un pin, un
+          parcours, une fin de parcours, ou via une image générée), il
+          faut que l'app remette la main au système d'exploitation pour
+          que celui-ci propose à l'utilisateur les destinations qu'il
+          connaît déjà — ses messageries, ses contacts, son partage
+          AirDrop, son mail, son enregistrement local. Réimplémenter une
+          UI de partage maison serait une faute : l'utilisateur connaît
+          déjà l'UI native de son téléphone, elle est traduite, elle est
+          accessible, elle s'intègre à toutes les apps qu'il utilise. Ce
+          sous-domaine est la RÉFÉRENCE CANONIQUE de ce comportement
+          pour tout le palier 3 — il est référencé depuis D2.4 (aperçu
+          pin), D2.5 (consultation approfondie), D3.3 (fiche parcours),
+          et D3.9 (fin de parcours, via D11.4).
+
+      comportement: >-
+          Quand l'utilisateur déclenche un partage depuis l'app sur un
+          élément partageable (pin, parcours, fin de parcours, image
+          générée), l'app prépare la donnée à partager (un lien universel
+          D11.1, un code visuel D11.3, une image D11.4, ou une combinaison)
+          puis remet la main au système d'exploitation, qui prend le relai
+          en présentant à l'utilisateur les destinations possibles via son
+          mécanisme natif. L'utilisateur choisit la destination et le
+          système gère l'envoi. L'app n'intervient pas dans le choix de la
+          destination ni dans l'UI de sélection — c'est un comportement
+          mutualisé du système, pas une UI maison. Si le partage est
+          annulé par l'utilisateur, l'app revient à son état précédent
+          sans drame.
+
+      regles_fonctionnelles:
+          - "L'app utilise le mécanisme natif de partage du système, pas une UI maison"
+          - "L'utilisateur déclenche le partage explicitement — jamais de partage automatique"
+          - "L'app prépare la donnée (lien, code visuel, image) et remet la main au système"
+          - "Les destinations possibles sont celles que le système propose à l'utilisateur sur son téléphone (varient selon ses apps installées)"
+          - "L'annulation du partage par l'utilisateur ramène l'app à son état précédent sans message d'erreur"
+          - "Le contenu partagé varie selon l'élément (pin → lien ; parcours → lien ; fin de parcours → lien + image partageable D11.4 ; partage non-numérique → code visuel D11.3)"
+
+      capabilites:
+          - "Préparer la donnée à partager pour un pin, un parcours, une fin de parcours, ou une image générée"
+          - "Déléguer la sélection de la destination au mécanisme natif du système"
+          - "Combiner plusieurs éléments à partager (lien + image, lien + code visuel) selon le contexte"
+          - "Gérer l'annulation du partage par l'utilisateur sans drame"
+          - "Servir de point d'entrée canonique au partage pour les autres domaines (D2.4, D2.5, D3.3, D3.9)"
+
+      ce_qu_on_ne_fait_pas:
+          - "Pas d'UI de partage maison qui reproduirait le mécanisme natif"
+          - "Pas de partage déclenché silencieusement sans action utilisateur"
+          - "Pas de pré-sélection ou de filtrage des destinations possibles côté app (laisser le système décider)"
+          - "Pas de message intrusif après partage (pas de pop-up 'merci d'avoir partagé !')"
+          - "Pas de tracking de qui partage quoi à qui"
+
+      criteres_de_reussite:
+          - "Atteint le test_litmus de Kenji (partage en quelques secondes — l'UI native qu'il connaît déjà sur son téléphone japonais l'aide)"
+          - "Mme Dupont peut envoyer son parcours par WhatsApp, mail ou AirDrop selon le canal le plus pratique pour ses parents — l'app n'impose pas un canal"
+          - "L'utilisateur n'a pas l'impression d'avoir 'utilisé HistoLyon' au moment du partage — l'expérience est celle de son téléphone, juste"
+
+      definition_of_done:
+          - "Un partage peut être déclenché depuis un pin, un parcours, une fin de parcours, et depuis une image générée"
+          - "Le mécanisme natif du système est utilisé — pas d'UI de partage maison"
+          - "La donnée préparée varie selon l'élément (lien seul, lien + image, lien + code visuel)"
+          - "L'annulation du partage est silencieuse"
+          - "Aucun tracking n'est mis en œuvre sur le partage"
+          - "Ce sous-domaine sert de référence canonique aux autres domaines qui exposent un partage (D2.4, D2.5, D3.3, D3.9)"
+
+      enjeux_transversaux:
+          accessibilite: >-
+              En utilisant le mécanisme natif, on hérite de l'accessibilité
+              du système (lecteurs d'écran, navigation clavier, traductions)
+              — c'est précisément l'avantage de ne pas refaire une UI
+              maison. Le déclencheur du partage côté app reste accessible.
+          performance: >-
+              La préparation de la donnée à partager (génération d'image
+              notamment) ne doit pas faire attendre l'utilisateur après
+              son geste de déclenchement. Critères chiffrés en palier 16.
+          vie_privee: >-
+              Critique : l'app ne sait pas et ne cherche pas à savoir vers
+              quelle destination l'utilisateur partage. Pas de tracking
+              de partage. Cohérent avec essence § ce_qu_on_refuse et
+              avec D6.
+
+      questions_ouvertes:
+          - "Comportement précis quand un canal natif refuse un type de contenu (ex. image trop lourde pour un canal donné) — à arbitrer en palier 6 flows"
+          - "Le partage d'une image générée (D11.4) inclut-il systématiquement le lien associé en complément, ou juste l'image ? — à arbitrer en palier 6 flows"
+          - "Comportement sur web (D11.2) du partage — héritage du partage navigateur ou suppression ? — à arbitrer"
+
+      priorite: "important"
+
+      personas_principaux:
+          - kenji
+          - mme_dupont
+          - pere_lyonnais
+
+      dependances:
+          - "D11.1 (lien universel — donnée partagée la plus fréquente)"
+          - "D11.3 (code visuel — pour partage non-numérique)"
+          - "D11.4 (image partageable — pour fin de parcours sur réseaux sociaux)"
+
+      comportements_transverses_referenced:
+          - "Partage natif système — ce sous-domaine est la RÉFÉRENCE CANONIQUE de ce comportement, référencé depuis D2.4 (aperçu pin), D2.5 (consultation approfondie), D3.3 (fiche parcours), D3.9 (fin de parcours, via image D11.4)"
+
+# -----------------------------------------------------------------------------
+# Persona-check du domaine D11
+# -----------------------------------------------------------------------------
+persona_check:
+    kenji:
+        pertinence: "Très élevée — partage social d'une découverte ou d'une fin de parcours sur Instagram"
+        scenarios_passes:
+            - scenario: "Partage d'une découverte sur Instagram en 10 secondes, sans comprendre une UI française"
+              reponse: "Couvert par D11.5 (partage natif système — UI native qu'il connaît déjà sur son téléphone japonais) et D11.4 (image partageable de fin de parcours, atmosphérique, parle d'elle-même)"
+            - scenario: "Préparation à l'hôtel hors-ligne d'un itinéraire reçu d'un ami via lien"
+              reponse: "Couvert par D11.1 (lien universel — ouvre l'app si installée) ; mode hors-ligne du contenu géré par D1.1 (canonique) et D3 (parcours)"
+            - scenario: "Le partage produit une image jolie et lisible, sans qu'il ait à composer du texte"
+              reponse: "Couvert par D11.4 — l'image parle pour elle-même, sobre, atmosphérique"
+        questions_levees:
+            - "Langues supportées sur la version web (D11.2) — à arbitrer"
+
+    mme_dupont:
+        pertinence: "Très élevée — envoi du parcours préparé aux six parents accompagnateurs"
+        scenarios_passes:
+            - scenario: "Envoi du parcours aux 6 parents via mail/WhatsApp, sans qu'ils créent de compte"
+              reponse: "Couvert par D11.1 (lien universel) et D11.2 (version web — destination quand l'app n'est pas installée, sans mur d'inscription)"
+            - scenario: "Un parent ouvre le lien le jour J, sans formation, et sait quoi faire en moins de 30 secondes"
+              reponse: "Couvert par D11.2 (version web responsive en lecture seule, sobre, ton conteur) ; performance et accessibilité critiques nommées en enjeux"
+            - scenario: "Impression d'une feuille pour les parents avec un code à scanner"
+              reponse: "Couvert par D11.3 (code visuel imprimable — encode le même lien que D11.1, scan = comportement identique au lien)"
+        questions_levees:
+            - "Comportement précis du partage d'une image en plus du lien quand on partage un parcours (D11.5) — à arbitrer en palier 6"
+
+    mme_martin:
+        pertinence: "Faible à modérée — peu de partage, mais usage potentiel du code visuel pour panneau en classe"
+        scenarios_passes:
+            - scenario: "Affichage d'un code dans une salle de classe pour que les élèves accèdent à un pin"
+              reponse: "Couvert par D11.3 (code visuel imprimable). Le scan amène les élèves sur la version web (D11.2) ou l'app si installée — usage cohérent avec son contexte projection"
+            - scenario: "Projection au tableau"
+              reponse: "Hors périmètre D11 — relève de D2.5 (mode présentation sans chrome) appliqué à la consultation, pas à une surface hors-app"
+        questions_levees: []
+
+    pere_lyonnais:
+        pertinence: "Modérée — partage ponctuel d'une découverte qui l'a marqué"
+        scenarios_passes:
+            - scenario: "Partage d'une anecdote à un ami pour qu'il aille voir aussi"
+              reponse: "Couvert par D11.1 (lien universel) et D11.5 (partage natif système). L'ami reçoit le lien, l'ouvre, accède au contenu via l'app ou la version web — sans friction"
+            - scenario: "Retrouver une découverte le soir pour la raconter à un ami"
+              reponse: "Hors périmètre D11 — relève de D6 (historique). Le partage qui suit éventuellement passe par D11"
+        questions_levees: []
+
+    anais_back_office:
+        pertinence: "Faible — domaine côté grand public, surfaces de consommation"
+        scenarios_passes:
+            - scenario: "Production des éléments partageables (textes, médias d'un pin)"
+              reponse: "Hors périmètre D11 — relève de D10 (production de contenu). Anaïs n'opère pas sur les surfaces hors-app elles-mêmes"
+        questions_levees: []

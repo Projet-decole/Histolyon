@@ -1,0 +1,349 @@
+# =============================================================================
+# Palier 14 — 07 Marque — logo HistoLyon et app icon
+# =============================================================================
+# Formalisation du logo HistoLyon et de l'app icon (springboard iOS, launcher
+# Android). Risque orphelin tracé palier 13 § risque_orphelin_signale —
+# levé ici (décision D3 du 00-index).
+#
+# Matériau de référence — Logo.png à la racine du projet
+# (/home/lunos/CODE/HistoLyon/Logo.png) inspecté en cadrage. Ce fichier
+# nomme les éléments constitutifs observés dans ce matériau, identifie
+# les usages où le logo apparaît, et trace les arbitrages encore ouverts
+# (tagline 'LYON IMMERSIVE', déclinaisons monochrome, espace de respiration).
+# Le palier 14 ne PRODUIT pas un logo finalisé — il pose le cadre d'usage.
+# La production graphique fine (variantes, exports vectoriels propres) se
+# fera au palier 15 (construction Figma) à partir de ce cadre.
+# =============================================================================
+
+document:
+  type: palier_surfaces_hors_app_artefact
+  artefact: marque_logo_et_app_icon
+  numero: 14
+  fichier_id: "07"
+  version: "0.3"
+  date: "2026-05-08"
+  format: yaml
+  prerequis_de_lecture:
+    - "design/conception/14-surfaces-hors-app/00-index.yaml — décision D3 (logo inclus), D4 (app icon inclus)"
+    - "design/conception/13-icones/00-index.yaml — § risque_orphelin_signale (LOGO HistoLyon)"
+    - "design/conception/12-tokens/01-couleurs.yaml — palette terracotta / parchemin / encre"
+    - "design/conception/01-essence.yaml — § principes_essentiels et ce_qu_on_refuse (sobriété, pas de city branding)"
+    - "design/conception/14-surfaces-hors-app/02-page-web-responsive.yaml — usage favicon"
+    - "design/conception/14-surfaces-hors-app/04-image-partageable.yaml — usage signature"
+  materiau_de_reference:
+    fichier: "/home/lunos/CODE/HistoLyon/Logo.png"
+    role: "Matière brute observée — réf­érence pour formaliser le logo. Pas une production finalisée à reprendre telle quelle (cf. arbitrages ouverts ci-dessous)."
+
+# -----------------------------------------------------------------------------
+# 1. Raison d'être
+# -----------------------------------------------------------------------------
+raison_d_etre: >-
+  Le logo HistoLyon signe quatre surfaces hors-app : favicon de la page
+  web (fichier 02), signature discrète de l'image partageable de fin
+  de parcours (fichier 04), signature optionnelle d'un code visuel
+  affiché en panneau d'office du tourisme (fichier 03 cas variante),
+  app icon sur le springboard iOS et le launcher Android. Sans
+  formalisation, chacune de ces surfaces inventerait sa propre
+  signature — incohérent, fragile, et hors essence.
+  L'app icon est de plus la PREMIÈRE surface hors-app que l'utilisateur
+  voit, avant même d'ouvrir l'app — sa formalisation conditionne la
+  reconnaissance de la marque dans le launcher Android d'un parent
+  accompagnateur, sur le springboard iOS de Kenji, dans une recherche
+  d'app store.
+
+# -----------------------------------------------------------------------------
+# 2. Décisions structurelles propres au fichier 07
+# -----------------------------------------------------------------------------
+decisions_structurelles:
+
+  - id: D-MARQUE-1
+    decision: "Le logo formalisé actuellement est un retraitement du matériau Logo.png archivé — pas une reprise à l'identique"
+    pourquoi: >-
+      Logo.png est un matériau préliminaire, illustratif, qui contient
+      certains éléments à conserver (palette terracotta, lion héraldique,
+      skyline lyonnaise, wordmark) et d'autres à arbitrer (tagline
+      'LYON IMMERSIVE' non validée par les paliers, traitement
+      illustratif vs vectoriel propre, intégration du téléphone tenu
+      par le lion). La production graphique finale se fera au palier 15
+      à partir des cadres posés ici.
+
+  - id: D-MARQUE-2
+    decision: "Tagline 'LYON IMMERSIVE' CONSERVÉE telle quelle dans le logo (validé utilisateur 2026-05-08)"
+    pourquoi: >-
+      Décision utilisateur explicite. La tagline 'LYON IMMERSIVE'
+      apparaît sous le wordmark dans Logo.png et reste dans le logo
+      formalisé. Bien qu'elle soit en anglais et ait un ton
+      assumé proche du registre marketing, l'utilisateur retient
+      l'identité visuelle complète du matériau de référence
+      (lion + skyline + wordmark + tagline) plutôt qu'une variante
+      partielle. La tagline accompagne donc systématiquement le
+      wordmark dans toutes les déclinaisons où l'espace le permet :
+      app icon, favicon en taille suffisante, signature complète.
+      Pour les déclinaisons réduites (favicon 16x16, signature image
+      partageable, signature code visuel), la tagline est OMISE par
+      contrainte de lisibilité — voir SHA-MARQUE-FAVICON et
+      SHA-MARQUE-SIGNATURE-IMAGE-PARTAGEABLE.
+
+  - id: D-MARQUE-3
+    decision: "Déclinaisons systémiques — couleur (palette terracotta complète) ET monochrome (encre seule sur parchemin, ou parchemin sur encre)"
+    pourquoi: >-
+      Cohérence inter-surface. L'app icon iOS/Android demande la couleur
+      complète. Le favicon web tolère la couleur. La signature de
+      l'image partageable peut utiliser la couleur ou un monochrome
+      selon la zone de l'image (TOK-COLOR-X palier 12). Le code visuel
+      en monochrome strict (D-CODE-1 fichier 03) impose une déclinaison
+      monochrome quand le logo y est présent. Trois déclinaisons
+      systémiques à produire au palier 15 :
+        (a) Couleur complète (palette terracotta + skyline parchemin + détails).
+        (b) Monochrome encre sur parchemin (impression noir et blanc).
+        (c) Monochrome parchemin sur fond sombre (au cas où le logo
+            apparaisse sur un fond sombre — peu probable mais à couvrir).
+
+  - id: D-MARQUE-4
+    decision: "App icon iOS et Android — formats distincts mais identité visuelle commune"
+    pourquoi: >-
+      iOS attend un carré sans coin arrondi (l'OS arrondit lui-même).
+      Android attend une icône adaptive (foreground + background séparés
+      pour permettre les masques de forme). Les deux formats consomment
+      la MÊME composition graphique mais avec un découpage spécifique
+      à la plateforme. Cohérent avec l'esprit du palier 14
+      (mécanisme-agnostique) — la composition est posée ici, le
+      découpage par plateforme est de l'implémentation / palier 15.
+
+  - id: D-MARQUE-5
+    decision: "Espace de respiration MINIMAL autour du logo — au moins une marge égale à la hauteur du wordmark"
+    pourquoi: >-
+      Convention typographique standard pour préserver la lisibilité
+      du logo dans toute composition. Évite l'écrasement du logo par
+      des éléments voisins. Sera formalisée précisément au palier 15
+      avec valeurs en pixels mais le principe systémique est posé ici.
+
+# -----------------------------------------------------------------------------
+# 3. Fiches d'artefact
+# -----------------------------------------------------------------------------
+artefacts:
+
+  # ===========================================================================
+  - id: SHA-MARQUE-LOGO
+    nom: "Logo HistoLyon — composition systémique"
+
+    raison_d_etre: >-
+      Le logo signe les surfaces hors-app et l'app icon. Sa composition
+      doit transmettre l'identité du projet (Lyon, histoire, immersion
+      via téléphone) en une silhouette reconnaissable à toutes les
+      tailles d'usage (favicon 16x16 jusqu'à app icon 1024x1024 ou
+      plus).
+
+    elements_constitutifs_observes:
+      heritage_logo_png: "Éléments présents dans le matériau Logo.png à la racine du projet"
+
+      element_1_palette:
+        description: "Dégradé terracotta du clair au foncé en arrière-plan"
+        tokens_palier_12: "TOK-COLOR-PRIMARY (palette palier 12) — référence par token, pas par valeur hex"
+        statut: "À conserver actuellement — cohérent essence et palette palier 12"
+
+      element_2_skyline_lyonnaise:
+        description: >-
+          Silhouette d'éléments architecturaux lyonnais reconnaissables
+          (Fourvière avec ses tours et sa basilique, autres édifices
+          historiques en arrière-plan). Représentée en TON CLAIR
+          (parchemin / beige) sur le fond terracotta.
+        statut: "À conserver actuellement — ancre l'identité lyonnaise sans tomber dans le city branding (la skyline est patrimoniale, pas promotionnelle)"
+        tokens_palier_12: "TOK-COLOR-FOND-PRINCIPAL ou variante claire de la palette"
+
+      element_3_lion_heraldique:
+        description: >-
+          Lion héraldique au premier plan (référence aux armoiries de
+          Lyon — symbole patrimonial fort), debout sur ses arrière-pattes
+          en attitude dressée. Tient un téléphone (avec écouteurs visibles
+          à côté).
+        statut: "À conserver actuellement — l'héraldique lyonnaise est un signe patrimonial cohérent avec essence § principes_essentiels (transmission patrimoniale)"
+        question_intégration_telephone: >-
+          L'intégration du téléphone tenu par le lion est un parti pris
+          fort qui mêle ancien et moderne (cohérent avec le pitch 'Lyon
+          en livre d'histoire vivant via téléphone'). À conserver mais
+          le traitement graphique précis (réalisme du téléphone,
+          stylisation, suppression éventuelle du téléphone si trop
+          chargé) est à arbitrer au palier 15.
+
+      element_4_wordmark_histolyon:
+        description: >-
+          'HistoLyon' en typographie capitale + minuscules, taille
+          notable, en bas de la composition.
+        statut: "À conserver actuellement — wordmark canonique de la marque"
+        typographie:
+          principe: >-
+            Cohérent avec palette typographique palier 12 — privilégier
+            TOK-TYPO-DISPLAY-LG (Playfair) ou Lora pour le wordmark
+            (cohérent avec le ton conteur). Choix exact arbitré au
+            palier 15.
+
+      element_5_tagline:
+        description: "'LYON IMMERSIVE' en petit, en dessous du wordmark"
+        statut: "À conserver actuellement — décision actée D-MARQUE-2 (validé utilisateur 2026-05-08)"
+
+    composition_systemique:
+      hierarchie_visuelle: >-
+        Du fond vers le premier plan : (1) palette terracotta,
+        (2) skyline lyonnaise en silhouette claire, (3) lion héraldique
+        + téléphone, (4) wordmark, (5) tagline 'LYON IMMERSIVE'
+        (D-MARQUE-2 — conservée actuellement). Cette hiérarchie est conservée à toutes les tailles ;
+        en taille réduite (favicon 16x16, 32x32), seuls les éléments
+        les plus reconnaissables sont préservés (cf. SHA-MARQUE-FAVICON).
+
+    consommation_paliers_amont:
+      tokens_palier_12: "TOK-COLOR-PRIMARY, TOK-COLOR-FOND-PRINCIPAL, TOK-COLOR-TEXTE-PRINCIPAL, TOK-TYPO-DISPLAY-LG ou variante (à arbitrer palier 15)"
+      essence: "§ principes_essentiels (transmission patrimoniale), § ce_qu_on_refuse (pas de city branding marketing)"
+
+  # ===========================================================================
+  - id: SHA-MARQUE-FAVICON
+    nom: "Favicon de la page web responsive"
+
+    raison_d_etre: >-
+      Quand un destinataire ouvre la page web dans un onglet de navigateur,
+      le favicon identifie HistoLyon dans la barre d'onglets et les
+      bookmarks. Taille typiquement très réduite (16x16, 32x32, 48x48
+      selon plateforme).
+
+    composition_a_taille_reduite:
+      principe: >-
+        À taille réduite, certains éléments du logo SHA-MARQUE-LOGO
+        ne sont plus lisibles (skyline détaillée, wordmark complet).
+        Le favicon préserve LA SILHOUETTE LA PLUS RECONNAISSABLE :
+        le lion héraldique sur fond terracotta. Wordmark et tagline
+        absents (illisibles à 16x16 de toute façon). Le palier 15
+        produira les déclinaisons exactes.
+      ce_qu_il_n_y_a_pas: "Pas de wordmark, pas de tagline, pas de skyline détaillée"
+
+    formats_attendus_palier_15:
+      - "16x16, 32x32, 48x48 (favicon classique)"
+      - "180x180 (Apple touch icon — quand la page est sauvegardée sur écran d'accueil iOS)"
+      - "192x192, 512x512 (Android home screen icon)"
+
+  # ===========================================================================
+  - id: SHA-MARQUE-APP-ICON
+    nom: "App icon — springboard iOS et launcher Android"
+
+    raison_d_etre: >-
+      Première surface hors-app que l'utilisateur voit. Reconnaissable
+      dans une grille d'icônes du springboard, dans le résultat d'un
+      app store, dans le multitâche.
+
+    composition_systemique:
+      principe: >-
+        Le logo SHA-MARQUE-LOGO en composition complète (palette
+        terracotta + skyline + lion + wordmark + tagline 'LYON IMMERSIVE'
+        — D-MARQUE-2) — taille suffisante pour que tous les éléments
+        restent lisibles. Cohérent avec le matériau Logo.png qui
+        présente exactement cette composition au format app icon.
+
+    formats_attendus_palier_15:
+      ios:
+        principe: "Carré sans coins arrondis (l'OS arrondit lui-même selon le masque iOS)"
+        tailles_canoniques: "1024x1024 (App Store), déclinaisons multiples (générées par les outils du palier 15 / build)"
+      android:
+        principe: "Adaptive icon — foreground (logo) + background (palette terracotta unie ou dégradé) séparés pour permettre les masques de forme du launcher (rond, carré arrondi, etc.)"
+        tailles_canoniques: "108x108 dp foreground + background, plusieurs densités"
+        note: "Le foreground inclut une zone de sécurité où le logo doit tenir, pour éviter d'être tronqué par les masques de forme — cohérent avec D-MARQUE-5 espace de respiration"
+
+  # ===========================================================================
+  - id: SHA-MARQUE-SIGNATURE-IMAGE-PARTAGEABLE
+    nom: "Signature de l'image partageable de fin de parcours"
+
+    raison_d_etre: >-
+      Le fichier 04 SHA-IMG-COMPOSITION zone_4 délègue ici la composition
+      exacte de la signature. Sobriété maximale : pas de gros logo,
+      pas de slogan (héritage strict D11.4).
+
+    composition: >-
+      Déclinaison RÉDUITE du logo SHA-MARQUE-LOGO : la silhouette du
+      lion héraldique seule (sans skyline, sans wordmark complet) plus
+      le wordmark 'HistoLyon' EN PETIT. Pas de tagline. Composition
+      horizontale compacte (lion à gauche, wordmark à droite — ou
+      empilement vertical selon contraintes de l'image).
+
+    contraintes:
+      - "Taille modérée — environ 8-12% de la hauteur de l'image partageable (à valider palier 15 sur composition réelle)"
+      - "TOK-COLOR-FOND-PRINCIPAL ou TOK-COLOR-BLANC-NARRATIF si la signature est sur fond sombre, TOK-COLOR-TEXTE-PRINCIPAL si sur fond clair"
+      - "Position en bas de l'image (zone_4 du fichier 04)"
+
+  # ===========================================================================
+  - id: SHA-MARQUE-SIGNATURE-CODE-VISUEL-VARIANTE
+    nom: "Signature optionnelle du code visuel — variante panneau OT"
+
+    raison_d_etre: >-
+      Cas variante du fichier 03 (apparence_marque) — quand un panneau
+      d'office du tourisme expose un code visuel, la marque émettrice
+      est attendue par le contexte institutionnel.
+
+    composition: >-
+      Déclinaison MONOCHROME du logo (D-MARQUE-3 option b — encre sur
+      parchemin) cohérente avec le code visuel imprimé en monochrome
+      strict (D-CODE-1 fichier 03). Composition horizontale, taille
+      modérée — placée en pied de l'export à côté ou juste avant la
+      zone d'accompagnement (zone 3 du fichier 03).
+
+    contraintes:
+      - "Monochrome strict (cohérent avec l'export du code visuel — D-CODE-1)"
+      - "Pas dans l'export par défaut du code visuel (D-CODE-5 sobriété stricte) — cas variante uniquement"
+
+# -----------------------------------------------------------------------------
+# 4. Personas servis
+# -----------------------------------------------------------------------------
+personas_servis:
+
+  kenji:
+    test_litmus_servi: "Reconnaître l'app dans le launcher / app store japonais"
+    apport_du_fichier: >-
+      L'app icon (SHA-MARQUE-APP-ICON) avec sa silhouette reconnaissable
+      (lion + skyline + wordmark) le distingue dans une grille d'icônes,
+      même si le wordmark 'HistoLyon' n'est pas en japonais. La palette
+      terracotta unique réduit le risque de confusion avec d'autres apps.
+
+  mme_dupont:
+    test_litmus_servi: "Reconnaître l'app sur le téléphone des parents accompagnateurs après installation"
+    apport_du_fichier: >-
+      App icon distinctive. Favicon (SHA-MARQUE-FAVICON) cohérent dans
+      l'onglet du navigateur quand les parents accèdent via le lien
+      web — reconnaissance même hors app.
+
+  pere_lyonnais:
+    test_litmus_servi: "Identifier la signature dans une image partagée par un ami"
+    apport_du_fichier: >-
+      SHA-MARQUE-SIGNATURE-IMAGE-PARTAGEABLE permet à un follower
+      curieux de retrouver l'app quand l'image apparaît dans son flux,
+      sans agressivité marketing.
+
+  mme_martin:
+    test_litmus_servi: "Reconnaître la signature sur un panneau OT ou une affiche pédagogique"
+    apport_du_fichier: >-
+      SHA-MARQUE-SIGNATURE-CODE-VISUEL-VARIANTE — la marque
+      institutionnelle est lisible sur le panneau, cohérent avec
+      l'usage scolaire / culturel.
+
+  anais_back_office:
+    impact: "indirect — la cohérence visuelle du logo signe l'écosystème dans lequel elle opère"
+
+# -----------------------------------------------------------------------------
+# 5. Articulation avec les paliers en aval
+# -----------------------------------------------------------------------------
+articulation_paliers_aval:
+
+  - palier: 15
+    nom: construction_figma
+    transmission: >-
+      Le palier 15 produit les déclinaisons graphiques du logo (couleur
+      complète, monochrome encre, monochrome parchemin) et de l'app
+      icon (iOS + Android adaptive) à partir des cadres posés ici.
+      La tagline 'LYON IMMERSIVE' (D-MARQUE-2 conservée) accompagne le wordmark dans toutes les déclinaisons où l'espace le permet ; OMISE en favicon réduit, signature image partageable, signature code visuel.
+      Le palier 15 produit aussi le favicon en plusieurs tailles.
+
+  - palier: 16
+    nom: validation
+    transmission: >-
+      Le palier 16 valide la reconnaissance du logo en taille réduite
+      (favicon 16x16), la lisibilité de l'app icon dans une grille
+      d'icônes (test proxy-personas), la cohérence visuelle des
+      déclinaisons monochrome avec la version couleur, l'absence de
+      collision avec d'autres logos d'apps culturelles existantes
+      (recherche d'antériorité légère).

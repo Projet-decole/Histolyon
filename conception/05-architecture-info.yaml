@@ -1,0 +1,722 @@
+# =============================================================================
+# Palier 5 — Architecture information
+# =============================================================================
+# Le palier 5 dit COMMENT l'app est ORGANISÉE et NAVIGUÉE — sans dire encore
+# à quoi ça ressemble. Il pose la typologie des modes de présentation, le
+# petit nombre de surfaces top-level qui structurent l'app, les surfaces
+# persistantes qui survivent à la navigation, et les règles qui encadrent
+# le tout.
+#
+# Le palier 5 reste CONCEPTUEL et FONCTIONNEL. Il ne nomme aucun composant
+# UI (BottomSheet, FAB, TabBar, Drawer, Modal) — ces noms apparaîtront en
+# palier 7 (écrans) et palier 10 (composants). Il dit ce qu'une surface
+# DOIT faire, pas comment elle doit RESSEMBLER.
+#
+# La leçon centrale du palier 3 vaut ici aussi : la rigueur d'un palier
+# se mesure à la pureté de son périmètre, pas à la quantité produite.
+# Le brief produit emploie des termes UI (push / sheet / modal / overlay /
+# toast / dialog) qui sont SYSTÉMATIQUEMENT REFORMULÉS ici en termes
+# fonctionnels.
+# =============================================================================
+
+document:
+  type: palier_architecture_information
+  numero: 5
+  version: "0.1"
+  date: "2026-05-05"
+  role: >-
+    Cadre d'organisation et de navigation de l'application — typologie
+    des modes de présentation, inventaire des surfaces top-level et
+    persistantes, règles de coexistence, comportement des deep-links
+    et des entrées externes.
+  format: yaml
+  prerequis_de_lecture:
+    - "design/conception/intention.yaml — § 5.7 separation_des_responsabilites_entre_paliers"
+    - "design/conception/01-essence.yaml"
+    - "design/conception/02-personas.yaml"
+    - "design/conception/03-fonctionnalites/00-index.yaml + les 11 domaines D1-D11"
+    - "design/conception/04-donnees/00-index.yaml — les entités sont rangées par cluster"
+
+# -----------------------------------------------------------------------------
+# 1. Périmètre
+# -----------------------------------------------------------------------------
+perimetre:
+
+  inclus:
+    - "Typologie des modes de présentation au sens fonctionnel"
+    - "Inventaire des surfaces top-level"
+    - "Inventaire des surfaces persistantes (qui survivent à la navigation)"
+    - "Règles de hiérarchie et de retour"
+    - "Règles de coexistence quand plusieurs surfaces sont actives"
+    - "Comportement des entrées externes (deep-links, onboarding, notifications)"
+
+  exclus:
+    - "Composants UI nommés (BottomSheet, TabBar, Drawer, FAB) — palier 10"
+    - "Mise en page, position spatiale, dimensions — palier 7"
+    - "Couleurs, opacités, ombres — paliers 9, 12"
+    - "Microcopy (libellés exacts des sélecteurs de section, titres d'écrans) — palier 8"
+    - "Animations, transitions chorégraphiées, timings — palier 11"
+    - "Mesures techniques (latences, fps, taille tactile) — palier 16"
+    - "Implémentation technique (router, deep-link handler, etc.)"
+
+  test_de_purete: >-
+    Si demain on bascule l'app en interface vocale, ou en réalité
+    augmentée, ou en interface adaptée pour grand écran tactile,
+    est-ce que la fiche reste valide ? Si oui, c'est bon. Si non,
+    elle a contaminé la couche d'écran (palier 7) ou de composants
+    (palier 10).
+
+  reformulations_imposees: >-
+    Le brief produit emploie des termes UI à proscrire ici. Toute
+    occurrence est reformulée :
+      "bottom sheet"     → "aperçu rapide"
+      "modal"            → "surface bloquante" ou "dialogue de confirmation"
+      "overlay"          → "couche superposée"
+      "toast"            → "message éphémère"
+      "dialog"           → "dialogue de confirmation" (uniquement si décision)
+      "push" (de page)   → "navigation en profondeur"
+      "FAB"              → "point d'accès permanent"
+      "tab bar"          → "sélecteur de section principale"
+      "mini-player"      → "surface persistante de lecture"
+      "sticky banner"    → "bandeau d'information persistant"
+
+# -----------------------------------------------------------------------------
+# 2. Modes de présentation (typologie fonctionnelle)
+# -----------------------------------------------------------------------------
+# Neuf types fonctionnels qui couvrent l'ensemble des situations dans
+# lesquelles une surface peut apparaître. Chaque surface utilisée plus
+# bas (top-level ou persistante) référence un de ces types.
+#
+# Termes choisis pour rester fonctionnels — pas d'inspiration UI directe.
+modes_de_presentation:
+
+  - id: M1
+    nom: "Surface principale"
+    role: >-
+      Vue par défaut d'une section top-level. C'est la surface qui
+      structure une intention de l'utilisateur (explorer, consulter
+      ses parcours, gérer son profil). Persiste tant qu'on reste
+      dans la section.
+    proprietes:
+      - "Toujours présente quand l'utilisateur est dans la section associée"
+      - "Le retour depuis ses sous-surfaces y ramène"
+      - "Le passage à une autre surface top-level la met en sommeil sans la fermer"
+    exemples_d_usage:
+      - "Surface Carte (S1)"
+      - "Surface Parcours (S2)"
+      - "Surface Profil (S3)"
+
+  - id: M2
+    nom: "Aperçu rapide"
+    role: >-
+      Consultation courte d'un objet (Pin, Parcours, parfois autre)
+      qui LAISSE la surface principale visible ou proche derrière.
+      L'utilisateur décide en quelques secondes : approfondir, agir,
+      ou refermer. Réversible d'un geste neutre.
+    proprietes:
+      - "N'efface pas la surface principale qui l'a déclenché"
+      - "Retour gracieux : un seul geste pour fermer"
+      - "Peut proposer un point d'accès vers la consultation approfondie"
+      - "Pas une couche bloquante : l'utilisateur peut continuer à percevoir le contexte"
+    exemples_d_usage:
+      - "Aperçu rapide d'un Pin tapé sur la Carte (D2.4)"
+      - "Aperçu rapide d'un Parcours sélectionné dans le catalogue (D3.3 partiel)"
+
+  - id: M3
+    nom: "Consultation approfondie"
+    role: >-
+      Vue dédiée à un objet, occupe la surface utile. On y entre
+      depuis un aperçu rapide, depuis un Lien universel reçu, ou
+      depuis un point d'accès dans une liste. Permet de lire en
+      détail, de naviguer dans le contenu narratif, d'écouter
+      l'audio, de suivre des liens vers d'autres objets.
+    proprietes:
+      - "Cache temporairement la surface principale"
+      - "Retour ramène à la surface principale ou à l'aperçu rapide d'origine"
+      - "Peut basculer en mode présentation (M4)"
+    exemples_d_usage:
+      - "Consultation approfondie d'un Pin (D2.5)"
+      - "Fiche détaillée d'un Parcours (D3.3)"
+      - "Consultation 3D / AR (D8.2)"
+
+  - id: M4
+    nom: "Mode présentation"
+    role: >-
+      Variante de la consultation approfondie où le chrome de l'app
+      (sélecteurs de section, surfaces persistantes, points d'accès
+      périphériques) est masqué. Pour projection en classe (Mme Martin),
+      pour immersion narrative (Kenji avec son casque), ou pour
+      consultation 3D/AR sans interférence.
+    proprietes:
+      - "Aucun chrome d'app visible (sauf un point de retour discret)"
+      - "Réversible d'un geste neutre"
+      - "Les surfaces persistantes (M5) sont mises en sommeil visuellement, mais leur état (audio en cours, parcours en cours) survit"
+      - "Comportement transverse défini canoniquement en D2.5 du palier 3"
+    exemples_d_usage:
+      - "Mme Martin projette un Pin en classe sans chrome"
+      - "Kenji entre en lecture immersive d'une narration"
+      - "Consultation AR d'un modèle 3D ancré"
+
+  - id: M5
+    nom: "Surface persistante de progression"
+    role: >-
+      Surface réduite et TOUJOURS visible (sauf en mode présentation)
+      qui rappelle un état en cours et permet d'y revenir. Survit à
+      la navigation entre sections top-level. C'est elle qui empêche
+      l'utilisateur de PERDRE une lecture audio ou un parcours
+      entrepris en passant à une autre section.
+    proprietes:
+      - "Visible sur les surfaces principales et leurs sous-surfaces"
+      - "Mise en sommeil en mode présentation (M4) — l'état persiste, l'affichage non"
+      - "Tap dessus : retour direct à la consultation approfondie de l'objet en cours"
+      - "Possibilité de fermer (action explicite) : termine l'état"
+      - "Au plus 1 surface persistante par catégorie d'état (au plus 1 audio + au plus 1 parcours en cours)"
+    exemples_d_usage:
+      - "Surface persistante de lecture audio (D7.4 audio en arrière-plan)"
+      - "Surface persistante de parcours en cours (D3.5)"
+
+  - id: M6
+    nom: "Surface ponctuelle"
+    role: >-
+      Apparaît pour traiter une INTENTION COURTE (rechercher, choisir
+      un filtre, sélectionner dans une liste, modifier une valeur) puis
+      disparaît après l'action ou l'annulation. Ne laisse pas de trace
+      dans la pile de navigation.
+    proprietes:
+      - "Apparaît en réponse à une action utilisateur explicite"
+      - "Se ferme à la confirmation, à l'annulation, ou à un geste neutre vers l'extérieur"
+      - "Ne déplace pas la pile de navigation"
+      - "Peut bloquer la surface qui l'a appelée (focus exclusif) ou la laisser visible derrière"
+    exemples_d_usage:
+      - "Surface de recherche (D1.4)"
+      - "Sélection d'une couche cartographique (D1.5)"
+      - "Sélecteur de motif lors d'un signalement (D9.4)"
+
+  - id: M7
+    nom: "Alerte ponctuelle"
+    role: >-
+      Signal ENTRANT, transitoire, qui informe l'utilisateur d'un
+      événement de proximité ou d'une opportunité contextuelle. Atterrit
+      sans interrompre la surface courante. L'utilisateur peut l'accepter
+      (tap = passage à un aperçu rapide ou à une consultation), la
+      refuser (geste de fermeture), ou la laisser passer (elle disparaît
+      d'elle-même).
+    proprietes:
+      - "Transitoire — n'occupe pas la surface définitivement"
+      - "Non bloquante — l'utilisateur peut continuer ce qu'il faisait"
+      - "Génère au plus une alerte à la fois pour un même événement (cf. D4 dédoublonnage)"
+      - "Peut être totalement supprimée par préférence du Profil (mode Balade libre, cf. cluster 03)"
+    exemples_d_usage:
+      - "Notification de proximité en mode Surprenez-moi (D4.2)"
+      - "Notification d'arrivée à une étape en mode En parcours (D4.3)"
+      - "Notification d'éloignement du tracé (D3.5)"
+
+  - id: M8
+    nom: "Dialogue de confirmation"
+    role: >-
+      Surface BLOQUANTE qui demande une décision sur une action à
+      effet sensible (suppression, désactivation, refus de permission
+      de manière définitive, déconnexion de Compte). Réservée aux
+      actes dont la conséquence n'est pas triviale.
+    proprietes:
+      - "Focus exclusif — l'utilisateur ne peut rien faire d'autre tant qu'il n'a pas répondu"
+      - "Au moins deux issues explicites (confirmer / annuler)"
+      - "Texte du dialogue défini en palier 8 contenu"
+      - "À utiliser AVEC PARCIMONIE — le dialogue est un coût d'attention pour l'utilisateur"
+    exemples_d_usage:
+      - "Confirmation de suppression d'un Parcours personnel (cluster 02)"
+      - "Confirmation d'effacement de l'historique de visite (cluster 03)"
+      - "Confirmation de suppression d'un Compte"
+
+  - id: M9
+    nom: "Message éphémère"
+    role: >-
+      Information ou retour utilisateur transitoire, NON bloquant.
+      Confirme silencieusement qu'une action a été prise, ou signale
+      un événement sans demander de décision. Disparaît seul après
+      un délai court.
+    proprietes:
+      - "Non bloquant — la surface courante reste pleinement utilisable"
+      - "Disparaît seul après un délai (durée précise en palier 11)"
+      - "Pas de point d'accès permanent — c'est un instantané"
+      - "Pas d'usage promotionnel ou décoratif (cohérence essence § ce_qu_on_refuse)"
+    exemples_d_usage:
+      - "« Lien copié » après un partage (cluster 06)"
+      - "« Vos retours sont en modération » après soumission"
+      - "« Vous semblez vous éloigner du tracé » (D3.5 retour gracieux)"
+
+# -----------------------------------------------------------------------------
+# 3. Surfaces top-level
+# -----------------------------------------------------------------------------
+# Trois surfaces top-level structurent l'app. Le passage de l'une à l'autre
+# se fait latéralement par un sélecteur de section principale (forme exacte
+# en palier 7). Chacune accueille une intention claire de l'utilisateur.
+#
+# La Carte est l'accueil par défaut au lancement (cohérent avec essence —
+# « la Carte est l'écran d'accueil, pas une feature parmi d'autres »).
+surfaces_top_level:
+
+  - id: S1
+    nom: "Carte"
+    mode: M1
+    accueil_par_defaut: true
+    role: >-
+      Surface centrale de l'app. Donne accès à la carte temporelle,
+      au slider d'époques, à la recherche, aux pins géolocalisés,
+      aux couches cartographiques. C'est ICI que la sérendipité
+      arrive — l'utilisateur passe et le lieu déclenche.
+    entites_accueillies:
+      - "Pin (cluster 01) — affichés selon localisation, époque sélectionnée, couches actives"
+      - "Couche cartographique (cluster 01) — sélection multiple"
+      - "Époque (cluster 01) — pilote l'apparence de la carte via le slider"
+    sous_surfaces_typiques:
+      - mode: M2  # aperçu rapide
+        usage: "tap sur un Pin"
+      - mode: M3  # consultation approfondie
+        usage: "approfondir un Pin depuis l'aperçu"
+      - mode: M4  # mode présentation
+        usage: "Mme Martin projette en classe"
+      - mode: M6  # surface ponctuelle
+        usage: "ouvrir la recherche, choisir une couche"
+      - mode: M7  # alerte ponctuelle
+        usage: "notification de proximité (mode Surprenez-moi)"
+    entree:
+      - "Lancement de l'app (par défaut)"
+      - "Tap sur le sélecteur de section principale 'Carte'"
+      - "Deep-link vers un Pin (atterrit en M3 sur la Carte avec Pin centré derrière)"
+    sortie:
+      - "Tap sur un autre sélecteur de section principale (Parcours / Profil)"
+      - "App passée en arrière-plan"
+
+  - id: S2
+    nom: "Parcours"
+    mode: M1
+    role: >-
+      Surface qui rassemble TOUT ce qui concerne les parcours :
+      explorer le catalogue (parcours éditoriaux et communautaires),
+      retrouver ses propres parcours (personnels en construction,
+      parcours entrepris en cours, parcours complétés), créer un
+      nouveau parcours.
+    accueille_deux_vues:
+      catalogue: >-
+        Parcours éditoriaux + Parcours communautaires (cf. cluster 02
+        Parcours, attribut provenance). Filtrable par époque,
+        catégorie, durée estimée.
+      mes_parcours: >-
+        Parcours personnels (cluster 02, provenance personnelle) +
+        suivi de progression sur les parcours entrepris (extrait
+        de l'Historique de visite, cluster 03).
+      note: >-
+        L'articulation des deux vues à l'intérieur de la surface
+        Parcours (deux sous-onglets, deux sections, bascule par
+        geste — au choix) relève du palier 7.
+    entites_accueillies:
+      - "Parcours (cluster 02) toutes provenances"
+      - "Étape (cluster 02) — par projection depuis Parcours"
+      - "Favori sur Parcours (cluster 03) — surfaçage des parcours favoris"
+      - "Historique de visite (cluster 03) — pour le suivi de progression"
+    sous_surfaces_typiques:
+      - mode: M2
+        usage: "aperçu rapide d'un Parcours dans le catalogue"
+      - mode: M3
+        usage: "fiche détaillée d'un Parcours, lancement d'un Parcours"
+      - mode: M6
+        usage: "filtres de recherche, création d'un nouveau Parcours personnel"
+      - mode: M8
+        usage: "confirmation de suppression d'un Parcours personnel"
+    entree:
+      - "Tap sur le sélecteur de section principale 'Parcours'"
+      - "Deep-link vers un Parcours (atterrit en M3)"
+      - "Lien universel partagé par Mme Dupont à un parent accompagnateur (M3 sur le Parcours, retour vers S2)"
+    sortie:
+      - "Tap sur un autre sélecteur de section principale"
+      - "Lancement d'un Parcours → bascule en consultation approfondie + apparition de la surface persistante de parcours en cours (P2)"
+
+  - id: S3
+    nom: "Profil"
+    mode: M1
+    role: >-
+      Surface où l'utilisateur retrouve ce qui lui est propre :
+      favoris, historique de visite, paramètres (langue, modes de
+      notification, accessibilité), gestion du Compte (création
+      facultative, déconnexion, suppression). Aucune création de
+      contenu ici — c'est un espace de paramétrage et de mémoire.
+    entites_accueillies:
+      - "Profil (cluster 03) — racine"
+      - "Compte (cluster 03) — si créé, avec gestion de la sync"
+      - "Favori (cluster 03) — vue consolidée des Pins et Parcours favoris"
+      - "Historique de visite (cluster 03) — vue chronologique éditable"
+    sous_surfaces_typiques:
+      - mode: M3
+        usage: "détail d'un favori, détail d'une visite passée"
+      - mode: M6
+        usage: "édition d'une préférence, sélection d'une langue"
+      - mode: M8
+        usage: "confirmation d'effacement d'historique, de suppression de Compte"
+    entree:
+      - "Tap sur le sélecteur de section principale 'Profil'"
+      - "Tap sur la représentation du Profil depuis n'importe quelle autre surface (point d'accès périphérique)"
+    sortie:
+      - "Tap sur un autre sélecteur de section principale"
+
+# -----------------------------------------------------------------------------
+# 4. Surfaces persistantes
+# -----------------------------------------------------------------------------
+# Surfaces de type M5 (surface persistante de progression) qui survivent à
+# la navigation entre sections top-level. Au plus une instance visible
+# par catégorie d'état (audio, parcours en cours).
+surfaces_persistantes:
+
+  - id: P1
+    nom: "Surface persistante de lecture audio"
+    mode: M5
+    declenchement: >-
+      Apparaît dès qu'une narration audio est en lecture (D7) et
+      qu'on quitte la consultation approfondie (M3) qui l'a démarrée.
+    entites_accueillies:
+      - "Pin (cluster 01) dont la narration est en cours"
+      - "Média de type audio_narration (cluster 01)"
+      - "Optionnellement Fragment musical (cluster 01) si une ambiance est tissée"
+    proprietes:
+      - "Visible sur S1, S2, S3 et leurs sous-surfaces (sauf M4)"
+      - "Tap dessus : retour à la consultation approfondie (M3) du Pin en cours de lecture"
+      - "Action explicite de fermeture : termine la lecture audio"
+      - "Survit au passage en arrière-plan de l'app (D7.4 audio en arrière-plan)"
+    cessation: "Fin naturelle de l'audio, fermeture explicite, ou nouvelle lecture qui remplace la précédente"
+
+  - id: P2
+    nom: "Surface persistante de parcours en cours"
+    mode: M5
+    declenchement: >-
+      Apparaît dès que l'utilisateur lance un Parcours (D3.5) et
+      sort de la fiche détaillée du Parcours.
+    entites_accueillies:
+      - "Parcours (cluster 02) en cours"
+      - "Étape (cluster 02) courante"
+      - "Indicateur de progression (étapes complétées / restantes — dérivé de l'Historique cluster 03)"
+    proprietes:
+      - "Visible sur S1, S2, S3 et leurs sous-surfaces (sauf M4)"
+      - "Tap dessus : retour à la consultation approfondie de l'Étape courante du Parcours"
+      - "Action explicite de fermeture : abandon du Parcours (avec dialogue de confirmation M8 — l'utilisateur ne quitte pas par accident)"
+    cessation: "Complétion du Parcours, abandon explicite, ou changement de Parcours en cours"
+
+  - id: P3
+    nom: "Bandeau d'information persistant"
+    mode: "M5 (variante minimale)"
+    role: >-
+      Forme réduite d'une surface persistante qui ne porte PAS un état
+      de progression mais une information contextuelle persistante à
+      l'échelle de l'app (ex. mode hors-ligne actif, restriction
+      réseau). Apparaît uniquement quand pertinent, disparaît quand
+      la condition cesse.
+    proprietes:
+      - "Au plus une instance visible à la fois — l'information la plus prioritaire prime"
+      - "Visible sur toutes les surfaces principales (cf. règle de priorité avec P1 et P2 en § 5)"
+    exemples_d_usage:
+      - "Indicateur 'mode hors-ligne actif' quand le terminal n'a pas de connexion (cf. cluster 03 préférence Profil + politique d'implémentation)"
+    note: >-
+      Distingué de P1/P2 parce qu'il ne représente pas une lecture
+      ou un parcours engagé. Si en cours de rédaction du palier 7
+      ce type s'avère sous-utilisé, on pourra fusionner avec M9
+      (message éphémère) — pour l'instant maintenu distinct car
+      la persistance est qualitative (la condition dure tant qu'elle
+      dure).
+
+# -----------------------------------------------------------------------------
+# 5. Hiérarchie de navigation et règles de coexistence
+# -----------------------------------------------------------------------------
+navigation:
+
+  hierarchie:
+    description: >-
+      L'app est organisée en TROIS niveaux. Le niveau 0 est le sélecteur
+      des surfaces top-level (S1, S2, S3). Le niveau 1 est la surface
+      principale d'une section (M1). Le niveau 2 est la sous-surface
+      ouverte depuis le niveau 1 (M2 aperçu rapide, M3 consultation
+      approfondie, M6 surface ponctuelle).
+    schema_textuel: |
+      [niveau 0] Sélecteur de section principale (S1 / S2 / S3)
+        ├── [niveau 1] S1 Carte (M1)
+        │     ├── [niveau 2] aperçu rapide d'un Pin (M2)
+        │     │     └── [niveau 2'] consultation approfondie (M3) ── (peut basculer en M4)
+        │     ├── [niveau 2] surface de recherche (M6)
+        │     └── [niveau 2] alerte ponctuelle (M7)
+        ├── [niveau 1] S2 Parcours (M1)
+        │     ├── [niveau 2] aperçu rapide d'un Parcours (M2)
+        │     └── [niveau 2] consultation approfondie d'un Parcours (M3)
+        └── [niveau 1] S3 Profil (M1)
+              └── [niveau 2] surface ponctuelle d'édition de préférence (M6)
+
+      Surfaces persistantes (P1, P2, P3) flottent au-dessus des niveaux 1 et 2 (sauf M4).
+
+  regles_de_navigation:
+    - id: N1
+      enonce: >-
+        Le retour est gracieux : un seul geste de retour ramène
+        l'utilisateur AU NIVEAU IMMÉDIATEMENT SUPÉRIEUR. On ne perd
+        jamais l'utilisateur dans une pile profonde.
+    - id: N2
+      enonce: >-
+        Le passage entre surfaces top-level (S1 ↔ S2 ↔ S3) ne traverse
+        pas une pile : c'est un saut latéral. Chaque surface top-level
+        garde l'état de sa pile interne quand on en sort.
+    - id: N3
+      enonce: >-
+        Une consultation approfondie (M3) ouverte depuis un aperçu
+        rapide (M2) revient sur cet aperçu rapide au retour, pas
+        directement sur la surface principale. L'utilisateur peut
+        ainsi continuer à parcourir d'autres aperçus rapides sans
+        repartir du début.
+    - id: N4
+      enonce: >-
+        Le mode présentation (M4) est une bascule sans étape de pile :
+        on y entre depuis une consultation approfondie (M3) par une
+        action explicite, et on en sort par retour à la consultation
+        approfondie d'origine.
+    - id: N5
+      enonce: >-
+        Une surface ponctuelle (M6) qui ne reçoit pas d'action explicite
+        de l'utilisateur (validation ou annulation) au bout d'un délai
+        ou par interaction extérieure se ferme proprement (annulation
+        implicite). L'état de la surface qui l'avait appelée reste
+        intact.
+    - id: N6
+      enonce: >-
+        Un dialogue de confirmation (M8) est strictement bloquant :
+        aucune action ailleurs n'est possible tant qu'il n'a pas reçu
+        de réponse. Pas de geste pour le contourner.
+    - id: N7
+      enonce: >-
+        L'app passée en arrière-plan préserve TOUT son état : surfaces
+        principales courantes, sous-surfaces en cours, surfaces
+        persistantes (P1/P2/P3 — pour P1 audio, la lecture continue
+        si l'OS l'autorise). Le retour au premier plan ramène
+        exactement où on était.
+
+  regles_de_coexistence:
+    - id: C1
+      enonce: >-
+        Les surfaces persistantes P1 (audio) et P2 (parcours en cours)
+        peuvent coexister visuellement (audio en cours pendant un
+        parcours est un cas typique). Leur articulation visuelle
+        relève du palier 7.
+    - id: C2
+      enonce: >-
+        En mode présentation (M4), TOUTES les surfaces persistantes
+        (P1, P2, P3) sont mises en sommeil VISUELLEMENT — leur état
+        survit (l'audio continue, le parcours reste en cours), mais
+        rien n'apparaît à l'écran sauf un point de retour minimal.
+    - id: C3
+      enonce: >-
+        Aperçu rapide (M2) et surface principale (M1) coexistent —
+        l'aperçu rapide n'efface pas la surface principale derrière.
+        Consultation approfondie (M3) cache temporairement la surface
+        principale qui l'a déclenchée.
+    - id: C4
+      enonce: >-
+        Une alerte ponctuelle (M7) ne bloque jamais : elle apparaît
+        sur la surface courante (quel que soit son niveau), et un
+        tap dessus emporte l'utilisateur vers la cible (généralement
+        un aperçu rapide ou une consultation approfondie). Un geste
+        de fermeture la fait disparaître sans bouger la surface
+        courante.
+    - id: C5
+      enonce: >-
+        Au plus 1 dialogue de confirmation (M8) actif à la fois.
+        Une nouvelle demande de confirmation pendant qu'un dialogue
+        est ouvert est mise en attente ou refusée selon le cas
+        (politique fonctionnelle à arbitrer en palier 6 flows).
+      questions_ouvertes:
+        - "Politique exacte sur les confirmations en cascade — palier 6"
+    - id: C6
+      enonce: >-
+        Un message éphémère (M9) ne déplace ni la pile ni la surface
+        courante. S'il en survient plusieurs en série, le précédent
+        cède la place au suivant (file simple de remplacement).
+
+# -----------------------------------------------------------------------------
+# 6. Entrées externes — deep-links et premier lancement
+# -----------------------------------------------------------------------------
+# Comment l'utilisateur ARRIVE dans l'app de l'extérieur. Trois cas couverts :
+# le tout premier lancement (onboarding), le Lien universel reçu, la
+# notification système.
+entrees_externes:
+
+  - id: E1
+    nom: "Premier lancement"
+    cas: >-
+      L'utilisateur ouvre l'app pour la première fois. Conformément
+      au D5 (onboarding), pas de tutoriel obligatoire ni de demande
+      de permission en bloc.
+    comportement: >-
+      Atterrissage direct sur S1 Carte en surface principale (M1).
+      L'onboarding est un flux d'entrée TRAVERSANT : il superpose
+      des indications ponctuelles (M9 messages éphémères ou M7
+      alertes ponctuelles selon le cas) au fil des premières actions,
+      sans bloquer l'utilisateur. Une fois traversé, il disparaît.
+    note: "L'onboarding n'est pas une surface top-level distincte (cf. arbitrage E)"
+
+  - id: E2
+    nom: "Lien universel reçu"
+    cas: >-
+      L'utilisateur ouvre un Lien universel (cluster 06) reçu par
+      messagerie, mail, ou tout autre canal. La cible est un Pin
+      ou un Parcours.
+    comportement: >-
+      Si l'app est installée : atterrissage direct en consultation
+      approfondie (M3) de la cible. La surface principale derrière
+      est S1 Carte (si Pin) ou S2 Parcours (si Parcours), de sorte
+      qu'au retour l'utilisateur arrive dans la section logique.
+    cas_app_non_installee: >-
+      Fallback vers la version web responsive (palier 14) — l'app
+      n'a pas la main. Modélisation détaillée du fallback en
+      palier 14.
+    note_palier_14: >-
+      Le palier 5 ne décide PAS le mécanisme de redirection (custom
+      scheme, universal links iOS, app links Android, etc.) — c'est
+      de l'implémentation.
+
+  - id: E3
+    nom: "Notification système entrante"
+    cas: >-
+      L'utilisateur reçoit une notification système (de proximité en
+      mode Surprenez-moi, d'arrivée à une étape en mode En parcours,
+      ou de signalement traité) et la tape.
+    comportement: >-
+      Selon le type :
+        - Notification de proximité (D4.2) → atterrit en aperçu rapide
+          (M2) du Pin concerné, surface principale S1 Carte derrière.
+        - Notification d'étape de parcours (D4.3) → atterrit en
+          consultation approfondie (M3) de l'étape, surface persistante
+          P2 active.
+        - Notification de modération (Anaïs ou rare cas utilisateur) →
+          atterrit dans S3 Profil section dédiée.
+    note: >-
+      Aucune notification ne déclenche de dialogue de confirmation
+      ni de surface bloquante au lancement de l'app — atterrir gracieusement
+      est une règle stricte.
+
+# -----------------------------------------------------------------------------
+# 7. Surfaces hors-app (rappel)
+# -----------------------------------------------------------------------------
+# Le partage natif système et la version web responsive sont des SURFACES
+# qui vivent en DEHORS de l'app HistoLyon. Le palier 5 ne les modélise pas
+# (ce sont des objets du palier 14). Mention pour mémoire.
+surfaces_hors_app_rappel:
+  - "Partage natif système (palier 14, déclenché depuis l'app, prend la main au système)"
+  - "Version web responsive (palier 14, atterrissage de fallback quand l'app n'est pas installée)"
+  - "Page externe pointée par 'Pour aller plus loin' d'un Pin (cluster 01) — ouverture dans le navigateur du système, pas dans une surface de l'app"
+
+# -----------------------------------------------------------------------------
+# 8. Articulation avec les paliers en aval
+# -----------------------------------------------------------------------------
+articulation_paliers_aval:
+
+  - palier: 6
+    nom: flows
+    transmission: >-
+      La typologie des modes de présentation, les règles de navigation
+      et les règles de coexistence cadrent les flows : un flow ne peut
+      pas inventer une surface qui n'a pas son type ici, et il doit
+      respecter les règles de coexistence (notamment C2 — le mode
+      présentation met en sommeil les surfaces persistantes).
+
+  - palier: 7
+    nom: ecrans
+    transmission: >-
+      Chaque surface (S1-S3, P1-P3) sera concrétisée en un ou
+      plusieurs écrans. La typologie des modes de présentation
+      (M1-M9) cadre quels écrans existent et comment ils se
+      composent. Le palier 7 décide la mise en page, la position
+      spatiale, les composants utilisés.
+
+  - palier: 8
+    nom: contenu_et_microcopy
+    transmission: >-
+      Toute la microcopy (libellés des sélecteurs de section, titres
+      d'écrans, libellés de boutons, messages éphémères, dialogues de
+      confirmation, alertes ponctuelles) sera produite ici à partir
+      des modes et surfaces nommés en palier 5.
+
+  - palier: 10
+    nom: composants
+    transmission: >-
+      Chaque mode de présentation correspondra à un ou plusieurs
+      composants UI réutilisables. Les composants sont nommés là —
+      pas ici.
+
+  - palier: 11
+    nom: interactions_et_motion
+    transmission: >-
+      Les transitions entre modes (M2 → M3, M3 → M4, ouverture/fermeture
+      de M6, apparition/disparition de M7 et M9) donnent lieu à des
+      animations chorégraphiées dont les courbes et durées sont
+      décidées en palier 11.
+
+  - palier: 14
+    nom: surfaces_hors_app
+    transmission: >-
+      Le comportement de Lien universel reçu quand l'app n'est pas
+      installée (fallback version web), la version web elle-même,
+      le mécanisme de partage natif système — tous décrits ici
+      uniquement pour articulation, modélisés en détail au palier 14.
+
+# -----------------------------------------------------------------------------
+# 9. Persona check
+# -----------------------------------------------------------------------------
+persona_check:
+
+  kenji:
+    impact: "direct"
+    note: >-
+      Test_litmus de Kenji 'comprendre l'app en moins de 60 secondes
+      sans tutoriel' = la hiérarchie à 3 surfaces top-level + accueil
+      direct sur la Carte + onboarding traversant non bloquant
+      garantissent qu'il n'a aucune friction au lancement. Le mode
+      M4 (présentation) lui permet de marcher avec son casque en
+      gardant les yeux sur Lyon. La règle N7 (préservation d'état en
+      arrière-plan) sert son cas 'plus de data au milieu de Bellecour'.
+
+  mme_dupont:
+    impact: "MAJEUR"
+    note: >-
+      Tout le scénario de Mme Dupont passe par la surface S2 Parcours
+      (création + envoi). Le Lien universel reçu par les parents
+      accompagnateurs (E2) atterrit en consultation approfondie M3
+      du Parcours sans demander de Compte (cohérent avec essence
+      § ce_qu_on_refuse 'mur d'inscription'). La surface persistante
+      P2 (parcours en cours) accompagne le parent qui passe en
+      flânerie sans perdre son fil.
+
+  mme_martin:
+    impact: "MAJEUR"
+    note: >-
+      Le mode M4 (présentation) répond directement à son test_litmus
+      'mode plein écran propre, sans chrome'. La règle C2 (toutes
+      les surfaces persistantes en sommeil visuel en M4) garantit
+      qu'aucune notification, aucune barre, aucun mini-player ne
+      surgit pendant sa projection. Les sources affichées en M3
+      consultation approfondie restent visibles avant de basculer
+      en M4 — elle peut citer.
+
+  pere_lyonnais:
+    impact: "direct"
+    note: >-
+      L'aperçu rapide M2 (consultation courte qui laisse la Carte
+      visible derrière) répond à son besoin 'lire avant que les
+      enfants ne le tirent par la manche'. L'alerte ponctuelle M7
+      en mode Surprenez-moi (D4.2) atterrit sans interrompre sa
+      promenade. La règle C4 (alerte non bloquante) lui permet de
+      l'ignorer s'il préfère continuer à flâner.
+
+  anais_back_office:
+    impact: "indirect"
+    note: >-
+      Anaïs n'utilise PAS l'app mobile telle qu'elle est ici —
+      elle opère sur le back-office (palier 13). Le palier 5 ne
+      la concerne pas directement, sauf en consommation : elle
+      doit pouvoir consulter son contenu DANS l'app pour
+      prévisualisation. Cette prévisualisation transitera par les
+      modes M3 (consultation approfondie) et M4 (mode présentation
+      pour vérifier le rendu sans chrome). Cohérent avec son
+      drapeau rouge 'pas de prévisualisation'.

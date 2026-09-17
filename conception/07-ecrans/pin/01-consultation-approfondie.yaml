@@ -1,0 +1,128 @@
+# =============================================================================
+# E-PIN-CONSULTATION-APPROFONDIE — Consultation approfondie d'un Pin
+# =============================================================================
+# Surface dense en P5.M3 imbriquée par-dessus la Carte (P5.S1). Vue dédiée à
+# un Pin : récit principal, audio, navigation multi-époque, zone post-narrative,
+# section commentaires. Point de bascule vers 3D/AR et vers le mode présentation.
+# Écran le plus dense du parcours utilisateur grand public.
+# =============================================================================
+
+document:
+  type: palier_ecrans_fiche
+  format: yaml
+
+ecran:
+  id: E-PIN-CONSULTATION-APPROFONDIE
+  nom: "Consultation approfondie d'un Pin"
+
+  mode: P5.M3
+  surface_parente: P5.S1
+
+  raison_d_etre: >-
+    Surface dédiée où le récit d'un Pin se déploie pleinement : narration
+    textuelle et audio, archives et citations sourcées, contenus interactifs
+    tissés, navigation entre Époques pour les Pins multi-temporels, zone
+    post-narrative (quiz, énigme, pins liés, pour aller plus loin), section
+    commentaires. C'est ICI que la promesse d'historicité s'incarne, et
+    c'est d'ici que démarre la lecture audio en arrière-plan, la consultation
+    3D/AR et le mode présentation.
+
+  composition:
+    - zone: "en-tête contextuel"
+      role: "titre du Pin, Catégorie, Époque(s) actives, indicateur de provenance ; marque distinctive si Pin communautaire en cours de vérification (I3) ; éventuel Badge éditorial"
+      entites_affichees: [Pin, Catégorie, Époque, Badge]
+
+    - zone: "navigation multi-époque"
+      role: "présente uniquement pour Pins associés à ≥ 2 Époques (I8) ; permet de basculer entre couches temporelles sans rechargement de Pin (flow B3) ; pré-sélection cohérente avec le slider d'Époque de la Carte"
+      entites_affichees: [Époque]
+
+    - zone: "contrôles audio"
+      role: "lecture, pause, déplacement dans la narration ; présent uniquement si le Pin a un Média de type audio_narration ; au démarrage de la lecture, l'état audio prépare l'apparition de la surface persistante P1 dès la sortie de l'écran"
+      entites_affichees: [Média, "Fragment musical"]
+
+    - zone: "récit principal"
+      role: "contenu narratif structuré (mise en condition d'ouverture, narration, contenus complexes tissés — exemples palier 8 : archives, citations, comparaisons temporelles, énigmes, encadrés explicatifs, frises) ; chaque archive et citation expose ses Sources"
+      entites_affichees: [Pin, Média, Source]
+
+    - zone: "point d'accès 3D"
+      role: "apparition conditionnelle (uniquement si Pin doté d'un Modèle 3D, D8.1) ; ouvre la consultation 3D (flow B4) → bascule vers E-PIN-CONSULTATION-3D"
+      entites_affichees: ["Modèle 3D"]
+
+    - zone: "zone post-narrative"
+      role: "frontière nette avec le récit principal ; affiche selon disponibilité : quiz, énigme, liens 'pour aller plus loin', Pins liés (flow B6) ; remplacée par l'accès à l'étape suivante quand un Parcours actif pilote la consultation (D2.7)"
+      entites_affichees: [Pin, "Historique de visite"]
+
+    - zone: "section commentaires"
+      role: "liste des Commentaires modérés rattachés au Pin (flow G1) ; point d'accès à la rédaction d'un nouveau Commentaire (flow G2)"
+      entites_affichees: [Commentaire]
+
+    - zone: "points d'accès actions"
+      role: "favori (B7), partage (F1), signalement (G3 — visible selon politique cluster 04), bascule mode présentation (M4), retour"
+
+    - zone: "pied de page sources"
+      role: "récapitulatif des Sources citées par le Pin avec crédit (engagement d'historicité I4)"
+      entites_affichees: [Source]
+
+  etats:
+    nominal_charge: "Pin entièrement chargé ; récit, médias, sources, zone post-narrative, commentaires accessibles"
+    chargement: "Structure de la consultation en place ; corps narratif et médias en cours de récupération ; titre et en-tête déjà visibles s'ils étaient préchargés depuis B1"
+    pin_communautaire_en_revue: "Marque distinctive (I3) visible durablement dans la consultation, signalant que les sources sont en cours de vérification ; aucune dégradation des fonctionnalités"
+    pin_multi_epoque: "Navigation multi-époque visible et fonctionnelle ; le contenu (récit, médias, sources) bascule sur la couche temporelle sélectionnée sans re-empilement"
+    audio_en_lecture: "Contrôles audio actifs ; à la sortie de l'écran, la surface persistante E-TRANSVERSES-AUDIO-PERSISTANT (P1) apparaît et la lecture continue (D7.4)"
+    audio_concurrent_autre_pin: "Une lecture audio est déjà active sur un AUTRE Pin (P1 visible) ; politique de remplacement à acter au démarrage d'une nouvelle lecture (cf. question ouverte D7.5)"
+    sans_localisation: "Pin sans coordonnées ouvert depuis la recherche (I9) ; consultation pleinement disponible ; le retour ramène à la surface ponctuelle de recherche, pas à un point sur la Carte"
+    sans_modele_3d: "Le point d'accès 3D est absent (pas grisé) ; la consultation reste complète"
+    sans_zone_post_narrative: "La zone post-narrative est absente (le Pin n'a ni quiz, ni énigme, ni lien externe, ni Pin lié) ; le récit s'achève sur le pied sources"
+    parcours_actif_arrivee_etape: "Consultation ouverte par arrivée géolocalisée à une étape (E2) ; la zone post-narrative remplace la liste de Pins liés par l'accès à l'étape suivante (D2.7, D3.10) ; surface persistante P2 reste active visuellement (sauf si M4)"
+    offline_avec_cache: "Récit textuel et médias préchargés disponibles ; bandeau P3 visible ; audio lançable seulement si préchargé ; commentaires non rafraîchissables — affichage du dernier état connu si présent en cache"
+    offline_sans_cache: "Récit indisponible ; message gracieux invitant à se reconnecter ; en-tête (titre, catégorie, époques) reste affiché s'il était disponible en cache ; aucune action de production (B7 favori reste fonctionnel localement, G1/G2/G3 indisponibles)"
+    pin_retire_pendant_consultation: "Le Pin a été retiré entre l'ouverture et un rafraîchissement ; message éphémère puis fermeture gracieuse vers la surface d'origine"
+    section_commentaires_vide: "Aucun Commentaire modéré sur le Pin ; invitation à rédiger le premier (flow G2)"
+    erreur_chargement: "Échec du chargement du Pin ; message gracieux avec possibilité de réessayer ; retour à la surface d'origine reste disponible"
+    mode_presentation_disponible: "Point d'accès au mode présentation (M4) actif ; bascule vers E-PIN-MODE-PRESENTATION"
+
+  elements_interactifs:
+    - "Lecture / pause / déplacement de la narration audio (si Média audio_narration présent)"
+    - "Tap sur une Époque alternative → flow B3 (navigation entre couches temporelles)"
+    - "Tap sur le point d'accès 3D → flow B4 → ouverture E-PIN-CONSULTATION-3D"
+    - "Tap sur le contrôle favori → flow B7 (marquage / retrait)"
+    - "Tap sur le contrôle partage → flow F1 (partage natif système)"
+    - "Tap sur le contrôle signalement → flow G3 avec cible = Pin"
+    - "Tap sur la bascule mode présentation → flow B2 entrée en P5.M4 → ouverture E-PIN-MODE-PRESENTATION"
+    - "Tap sur un Pin lié dans la zone post-narrative → flow B6 puis bascule récursive vers E-CARTE-APERCU-PIN sur le nouveau Pin"
+    - "Tap sur un lien 'pour aller plus loin' → ouverture dans le navigateur du système (sortie hors-app)"
+    - "Tap sur le point d'accès rédaction de commentaire → flow G2 → ouverture E-COMMUNAUTE-REDACTION-COMMENTAIRE"
+    - "Validation d'un quiz dans la zone post-narrative → enregistrement du score dans l'Historique de visite (D6.3)"
+    - "Retour → P5.N3 : retour à E-CARTE-APERCU-PIN si ouvert depuis B1 ; retour à E-CARTE-PRINCIPALE si ouvert depuis Lien universel ; retour au Parcours en cours si ouvert depuis E2"
+
+  flows_actifs:
+    - B2   # Consultation approfondie (cet écran est l'instanciation de B2)
+    - B3   # Navigation entre couches temporelles (zone interne)
+    - B4   # Accès à la consultation 3D (bascule vers E-PIN-CONSULTATION-3D)
+    - B6   # Engagement post-narratif (zone interne)
+    - B7   # Marquage favori
+    - F1   # Partage du Pin
+    - G1   # Consultation des commentaires (zone interne)
+    - G2   # Rédaction d'un commentaire (bascule)
+    - G3   # Signalement
+    - F5   # Atterrissage Lien universel ciblant un Pin
+    - E1   # Atterrissage acceptation notification de proximité
+    - E2   # Arrivée géolocalisée à une étape de Parcours
+
+  surfaces_imbriquees:
+    - E-PIN-MODE-PRESENTATION              # bascule en M4 sans étape de pile (P5.N4)
+    - E-PIN-CONSULTATION-3D                # bascule depuis le point d'accès 3D
+    - E-COMMUNAUTE-REDACTION-COMMENTAIRE   # M6 imbriqué pour G2
+    - E-COMMUNAUTE-REDACTION-SIGNALEMENT   # M6 imbriqué pour G3
+    - E-TRANSVERSES-AUDIO-PERSISTANT       # P1 dès sortie de l'écran si audio en lecture
+    - E-TRANSVERSES-PARCOURS-PERSISTANT    # P2 visible si Parcours en cours
+    - E-TRANSVERSES-BANDEAU-OFFLINE        # P3 si mode hors-ligne
+    - E-TRANSVERSES-MESSAGE-EPHEMERE       # M9 confirmations (favori, partage, etc.)
+    - E-TRANSVERSES-DIALOGUE-CONFIRMATION  # M8 si action sensible
+
+  questions_ouvertes:
+    - "Politique de re-jeu du quiz et persistance des résultats (score historique unique ou série de tentatives ?) — relève D6.3 / cluster 03"
+    - "Démarrer un nouvel audio pendant qu'un précédent joue : remplacement immédiat, dialogue de confirmation, ou file ? — cf. D7.4 / D7.5"
+    - "Politique exacte de surfaçage du contrôle signalement (toujours visible ou conditionné à la provenance) — cluster 04"
+    - "Mémoriser la dernière Époque consultée par Pin dans le Profil ou repartir systématiquement de la pré-sélection slider à chaque ouverture ? — cf. B3 question ouverte"
+    - "Activation du mode présentation : geste explicite ou point d'accès dans les actions ? — palier 10"

@@ -1,0 +1,83 @@
+# =============================================================================
+# E-COMMUNAUTE-REDACTION-COMMENTAIRE — Rédaction d'un Commentaire
+# =============================================================================
+# Surface ponctuelle (P5.M6) ouverte depuis la consultation approfondie d'un
+# Pin (E-PIN-CONSULTATION-APPROFONDIE) pour saisir et soumettre un Commentaire.
+# Ne déplace pas la pile : retour à la consultation du Pin à la sortie. Compte
+# requis (I2) — redirection vers création de Compte si absent.
+# =============================================================================
+
+document:
+  type: palier_ecrans_fiche
+  format: yaml
+
+ecran:
+  id: E-COMMUNAUTE-REDACTION-COMMENTAIRE
+  nom: "Rédaction d'un Commentaire"
+
+  mode: P5.M6
+  surface_parente: P5.S1
+
+  raison_d_etre: >-
+    Permet à un utilisateur connecté de réagir à un Pin par un texte court
+    (souvenir, précision, question — D9.1). Surface dédiée à l'intention
+    courte de rédaction, qui s'efface après validation ou annulation.
+    Modération a priori (I3 nuance Commentaire) : à la validation, le
+    Commentaire passe en en_attente, n'apparaît pas immédiatement
+    publiquement.
+
+  composition:
+    - zone: "rappel de la cible"
+      role: "rappel synthétique du Pin commenté (titre, catégorie, époque) afin que l'auteur sache à quoi il réagit"
+      entites_affichees: [Pin]
+
+    - zone: "identité publique de l'auteur"
+      role: "affichage du pseudonyme et de la représentation graphique du Compte tels qu'ils apparaîtront publiquement (I1 — jamais d'identité civile)"
+      entites_affichees: [Compte]
+
+    - zone: "champ de saisie du contenu"
+      role: "zone d'édition du texte du Commentaire ; longueur et règles typographiques palier 8"
+      entites_affichees: [Commentaire]
+
+    - zone: "indicateurs de saisie"
+      role: "compteur de caractères ou indication de limite si applicable, signalement si saisie incomplète"
+
+    - zone: "actions de soumission"
+      role: "valider (déclenche la soumission) ou annuler (referme la surface)"
+
+    - zone: "rappel des règles communautaires"
+      role: "mention discrète rappelant que le Commentaire passe par modération avant publication (cohérence I3)"
+
+  etats:
+    nominal_saisie: "Champ de saisie actif, contenu en cours de rédaction, l'utilisateur peut valider ou annuler"
+    saisie_vide: "Aucun contenu saisi ; l'action de validation est désactivée jusqu'à saisie non vide"
+    saisie_invalide: "Contenu vide ou hors contraintes (palier 8) ; signalement gracieux invitant à corriger ; validation indisponible"
+    soumission_en_cours: "Soumission émise, en attente de confirmation ; l'utilisateur ne peut pas modifier ou re-valider tant que la réponse n'est pas reçue"
+    soumission_reussie: "Le Commentaire est passé en en_attente côté serveur ; message éphémère P5.M9 confirme ; la surface se referme automatiquement"
+    soumission_echouee: "Échec d'envoi (erreur serveur ou réseau) ; message gracieux invitant à réessayer ; le contenu reste préservé"
+    offline_avec_brouillon: "Connexion réseau indisponible au moment de la validation ; l'envoi est mis en attente locale ; brouillon sauvegardé ; bandeau P5.P3 visible derrière"
+    compte_absent: "Aucun Compte n'est associé à l'utilisateur ; redirection préalable vers E-PROFIL-CREATION-COMPTE déclenchée par G2 ; au retour, on revient sur cette surface (l'écran proprement dit n'existe pas dans cet état — il est précédé par la création)"
+    pin_cible_retire_pendant_redaction: "Le Pin commenté est passé en retiré pendant la saisie ; validation impossible ; message gracieux ; le contenu peut être copié manuellement par l'utilisateur"
+    mode_edition_apres_publication: "L'utilisateur édite son propre Commentaire publié (cf. G1 bifurcation) — le champ est pré-rempli ; politique de re-modération sur édition à arbitrer (cf. questions ouvertes)"
+
+  elements_interactifs:
+    - "Saisie au clavier dans le champ de contenu"
+    - "Validation de la soumission → flow G2 étape 4 (passage en en_attente)"
+    - "Annulation explicite → si saisie non vide, dialogue P5.M8 de confirmation d'abandon ; sinon fermeture directe"
+    - "Geste neutre de fermeture (équivalent annulation, P5.N5)"
+
+  flows_actifs:
+    - G2   # Soumission d'un Commentaire
+
+  surfaces_imbriquees:
+    - E-TRANSVERSES-DIALOGUE-CONFIRMATION   # M8 si abandon avec saisie non vide
+    - E-TRANSVERSES-MESSAGE-EPHEMERE        # M9 confirmation de prise en compte ou erreur
+    - E-PROFIL-CREATION-COMPTE              # redirection préalable si compte_absent
+    - E-TRANSVERSES-BANDEAU-OFFLINE         # P3 si offline
+
+  entites_affichees: [Commentaire, Pin, Compte]
+
+  questions_ouvertes:
+    - "Édition d'un Commentaire publié : la même surface est-elle réutilisée en mode édition (recommandation oui), et la modification redéclenche-t-elle un cycle de modération (cluster 04 question ouverte) ?"
+    - "Sauvegarde de brouillon entre fermeture et réouverture (G2 question ouverte) — politique précise palier 13"
+    - "Aperçu de rendu avant soumission (voir comment le Commentaire apparaîtra) — utile ou superflu ? À arbitrer palier 8/10"

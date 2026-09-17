@@ -1,0 +1,210 @@
+# =============================================================================
+# Palier 9 — Densité et zoom
+# =============================================================================
+# Règles paramétriques qualifiées sur les niveaux de zoom et le regroupement
+# (clustering) des Pins quand la densité devient trop élevée. Aucun seuil
+# chiffré (palier 16). Aucune valeur (palier 12).
+# =============================================================================
+
+document:
+  type: palier_cartographie_densite_zoom
+  numero: 9
+  fichier: "04-densite-zoom.yaml"
+  version: "0.1"
+  date: "2026-05-06"
+  format: yaml
+  prerequis_de_lecture:
+    - "design/conception/09-cartographie/00-index.yaml"
+    - "design/conception/09-cartographie/02-pins.yaml — registres visuels du Pin (à hériter par le cluster)"
+    - "design/conception/03-fonctionnalites/01-carte-exploration-temporelle.yaml — D1.1 (limites géographiques Lyon + agglomération)"
+    - "design/conception/03-fonctionnalites/02-pins-et-contenu.yaml — D2.1 (regroupement à forte densité)"
+
+raison_d_etre: >-
+  Sans règles de densité, la carte sature dès qu'une zone concentre
+  beaucoup de Pins (Vieux Lyon, Croix-Rousse). Le clustering est le
+  levier principal de lisibilité. Ce fichier pose la grammaire du
+  regroupement — quand il se déclenche, ce qu'il hérite des Pins,
+  comment il se distingue, comment il se résout.
+
+# -----------------------------------------------------------------------------
+# 1. Niveaux de zoom qualifiés
+# -----------------------------------------------------------------------------
+# Trois niveaux qualifiés. Les seuils chiffrés sont au palier 16.
+niveaux_de_zoom:
+
+  - niveau: large
+    description: "L'utilisateur voit Lyon dans son emprise large (métropole, voire agglomération)"
+    rendu_des_pins: "Clustering systématique — seuls les clusters et quelques Pins isolés majeurs sont visibles. Les libellés de quartiers dominent."
+    usage_typique: "Premier lancement, recadrage 'Me localiser' depuis l'extérieur de Lyon, vue d'ensemble pédagogique en classe."
+
+  - niveau: intermediaire
+    description: "Échelle de quartier (Vieux Lyon, Croix-Rousse, Confluence). L'utilisateur distingue les rues et les places."
+    rendu_des_pins: "Clustering activé sur les zones à forte densité ; Pins individuels visibles ailleurs."
+    usage_typique: "Exploration libre, préparation d'une sortie scolaire, flânerie."
+
+  - niveau: proche
+    description: "Échelle de la rue, lecture fine."
+    rendu_des_pins: "Clustering désactivé — tous les Pins sont individuels. C'est l'échelle d'engagement (tap, lecture, parcours)."
+    usage_typique: "Consultation d'un Pin, suivi d'un parcours, vérification d'une adresse."
+
+limites_geographiques: >-
+  Le pan reste limité à Lyon + agglomération immédiate (cf. D1.1).
+  Au-delà, comportement du palier 10 (composant Carte).
+
+delegation: >-
+  Seuils précis de bascule entre niveaux et de déclenchement du
+  clustering au palier 16 (validation chiffrée). Le palier 9
+  décide UNIQUEMENT que ces niveaux existent et ce qu'ils
+  contiennent qualitativement.
+
+# -----------------------------------------------------------------------------
+# 2. Déclenchement du clustering
+# -----------------------------------------------------------------------------
+declenchement_clustering:
+
+  principe: >-
+    Le clustering se déclenche quand la densité de Pins individuels
+    dépasse un seuil de lisibilité — c'est-à-dire quand l'utilisateur
+    ne pourrait plus distinguer ni taper individuellement les Pins
+    sans frustration. La densité dépend du niveau de zoom courant.
+
+  axes_qualifies:
+    - "À zoom 'large', clustering systématique sur l'ensemble"
+    - "À zoom 'intermédiaire', clustering local aux zones denses (le reste reste en Pins individuels)"
+    - "À zoom 'proche', clustering désactivé (toujours)"
+
+  facteurs_de_densite:
+    - "Nombre de Pins dans une emprise visuelle donnée"
+    - "Taille tactile minimale d'un Pin (palier 16) — détermine la densité maximale supportable"
+
+  delegation: "Seuils chiffrés au palier 16."
+
+# -----------------------------------------------------------------------------
+# 3. Anatomie qualitative d'un cluster
+# -----------------------------------------------------------------------------
+cluster:
+
+  principe: >-
+    Le cluster est un objet visuel distinct du Pin. Il n'efface pas
+    les Pins — il les représente collectivement avec une indication
+    qu'ils sont nombreux et un héritage des registres visuels les
+    plus importants.
+
+  forme: >-
+    Forme distincte de celle du Pin, pour ne pas confondre cluster
+    et Pin individuel. Anatomie exacte au palier 10.
+
+  registres_herites:
+
+    - dimension: provenance
+      regle: "Si AU MOINS UN Pin éditorial dans le cluster → couleur éditoriale. Sinon → couleur communautaire."
+      pourquoi: >-
+        L'éditorial signale 'contenu validé scientifiquement présent
+        ici' — information précieuse pour l'utilisateur qui décide
+        d'approfondir. La présence d'au moins un Pin éditorial
+        domine visuellement. Cohérent avec le mapping Pin (02-pins).
+
+    - dimension: heterogeneite_temporelle
+      regle: "Si le cluster contient des Pins de DIFFÉRENTES Époques OU au moins un Pin multi-époque → forme empilée du cluster (cohérent avec le mapping Pin multi-époque). Sinon → forme simple."
+      pourquoi: >-
+        L'empilement sur cluster signale 'zone qui traverse le temps' —
+        invitation à explorer la richesse temporelle. Cohérent avec
+        02-pins multi_epoques.
+
+    - dimension: statut_de_verification
+      regle: "Si AU MOINS UN Pin du cluster est en cours de vérification (I3) → contour distinctif sur le cluster (cohérent 02-pins)."
+      pourquoi: "L'utilisateur est averti que la zone contient au moins une contribution communautaire en cours de vérification — il sait qu'en explorant il pourra rencontrer un Pin marqué."
+
+    - dimension: contenance
+      regle: "Le cluster porte une indication numérique de la quantité regroupée, avec bascule en abréviation au-delà d'un seuil"
+      pourquoi: "L'utilisateur estime au coup d'œil l'ampleur de l'exploration possible."
+      delegation: "Seuil de bascule en abréviation au palier 16. Représentation typographique du nombre au palier 13."
+
+  ce_que_le_cluster_n_herite_pas:
+    - "Catégorie — un cluster regroupe des Pins de catégories potentiellement diverses ; pas d'icône de Catégorie héritée. Représentation iconique générique au palier 13."
+    - "État 'déjà visité' — le cluster ne signale pas que ses Pins sont déjà visités (information trop diluée pour être utile)."
+    - "État 'étape courante de Parcours' — l'étape courante reste un Pin individuel (pas de cluster qui mangerait l'étape courante ; règle stricte cf. § 4)."
+
+# -----------------------------------------------------------------------------
+# 4. Règles strictes
+# -----------------------------------------------------------------------------
+regles_strictes:
+
+  - id: R1
+    enonce: >-
+      L'étape courante d'un Parcours actif n'est JAMAIS regroupée
+      dans un cluster — elle reste toujours visible individuellement,
+      quel que soit le zoom et la densité.
+    pourquoi: "L'étape courante est un repère fonctionnel critique. La perdre dans un cluster casserait le suivi du Parcours."
+
+  - id: R2
+    enonce: >-
+      Tap sur un cluster → la carte zoome avant sur la zone du
+      cluster jusqu'à ce que les Pins individuels (ou des sous-clusters
+      moins denses) apparaissent.
+    pourquoi: "Le cluster est une promesse d'exploration ; le tap résout cette promesse."
+
+  - id: R3
+    enonce: >-
+      Le cluster reste lisible à toute valeur d'axe paramétrique du
+      fond carte (renvoi L1, L4 fichier 01).
+
+  - id: R4
+    enonce: >-
+      Aucun cluster ne masque la totalité d'un tracé de Parcours
+      actif. Si un cluster recouvrirait visuellement un segment du
+      tracé, le tracé reste visible (priorité d'affichage tracé > cluster).
+    delegation: "Politique exacte de cohabitation au palier 10/12."
+
+# -----------------------------------------------------------------------------
+# 5. Lisibilité par densité
+# -----------------------------------------------------------------------------
+lisibilite_par_densite:
+
+  invariant: >-
+    Quel que soit le niveau de zoom et la densité, l'utilisateur
+    doit pouvoir : (a) taper un Pin ou un cluster sans risque de
+    se tromper de cible, (b) distinguer visuellement un Pin
+    individuel d'un cluster, (c) lire les libellés essentiels
+    (rues, quartiers).
+
+  validation: "Tests de densité sur les zones les plus chargées (Vieux Lyon, Bellecour, Croix-Rousse) au palier 16."
+
+# -----------------------------------------------------------------------------
+# 6. Enjeux transversaux
+# -----------------------------------------------------------------------------
+enjeux_transversaux:
+
+  accessibilite: >-
+    Perceptibilité d'interaction du cluster ≥ celle du Pin individuel
+    (seuils tactiles chiffrés au palier 16). Label vocal du cluster :
+    'cluster de N Pins, dont X éditoriaux, couvre Y époques'
+    (microcopy palier 8). Mode présentation Mme Martin : les clusters
+    restent lisibles depuis le fond de la classe.
+
+  performance: >-
+    Critique : le calcul de clustering en temps réel doit être
+    fluide pendant le pan/zoom. Politique d'implémentation au
+    palier technique.
+
+  vie_privee: "Pas d'enjeu spécifique."
+
+  i18n: "Pas d'enjeu spécifique au système ; libellés au palier 8."
+
+# -----------------------------------------------------------------------------
+# 7. Questions ouvertes
+# -----------------------------------------------------------------------------
+questions_ouvertes:
+
+  - "Comportement quand l'utilisateur a un Parcours actif ET zoome très large : le tracé du Parcours reste-t-il visible en rendu compressé, ou disparaît-il sous le clustering ? Suggestion : tracé reste visible (cohérent avec R4)."
+  - "Mode présentation (M4) Mme Martin : niveau de zoom large utilisé pour montrer une évolution sur Lyon entier — le clustering ne doit pas masquer les Pins emblématiques que l'enseignante veut désigner. À tester palier 16."
+  - "Cluster qui se forme exactement sur une couche d'archive (D1.5) très chargée : lisibilité critique, palier 16 valide."
+  - "Ambiguïté sémantique de la forme empilée : sur un Pin individuel = 'ce lieu traverse plusieurs Époques' (D4 index, mapping multi-époques) ; sur un cluster = 'au moins un Pin multi-époque OU hétérogénéité temporelle dans le cluster'. Sémantiquement cohérent (la forme dit 'temporalité riche') mais à valider en palier 16 que l'utilisateur ne crée pas de fausse attente au tap d'un cluster empilé."
+
+# -----------------------------------------------------------------------------
+# 8. Dépendances internes
+# -----------------------------------------------------------------------------
+dependances:
+  - "01-fond-et-epoques.yaml — invariants L1, L4, L5 (lisibilité du cluster aux ancres et interpolations)"
+  - "02-pins.yaml — registres visuels hérités par le cluster (provenance, multi-époque, vérification)"
+  - "03-parcours-traces.yaml — règle R4 (cluster ne masque pas le tracé)"

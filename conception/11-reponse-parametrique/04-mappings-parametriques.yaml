@@ -1,0 +1,619 @@
+# =============================================================================
+# Palier 11 — 04 Mappings paramétriques
+# =============================================================================
+# Fonctions du dynamisme. Chaque MAP-X prend une variable d'entrée (position
+# du slider, contexte, état applicatif partagé) et produit des valeurs de
+# sortie selon une table d'ancres et des courbes d'interpolation.
+#
+# Le pivot du fichier — et du palier 11 entier — est MAP-SLIDER-VERS-AXES-CARTE :
+# la fonction qui transforme la carte moderne en voyage temporel. Sa STRUCTURE
+# est complète ici ; ses 50 valeurs effectives (5 axes × 10 ancres) sont
+# REPORTÉES au palier 15 (construction Figma) pour calibrage visuel itératif
+# sur la maquette cible. Décision utilisateur 2026-05-07.
+#
+# Les autres mappings (modulations Pins, mode offline, sommeil M4) ont leurs
+# valeurs posées DIRECTEMENT ici — elles sont arbitrables en raisonnement
+# sans nécessiter de calibrage visuel poussé.
+# =============================================================================
+
+document:
+  type: palier_reponse_parametrique_mappings
+  numero: 11
+  fichier: "04-mappings-parametriques.yaml"
+  version: "0.1"
+  date: "2026-05-07"
+  format: yaml
+  prerequis_de_lecture:
+    - "design/conception/11-reponse-parametrique/00-index.yaml — § 5 format MAP, § 9 décision D5 (50 valeurs reportées palier 15)"
+    - "design/conception/09-cartographie/01-fond-et-epoques.yaml — 5 axes de transformation, 10 ancres aux Époques, comportement_pendant_le_geste vs au_calage"
+    - "design/conception/09-cartographie/02-pins.yaml — variantes contextuelles des Pins (provenance, multi-époques, vérification, contexte parcours, déjà visité)"
+    - "design/conception/10-composants/00-index.yaml — § 4 état applicatif partagé (7 états ETAT-XXX)"
+    - "design/conception/10-composants/03-fonctionnels.yaml — comp-pin matrice variants § 2"
+
+raison_d_etre: >-
+  Sans ces mappings, deux types d'éléments dériveraient à
+  l'implémentation : (1) le système paramétrique du fond carte
+  (palier 9 D8) — qui interpole quoi, dans quelle plage, selon
+  quelle courbe entre quelles ancres ; (2) les modulations
+  contextuelles des Pins, du tracé, de la Carte selon des états
+  applicatifs partagés (parcours en cours, déjà visité, mode
+  offline, mode présentation). Les chiffres ici ne sont pas des
+  tokens visuels statiques (palier 12) — ce sont les valeurs ET
+  fonctions D'UN SYSTÈME DYNAMIQUE.
+
+# -----------------------------------------------------------------------------
+# 1. MAP-SLIDER-VERS-AXES-CARTE — le pivot
+# -----------------------------------------------------------------------------
+# Mapping le plus structurel du palier. Transforme la position du slider
+# d'Époque (0.0 = début Antiquité → 1.0 = Aujourd'hui) en valeurs des
+# 5 axes paramétriques palier 9 D8 du fond carte. Réifie les 10 ancres
+# qualifiées palier 9 § 3 en table de valeurs précises.
+#
+# STATUT IMPORTANT : les 50 cellules de la table (5 axes × 10 ancres)
+# sont MARQUÉES 'à calibrer en phase visuelle palier 15'. La structure,
+# le format de cellule, les ranges indicatifs et les courbes d'interpolation
+# sont posés ici. Le calibrage effectif (test visuel sur la maquette
+# Figma cible) se fait au palier 15.
+
+mappings:
+
+  - id: MAP-SLIDER-VERS-AXES-CARTE
+    nom: "Position du slider d'Époque → 5 axes paramétriques du fond carte"
+
+    statut_calibrage:
+      structure: COMPLETE
+      valeurs_aux_ancres: A_CALIBRER_PALIER_15
+      decision_utilisateur: "2026-05-07 — calibrage visuel reporté au palier 15 (construction Figma) sur la maquette cible plutôt qu'un banc de test ad-hoc. MCP Figma activation différée."
+      consequence_implementation: >-
+        Tant que les 50 valeurs ne sont pas calibrées, l'app peut être
+        développée avec des valeurs INDICATIVES posées dans les ranges
+        ci-dessous (interpolation visible mais non finalisée). Les valeurs
+        définitives seront injectées en sortie du palier 15.
+
+    entree:
+      variable: "position du slider d'Époque"
+      type: continu
+      domaine: [0.0, 1.0]
+      mapping_position_vers_epoque:
+        principe: >-
+          Les 10 Époques sont positionnées en ANCRES sur l'axe 0.0–1.0.
+          Positions actuelles indicatives ci-dessous — recalibrables si
+          bornes historiques précisées par lead/historienne (palier 4
+          tracker question_ouverte).
+        ancres:
+          - { epoque: antiquite_romaine,        position: 0.0 }
+          - { epoque: haut_moyen_age,           position: 0.10 }
+          - { epoque: moyen_age,                position: 0.25 }
+          - { epoque: renaissance,              position: 0.42 }
+          - { epoque: epoque_classique,         position: 0.55 }
+          - { epoque: revolution_empire,        position: 0.65 }
+          - { epoque: xixe_siecle,              position: 0.75 }
+          - { epoque: seconde_guerre_mondiale,  position: 0.85 }
+          - { epoque: xxe_siecle,               position: 0.92 }
+          - { epoque: aujourd_hui,              position: 1.0 }
+        note_distribution: >-
+          Distribution NON UNIFORME — les Époques anciennes ont des
+          plages plus larges (le sentiment de 'voyage' demande plus
+          d'espace pour les écarts visuels marqués), les Époques
+          récentes plus serrées. À VALIDER au palier 15 sur ressenti
+          visuel.
+
+    sortie:
+      axes:
+        - axe: temperature_chromatique
+          unite: delta_kelvin
+          description: "Décalage de la température chromatique du fond carte par rapport à la base neutre (Aujourd'hui)"
+          range_indicatif: [-200, +1000]   # de moins chaud que neutre (improbable) à très chaud (Antiquité ocre)
+          note_signe: "valeurs positives = plus chaud (ocre, ambre) ; négatives = plus froid (bleu)"
+
+        - axe: desaturation
+          unite: facteur_relatif
+          description: "Multiplicateur de saturation appliqué au fond carte. 1.0 = saturation pleine moderne, 0.0 = N&B total"
+          range_indicatif: [0.0, 1.0]
+
+        - axe: grain_et_texture
+          unite: intensite_relative
+          description: "Présence de texture visuelle (parchemin, grain film). 0.0 = absent (présent moderne lisse), 1.0 = très marqué"
+          range_indicatif: [0.0, 1.0]
+          variante_de_texture:
+            description: "L'AXE produit une intensité ; le TYPE de texture varie selon la zone du slider"
+            zones:
+              - { plage_position: [0.0, 0.42], type_texture: "parchemin / aquarelle (Époques pré-photographiques)" }
+              - { plage_position: [0.65, 0.92], type_texture: "grain film argentique (Époques photographiques)" }
+              - { plage_position: [0.92, 1.0], type_texture: "absent (le présent est numérique propre)" }
+            note: >-
+              Le type de texture est une caractéristique QUALITATIVE qui
+              bascule selon zone — pas une interpolation continue. Le
+              palier 15 (Figma) doit fournir 2 textures distinctes
+              (parchemin + grain film) que l'AXE pondère par son
+              intensité. À VALIDER palier 16 (cohabitation visuelle).
+
+        - axe: vignettage
+          unite: intensite_relative
+          description: "Assombrissement progressif des bords du champ. 0.0 = aucun, 1.0 = vignettage marqué"
+          range_indicatif: [0.0, 1.0]
+
+        - axe: contraste
+          unite: facteur_relatif
+          description: "Multiplicateur de contraste appliqué au fond carte. 1.0 = contraste neutre, >1 = accentué, <1 = adouci"
+          range_indicatif: [0.85, 1.20]
+
+    table_ancres:
+      note_legende: >-
+        Pour chaque cellule : valeur À CALIBRER palier 15. Les profils
+        qualifiés palier 9 § 3 ('chaleur ocre antique', 'sépia argentique',
+        etc.) servent de cadre directeur au calibrage. Format : objet
+        contenant 'a_calibrer: true' + 'profil_qualifie' (rappel palier 9)
+        + 'cible_indicative' (estimation initiale qui sera ajustée).
+
+      antiquite_romaine:
+        position: 0.0
+        profil_qualifie: "chaleur ocre antique, désaturation marquée, texture aquarelle, vignettage présent"
+        valeurs_5_axes:
+          temperature_chromatique: { a_calibrer: true, cible_indicative: +800 }
+          desaturation:            { a_calibrer: true, cible_indicative: 0.55 }
+          grain_et_texture:        { a_calibrer: true, cible_indicative: 0.7 }
+          vignettage:              { a_calibrer: true, cible_indicative: 0.5 }
+          contraste:               { a_calibrer: true, cible_indicative: 0.95 }
+
+      haut_moyen_age:
+        position: 0.10
+        profil_qualifie: "sépia profond presque monochrome, vignettage fort, lecture austère"
+        valeurs_5_axes:
+          temperature_chromatique: { a_calibrer: true, cible_indicative: +600 }
+          desaturation:            { a_calibrer: true, cible_indicative: 0.30 }
+          grain_et_texture:        { a_calibrer: true, cible_indicative: 0.6 }
+          vignettage:              { a_calibrer: true, cible_indicative: 0.7 }
+          contraste:               { a_calibrer: true, cible_indicative: 1.05 }
+
+      moyen_age:
+        position: 0.25
+        profil_qualifie: "ambre doré d'enluminure, texture parchemin, accents rouges et bleus préservés"
+        valeurs_5_axes:
+          temperature_chromatique: { a_calibrer: true, cible_indicative: +700 }
+          desaturation:            { a_calibrer: true, cible_indicative: 0.65 }
+          grain_et_texture:        { a_calibrer: true, cible_indicative: 0.6 }
+          vignettage:              { a_calibrer: true, cible_indicative: 0.4 }
+          contraste:               { a_calibrer: true, cible_indicative: 1.0 }
+
+      renaissance:
+        position: 0.42
+        profil_qualifie: "couleurs vives légèrement adoucies, ombres chaleureuses, détails nets"
+        valeurs_5_axes:
+          temperature_chromatique: { a_calibrer: true, cible_indicative: +400 }
+          desaturation:            { a_calibrer: true, cible_indicative: 0.85 }
+          grain_et_texture:        { a_calibrer: true, cible_indicative: 0.4 }
+          vignettage:              { a_calibrer: true, cible_indicative: 0.25 }
+          contraste:               { a_calibrer: true, cible_indicative: 1.05 }
+
+      epoque_classique:
+        position: 0.55
+        profil_qualifie: "dominante bleu froid noble, contraste accentué, géométrie nette"
+        valeurs_5_axes:
+          temperature_chromatique: { a_calibrer: true, cible_indicative: -100 }
+          desaturation:            { a_calibrer: true, cible_indicative: 0.80 }
+          grain_et_texture:        { a_calibrer: true, cible_indicative: 0.3 }
+          vignettage:              { a_calibrer: true, cible_indicative: 0.2 }
+          contraste:               { a_calibrer: true, cible_indicative: 1.15 }
+
+      revolution_empire:
+        position: 0.65
+        profil_qualifie: "contraste brutal, désaturation partielle avec rouges accentués, grain papier"
+        valeurs_5_axes:
+          temperature_chromatique: { a_calibrer: true, cible_indicative: +300 }
+          desaturation:            { a_calibrer: true, cible_indicative: 0.65 }
+          grain_et_texture:        { a_calibrer: true, cible_indicative: 0.45 }
+          vignettage:              { a_calibrer: true, cible_indicative: 0.3 }
+          contraste:               { a_calibrer: true, cible_indicative: 1.20 }
+
+      xixe_siecle:
+        position: 0.75
+        profil_qualifie: "sépia argentique du daguerréotype, grain film, teinte légèrement froide"
+        valeurs_5_axes:
+          temperature_chromatique: { a_calibrer: true, cible_indicative: +200 }
+          desaturation:            { a_calibrer: true, cible_indicative: 0.40 }
+          grain_et_texture:        { a_calibrer: true, cible_indicative: 0.55 }
+          vignettage:              { a_calibrer: true, cible_indicative: 0.3 }
+          contraste:               { a_calibrer: true, cible_indicative: 1.05 }
+
+      seconde_guerre_mondiale:
+        position: 0.85
+        profil_qualifie: "monochrome quasi pur, grain fort, contraste brutal"
+        valeurs_5_axes:
+          temperature_chromatique: { a_calibrer: true, cible_indicative: 0 }
+          desaturation:            { a_calibrer: true, cible_indicative: 0.10 }
+          grain_et_texture:        { a_calibrer: true, cible_indicative: 0.65 }
+          vignettage:              { a_calibrer: true, cible_indicative: 0.35 }
+          contraste:               { a_calibrer: true, cible_indicative: 1.15 }
+
+      xxe_siecle:
+        position: 0.92
+        profil_qualifie: "Kodachrome chaleureux, saturation pop, grain film 35mm"
+        valeurs_5_axes:
+          temperature_chromatique: { a_calibrer: true, cible_indicative: +250 }
+          desaturation:            { a_calibrer: true, cible_indicative: 0.95 }
+          grain_et_texture:        { a_calibrer: true, cible_indicative: 0.30 }
+          vignettage:              { a_calibrer: true, cible_indicative: 0.15 }
+          contraste:               { a_calibrer: true, cible_indicative: 1.0 }
+
+      aujourd_hui:
+        position: 1.0
+        profil_qualifie: "neutre sans filtre — le présent ne se filtre pas"
+        valeurs_5_axes:
+          temperature_chromatique: { valeur: 0,    note: "ancrée à neutre, pas de calibrage visuel nécessaire" }
+          desaturation:            { valeur: 1.0,  note: "saturation pleine, pas de calibrage" }
+          grain_et_texture:        { valeur: 0.0,  note: "absent, pas de calibrage" }
+          vignettage:              { valeur: 0.0,  note: "absent, pas de calibrage" }
+          contraste:               { valeur: 1.0,  note: "neutre, pas de calibrage" }
+        note: >-
+          L'ancre 'Aujourd'hui' a des valeurs DÉFINITIVES (pas à calibrer)
+          car par construction elle est l'état non-filtré du fond carte
+          moderne. C'est l'ancre de référence (palier 9 § 3).
+
+    courbes_interpolation:
+      principe: >-
+        Entre deux ancres consécutives, l'interpolation est PAR DÉFAUT
+        LINÉAIRE (la valeur d'un axe à position p est l'interpolation
+        linéaire des valeurs aux deux ancres encadrant p, pondérée par
+        la distance à chacune).
+      exception_aux_ruptures_historiques:
+        description: >-
+          Aux ruptures historiques (Époque classique → Révolution-Empire,
+          XIXe → Seconde Guerre), une courbe ease-in-out (CRV-EASE-IN-OUT)
+          peut accentuer le sentiment de basculement — la transition se
+          'ralentit' au milieu de l'intervalle, donnant un sentiment de
+          rupture nette plutôt qu'un fondu uniforme.
+        application:
+          - "Entre epoque_classique et revolution_empire (position 0.55 → 0.65) : axe contraste utilise CRV-EASE-IN-OUT (le saut de 1.15 à 1.20 se concentre au milieu)"
+          - "Entre xixe_siecle et seconde_guerre_mondiale (position 0.75 → 0.85) : axes desaturation et contraste utilisent CRV-EASE-IN-OUT (rupture du monochrome)"
+        note: "À VALIDER palier 15 sur ressenti visuel — peut être désactivé si trop subtil ou trop marqué."
+      note_continuite: >-
+        Quel que soit le choix d'interpolation entre ancres, la fonction
+        DOIT être continue (pas de saut) — sinon le voyage temporel
+        perd sa fluidité.
+
+    invariants_de_lisibilite_palier_9:
+      rappel: >-
+        Les 5 invariants L1-L5 du palier 9 § 5 (Pins visibles, tracé visible,
+        libellés rues lisibles, forme empilée perceptible, contour de
+        vérification perceptible) doivent être respectés AUX ANCRES ET
+        AUX INTERPOLATIONS — c'est le palier 16 qui valide.
+      contrainte_sur_calibrage:
+        - "Aucune cellule de la table ne doit conduire à un fond carte qui rend les Pins invisibles aux interpolations entre ancres"
+        - "Le calibrage palier 15 est itératif : poser des valeurs, tester aux 10 ancres + 9 points d'interpolation médians, ajuster si invariant violé"
+
+    couplage_etat_partage:
+      - { etat: ETAT-EPOQUE-COURANTE, role: "consommateur primaire (le mapping EST la définition de cet état partagé)", source: "palier 10 fonctionnels:171 comp-slider-epoque producteur, palier 10 § 4 ETAT-EPOQUE-COURANTE" }
+
+    chorégraphies_associees:
+      - "CHO-CALAGE-EPOQUE (fichier 03) — au snap, l'interpolation se cale aux valeurs de l'ancre cible"
+      - "CHO-PILOTAGE-AUTOMATIQUE-EPOQUE (fichier 03) — le pilotage automatique utilise CRV-EASE-IN-OUT pour la transition entre Époque courante et Époque cible"
+
+    questions_ouvertes:
+      - "Distribution non uniforme des positions d'ancres (0.0, 0.10, 0.25, 0.42, 0.55, 0.65, 0.75, 0.85, 0.92, 1.0) — confirmer ou ajuster avec lead/historienne lorsque bornes précises seront actées."
+      - "Type de texture par zone (parchemin / grain film / absent) : 2 textures distinctes ou 3 ? Trancher palier 15."
+      - "Courbes ease-in-out aux ruptures historiques : conserver ou simplifier en linéaire partout ? Trancher palier 15 sur ressenti visuel."
+
+# -----------------------------------------------------------------------------
+# 2. MAP-CONTEXTE-PARCOURS-VERS-PIN — modulations Pin selon contexte parcours
+# -----------------------------------------------------------------------------
+
+  - id: MAP-CONTEXTE-PARCOURS-VERS-PIN
+    nom: "Modulations Pin selon le contexte parcours"
+
+    statut_calibrage:
+      structure: COMPLETE
+      valeurs: COMPLETES   # arbitrables en raisonnement, pas besoin de calibrage visuel poussé
+
+    entree:
+      variable: "contexte_parcours du Pin"
+      type: discret
+      domaine: [normal, etape_courante, etape_complete, etape_future, hors_parcours]
+      source: "palier 10 fonctionnels:84 comp-pin dimension contexte_parcours, valeur dérivée de ETAT-PARCOURS-EN-COURS"
+
+    sortie:
+      axes_modulation:
+        - opacite                 # multiplicateur de l'opacité de base du Pin
+        - halo                    # halo lumineux (présent / absent)
+        - saturation_relative     # multiplicateur de la saturation des couleurs du Pin
+
+    table:
+      normal:
+        opacite: 1.0
+        halo: { type: aucun }
+        saturation_relative: 1.0
+        note: "Pin nominal, hors contexte parcours actif"
+      etape_courante:
+        opacite: 1.0
+        halo: { type: statique, intensite: 0.8, taille_relative: 1.4 }
+        saturation_relative: 1.10
+        note: >-
+          Mise en relief stable (statique, pas pulsation — décision actée
+          fichier 01 question_ouverte tranchée). Si le palier 16 trouve la
+          mise en relief insuffisante, reconsidérer pulsation qualifiée
+          (mais alors c'est une CHO périodique, pas une MAP statique).
+      etape_complete:
+        opacite: 0.85
+        halo: { type: aucun }
+        saturation_relative: 0.90
+        note: "Légèrement atténué — 'fait' sans être effacé"
+      etape_future:
+        opacite: 1.0
+        halo: { type: aucun }
+        saturation_relative: 1.0
+        note: "Identique à normal — l'utilisateur peut anticiper visuellement"
+      hors_parcours:
+        opacite: 0.35
+        halo: { type: aucun }
+        saturation_relative: 0.70
+        note: "Atténué fortement — l'attention reste sur les Pins du parcours"
+
+    contraintes_invariantielles:
+      - id: PR1
+        regle: "(contexte_parcours = etape_courante) ET (deja_visite = oui) → mise en relief PRIME sur atténuation déjà-visité (cf. MAP-DEJA-VISITE-VERS-PIN)"
+        source: "palier 9 02-pins, palier 10 fonctionnels:94"
+      - id: PR2
+        regle: "(contexte_parcours = hors_parcours) ET (deja_visite = oui) → CUMUL des deux modulations (opacité 0.35 × adoucissement chromatique de MAP-DEJA-VISITE-VERS-PIN)"
+        source: "palier 9 02-pins, palier 10 fonctionnels:95"
+
+    couplage_etat_partage:
+      - { etat: ETAT-PARCOURS-EN-COURS, role: "consommateur (détermine le contexte_parcours de chaque Pin)", source: "palier 10 § 4" }
+
+    chorégraphies_associees:
+      - "CHO-LANCEMENT-PARCOURS (fichier 03) — étape 2, transition vers ces variantes"
+      - "CHO-ABANDON-PARCOURS (fichier 03) — étape 3, retour à 'normal' pour tous les Pins"
+
+    questions_ouvertes:
+      - "PR1 + PR2 cumul : tester palier 16 sur cas concrets (étape_courante + déjà_visite, hors_parcours + déjà_visite, et les 8 autres combinaisons étape_complete/etape_future × deja_visite)."
+
+# -----------------------------------------------------------------------------
+# 3. MAP-DEJA-VISITE-VERS-PIN — modulation chromatique adoucie
+# -----------------------------------------------------------------------------
+
+  - id: MAP-DEJA-VISITE-VERS-PIN
+    nom: "Modulation Pin selon état déjà-visité"
+
+    statut_calibrage:
+      structure: COMPLETE
+      valeurs: COMPLETES
+
+    entree:
+      variable: "deja_visite du Pin"
+      type: discret
+      domaine: [non, oui]
+      source: "palier 10 fonctionnels:88 comp-pin dimension deja_visite, valeur dérivée de l'Historique de visite (palier 4 cluster 03)"
+
+    sortie:
+      axes_modulation:
+        - teinte_relative      # nuance chromatique adoucie
+        - saturation_relative  # multiplicateur
+
+    table:
+      non:
+        teinte_relative: 1.0
+        saturation_relative: 1.0
+        note: "Pin nominal"
+      oui:
+        teinte_relative: 0.95
+        saturation_relative: 0.85
+        note: >-
+          Adoucissement chromatique — signale 'déjà vu' sans effacer.
+          Volontairement subtil pour ne pas concurrencer les modulations
+          contextuelles plus fortes (hors_parcours).
+
+    contraintes_invariantielles:
+      - "PR1 (cf. MAP-CONTEXTE-PARCOURS-VERS-PIN) : (etape_courante + deja_visite=oui) → mise en relief PRIME, MAP-DEJA-VISITE-VERS-PIN ignoré"
+      - "PR2 : (hors_parcours + deja_visite=oui) → CUMUL des deux modulations (opacité 0.35 × saturation 0.85 = saturation effective ~0.30)"
+
+    couplage_etat_partage: []   # Historique de visite est local au Profil, pas un état partagé inter-composants
+
+# -----------------------------------------------------------------------------
+# 4. MAP-MODE-OFFLINE-VERS-CARTE
+# -----------------------------------------------------------------------------
+
+  - id: MAP-MODE-OFFLINE-VERS-CARTE
+    nom: "Modulation Carte selon état réseau"
+
+    statut_calibrage:
+      structure: COMPLETE
+      valeurs: COMPLETES
+
+    entree:
+      variable: "ETAT-CONNEXION-RESEAU (palier 10 § 4)"
+      type: discret
+      domaine: [online, offline_avec_cache, offline_sans_cache]
+
+    sortie:
+      axes_modulation:
+        - opacite_tuiles_de_base
+        - rendu_zones_non_chargees
+
+    table:
+      online:
+        opacite_tuiles_de_base: 1.0
+        rendu_zones_non_chargees: { applicable: false }
+        note: "Mode nominal"
+      offline_avec_cache:
+        opacite_tuiles_de_base: 1.0
+        rendu_zones_non_chargees: { applicable: false }
+        note: "Tuiles préchargées affichées normalement. P3 bandeau information offline visible (cf. CHO-APPARITION-P3)."
+      offline_sans_cache:
+        opacite_tuiles_de_base: 0.5
+        rendu_zones_non_chargees:
+          applicable: true
+          rendu: "fond uni neutre clair avec quadrillage léger"
+          note: "Visuellement signale 'pas de tuiles ici' sans masquer les Pins préchargés"
+        note: "Mode dégradé — fonctionnalité réduite mais l'app reste utilisable sur les zones préchargées (Pins favoris, Parcours téléchargés)"
+
+    note_perimetre_recherche: >-
+      Le comportement de la recherche en mode offline (recherche
+      indisponible / limitée au cache local) n'est PAS modélisé ici —
+      il est porté par la machine d'état de comp-recherche-surface
+      (palier 10 fonctionnels, état `offline_local`). Ce mapping ne
+      modélise que les axes VISUELS de la Carte selon l'état réseau.
+
+    couplage_etat_partage:
+      - { etat: ETAT-CONNEXION-RESEAU, role: "consommateur primaire", source: "palier 10 § 4" }
+
+    chorégraphies_associees:
+      - "CHO-APPARITION-P3 / CHO-DISPARITION-P3 (fichier 03)"
+
+    questions_ouvertes:
+      - "Cas d'un changement d'état réseau pendant un drag du slider d'Époque : interrompre le drag ou laisser terminer ? Proposition par défaut : laisser terminer, P3 apparaît à la fin du calage. À acter palier 16."
+
+# -----------------------------------------------------------------------------
+# 5. MAP-MODE-M4-VERS-PERSISTANTES
+# -----------------------------------------------------------------------------
+
+  - id: MAP-MODE-M4-VERS-PERSISTANTES
+    nom: "Sommeil visuel des persistantes selon mode présentation"
+
+    statut_calibrage:
+      structure: COMPLETE
+      valeurs: COMPLETES
+
+    entree:
+      variable: "mode présentation M4 actif"
+      type: booleen
+      domaine: [false, true]
+      source: "ETAT inféré par la pile de surfaces (M4 sur le sommet)"
+
+    sortie:
+      axes_modulation:
+        - opacite_p1
+        - opacite_p2
+        - opacite_p3
+
+    table:
+      false:
+        opacite_p1: 1.0   # ou opacité par défaut configurée P1
+        opacite_p2: 1.0
+        opacite_p3: 1.0
+        note: "Mode nominal — persistantes visibles selon leur état"
+      true:
+        opacite_p1: 0.0
+        opacite_p2: 0.0
+        opacite_p3: 0.0
+        note: >-
+          Sommeil visuel total. État applicatif PRÉSERVÉ (audio continue,
+          parcours en cours, condition offline préservée — cf. P5.C2).
+          Cohérent avec CHO-SOMMEIL-PERSISTANTES-EN-M4 (fichier 03).
+
+    couplage_etat_partage:
+      - { etat: "tous (ETAT-AUDIO-EN-COURS, ETAT-PARCOURS-EN-COURS, ETAT-CONNEXION-RESEAU)", role: "consommateurs au sens de la visibilité M4 ; états eux-mêmes préservés" }
+
+    chorégraphies_associees:
+      - "CHO-ENTREE-M4 / CHO-SORTIE-M4"
+      - "CHO-SOMMEIL-PERSISTANTES-EN-M4 / CHO-REVEIL-PERSISTANTES-APRES-M4"
+
+    note_simplicite: >-
+      Mapping booléen simple — la valeur de sortie est uniformément 0.0
+      en M4 et 1.0 hors M4. Le mapping existe pour formaliser que c'est
+      bien un mapping paramétrique (pas un code en dur).
+
+# -----------------------------------------------------------------------------
+# 6. Cohérence inter-mappings
+# -----------------------------------------------------------------------------
+coherence_inter_mappings:
+
+  cas_pin_cumul_modulations:
+    description: >-
+      Un Pin peut subir simultanément plusieurs modulations
+      (MAP-CONTEXTE-PARCOURS-VERS-PIN + MAP-DEJA-VISITE-VERS-PIN). L'ordre
+      d'application est documenté par les contraintes invariantielles
+      PR1 et PR2 ci-dessus.
+
+  cas_carte_cumul:
+    description: >-
+      La Carte subit MAP-SLIDER-VERS-AXES-CARTE (filtre paramétrique
+      par Époque) et MAP-MODE-OFFLINE-VERS-CARTE (atténuation offline).
+      Composition multiplicative simple : opacité finale tuiles =
+      opacite_axes_carte × opacite_offline. À VALIDER palier 16 sur
+      cas extrême (offline_sans_cache à l'Antiquité).
+
+  cas_pin_sur_carte_offline:
+    description: >-
+      Un Pin reste pleinement visible sur une zone non-chargée offline
+      (le fond uni neutre garantit le contraste). Test à VALIDER palier 16.
+
+# -----------------------------------------------------------------------------
+# 7. Persona check
+# -----------------------------------------------------------------------------
+persona_check:
+
+  kenji:
+    impact: moyen
+    note: >-
+      MAP-MODE-OFFLINE-VERS-CARTE critique pour son cas 'plus de data
+      au milieu de Bellecour' — le mode offline_avec_cache préserve la
+      lisibilité, le mode offline_sans_cache reste utilisable sur Pins
+      préchargés.
+
+  mme_dupont:
+    impact: moyen
+    note: >-
+      MAP-CONTEXTE-PARCOURS-VERS-PIN principal pour ses sorties scolaires.
+      L'étape courante doit ressortir clairement, les hors-parcours
+      atténués pour ne pas distraire les enfants.
+
+  mme_martin:
+    impact: MAJEUR
+    note: >-
+      MAP-SLIDER-VERS-AXES-CARTE est le PIVOT de son test_litmus
+      (défilement entre 3 époques en 30s, projection en classe). Le
+      calibrage palier 15 doit garantir que les contrastes restent
+      perceptibles AUX ANCRES ET AUX INTERPOLATIONS depuis le fond
+      d'une classe. MAP-MODE-M4-VERS-PERSISTANTES garantit qu'aucune
+      mini-bar ne perturbe la projection.
+
+  pere_lyonnais:
+    impact: moyen
+    note: >-
+      MAP-CONTEXTE-PARCOURS-VERS-PIN secondaire (il ne fait pas de
+      Parcours formels). MAP-DEJA-VISITE-VERS-PIN intéressant — l'aide
+      à identifier ce qu'il a découvert hier vs aujourd'hui.
+
+  anais_back_office:
+    impact: nul
+    note: "Aucun mapping ci-dessus ne concerne le back-office desktop."
+
+# -----------------------------------------------------------------------------
+# 8. Enjeux transversaux
+# -----------------------------------------------------------------------------
+enjeux_transversaux:
+
+  accessibilite: >-
+    MAP-SLIDER-VERS-AXES-CARTE doit préserver L1-L5 (palier 9) aux
+    interpolations. PR1/PR2 (cumul modulations Pin) à valider palier
+    16. Tests daltonisme aux ancres chromatiquement chargées
+    (Antiquité ocre, Moyen Âge ambre, Révolution rouge, XXe Kodachrome).
+
+  performance: >-
+    MAP-SLIDER-VERS-AXES-CARTE pendant le drag — interpolation
+    continue à 60fps requise. À VALIDER palier 16 sur device cible
+    (smartphone milieu de gamme pour Mme Dupont). Voir
+    note_implementation ci-dessous pour les techniques candidates.
+
+  note_implementation: >-
+    Le palier 11 ne nomme pas la technique d'implémentation graphique.
+    Côté équipe dev, plusieurs approches sont envisageables selon le
+    moteur cartographique retenu (Mapbox / MapLibre / autre, cf.
+    tracker question_ouverte) : pipeline graphique paramétrée (uniforms
+    GPU mis à jour à chaque frame), couches de teinte/saturation
+    appliquées au-dessus du fond carte, ou combinaison. Décision
+    technique à arbitrer en phase d'implémentation, pas au palier 11.
+
+  vie_privee: "Aucun enjeu spécifique."
+
+  i18n: "Aucun enjeu spécifique aux mappings."
+
+# -----------------------------------------------------------------------------
+# 9. Questions ouvertes (récapitulatif)
+# -----------------------------------------------------------------------------
+questions_ouvertes:
+  - "MAP-SLIDER-VERS-AXES-CARTE : 50 valeurs aux ancres À CALIBRER palier 15 (décision majeure du palier 11)."
+  - "Distribution non uniforme des positions d'ancres : confirmer avec lead/historienne quand bornes précises actées."
+  - "Type de texture par zone (parchemin / grain film / absent) : 2 ou 3 textures ? Trancher palier 15."
+  - "Courbes ease-in-out aux ruptures historiques : conserver ou linéaire partout ? Trancher palier 15."
+  - "MAP-CONTEXTE-PARCOURS-VERS-PIN : test palier 16 sur les 10 combinaisons (5 contextes × 2 états déjà_visite)."
+  - "MAP-MODE-OFFLINE-VERS-CARTE : changement de réseau pendant drag du slider — interrompre ou laisser terminer ? À acter palier 16."

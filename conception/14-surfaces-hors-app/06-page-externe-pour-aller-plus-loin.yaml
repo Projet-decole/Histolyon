@@ -1,0 +1,152 @@
+# =============================================================================
+# Palier 14 — 06 Page externe « Pour aller plus loin »
+# =============================================================================
+# Surface TIERCE pointée par le bloc « Pour aller plus loin » d'un Pin
+# (référence biblio, archive en ligne, article externe). Pas une surface
+# créée par HistoLyon — c'est une URL externe qu'on ouvre dans le navigateur
+# système.
+#
+# Tracée par palier 5 § 7 surfaces_hors_app_rappel comme surface hors-app.
+# Le palier 14 la modélise en note brève parce qu'elle est la dernière
+# étape avant que l'utilisateur quitte l'écosystème HistoLyon — cohérence
+# du retour gracieux et du ton importants.
+# =============================================================================
+
+document:
+  type: palier_surfaces_hors_app_artefact
+  artefact: page_externe_pour_aller_plus_loin
+  numero: 14
+  fichier_id: "06"
+  version: "0.2"
+  date: "2026-05-07"
+  format: yaml
+  prerequis_de_lecture:
+    - "design/conception/14-surfaces-hors-app/00-index.yaml"
+    - "design/conception/05-architecture-info.yaml — § 7 surfaces_hors_app_rappel"
+    - "design/conception/03-fonctionnalites/02-pins-et-contenu.yaml — bloc 'Pour aller plus loin' d'un Pin"
+
+# -----------------------------------------------------------------------------
+# 1. Raison d'être
+# -----------------------------------------------------------------------------
+raison_d_etre: >-
+  Un Pin peut pointer vers une référence externe (archive en ligne du
+  Musée des Beaux-Arts, article scientifique, page Wikipédia, document
+  des archives municipales). Cette URL n'est pas une surface créée par
+  HistoLyon — elle vit dans le navigateur système, gérée par un site
+  tiers. Mais le geste de bascule depuis le Pin vers l'extérieur, et
+  le retour à l'app au navigateur fermé, font partie de l'expérience
+  HistoLyon. Ce fichier modélise ce passage.
+
+# -----------------------------------------------------------------------------
+# 2. Décisions structurelles
+# -----------------------------------------------------------------------------
+decisions_structurelles:
+
+  - id: D-EXTERNE-1
+    decision: "Ouverture dans le navigateur système, JAMAIS dans une webview interne"
+    pourquoi: >-
+      Cohérent avec essence § ce_qu_on_refuse (pas de capture d'attention,
+      pas de growth hack). Une webview interne piégerait l'utilisateur
+      dans l'app HistoLyon en lui donnant l'impression de lire un site
+      tiers — manipulation d'attention. Le navigateur système est le
+      contexte attendu pour lire une référence externe : l'utilisateur
+      sait où il est, peut bookmarker, partager, traduire avec ses outils
+      habituels. Le retour à l'app passe par le geste système (multitâche
+      iOS, bouton retour Android) — pas par un bouton 'Retour à HistoLyon'
+      injecté dans le navigateur (impossible techniquement et déplacé).
+      La décision est mécanisme-agnostique au sens du test de pureté
+      (1) du palier 14 — le mécanisme exact d'ouverture (intent Android,
+      SFSafariViewController vs Safari iOS, etc.) relève de
+      l'implémentation, le palier 14 dit seulement 'navigateur système
+      et non webview maison'.
+
+  - id: D-EXTERNE-2
+    decision: "Pré-bascule discrète dans l'app — pas d'écran d'avertissement bloquant"
+    pourquoi: >-
+      Quand l'utilisateur tape sur un libellé externe (microcopy palier 8
+      cluster 02-template-pin section 'pour aller plus loin'), la bascule
+      vers le navigateur système est immédiate. Pas de dialogue de
+      confirmation 'Vous quittez HistoLyon, voulez-vous continuer ?' —
+      ce serait une friction inutile et déplacée (l'utilisateur a tapé
+      explicitement sur un libellé qui annonce une sortie). Le ton du
+      libellé palier 8 et l'icône ICON-UI-LIEN-EXTERNE palier 13 signalent
+      visuellement la sortie — c'est suffisant.
+
+  - id: D-EXTERNE-3
+    decision: "Comportement face à une URL cassée — bascule vers navigateur quand même, gestion par le navigateur"
+    pourquoi: >-
+      L'app n'a pas la maîtrise de la disponibilité d'une URL externe.
+      Si la page tierce a disparu depuis qu'Anaïs a rempli le Pin (et
+      que le contrôle interne du back-office ne l'a pas encore vu), le
+      navigateur affichera son propre message d'erreur. C'est le
+      comportement attendu — ce n'est pas une faute de l'app HistoLyon
+      ni de la page web responsive. Note pour palier 16 : test périodique
+      des URLs externes côté back-office (D9 production de contenu —
+      hors palier 14).
+
+# -----------------------------------------------------------------------------
+# 3. Fiches d'artefact
+# -----------------------------------------------------------------------------
+artefacts:
+
+  # ===========================================================================
+  - id: SHA-EXTERNE-BASCULE
+    nom: "Bascule depuis l'app vers une page externe"
+
+    raison_d_etre: >-
+      Le geste qui amène l'utilisateur du Pin (dans l'app) à la page
+      tierce (dans son navigateur).
+
+    deroule_destinataire_centre:
+      - "L'utilisateur consulte un Pin (M3 consultation approfondie)."
+      - "Le bloc 'Pour aller plus loin' du Pin liste une ou plusieurs références (microcopy palier 8 cluster 02-template-pin)."
+      - "Tap sur un libellé de référence — bascule immédiate vers le navigateur système (D-EXTERNE-2)."
+      - "L'app passe en arrière-plan (cohérent palier 5 N7 préservation d'état — au retour, l'utilisateur est exactement là où il l'avait laissée)."
+      - "Le navigateur ouvre la page tierce. À partir de ce moment, l'app n'a plus la main (D-EXTERNE-1)."
+
+    consommation_paliers_amont:
+      icones_palier_13: "ICON-UI-LIEN-EXTERNE (palier 13 fichier 03 — déjà identifié dans audit slots palier 10)"
+      microcopy_palier_8: "Cluster 02-template-pin section 'pour aller plus loin'"
+      regles_palier_5: "N7 (préservation d'état en arrière-plan)"
+
+  # ===========================================================================
+  - id: SHA-EXTERNE-RETOUR
+    nom: "Retour à l'app depuis le navigateur"
+
+    raison_d_etre: >-
+      Quand l'utilisateur referme le navigateur ou bascule vers l'app
+      via le multitâche / bouton retour, il revient à l'écran qu'il
+      avait laissé.
+
+    comportement: >-
+      Hérité de palier 5 N7 (préservation d'état) — l'app reprend
+      exactement à l'écran qu'elle avait laissé (M3 consultation
+      approfondie du Pin). Aucune intervention propre du palier 14.
+
+    consommation_paliers_amont:
+      regles_palier_5: "N7"
+
+# -----------------------------------------------------------------------------
+# 4. Personas servis
+# -----------------------------------------------------------------------------
+personas_servis:
+
+  pere_lyonnais:
+    test_litmus_servi: "Approfondir une découverte qui l'a marqué — référence biblio, archive"
+    apport_du_fichier: >-
+      Bascule sans friction (D-EXTERNE-2) vers le contexte habituel
+      du navigateur où il sait lire, bookmarker, partager. Retour à
+      l'app sans perte d'état (N7).
+
+  mme_martin:
+    test_litmus_servi: "Vérifier les sources avant de citer en classe"
+    apport_du_fichier: >-
+      Cohérent avec son besoin de fiabilité scientifique. Le navigateur
+      système lui permet d'évaluer la source (URL visible, certificat,
+      etc.) — ce qu'une webview interne masquerait.
+
+  kenji:
+    impact: "marginal — pas son cas central (il consulte plus qu'il n'approfondit en mobilité)"
+
+  mme_dupont:
+    impact: "marginal — pas son cas central"

@@ -1,0 +1,300 @@
+# =============================================================================
+# Palier 14 — 05 Partage natif — payload (et Open Graph / Twitter Card)
+# =============================================================================
+# Deux strates solidaires :
+#   (1) Le PAYLOAD remis au mécanisme de partage natif système quand
+#       l'utilisateur déclenche un partage depuis l'app (lien seul, lien +
+#       image partageable, lien + code visuel selon le contexte).
+#   (2) Les MÉTADONNÉES OPEN GRAPH / TWITTER CARD exposées par la page web
+#       responsive — qui pilotent l'aperçu généré par les messageries
+#       (WhatsApp / Slack / Twitter / mail) quand le lien est collé.
+#
+# Le palier 3 D11.5 a posé la matière fonctionnelle du partage natif (l'app
+# remet la main au système, pas d'UI maison, pas de tracking). Ce fichier
+# dit ce que l'app PRÉPARE comme donnée avant de remettre la main, et ce
+# que la page web EXPOSE pour que l'aperçu soit cohérent.
+# =============================================================================
+
+document:
+  type: palier_surfaces_hors_app_artefact
+  artefact: partage_natif_payload_et_apercu_open_graph
+  numero: 14
+  fichier_id: "05"
+  version: "0.2"
+  date: "2026-05-07"
+  format: yaml
+  prerequis_de_lecture:
+    - "design/conception/14-surfaces-hors-app/00-index.yaml"
+    - "design/conception/14-surfaces-hors-app/01-lien-universel.yaml — SHA-LIEN-APERCU-EN-MESSAGERIE délègue ici"
+    - "design/conception/14-surfaces-hors-app/02-page-web-responsive.yaml — la page expose les métadonnées Open Graph"
+    - "design/conception/14-surfaces-hors-app/04-image-partageable.yaml — payload de fin de parcours"
+    - "design/conception/03-fonctionnalites/11-surfaces-hors-app.yaml — D11.5 (matière fonctionnelle)"
+    - "design/conception/06-flows/06-partage.yaml — F1, F2, F3, F4 (déclencheurs de payload)"
+
+# -----------------------------------------------------------------------------
+# 1. Raison d'être
+# -----------------------------------------------------------------------------
+raison_d_etre: >-
+  Le palier 3 D11.5 dit que l'app remet la main à l'OS et NE TOUCHE PAS
+  à l'UI de partage. Mais il dit aussi que l'app PRÉPARE la donnée à
+  partager — c'est cette préparation qu'on précise ici. Selon ce qu'on
+  partage (un Pin, un Parcours, une fin de parcours, un Code visuel),
+  le payload remis au système varie. Et quand le lien voyage par
+  messagerie au lieu du partage natif (collé dans WhatsApp), l'aperçu
+  qu'affiche la messagerie est piloté par les métadonnées de la page
+  web. Les deux strates parlent de la même question : 'qu'est-ce qui
+  voyage avec le lien ?'
+
+# -----------------------------------------------------------------------------
+# 2. Héritage palier 3 D11.5 — par référence, pas redit
+# -----------------------------------------------------------------------------
+heritage_palier_3:
+  reference: "design/conception/03-fonctionnalites/11-surfaces-hors-app.yaml § D11.5"
+  ce_qui_est_deja_pose:
+    - "Capabilités (préparer la donnée, déléguer la sélection, combiner plusieurs éléments selon contexte, gérer l'annulation, servir de référence canonique)"
+    - "Règles fonctionnelles (mécanisme natif, déclenchement explicite, app prépare et remet la main, destinations système-décidées, pas de message intrusif après partage)"
+    - "Ce qu'on ne fait pas (pas d'UI maison, pas de partage silencieux, pas de pré-sélection, pas de tracking)"
+    - "Definition of Done D11.5"
+    - "Enjeux transversaux (a11y héritée du système, performance préparation donnée, vie privée stricte)"
+  questions_ouvertes_d11_5_a_arbitrer_ici:
+    - "Comportement quand un canal natif refuse un type de contenu — TRACÉE en SHA-PAYLOAD-RESILIENCE (note de fallback)"
+    - "Image partageable + lien systématiquement, ou juste l'image — TRANCHÉE en SHA-PAYLOAD-FIN-PARCOURS"
+    - "Comportement sur web — TRACÉE en note (web hérite du partage navigateur — pas refait par HistoLyon)"
+
+# -----------------------------------------------------------------------------
+# 3. Décisions structurelles propres au fichier 05
+# -----------------------------------------------------------------------------
+decisions_structurelles:
+
+  - id: D-PAYLOAD-1
+    decision: "Mention sobre 'via HistoLyon' jointe au payload pour les canaux qui acceptent un texte d'accompagnement"
+    pourquoi: >-
+      Tranche l'arbitrage UX/branding posé en cadrage. Pas de slogan
+      ('Découvrez Lyon !', 'Téléchargez !' — interdits D11.4 / D11.2),
+      mais une mention courte et neutre qui identifie la source. Utile
+      au destinataire pour savoir d'où vient le lien avant de cliquer
+      (cohérent avec essence § ce_qu_on_refuse 'pas de growth hack' —
+      l'identification est factuelle, pas promotionnelle). Sobriété
+      stricte — phrasé exact palier 8 cluster transverse 'mention de
+      source partage natif'.
+
+  - id: D-PAYLOAD-2
+    decision: "Pour la fin de parcours — payload = image partageable + lien universel SYSTÉMATIQUEMENT"
+    pourquoi: >-
+      Tranche question ouverte D11.5. L'image atmosphérique parle pour
+      elle-même (D11.4) mais le lien permet au destinataire de basculer
+      vers l'app ou la page web. Sans le lien, l'image est jolie mais
+      l'expérience s'arrête là. Cohérent avec F3 étape 3 (palier 6 —
+      'composition Image partageable + Lien universel'). En cas de
+      fallback (génération image échouée), le lien voyage seul.
+
+  - id: D-PAYLOAD-3
+    decision: "L'image preview Open Graph pour les vues Pin et Parcours = vignette ou image hero de la cible (PAS l'image partageable de fin de parcours)"
+    pourquoi: >-
+      L'image partageable (fichier 04) est un artefact spécifique à la
+      fin de parcours. Quand un Lien Pin ou Parcours est collé dans
+      une messagerie, l'aperçu doit refléter la cible (la vignette du
+      Pin ou l'image hero du Parcours), pas une image de fin de
+      parcours qui n'a aucun rapport. Cohérent avec SHA-WEB-VUE-PIN
+      structure et SHA-WEB-VUE-PARCOURS structure (les deux exposent
+      ces images dans la page).
+
+  - id: D-PAYLOAD-4
+    decision: "Open Graph et Twitter Card alignés (mêmes title / description / image)"
+    pourquoi: >-
+      Cohérence inter-messagerie. Pas de divergence entre l'aperçu
+      WhatsApp (Open Graph) et l'aperçu Twitter (Twitter Card) — un
+      même contenu doit être reconnaissable quel que soit le canal.
+      Le format technique exact (balises meta dans le HTML) relève
+      de l'implémentation web ; ce fichier dit seulement le contenu
+      à exposer.
+
+# -----------------------------------------------------------------------------
+# 4. Fiches d'artefact
+# -----------------------------------------------------------------------------
+artefacts:
+
+  # ===========================================================================
+  - id: SHA-PAYLOAD-PIN
+    nom: "Payload de partage natif d'un Pin"
+
+    declencheur_amont: "F1 (palier 6) — partage d'un Pin via partage natif système"
+
+    contenu_du_payload:
+      lien_universel: "Le Lien universel canonique du Pin (héritage SHA-LIEN-FORME fichier 01)"
+      texte_accompagnement: "Mention sobre 'via HistoLyon' (D-PAYLOAD-1) — phrasé palier 8"
+      image_preview_jointe: "Aucune image jointe au payload natif (l'aperçu sera généré par la messagerie réceptrice via Open Graph — voir SHA-OPEN-GRAPH-PIN ci-dessous)"
+
+    consommation_paliers_amont:
+      microcopy_palier_8: "Cluster transverse 'mention de source partage natif'"
+
+  # ===========================================================================
+  - id: SHA-PAYLOAD-PARCOURS
+    nom: "Payload de partage natif d'une fiche de Parcours"
+
+    declencheur_amont: "F2 (palier 6) — partage d'une fiche de parcours"
+
+    contenu_du_payload:
+      lien_universel: "Le Lien universel canonique du Parcours"
+      texte_accompagnement: "Mention sobre 'via HistoLyon' (D-PAYLOAD-1)"
+      image_preview_jointe: "Aucune image jointe au payload natif (aperçu généré via Open Graph)"
+
+    cas_capability_parcours_personnel:
+      heritage: "Palier 6 F2 cas particulier — modèle CAPABILITY"
+      comportement: >-
+        Le Lien universel reste résoluble par qui le détient. Le payload
+        est strictement identique à celui d'un parcours public — aucune
+        marque visuelle 'parcours privé', aucune restriction côté
+        partage natif. Le destinataire qui a le lien accède
+        normalement (cohérent avec SHA-WEB-VUE-PARCOURS état
+        'parcours_personnel_capability').
+
+  # ===========================================================================
+  - id: SHA-PAYLOAD-FIN-PARCOURS
+    nom: "Payload de partage natif d'une fin de parcours"
+
+    declencheur_amont: "F3 (palier 6) — partage de fin de parcours via Image partageable"
+
+    contenu_du_payload_nominal:
+      image_partageable: "L'Image partageable générée (fichier 04 SHA-IMG-COMPOSITION) — pièce centrale"
+      lien_universel: "Le Lien universel canonique du Parcours, JOINT SYSTÉMATIQUEMENT (D-PAYLOAD-2)"
+      texte_accompagnement: "Mention sobre 'via HistoLyon' (D-PAYLOAD-1)"
+      texte_alternatif_image: "Texte alternatif descriptif (héritage SHA-IMG-METADONNEES-DE-PARTAGE)"
+
+    contenu_du_payload_fallback:
+      heritage: "Palier 6 F3 cas particulier 'génération image échouée ou trop longue'"
+      comportement: >-
+        Si la génération de l'image n'aboutit pas, fallback sur partage
+        du Lien universel SEUL (sans image), avec la mention sobre. Le
+        moment de célébration n'est pas rompu par une attente bloquante
+        (cohérent palier 7 partage/02-fin-parcours-image.yaml état
+        'erreur_generation_avec_fallback').
+
+  # ===========================================================================
+  - id: SHA-PAYLOAD-CODE-VISUEL
+    nom: "Payload de partage natif d'un Code visuel"
+
+    declencheur_amont: "F4 (palier 6) — partage du Code visuel généré"
+
+    contenu_du_payload:
+      code_visuel: "L'export du Code visuel (fichier 03 SHA-CODE-COMPOSITION — image bitmap ou vectoriel selon ce que l'utilisateur a choisi sur l'écran générateur)"
+      texte_accompagnement: "Mention sobre 'via HistoLyon' (D-PAYLOAD-1) si le canal de partage l'accepte (l'enregistrement local pur n'a pas de texte)"
+    cas_d_usage_typique: >-
+      Enregistrement local de l'image du code en vue d'une impression
+      ultérieure (Mme Dupont prépare la feuille pour les parents).
+      Le partage par messagerie est plus rare pour le code visuel —
+      le Lien universel direct est plus pratique dans une messagerie.
+
+  # ===========================================================================
+  - id: SHA-OPEN-GRAPH-PIN
+    nom: "Aperçu Open Graph / Twitter Card — vue Pin"
+
+    raison_d_etre: >-
+      Quand un utilisateur colle le Lien universel d'un Pin dans une
+      messagerie (WhatsApp, Slack, Twitter, mail), la messagerie
+      réceptrice génère un aperçu à partir des métadonnées de la page
+      web pointée. Ces métadonnées sont exposées par la page web
+      (fichier 02 SHA-WEB-VUE-PIN).
+
+    contenu_expose:
+      titre: "Le titre du Pin (équivalent au titre affiché en SHA-WEB-VUE-PIN zone titre)"
+      description: "Court extrait du teaser narratif du Pin (microcopy palier 8 cluster 02-template-pin teaser ; tronqué si nécessaire)"
+      image: "Vignette ou image hero du Pin (D-PAYLOAD-3) — composition palier 9"
+      site_name: "HistoLyon (constante)"
+      type: "article (cohérent sémantique web standard pour un contenu narratif)"
+
+    consommation_paliers_amont:
+      microcopy_palier_8: "Cluster 02-template-pin teaser (le même qui apparaît côté app pour l'aperçu rapide M2)"
+      grammaire_palier_9: "Composition de la vignette / image hero"
+
+  # ===========================================================================
+  - id: SHA-OPEN-GRAPH-PARCOURS
+    nom: "Aperçu Open Graph / Twitter Card — vue Parcours"
+
+    raison_d_etre: >-
+      Identique à SHA-OPEN-GRAPH-PIN mais pour un Parcours. Pertinent
+      principalement pour Mme Dupont — quand elle colle le lien dans
+      le mail collectif aux six parents, l'aperçu doit donner envie
+      d'ouvrir.
+
+    contenu_expose:
+      titre: "Le titre du Parcours et sa thématique"
+      description: "Court extrait de la description narrative du Parcours (microcopy palier 8 cluster 03-template-parcours)"
+      image: "Image hero du Parcours (composition palier 9 — tracé stylisé sur fond carte)"
+      site_name: "HistoLyon"
+      type: "article"
+
+    cas_capability_parcours_personnel:
+      heritage: "Palier 6 F2 cas particulier — modèle CAPABILITY"
+      comportement: >-
+        L'aperçu est exposé normalement. La page web SHA-WEB-VUE-PARCOURS
+        résout le parcours pour qui détient le lien — cohérence stricte
+        de l'expérience entre l'aperçu et la page atteinte.
+
+  # ===========================================================================
+  - id: SHA-OPEN-GRAPH-FIN-PARCOURS
+    nom: "Aperçu Open Graph / Twitter Card — vue Fin de parcours partagée"
+
+    raison_d_etre: >-
+      Quand quelqu'un colle dans WhatsApp le lien d'une fin de parcours
+      partagée par Kenji (sans l'image partageable elle-même, juste
+      le lien), l'aperçu doit refléter la fin de parcours.
+
+    contenu_expose:
+      titre: "Mention de la fin de parcours et titre du Parcours d'origine (microcopy palier 8)"
+      description: "Mention sobre du parcours complété, sans glorification (palier 8 cluster 03-template-parcours fin de parcours partagée)"
+      image: "L'Image partageable elle-même (fichier 04) si elle a été persistée pour cette fin de parcours, OU l'image hero du Parcours d'origine en fallback"
+      site_name: "HistoLyon"
+      type: "article"
+
+    note_articulation_avec_image_partageable: >-
+      Si Kenji partage l'Image partageable + le Lien (SHA-PAYLOAD-FIN-PARCOURS),
+      la messagerie affiche directement l'image et le lien tient lieu
+      de complément. L'Open Graph entre en jeu seulement si quelqu'un
+      colle le Lien SEUL (sans l'image qui l'accompagnait).
+
+    questions_ouvertes:
+      - "Persistance de l'Image partageable pour usage Open Graph ultérieur — palier 4 cluster 06 entité Image partageable a posé un cycle de vie 'générée → regénérée' mais sa durée de persistance et son URL stable d'exposition par la page web ne sont pas spécifiées. À arbitrer en articulation palier 4 cluster 06 et palier 6 F3 question ouverte 're-partage depuis l'Historique'. En attendant, le fallback 'image hero du Parcours d'origine' reste systémiquement disponible."
+
+  # ===========================================================================
+  - id: SHA-PAYLOAD-RESILIENCE
+    nom: "Comportement face aux limites des canaux natifs"
+
+    raison_d_etre: >-
+      Trace question ouverte D11.5 : 'comportement précis quand un canal
+      natif refuse un type de contenu (ex. image trop lourde pour un
+      canal donné)'. Pas un arbitrage de palier 14 — l'app remet la
+      main au système et le système gère ses limites. Mais on note
+      le comportement attendu pour cohérence.
+
+    comportement_attendu:
+      - "Si le canal refuse l'image (taille, format), il l'omet — l'utilisateur le voit dans l'UI native du système. Ce comportement est ATTENDU et NORMAL — pas un bug à compenser côté app."
+      - "Si le canal refuse le lien (rare — par ex. canal qui ne fait que du texte sans URL cliquable), le système gère seul (mode dégradé hors champ de l'app)."
+      - "L'app NE PRÉ-DIMENSIONNE PAS l'image en fonction du canal présumé (cohérent D11.5 'pas de pré-sélection ou filtrage côté app')."
+
+# -----------------------------------------------------------------------------
+# 5. Personas servis
+# -----------------------------------------------------------------------------
+personas_servis:
+
+  kenji:
+    test_litmus_servi: "Partage en quelques secondes via UI native qu'il connaît déjà sur son téléphone japonais"
+    apport_du_fichier: >-
+      SHA-PAYLOAD-FIN-PARCOURS (D-PAYLOAD-2 image + lien) garantit que
+      ses followers voient l'image atmosphérique et peuvent rebondir
+      via le lien. L'aperçu Open Graph de la page web (SHA-OPEN-GRAPH-FIN-PARCOURS)
+      garantit la cohérence si quelqu'un colle le lien plus tard.
+
+  mme_dupont:
+    test_litmus_servi: "Envoi du parcours aux 6 parents accompagnateurs"
+    apport_du_fichier: >-
+      SHA-PAYLOAD-PARCOURS + SHA-OPEN-GRAPH-PARCOURS — dans le mail
+      collectif, l'aperçu donne envie d'ouvrir, le lien fonctionne
+      même pour un parcours personnel non publié (capability).
+
+  pere_lyonnais:
+    test_litmus_servi: "Partager une découverte ponctuelle sur WhatsApp"
+    apport_du_fichier: >-
+      SHA-PAYLOAD-PIN + SHA-OPEN-GRAPH-PIN — l'aperçu lit comme une
+      petite carte d'accroche, son ami clique sans avoir besoin d'un
+      texte d'explication.

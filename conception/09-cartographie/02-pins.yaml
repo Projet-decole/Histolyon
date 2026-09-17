@@ -1,0 +1,222 @@
+# =============================================================================
+# Palier 9 — Pins
+# =============================================================================
+# Mapping registre visuel ↔ dimension fonctionnelle pour les Pins, et leurs
+# variantes contextuelles. Aucune valeur (palier 12). Aucune icône concrète
+# (palier 13). Aucune durée d'animation (palier 11).
+# =============================================================================
+
+document:
+  type: palier_cartographie_pins
+  numero: 9
+  fichier: "02-pins.yaml"
+  version: "0.1"
+  date: "2026-05-06"
+  format: yaml
+  prerequis_de_lecture:
+    - "design/conception/09-cartographie/00-index.yaml — décisions D1-D6, D10 et anti-périmètre"
+    - "design/conception/04-donnees/01-contenu.yaml — Pin, Catégorie, Badge"
+    - "design/conception/04-donnees/00-index.yaml — invariants I3, I8, I9, I10"
+
+raison_d_etre: >-
+  Un Pin manipule plusieurs dimensions fonctionnelles simultanément
+  (catégorie, provenance, multi-époques, statut de vérification,
+  contexte de parcours, déjà visité). Sans grammaire d'allocation
+  des registres visuels, chaque palier aval déciderait en silo —
+  et le système perdrait sa cohérence. Ce fichier pose qui voit
+  quoi par quel registre.
+
+# -----------------------------------------------------------------------------
+# 1. Mappings registre visuel ↔ dimension fonctionnelle
+# -----------------------------------------------------------------------------
+mappings:
+
+  - dimension: catégorie
+    registre: "icône distinctive intégrée au Pin sur la carte ; reprise dans un chip 'icône + libellé' en tête de l'aperçu rapide (M2) et de la consultation approfondie (M3)"
+    pourquoi: >-
+      L'icône est un registre visuel auto-explicatif et indépendant
+      de la couleur (auto-suffisant pour daltonisme). Sobriété : la
+      couleur reste réservée à la provenance, dimension fonctionnelle
+      plus structurante.
+    delegation: "Mapping Catégorie → icône concrète au palier 13 (cf. décision D1)"
+
+  - dimension: provenance
+    registre: "couleur du Pin"
+    valeurs_qualifiees:
+      editorial: "teinte chaude affirmée"
+      communautaire: "teinte neutre"
+    pourquoi: >-
+      Provenance = statut fonctionnel structurant (un Pin éditorial
+      est validé par l'équipe et ses Sources sont scientifiquement
+      vérifiées ; un Pin communautaire est une contribution avec
+      ses propres invariants, cf. I3). La couleur est le registre
+      le plus immédiat pour cette distinction.
+    delegation: "Valeurs précises au palier 12 (cf. décision D3)"
+
+  - dimension: multi_epoques
+    registre: "forme empilée du Pin — évocation visuelle de plusieurs Pins superposés au fil des Époques"
+    pourquoi: >-
+      La forme dit 'ce lieu traverse le temps' sans nécessiter de
+      compteur ni de badge. Sémantiquement éloquent. Cohérent avec
+      I8 (multi-époques admis pour Pin et Parcours).
+    delegation: >-
+      Forme exacte (anatomie de l'empilement, nombre de strates
+      visibles, variant du composant Pin) au palier 10. Valeurs
+      d'épaisseur/espacement au palier 12.
+    note: >-
+      L'empilement signale la PRÉSENCE de multi-époques, pas le
+      NOMBRE. Pas de compteur sur le Pin (le compteur '5+' est
+      réservé aux clusters, cf. fichier 04-densite-zoom).
+
+  - dimension: statut_de_verification
+    registre: "contour du Pin"
+    valeur_qualifiee: "contour distinctif signalant 'sources en cours de vérification' (I3)"
+    pourquoi: >-
+      Le contour est un registre disjoint de la couleur (provenance),
+      de la forme (multi-époques) et de l'icône (catégorie) — il
+      cohabite sans conflit. Cohérent avec la nuance I3 : visibilité
+      immédiate du Pin communautaire avec marque distinctive levée
+      quand la modération a confirmé.
+    cohabitation_avec_provenance: >-
+      Un Pin en cours de vérification est nécessairement de
+      provenance communautaire (l'éditorial est validé en interne
+      avant publication). Donc contour + teinte neutre coexistent
+      sans redondance.
+    delegation: >-
+      Nature exacte du contour (pointillé ? double trait ? teinte
+      spécifique ?) au palier 12. Suggestion forte palier 9 :
+      pointillé — registre visuel déjà associé culturellement
+      à 'provisoire / en cours'.
+
+  - dimension: contenu_immersif
+    registre: "AUCUN signe distinctif sur la carte"
+    pourquoi: >-
+      Sobriété actée (cf. décision D10). L'enrichissement (Modèle
+      3D, audio long, AR, élément interactif) se découvre à
+      l'aperçu rapide ou en consultation approfondie. La carte
+      n'a pas à le pré-annoncer.
+    reconsideration_palier_16: "Si retour utilisateur en validation signale un manque, à reconsidérer."
+
+# -----------------------------------------------------------------------------
+# 2. Variantes contextuelles des Pins
+# -----------------------------------------------------------------------------
+# Modulations selon l'état fonctionnel. Chaque variante précise QUELS axes
+# modulent et selon quelle direction qualitative — pas de valeurs (palier 12).
+variantes_contextuelles:
+
+  - etat: normal
+    contexte: "Aucun Parcours actif"
+    modulation: "rendu nominal (baseline)"
+    note: "Quand AUCUN Parcours n'est actif, le Pin n'est pas 'hors-parcours', il est simplement présent."
+
+  - etat: pin_du_parcours_actif
+    contexte: "Un Parcours est actif et le Pin fait partie du Parcours (sans être l'étape courante)"
+    modulation: "Pin pleinement visible, légèrement renforcé pour le distinguer des Pins hors-parcours"
+    axes_de_modulation_admis: ["mise en évidence subtile (ex. rehaussement chromatique)"]
+    delegation: "Valeurs au palier 12. Animation éventuelle au palier 11."
+
+  - etat: etape_courante_du_parcours_actif
+    contexte: "Pin = étape courante d'un Parcours actif (D3.5)"
+    modulation: "Pin nettement mis en relief — l'utilisateur doit le repérer immédiatement parmi les autres Pins du Parcours"
+    axes_de_modulation_admis: ["halo / aura visuelle", "mise au premier plan visuel"]
+    delegation: "Valeurs au palier 12. Comportement vivant éventuel (pulsation qualifiée) au palier 11."
+    note: "PAS d'animation permanente sur les Pins en général (cf. D2.1) — l'étape courante est l'exception assumée."
+
+  - etat: hors_parcours
+    contexte: "Un Parcours est actif et le Pin n'en fait pas partie"
+    modulation: "Pin atténué visuellement — perceptible mais en retrait, pour ne pas distraire de la progression"
+    axes_de_modulation_admis: ["opacité réduite", "désaturation légère"]
+    delegation: "Valeurs au palier 12."
+    invariant: "Le Pin reste perceptible — la sérendipité ne s'éteint pas pendant un Parcours (l'utilisateur doit pouvoir voir un autre Pin intrigant à proximité et choisir de dévier)."
+
+  - etat: deja_visite
+    contexte: "Pin déjà consulté par l'utilisateur (Historique de visite, cluster 03)"
+    modulation: "Nuance chromatique adoucie — signal subtil sans changer la forme ni l'icône"
+    axes_de_modulation_admis: ["légère atténuation de saturation"]
+    delegation: "Valeur au palier 12. À tester en validation : le signal doit être perceptible mais ne pas créer de hiérarchie qui pénaliserait les Pins déjà visités (P4 essence : ne jamais culpabiliser)."
+    note: "Le déjà-visité est un signal d'aide à la mémoire, pas une marque de complétion."
+
+  - etat: pin_sans_localisation
+    contexte: "Pin sans coordonnées (I9 — patrimoine vivant immatériel)"
+    rendu_carte: "AUCUN — le Pin n'apparaît pas sur la carte"
+    accessibilite: "Le Pin reste accessible via la recherche (D1.4) et via la liste de Catégorie."
+    invariant: "Sa présence dans le système est entière (cluster 01 reste intact) ; seul son rendu cartographique est nul."
+
+# -----------------------------------------------------------------------------
+# 3. Combinaisons admises
+# -----------------------------------------------------------------------------
+# Plusieurs dimensions peuvent s'appliquer simultanément à un même Pin. Aucune
+# combinaison n'est interdite par construction — les registres sont disjoints.
+combinaisons_admises:
+
+  exemple_pin_communautaire_multi_epoque_etape_courante:
+    teinte: neutre
+    forme: empilée
+    contour: présent
+    icône: catégorie
+    modulation: relief d'étape courante
+    note: "Aucun conflit. Tous les registres cohabitent — c'est exactement la raison d'avoir alloué chaque dimension à un registre disjoint."
+
+  invariant_de_perceptibilite: >-
+    Toute combinaison reste lisible. Aucune accumulation ne doit
+    rendre un Pin illisible — validation au palier 16 sur les cas
+    extrêmes (multi-époque + en cours de vérification + hors-parcours +
+    déjà visité).
+
+# -----------------------------------------------------------------------------
+# 4. Enjeux transversaux
+# -----------------------------------------------------------------------------
+enjeux_transversaux:
+
+  accessibilite: >-
+    Critique. La distinction Catégorie repose sur l'icône seule
+    (pas de couleur catégorie) — auto-cohérent pour daltonisme.
+    La distinction Provenance repose sur la couleur — vérification
+    daltonisme requise (deux teintes choisies au palier 12 doivent
+    rester distinguables). Label vocal de chaque Pin obligatoire :
+    'catégorie + nom du lieu + provenance + nombre d'époques'
+    (microcopy palier 8). Mode présentation Mme Martin : tous
+    les registres restent lisibles depuis le fond de la classe.
+
+  performance: >-
+    Critique : densité élevée de Pins fréquente. Le clustering
+    (fichier 04-densite-zoom) est le levier principal. Critères
+    chiffrés au palier 16.
+
+  vie_privee: >-
+    L'état 'déjà visité' s'appuie sur l'Historique de visite
+    (cluster 03) qui est strictement local au terminal (I6). Aucun
+    enjeu d'exposition.
+
+  i18n: "Pas d'enjeu spécifique au mapping ; le chip 'icône + libellé catégorie' suit la microcopy palier 8 / 06-i18n."
+
+# -----------------------------------------------------------------------------
+# 5. Questions ouvertes
+# -----------------------------------------------------------------------------
+regles_de_priorite:
+
+  - id: PR1
+    enonce: >-
+      Combinaison étape_courante + déjà_visité (Pin que l'utilisateur
+      a déjà visité mais qui devient étape courante d'un nouveau
+      Parcours) : la mise en relief de l'étape courante PRIME sur
+      l'atténuation déjà-visité.
+    pourquoi: "L'étape courante est un repère fonctionnel critique pour le suivi du Parcours ; la mémoire de visite est un signal subordonné."
+
+  - id: PR2
+    enonce: >-
+      Combinaison hors_parcours + déjà_visité : les deux modulations
+      cumulent (Pin atténué ET nuance chromatique adoucie). Validation
+      au palier 16 que le Pin reste perceptible.
+
+questions_ouvertes:
+
+  - "Forme exacte du contour de vérification (pointillé, double trait, teinte) — palier 12 décide la valeur. Suggestion non normative : pointillé (convention culturelle 'provisoire / en cours')."
+
+# -----------------------------------------------------------------------------
+# 6. Dépendances internes
+# -----------------------------------------------------------------------------
+dependances:
+  - "01-fond-et-epoques.yaml — invariants L1 (contraste Pin/fond) et L4 (forme empilée perceptible) et L5 (contour de vérification perceptible)"
+  - "03-parcours-traces.yaml — cohérence des couleurs de provenance entre Pin et tracé"
+  - "04-densite-zoom.yaml — héritage des registres visuels par les clusters"

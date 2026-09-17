@@ -1,0 +1,213 @@
+# =============================================================================
+# Palier 13 — 04 Icônes back-office
+# =============================================================================
+# Icônes des actions desktop admin (modération, validation scientifique,
+# retrait, promotion, soumission). Cardinalité réduite mais cohérence
+# stricte avec la charte 01.
+#
+# Persona principale : Anaïs Lefèvre (palier 2). Drapeau rouge persona
+# 'pas de prévisualisation' relève du palier 13 admin (icône de
+# prévisualisation à fournir si introduit).
+# =============================================================================
+
+document:
+  type: palier_icones_back_office
+  numero: 13
+  fichier: "04-icones-back-office.yaml"
+  version: "0.1"
+  date: "2026-05-07"
+  format: yaml
+  prerequis_de_lecture:
+    - "design/conception/13-icones/01-charte-graphique.yaml — style, états, mapping couleurs"
+    - "design/conception/10-composants/05-back-office.yaml — composants admin desktop consommateurs"
+
+raison_d_etre: >-
+  Le back-office desktop d'Anaïs partage la même charte graphique que
+  l'app mobile — pas de rupture sur le passage entre prévisualisation
+  mobile et action admin. Les icônes admin sont fonctionnelles (actions
+  de cycle de vie : valider, rejeter, retirer, promouvoir, prévisualiser).
+
+# -----------------------------------------------------------------------------
+# 1. Inventaire
+# -----------------------------------------------------------------------------
+icones_back_office:
+
+  - id: ICON-ADMIN-VALIDER
+    nom_palier_13: "valider_pin_communautaire"
+    source: "lucide:circle-check"
+    metaphore: "Cercle avec coche — convention universelle d'acceptation. Réutilise ICON-UI-SUCCES (états inline) car la sémantique est convergente (succès = validation par modération)."
+    slot_palier_10:
+      - "comp-moderation-soumissions action 'valider' (palier 10 05-back-office)"
+      - "comp-validation-scientifique action 'valider sources'"
+    variants: { tailles: [LG], etats: [default, hover, pressed] }
+    mapping_couleurs: { default: TOK-COLOR-FONCTIONNEL-SUCCES }
+    fichier_svg_attendu: "assets/ui/etat-succes.svg"
+    note_mutualisation: >-
+      MUTUALISÉ avec ICON-UI-SUCCES (fichier 03). Un seul SVG produit
+      étape ultérieure sous assets/ui/etat-succes.svg ; les composants admin
+      référencent ce même fichier. PAS de production séparée
+      assets/back-office/valider.svg (corrigé après relecture S2).
+    note_renommage_lucide: "Lucide a renommé check-circle → circle-check."
+
+  - id: ICON-ADMIN-REJETER
+    nom_palier_13: "rejeter_pin_communautaire"
+    source: "lucide:circle-x"
+    metaphore: "Cercle avec croix — convention universelle de rejet. Distinct de ICON-UI-FERMETURE (lucide:x sans cercle) pour la sémantique 'rejet définitif' vs 'fermeture transitoire'."
+    note_renommage_lucide: "Lucide a renommé x-circle → circle-x."
+    slot_palier_10: ["comp-moderation-soumissions action 'rejeter' (palier 10 05-back-office)"]
+    variants: { tailles: [LG], etats: [default, hover, pressed] }
+    mapping_couleurs: { default: TOK-COLOR-FONCTIONNEL-ERREUR }
+    fichier_svg_attendu: "assets/back-office/rejeter.svg"
+
+  - id: ICON-ADMIN-MODERER
+    nom_palier_13: "moderation_communautaire"
+    source: "lucide:shield-check"
+    metaphore: "Bouclier avec coche — symbole de protection / vérification de qualité. Cohérent avec le rôle d'Anaïs gardienne de la qualité éditoriale."
+    slot_palier_10:
+      - "comp-moderation-communautaire (palier 10 05-back-office)"
+      - "comp-tableau-bord-admin slot accès modération"
+    variants: { tailles: [LG, MD], etats: [default, active, hover] }
+    mapping_couleurs:
+      default: TOK-COLOR-TEXTE-PRINCIPAL
+      active: TOK-COLOR-PRIMARY
+    fichier_svg_attendu: "assets/back-office/moderation.svg"
+
+  - id: ICON-ADMIN-VALIDATION-SCIENTIFIQUE
+    nom_palier_13: "validation_scientifique"
+    source: "lucide:book-open-check"
+    metaphore: "Livre ouvert avec coche — symbolise la vérification documentaire / scientifique d'un Pin (cohérence de l'historicité, sources fiables). Distinct de ICON-ADMIN-VALIDER (acceptation simple) par la dimension SAVOIR (livre)."
+    slot_palier_10: ["comp-validation-scientifique action principale (palier 10 05-back-office)"]
+    variants: { tailles: [LG], etats: [default, hover, pressed] }
+    mapping_couleurs:
+      default: TOK-COLOR-TEXTE-PRINCIPAL
+      active: TOK-COLOR-PRIMARY
+    fichier_svg_attendu: "assets/back-office/validation-scientifique.svg"
+
+  - id: ICON-ADMIN-PROMOUVOIR
+    nom_palier_13: "promotion_communautaire_vers_editorial"
+    source: "lucide:circle-arrow-up"
+    metaphore: "Flèche vers le haut dans un cercle — métaphore de l'élévation / promotion. Cohérent avec la sémantique 'un Pin communautaire de qualité passe au statut éditorial' (cluster 01 invariant I10)."
+    note_renommage_lucide: "Lucide a renommé arrow-up-circle → circle-arrow-up."
+    slot_palier_10: ["comp-promotion-communautaire action 'promouvoir' (palier 10 05-back-office)"]
+    variants: { tailles: [LG], etats: [default, hover, pressed] }
+    mapping_couleurs:
+      default: TOK-COLOR-PIN-EDITORIAL   # cible = devenir éditorial → couleur cible
+      pressed: TOK-COLOR-PRIMARY-FONCE
+    fichier_svg_attendu: "assets/back-office/promouvoir.svg"
+
+  - id: ICON-ADMIN-RETIRER
+    nom_palier_13: "retrait_pin"
+    source: "lucide:archive"
+    metaphore: >-
+      Boîte d'archive — métaphore de mise à l'écart sans destruction
+      (cohérent avec cycle de vie palier 4 : un Pin retiré n'est pas
+      supprimé, il passe en statut 'archivé' réversible). Préfère
+      lucide:archive à lucide:trash (suppression définitive — pas
+      la sémantique).
+    slot_palier_10: ["comp-retrait-reouverture-pin action 'retirer' (palier 10 05-back-office)"]
+    variants: { tailles: [LG], etats: [default, hover, pressed] }
+    mapping_couleurs:
+      default: TOK-COLOR-TEXTE-PRINCIPAL
+      hover: TOK-COLOR-FONCTIONNEL-ERREUR
+    fichier_svg_attendu: "assets/back-office/retirer.svg"
+
+  - id: ICON-ADMIN-REOUVRIR
+    nom_palier_13: "reouverture_pin"
+    source: "lucide:archive-restore"
+    metaphore: "Boîte d'archive avec flèche de retour — symbolise la sortie d'archive, la réintroduction. Cohérent avec ICON-ADMIN-RETIRER (réciproque visuelle)."
+    slot_palier_10: ["comp-retrait-reouverture-pin action 'réouvrir' (palier 10 05-back-office)"]
+    variants: { tailles: [LG], etats: [default, hover, pressed] }
+    mapping_couleurs:
+      default: TOK-COLOR-TEXTE-PRINCIPAL
+      hover: TOK-COLOR-FONCTIONNEL-SUCCES
+    fichier_svg_attendu: "assets/back-office/reouvrir.svg"
+
+  - id: ICON-ADMIN-TABLEAU-BORD
+    nom_palier_13: "tableau_de_bord"
+    source: "lucide:layout-dashboard"
+    metaphore: "Grille de blocs — convention universelle de tableau de bord avec widgets multiples."
+    slot_palier_10: ["comp-tableau-bord-admin point d'entrée principal (palier 10 05-back-office)"]
+    variants: { tailles: [LG, MD], etats: [default, active] }
+    mapping_couleurs:
+      active: TOK-COLOR-PRIMARY
+      default: TOK-COLOR-TEXTE-PRINCIPAL
+    fichier_svg_attendu: "assets/back-office/tableau-bord.svg"
+
+  - id: ICON-ADMIN-CATALOGUE
+    nom_palier_13: "catalogue_pins_admin"
+    source: "lucide:list"
+    metaphore: "Liste à puces — convention universelle de catalogue / inventaire."
+    slot_palier_10: ["comp-catalogue-pins-admin point d'accès (palier 10 05-back-office)"]
+    variants: { tailles: [LG, MD], etats: [default, active] }
+    mapping_couleurs:
+      active: TOK-COLOR-PRIMARY
+      default: TOK-COLOR-TEXTE-PRINCIPAL
+    fichier_svg_attendu: "assets/back-office/catalogue.svg"
+
+  - id: ICON-ADMIN-PREVISUALISATION
+    nom_palier_13: "previsualisation_pin"
+    source: "lucide:eye"
+    metaphore: "Œil — convention universelle de prévisualisation / visualisation. Adresse le drapeau rouge persona Anaïs ('pas de prévisualisation' frustrant)."
+    slot_palier_10: ["comp-formulaire-saisie-pin-admin action 'prévisualiser' (palier 10 05-back-office)"]
+    variants: { tailles: [LG, MD], etats: [default, hover, pressed] }
+    mapping_couleurs:
+      default: TOK-COLOR-TEXTE-PRINCIPAL
+      pressed: TOK-COLOR-PRIMARY
+    fichier_svg_attendu: "assets/back-office/previsualisation.svg"
+    note_drapeau_rouge: "Cette icône matérialise la fonctionnalité de prévisualisation qui adresse le drapeau rouge d'Anaïs. Sa présence dans le palier 13 admin signale que la prévisualisation EST une fonction première du back-office."
+
+# -----------------------------------------------------------------------------
+# 2. Récapitulatif
+# -----------------------------------------------------------------------------
+recapitulatif:
+  total_icones_uniques: 10
+  mutualisations_avec_palier_03:
+    - "ICON-ADMIN-VALIDER (lucide:check-circle) = ICON-UI-SUCCES (un seul SVG produites)"
+
+# -----------------------------------------------------------------------------
+# 3. Persona check
+# -----------------------------------------------------------------------------
+persona_check:
+
+  anais_back_office:
+    impact: MAJEUR
+    note: >-
+      Toutes les icônes ici sont SES outils quotidiens. Les métaphores
+      doivent être immédiatement compréhensibles — Anaïs n'a pas de
+      tutoriel à rallonge, elle veut traiter 50 soumissions
+      communautaires par jour sans réfléchir à 'que fait ce bouton'.
+      Test_litmus 'saisir un pin sans batailler' : ICON-ADMIN-PREVISUALISATION
+      (eye) est l'icône qui adresse son drapeau rouge ; sa présence
+      dans le palier signale l'engagement.
+
+  autres_personas:
+    impact: nul
+    note: "Les icônes back-office ne sont pas vues par les utilisateurs grand public."
+
+# -----------------------------------------------------------------------------
+# 4. Enjeux transversaux
+# -----------------------------------------------------------------------------
+enjeux_transversaux:
+
+  accessibilite: >-
+    Cibles tactiles back-office desktop : la souris remplace le doigt,
+    contrainte 44×44 moins critique mais hover states bien définis
+    (mapping_couleurs.hover précisé pour chaque icône). Label vocal
+    via palier 8 microcopy.
+
+  performance: "10 SVG ~1-2 KB chacun = ~15 KB cumulés. Trivial."
+
+  vie_privee: "Aucun enjeu spécifique."
+
+  i18n: >-
+    Anaïs travaille en français actuellement. Si le back-office est traduit
+    plus tard, les icônes restent universelles (les libellés relèvent
+    du palier 8).
+
+# -----------------------------------------------------------------------------
+# 5. Questions ouvertes
+# -----------------------------------------------------------------------------
+questions_ouvertes:
+  - "ICON-ADMIN-PREVISUALISATION : prévisualisation est-elle un écran admin existant actuellement ou une fonctionnalité à introduire ? À confirmer avec lecture palier 7 admin/. Si non implémentée, l'icône reste posée pour plus tard (ne pas la retirer du palier 13)."
+  - "ICON-ADMIN-VALIDATION-SCIENTIFIQUE (lucide:book-open-check) : alternative possible lucide:graduation-cap (parchemin universitaire). book-open-check retient car lit la sémantique 'sources documentaires vérifiées' plus directement que la sémantique 'titre académique'."
+  - "Si une fonctionnalité admin émerge en cours de palier 7 admin que ces 10 icônes ne couvrent pas, ajout ICI plutôt qu'invention ad-hoc dans le composant."

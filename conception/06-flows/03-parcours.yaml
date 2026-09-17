@@ -1,0 +1,674 @@
+# =============================================================================
+# Palier 6 — 03-parcours — PILOTE
+# =============================================================================
+# Cluster pilote du palier 6. Couvre les 13 flows liés aux Parcours :
+# découverte du catalogue, consultation d'une fiche, lancement, déroulé en
+# terrain et en mode canapé, déviations et pauses, saut d'étape, fin et
+# célébration, relancement, création d'un Parcours personnel, édition des
+# étapes, publication communautaire.
+#
+# Sert d'EXEMPLE CANONIQUE de format pour les autres fichiers du palier 6.
+# Les conventions sont définies dans 00-index.yaml (préfixe P5. pour les
+# références au palier 5 ; pré-requis non triviaux uniquement ; granularité
+# atomique).
+# =============================================================================
+
+document:
+  type: palier_flows_cluster
+  cluster_id: "03-parcours"
+  nom: "Parcours"
+  version: "0.1"
+  date: "2026-05-05"
+  format: yaml
+  pilote: true
+
+raison_d_etre_du_cluster: >-
+  Le Parcours est l'objet par lequel HistoLyon assemble plusieurs Pins
+  en une expérience guidée et racontée. Il existe en trois provenances
+  (éditorial, communautaire, personnel) qui partagent un déroulé commun
+  mais des cycles de vie distincts. Ce cluster déroule TOUT ce que
+  l'utilisateur fait avec un Parcours, de la découverte du catalogue
+  jusqu'à la publication d'un Parcours qu'il a lui-même créé.
+
+# -----------------------------------------------------------------------------
+# Flows
+# -----------------------------------------------------------------------------
+flows:
+
+  # ---------------------------------------------------------------------------
+  - id: C1
+    nom: "Découverte du catalogue des parcours"
+
+    declencheur: "Tap sur le sélecteur de section principale Parcours (P5.S2)"
+    acteurs: [utilisateur grand public]
+
+    deroule:
+      - etape: 1
+        action: "L'utilisateur arrive sur la surface principale Parcours (P5.S2 en P5.M1)"
+      - etape: 2
+        action: >-
+          Le catalogue présente les Parcours de provenance éditoriale et
+          communautaire. Une vue alternative donne accès aux parcours
+          personnels et au suivi des parcours en cours / complétés
+          (l'agencement entre les deux vues relève du palier 7).
+      - etape: 3
+        action: "L'utilisateur fait défiler la liste, lit les vignettes (titre, durée estimée, distance estimée, époques principales, badge éventuel, marque distinctive si provenance communautaire)"
+
+    bifurcations:
+      - si: "L'utilisateur tape sur un Parcours"
+        alors: "bascule vers C3 (Consultation de la fiche)"
+      - si: "L'utilisateur active un filtre"
+        alors: "bascule vers C2 (Filtrage du catalogue)"
+      - si: "L'utilisateur active le point d'accès création"
+        alors: "bascule vers C11 (Création d'un parcours personnel)"
+      - si: "L'utilisateur tape sur un parcours en cours dans la vue 'Mes parcours'"
+        alors: "bascule vers C5 ou C6 selon que le parcours est en mode terrain ou canapé"
+
+    sorties_normales:
+      - "Bascule vers une autre surface top-level (P5.S1 Carte ou P5.S3 Profil) — l'état du catalogue est mémorisé (cf. P5.N2)"
+
+    cas_particuliers:
+      - cas: "Connexion réseau indisponible"
+        comportement: "Le catalogue se limite aux Parcours préalablement préchargés (cf. préférence hors-ligne du Profil) ; un bandeau d'information persistant (P5.P3) signale le mode hors-ligne"
+
+    entites_impliquees: [Parcours, Étape, Badge, Époque]
+    surfaces_et_modes: [P5.S2, P5.M1, P5.P3]
+    references_palier_3: [D3.2]
+    invariants_respectes: [I3]
+
+  # ---------------------------------------------------------------------------
+  - id: C2
+    nom: "Filtrage du catalogue"
+
+    declencheur: "Activation du contrôle de filtres depuis le catalogue (C1 en cours)"
+    acteurs: [utilisateur grand public]
+
+    deroule:
+      - etape: 1
+        action: "Une surface ponctuelle (P5.M6) s'ouvre par-dessus C1, présentant les critères disponibles (provenance, époque, durée estimée, distance estimée, catégorie principale)"
+      - etape: 2
+        action: "L'utilisateur ajuste les critères ; un compteur de Parcours correspondants se met à jour"
+      - etape: 3
+        action: "L'utilisateur valide la sélection ou annule"
+
+    bifurcations:
+      - si: "L'utilisateur valide"
+        alors: "la surface ponctuelle se ferme, C1 reprend avec liste filtrée"
+      - si: "L'utilisateur annule (ou geste de fermeture extérieur)"
+        alors: "la surface ponctuelle se ferme, C1 reprend dans son état antérieur (P5.N5 — annulation implicite ne touche pas à l'état)"
+
+    sorties_normales:
+      - "Retour à C1 avec liste filtrée ou inchangée"
+
+    surfaces_et_modes: [P5.M6, P5.N5]
+    references_palier_3: [D3.2]
+
+    questions_ouvertes:
+      - "Persistance du filtre entre sessions : retenu jusqu'à effacement explicite, ou réinitialisé à chaque ouverture du catalogue ? — à arbitrer en palier 7"
+
+  # ---------------------------------------------------------------------------
+  - id: C3
+    nom: "Consultation de la fiche d'un parcours"
+
+    declencheur: >-
+      Soit tap sur un Parcours depuis C1 (ou sur un Parcours dans la
+      vue 'Mes parcours' qui n'est pas en cours), soit réception d'un
+      Lien universel ciblant un Parcours (entrée externe via F5).
+    acteurs: [utilisateur grand public]
+
+    deroule:
+      - etape: 1
+        action: "Bascule en P5.M3 (consultation approfondie). La fiche présente : titre, description, auteur (signature_éditoriale OU pseudonyme communautaire OU auteur personnel), durée estimée, distance estimée, liste des étapes (avec leurs Pins), époques associées, badges, retours synthétisés (si Parcours communautaire avec retours suffisants)"
+        surfaces_actives: [P5.S2, P5.M3]
+      - etape: 2
+        action: "L'utilisateur peut parcourir la liste des étapes, voir un aperçu rapide d'une étape (P5.M2 imbriqué), consulter les Retours détaillés si Parcours communautaire"
+
+    bifurcations:
+      - si: "L'utilisateur tape démarrer"
+        alors: "bascule vers C4 (Lancement)"
+      - si: "L'utilisateur tape partage"
+        alors: "bascule vers F2 (Partage d'une fiche de parcours)"
+      - si: "L'utilisateur tape favori"
+        alors: "le Parcours est marqué favori (référencé par le Profil — analogue B7 pour Pin) ; reste en C3"
+      - si: "L'utilisateur tape sur un Pin d'une étape pour le consulter hors contexte parcours"
+        alors: "bascule vers B2 (Consultation approfondie d'un Pin) ; le retour ramène à C3"
+      - si: "L'utilisateur active la rédaction d'un Retour (Parcours communautaire uniquement, parcours déjà vécu)"
+        alors: "bascule vers G6 (Soumission d'un Retour de parcours)"
+      - si: "L'utilisateur active le signalement"
+        alors: "bascule vers G3 (Signalement) avec cible = Parcours"
+      - si: "Retour"
+        alors: "retour à C1 ou à la source d'entrée (Lien universel → ramène à P5.S2 Parcours)"
+
+    sorties_normales:
+      - "Retour à C1"
+      - "Bascule vers C4 (lancement)"
+      - "Sortie via Lien universel suivi d'un retour direct vers P5.S2 si entrée externe"
+
+    cas_particuliers:
+      - cas: "Parcours de provenance communautaire en cours de vérification (I3)"
+        comportement: "Marque distinctive visible dans la fiche, signalant que les sources / l'itinéraire sont en cours de vérification. La fiche reste consultable et lançable."
+      - cas: "Parcours retiré ou supprimé (provenance communautaire suite à signalement honoré, ou personnel supprimé par auteur)"
+        comportement: "Si l'entrée vient d'un Lien universel, message gracieux 'ce parcours n'est plus disponible' et bouton de retour vers P5.S2"
+
+    entites_impliquees: [Parcours, Étape, Pin, Badge, Compte (auteur), Retour de parcours]
+    surfaces_et_modes: [P5.M3, P5.M2]
+    references_palier_3: [D3.3]
+    invariants_respectes: [I3, I8]
+
+  # ---------------------------------------------------------------------------
+  - id: C4
+    nom: "Lancement d'un parcours depuis la fiche"
+
+    declencheur: >-
+      Soit action de démarrage depuis C3, soit acceptation de l'invitation
+      au micro-parcours découverte depuis A2 (le micro-parcours D5.3 entre
+      directement en C4 sans passer par C3).
+    acteurs: [utilisateur grand public]
+
+    pre_requis_specifiques:
+      - "Parcours dans un état lançable (publié pour communautaire / éditorial ; brouillon ou local pour personnel suffit)"
+
+    deroule:
+      - etape: 1
+        action: "L'app détermine le mode de lancement par défaut selon la position de l'utilisateur (proximité de la première étape) et sa préférence"
+      - etape: 2
+        action: >-
+          Si l'utilisateur est à proximité de la première étape ET que la
+          permission de géolocalisation est accordée → mode terrain
+          proposé. Sinon → mode canapé proposé.
+      - etape: 3
+        action: "L'utilisateur confirme ou bascule manuellement vers l'autre mode"
+      - etape: 4
+        action: "Le Parcours passe en état 'en cours' (cf. cluster 02 — état runtime). La surface persistante de progression P5.P2 apparaît"
+
+    bifurcations:
+      - si: "Mode terrain choisi"
+        alors: "bascule vers C5 (Vivre un parcours en terrain)"
+      - si: "Mode canapé choisi"
+        alors: "bascule vers C6 (Mode canapé)"
+
+    sorties_normales:
+      - "Bascule vers C5 ou C6"
+
+    cas_particuliers:
+      - cas: "Permission de géolocalisation non accordée"
+        comportement: "Le mode terrain n'est pas proposé. Le flow A6 (Demande de permission juste-à-temps) peut être proposé en option, sinon mode canapé direct."
+      - cas: "Parcours déjà en cours par l'utilisateur (autre Parcours actif)"
+        comportement: "Dialogue de confirmation P5.M8 demandant si l'utilisateur abandonne le précédent ou annule le nouveau lancement"
+
+    entites_impliquees: [Parcours, Étape]
+    surfaces_et_modes: [P5.P2, P5.M8]
+    references_palier_3: [D3.4]
+
+  # ---------------------------------------------------------------------------
+  - id: C5
+    nom: "Vivre un parcours en terrain (avec géoloc)"
+
+    declencheur: "Lancement en mode terrain depuis C4"
+    acteurs: [utilisateur grand public]
+
+    pre_requis_specifiques:
+      - "Permission de géolocalisation accordée"
+      - "Parcours en état 'en cours' avec mode terrain actif"
+
+    deroule:
+      - etape: 1
+        action: "L'utilisateur revient (en général) sur P5.S1 Carte avec son tracé visible et la première étape mise en évidence"
+        surfaces_actives: [P5.S1, P5.M1, P5.P2]
+      - etape: 2
+        action: "L'utilisateur marche vers l'étape. La surface persistante P5.P2 reste visible"
+      - etape: 3
+        action: >-
+          À l'arrivée à proximité d'une étape, le flow E2 se déclenche
+          (alerte ponctuelle P5.M7) ; l'utilisateur peut accepter
+          l'invitation à consulter ou la laisser passer.
+      - etape: 4
+        action: "Si l'utilisateur consulte → bascule vers B2 (Consultation approfondie d'un Pin) ; au retour, l'étape est marquée complétée dans l'Historique de visite"
+      - etape: 5
+        action: "Le tracé met à jour la prochaine étape ; la surface P5.P2 reflète la progression"
+
+    bifurcations:
+      - si: "L'utilisateur s'éloigne du tracé"
+        alors: "bascule vers C7 (Gestion des déviations et pauses)"
+      - si: "L'utilisateur active une pause depuis P5.P2 ou la fiche du parcours"
+        alors: "bascule vers C7 (état pausé)"
+      - si: "L'utilisateur saute une étape manuellement"
+        alors: "bascule vers C8 (Saut d'étape)"
+      - si: "Toutes les étapes sont complétées (la dernière inclut)"
+        alors: "bascule vers C9 (Fin et célébration)"
+      - si: "L'utilisateur tape P5.P2"
+        alors: "retour à la consultation approfondie de l'étape courante (B2)"
+      - si: "L'utilisateur active explicitement la fermeture de P5.P2"
+        alors: "dialogue P5.M8 demandant confirmation d'abandon ; si oui, le parcours passe en état 'abandonné', P5.P2 disparaît"
+
+    sorties_normales:
+      - "Bascule vers C9 (complétion)"
+      - "Bascule vers C7 (pause / déviation)"
+      - "Abandon explicite après confirmation P5.M8"
+
+    cas_particuliers:
+      - cas: "Permission de géolocalisation révoquée en cours de parcours"
+        comportement: "Bascule automatique vers C6 (mode canapé) avec message éphémère P5.M9 informant l'utilisateur"
+      - cas: "Connexion réseau perdue"
+        comportement: "Si le Parcours a été préchargé hors-ligne, continue normalement avec un bandeau P5.P3 signalant le mode hors-ligne. Sinon, la consultation des étapes se limite aux contenus déjà téléchargés ; un message P5.M9 le signale au passage à une étape non disponible."
+      - cas: "App passée en arrière-plan"
+        comportement: "P5.N7 — l'état est préservé, P5.P2 reste actif au retour. Si une narration audio était en lecture (P5.P1), elle continue selon la politique du système."
+
+    entites_impliquees: [Parcours, Étape, Pin, Historique de visite]
+    surfaces_et_modes: [P5.S1, P5.P2, P5.M3, P5.M7, P5.M8, P5.M9, P5.P1, P5.P3, P5.N7]
+    references_palier_3: [D3.5, D4.3, D7.4]
+    invariants_respectes: [I9]
+    questions_ouvertes:
+      - "Comportement précis du slider d'époque pendant un parcours en cours : pilotage automatique par l'étape courante ou manipulation manuelle prioritaire ? (cf. D1.2 question ouverte)"
+
+  # ---------------------------------------------------------------------------
+  - id: C6
+    nom: "Mode canapé d'un parcours"
+
+    declencheur: >-
+      Lancement en mode canapé depuis C4 (par défaut quand pas de
+      proximité ou pas de permission géoloc), ou bascule explicite
+      depuis C5.
+    acteurs: [utilisateur grand public]
+
+    pre_requis_specifiques:
+      - "Parcours en état 'en cours' avec mode canapé actif"
+
+    deroule:
+      - etape: 1
+        action: "L'utilisateur reste sur P5.S2 (ou P5.S1 selon préférence) avec la liste des étapes accessible et la première étape mise en évidence"
+        surfaces_actives: [P5.P2]
+      - etape: 2
+        action: "L'utilisateur consulte les étapes manuellement, dans l'ordre proposé ou librement"
+      - etape: 3
+        action: "Pour chaque étape consultée → bascule vers B2 (Consultation approfondie du Pin) ; le retour marque l'étape comme visitée dans l'Historique"
+      - etape: 4
+        action: "L'utilisateur progresse manuellement. Aucune alerte de proximité ne se déclenche en mode canapé."
+
+    bifurcations:
+      - si: "L'utilisateur veut basculer en mode terrain"
+        alors: "vérification des pré-requis (permission géoloc, proximité) ; si OK, bascule vers C5"
+      - si: "L'utilisateur saute une étape"
+        alors: "bascule vers C8"
+      - si: "L'utilisateur active la pause"
+        alors: "bascule vers C7"
+      - si: "L'utilisateur consulte la dernière étape et la marque comme vue"
+        alors: "bascule vers C9"
+
+    sorties_normales:
+      - "Bascule vers C9 (complétion)"
+      - "Bascule vers C5 (terrain)"
+      - "Abandon explicite avec confirmation P5.M8"
+
+    cas_particuliers:
+      - cas: "Mode présentation activé (Mme Martin en classe)"
+        comportement: "L'utilisateur bascule en P5.M4 depuis B2 — toutes les surfaces persistantes (P5.P2, P5.P1, P5.P3) sont en sommeil visuel (P5.C2) ; l'état du parcours est préservé. Retour de M4 ramène en mode canapé normal."
+
+    entites_impliquees: [Parcours, Étape, Pin, Historique de visite]
+    surfaces_et_modes: [P5.S2, P5.P2, P5.M3, P5.M4, P5.M8]
+    references_palier_3: [D3.6]
+
+  # ---------------------------------------------------------------------------
+  - id: C7
+    nom: "Gestion des déviations et pauses en parcours"
+
+    declencheur: >-
+      Soit éloignement détecté du tracé (en mode terrain — automatique),
+      soit action explicite de pause par l'utilisateur (les deux modes).
+    acteurs: [utilisateur grand public]
+
+    pre_requis_specifiques:
+      - "Parcours en état 'en cours'"
+
+    deroule:
+      cas_deviation:
+        - etape: 1
+          action: "Détection que l'utilisateur s'éloigne du tracé en mode terrain"
+        - etape: 2
+          action: "Un message éphémère P5.M9 signale discrètement l'éloignement, sans bloquer ni interrompre"
+        - etape: 3
+          action: "Si l'éloignement persiste au-delà d'un seuil, une alerte ponctuelle P5.M7 propose : revenir au tracé, basculer en mode canapé, ou ignorer"
+
+      cas_pause_utilisateur:
+        - etape: 1
+          action: "L'utilisateur active la pause depuis P5.P2 ou depuis la fiche de Parcours"
+        - etape: 2
+          action: "Le Parcours passe en état 'en pause' ; P5.P2 reste visible avec indication de pause ; aucune alerte de proximité ne se déclenche"
+
+    bifurcations:
+      - si: "L'utilisateur reprend depuis la pause"
+        alors: "retour à C5 ou C6 selon le mode actif"
+      - si: "L'utilisateur abandonne explicitement"
+        alors: "dialogue P5.M8 ; si confirmé, le Parcours passe en 'abandonné' et P5.P2 disparaît"
+      - si: "Sur déviation persistante, l'utilisateur choisit de basculer en mode canapé"
+        alors: "bascule vers C6"
+      - si: "Sur déviation, l'utilisateur ignore"
+        alors: "C5 continue normalement"
+
+    sorties_normales:
+      - "Reprise → retour C5 ou C6"
+      - "Abandon confirmé → état 'abandonné' enregistré dans Historique"
+      - "Bascule mode canapé → C6"
+
+    entites_impliquees: [Parcours, Étape, Historique de visite]
+    surfaces_et_modes: [P5.M7, P5.M8, P5.M9, P5.P2]
+    references_palier_3: [D3.10]
+
+    questions_ouvertes:
+      - "Seuil d'éloignement déclenchant l'alerte P5.M7 (vs simple message éphémère P5.M9) — palier 16"
+
+  # ---------------------------------------------------------------------------
+  - id: C8
+    nom: "Saut d'étape dans un parcours en cours"
+
+    declencheur: "Activation manuelle du saut depuis la liste des étapes ou depuis P5.P2"
+    acteurs: [utilisateur grand public]
+
+    pre_requis_specifiques:
+      - "Parcours en état 'en cours'"
+      - "Au moins une étape non encore complétée après l'étape courante"
+
+    deroule:
+      - etape: 1
+        action: "L'utilisateur sélectionne l'étape à laquelle sauter (étape suivante, ou sélection libre dans la liste)"
+      - etape: 2
+        action: "L'étape sautée est implicitement marquée 'non complétée' dans l'Historique (cf. arbitrage J du palier 4 — pas d'état explicite, complétion implicite)"
+      - etape: 3
+        action: "L'étape cible devient l'étape courante ; P5.P2 reflète la nouvelle position"
+
+    bifurcations:
+      - si: "L'utilisateur saute la dernière étape (= toutes les étapes restantes)"
+        alors: "bascule vers C9 (Fin et célébration) avec mention 'parcours partiellement complété'"
+
+    sorties_normales:
+      - "Retour à C5 ou C6 avec étape courante mise à jour"
+
+    cas_particuliers:
+      - cas: "L'utilisateur veut revenir à une étape précédente déjà complétée"
+        comportement: "Pas un saut au sens C8 — c'est une re-consultation d'étape (B2 sur le Pin de l'étape) sans modifier la progression du Parcours"
+
+    entites_impliquees: [Parcours, Étape, Historique de visite]
+    surfaces_et_modes: [P5.P2]
+    references_palier_3: [D3.10]
+
+  # ---------------------------------------------------------------------------
+  - id: C9
+    nom: "Fin de parcours et célébration"
+
+    declencheur: "Complétion de la dernière étape (en C5, C6, ou C8)"
+    acteurs: [utilisateur grand public]
+
+    deroule:
+      - etape: 1
+        action: "L'app bascule en P5.M3 sur une surface dédiée à la célébration : récapitulatif (étapes complétées vs sautées, durée écoulée, époques traversées), et selon le palier 8 un message conteur de clôture"
+      - etape: 2
+        action: "Une Image partageable (cluster 06 distribution) peut être générée à la demande"
+      - etape: 3
+        action: "Le Parcours passe en état 'complété' dans l'Historique de visite (cluster 03)"
+      - etape: 4
+        action: "P5.P2 (surface persistante de progression) disparaît"
+
+    bifurcations:
+      - si: "L'utilisateur tape partage"
+        alors: "bascule vers F3 (Partage d'une fin de parcours)"
+      - si: "L'utilisateur peut laisser un Retour (uniquement si Parcours communautaire et non auteur lui-même)"
+        alors: "bascule vers G6 (Soumission d'un Retour de parcours)"
+      - si: "L'utilisateur ferme la célébration"
+        alors: "retour à P5.S2 Parcours, vue 'Mes parcours' positionnée sur le parcours complété"
+
+    sorties_normales:
+      - "Retour à P5.S2 ; le Parcours est désormais visible dans l'Historique avec état 'complété'"
+
+    cas_particuliers:
+      - cas: "Parcours complété avec étapes sautées"
+        comportement: "Le récapitulatif mentionne les étapes sautées sans culpabiliser. La célébration reste pleine."
+      - cas: "Parcours retiré entre-temps (ex. parcours communautaire dépublié pendant que l'utilisateur le vivait)"
+        comportement: "La célébration a quand même lieu (l'expérience vécue compte) ; un message éphémère P5.M9 signale que le parcours n'est plus disponible publiquement"
+
+    entites_impliquees: [Parcours, Étape, Historique de visite, "Image partageable"]
+    surfaces_et_modes: [P5.M3, P5.M9]
+    references_palier_3: [D3.9]
+
+  # ---------------------------------------------------------------------------
+  - id: C10
+    nom: "Relancement d'un parcours déjà complété"
+
+    declencheur: "Sélection d'un parcours dans la vue 'Mes parcours' depuis P5.S2, parmi les parcours en état 'complété' ou 'abandonné'"
+    acteurs: [utilisateur grand public]
+
+    pre_requis_specifiques:
+      - "Au moins un Parcours en état 'complété' ou 'abandonné' dans l'Historique de visite"
+      - "Le Parcours cible existe encore (pas retiré ni supprimé)"
+
+    deroule:
+      - etape: 1
+        action: "L'app ouvre la fiche du Parcours (équivalent C3) avec un état particulier indiquant la précédente complétion (date, étapes complétées vs sautées)"
+      - etape: 2
+        action: "L'utilisateur peut consulter les étapes individuellement (sans relancer) ou choisir de relancer"
+
+    bifurcations:
+      - si: "L'utilisateur consulte une étape"
+        alors: "bascule vers B2 sur le Pin de l'étape (sans changer l'état du Parcours)"
+      - si: "L'utilisateur relance"
+        alors: "bascule vers C4 (Lancement) ; l'Historique précédent reste tracé, un nouvel enregistrement de progression démarre"
+
+    sorties_normales:
+      - "Retour à P5.S2"
+      - "Bascule vers C4 (relancement)"
+
+    cas_particuliers:
+      - cas: "Le Parcours a été retiré ou supprimé depuis sa précédente complétion"
+        comportement: "Message gracieux 'ce parcours n'est plus disponible' ; consultation des étapes via Historique reste possible si les Pins existent encore"
+
+    entites_impliquees: [Parcours, Historique de visite, Étape]
+    surfaces_et_modes: [P5.M3]
+    references_palier_3: [D3.9, D6.3]
+
+    questions_ouvertes:
+      - "Plusieurs lancements successifs d'un même Parcours : un Historique unique consolidé ou un enregistrement par session ? — à arbitrer en cluster 03 / palier 6 D3"
+
+  # ---------------------------------------------------------------------------
+  - id: C11
+    nom: "Création d'un parcours personnel"
+
+    declencheur: "Activation du point d'accès création depuis P5.S2 Parcours"
+    acteurs: [utilisateur grand public]
+
+    deroule:
+      - etape: 1
+        action: "Bascule en P5.M3 sur l'éditeur de Parcours. Un nouveau Parcours est instancié en provenance personnelle, état brouillon, local"
+      - etape: 2
+        action: "L'utilisateur saisit le titre, optionnellement une description, sélectionne les Époques associées (multi-sélection)"
+      - etape: 3
+        action: "L'éditeur propose d'ajouter des étapes — bascule vers C12 pour la gestion des étapes"
+
+    bifurcations:
+      - si: "L'utilisateur sauvegarde et quitte"
+        alors: "le Parcours brouillon reste local sur P5.S2 vue 'Mes parcours'"
+      - si: "L'utilisateur annule (parcours sans étape ni titre)"
+        alors: "abandon ; aucun enregistrement"
+      - si: "L'utilisateur tente de publier publiquement"
+        alors: "bascule vers C13 (Publication communautaire — change la provenance)"
+      - si: "L'utilisateur veut partager le Parcours sans le publier publiquement (cas Mme Dupont avec parents accompagnateurs)"
+        alors: "bascule vers F2 (Partage de fiche) — la capability du Lien universel permet la résolution privée par les destinataires sans modifier la provenance personnelle (décision utilisateur 2026-05-05)"
+
+    sorties_normales:
+      - "Sauvegarde brouillon local"
+      - "Bascule vers C12 (édition d'étapes)"
+      - "Bascule vers F2 (partage privé via capability)"
+      - "Publication communautaire via C13"
+
+    cas_particuliers:
+      - cas: "Sortie inattendue de l'app (perte de focus, fermeture)"
+        comportement: "P5.N7 — l'état de l'éditeur est préservé ; au retour, l'utilisateur reprend là où il était. Le brouillon est sauvegardé localement à chaque modification (politique de sauvegarde implicite à acter en palier 13 admin pour la phase 2 / CMS)"
+
+    entites_impliquees: [Parcours, Étape, Époque]
+    surfaces_et_modes: [P5.M3]
+    references_palier_3: [D3.7]
+    invariants_respectes: [I6, I8]
+
+    questions_ouvertes:
+      - "Limite minimum d'étapes pour qu'un Parcours soit lançable (1 ? 2 ? 3 ?) — à arbitrer en cluster 02 et palier 16"
+
+  # ---------------------------------------------------------------------------
+  - id: C12
+    nom: "Édition des étapes pendant la création"
+
+    declencheur: "Action d'ajout, retrait, ou réordonnancement d'étapes depuis l'éditeur de Parcours en C11"
+    acteurs: [utilisateur grand public]
+
+    pre_requis_specifiques:
+      - "Parcours en état brouillon en cours d'édition (provenance personnelle)"
+
+    deroule:
+      cas_ajout:
+        - etape: 1
+          action: "L'utilisateur active 'Ajouter une étape'. Une surface ponctuelle (P5.M6) propose la sélection d'un Pin via recherche ou choix sur la carte"
+        - etape: 2
+          action: "L'utilisateur sélectionne un Pin. Une introduction d'étape optionnelle peut être saisie (texte court — cf. cluster 02)"
+        - etape: 3
+          action: "L'étape est ajoutée à la fin de la liste ; la surface ponctuelle se ferme ; retour à C11"
+
+      cas_retrait:
+        - etape: 1
+          action: "L'utilisateur active la suppression d'une étape"
+        - etape: 2
+          action: "Dialogue de confirmation P5.M8 si le Parcours a déjà été lancé (rare en brouillon mais possible si édition d'un parcours déjà publié — cf. questions ouvertes)"
+        - etape: 3
+          action: "L'étape est retirée ; les numéros des étapes suivantes sont décrémentés"
+
+      cas_reordonnancement:
+        - etape: 1
+          action: "L'utilisateur active le mode de réordonnancement"
+        - etape: 2
+          action: "L'utilisateur déplace les étapes par manipulation directe"
+        - etape: 3
+          action: "Les nouveaux numéros sont enregistrés à la sortie du mode"
+
+    bifurcations:
+      - si: "L'utilisateur sélectionne un Pin qui n'existe pas encore comme contenu"
+        alors: "il peut soumettre un nouveau Pin via G4 (Soumission d'un Pin) — au retour, le Pin soumis devient une étape candidate"
+
+    sorties_normales:
+      - "Retour à C11 avec liste d'étapes mise à jour"
+
+    cas_particuliers:
+      - cas: "Pin associé à une étape retiré du contenu (ex. Pin retiré côté éditorial entre la création et la consultation)"
+        comportement: "L'étape pointe vers un Pin indisponible — message gracieux dans l'éditeur et option de la retirer ou de la remplacer"
+
+    entites_impliquees: [Parcours, Étape, Pin]
+    surfaces_et_modes: [P5.M6, P5.M8]
+    references_palier_3: [D3.7]
+
+    questions_ouvertes:
+      - "Édition des étapes d'un Parcours communautaire DÉJÀ publié (provenance changée par C13) : autorisée avec re-modération, ou interdite (force la création d'un nouveau Parcours) ? — relève de cluster 02 question ouverte"
+
+  # ---------------------------------------------------------------------------
+  - id: C13
+    nom: "Publication d'un parcours créé (provenance personnelle → communautaire)"
+
+    declencheur: "Action explicite de publication depuis l'éditeur d'un Parcours en provenance personnelle"
+    acteurs: [utilisateur grand public]
+
+    pre_requis_specifiques:
+      - "Au moins une étape dans le Parcours"
+      - "Compte créé avec pseudonyme (instanciation locale de I2)"
+
+    deroule:
+      - etape: 1
+        action: "L'app vérifie la présence d'un Compte. Si absent, redirection vers D6 (Création d'un Compte) — au retour, on revient à l'étape suivante"
+      - etape: 2
+        action: "Dialogue de confirmation P5.M8 informant l'utilisateur que la publication change la provenance en communautaire, expose son pseudonyme, et soumet le Parcours à modération avec marque distinctive"
+      - etape: 3
+        action: "Confirmation → le Parcours passe en provenance communautaire, état publié AVEC marque distinctive (instanciation locale de I3)"
+      - etape: 4
+        action: "Le Parcours apparaît dans le catalogue P5.S2 pour tous les utilisateurs, avec sa marque distinctive ; l'auteur reçoit une confirmation par message éphémère P5.M9"
+      - etape: 5
+        action: "Le flow de modération a posteriori H4 est ouvert côté back-office"
+
+    bifurcations:
+      - si: "L'utilisateur n'a pas de Compte et refuse d'en créer un"
+        alors: "annulation de la publication, retour à C11 avec Parcours en provenance personnelle inchangé"
+      - si: "Le Parcours est ultérieurement modéré et refusé (H4)"
+        alors: "le Parcours passe en état 'retiré' communautaire ; une notification informe l'auteur (Profil) avec motif"
+      - si: "Le Parcours est modéré et validé (H4)"
+        alors: "la marque distinctive est levée"
+
+    sorties_normales:
+      - "Parcours désormais visible publiquement avec marque distinctive ; ouverture du flow back-office H4"
+
+    cas_particuliers:
+      - cas: "Le Parcours référence un Pin de provenance communautaire encore en cours de vérification"
+        comportement: "Publication possible — la marque distinctive sur le Parcours et celles éventuelles sur les Pins de ses étapes coexistent"
+      - cas: "Connexion réseau indisponible au moment de la publication"
+        comportement: "L'action est mise en attente locale. Au retour de la connexion, la publication est tentée. Un message éphémère P5.M9 informe."
+
+    entites_impliquees: [Parcours, Étape, Compte, Profil]
+    surfaces_et_modes: [P5.M8, P5.M9]
+    references_palier_3: [D3.7, D3.1]
+    invariants_respectes: [I1, I2, I3]
+
+    questions_ouvertes:
+      - "Possibilité pour un utilisateur de DÉpublier un Parcours communautaire qu'il a publié (revenir à provenance personnelle) — relève de cluster 02 question ouverte"
+      - "Promotion communautaire → éditorial pour un Parcours (analogue I10 pour Pin) : à arbitrer côté back-office (flow H5 ne couvre actuellement que les Pins)"
+
+# -----------------------------------------------------------------------------
+# Persona check
+# -----------------------------------------------------------------------------
+persona_check:
+
+  kenji:
+    impact: "direct"
+    note: >-
+      C5 (terrain avec géoloc) sert son scénario type — marche dans le
+      Vieux Lyon avec son casque. C6 (mode canapé) sert la préparation
+      à l'hôtel le soir. La règle de préchargement hors-ligne (cas
+      particulier de C5) répond à son drapeau rouge 'plus de data au
+      milieu de Bellecour'. Le flow F5 + C3 (Lien universel reçu vers
+      un Parcours) lui permet de recevoir une recommandation d'un ami
+      sans installer de Compte.
+
+  mme_dupont:
+    impact: "MAJEUR"
+    note: >-
+      C11 et C12 (création + édition d'étapes) servent directement la
+      préparation de sa sortie scolaire. Son test_litmus 'créer un
+      parcours en moins de 30 minutes' est cadré ici par la nécessité
+      d'un éditeur qui ne brime pas (questions ouvertes sur la
+      politique de sauvegarde et le minimum d'étapes à acter). C13
+      la fait passer par un Compte pour publier — sa sortie scolaire
+      pourrait rester en provenance personnelle pour les parents
+      accompagnateurs (à confirmer si le parcours partagé doit
+      forcément être communautaire ou si un Lien universel peut
+      pointer vers un Parcours personnel — cf. cluster 06 question
+      ouverte).
+
+  mme_martin:
+    impact: "MAJEUR"
+    note: >-
+      C6 (mode canapé) avec bascule en P5.M4 (mode présentation)
+      répond à son scénario de projection en classe. Le cas particulier
+      de C6 'mode présentation activé' garantit que P5.P2 et P5.P1
+      sont en sommeil visuel (P5.C2) — pas de chrome qui dérange
+      pendant la projection. Les sources des Pins consultés en B2
+      (depuis les étapes) restent visibles pour citation.
+
+  pere_lyonnais:
+    impact: "indirect"
+    note: >-
+      Le père lyonnais n'est pas un utilisateur principal de Parcours
+      (son usage type est l'exploration spontanée et les notifications
+      de proximité — cf. famille A et E). Mais s'il découvre un
+      Parcours communautaire via le catalogue, C5 / C6 fonctionnent
+      pour lui sans préparation préalable.
+
+  anais_back_office:
+    impact: "indirect"
+    note: >-
+      Anaïs n'utilise pas ce cluster directement (elle n'est pas
+      utilisatrice grand public des Parcours). Indirectement, C13
+      ouvre la file de modération H4 qu'elle consulte côté back-office.
+      L'arbitrage 'édition d'un Parcours communautaire publié →
+      re-modération ou non' (question ouverte de C12) la concerne :
+      surcharge éventuelle de file. À arbitrer si la communauté
+      devient active.

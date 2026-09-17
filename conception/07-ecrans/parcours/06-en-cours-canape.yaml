@@ -1,0 +1,92 @@
+# =============================================================================
+# E-PARCOURS-EN-COURS-CANAPE — Parcours en cours, mode canapé
+# =============================================================================
+# Surface de déroulé d'un Parcours actif en mode canapé (sans géoloc, sans
+# alertes de proximité). L'utilisateur progresse manuellement d'étape en étape.
+# Sert le scénario Mme Martin (projection en classe via P5.M4) et le scénario
+# Kenji en préparation à l'hôtel. Surface persistante P2 visible (sauf en M4).
+# =============================================================================
+
+document:
+  type: palier_ecrans_fiche
+  format: yaml
+
+ecran:
+  id: E-PARCOURS-EN-COURS-CANAPE
+  nom: "Parcours en cours, mode canapé"
+
+  mode: P5.M3
+  surface_parente: P5.S2
+
+  raison_d_etre: >-
+    Accompagner l'utilisateur qui vit un Parcours sans déplacement
+    physique : préparation d'une sortie, projection en classe, lecture
+    confortable depuis chez soi. La progression est entièrement
+    manuelle — aucune alerte de proximité, l'utilisateur consulte les
+    étapes dans l'ordre proposé ou librement. Sert également de
+    fallback si la géoloc devient indisponible pendant un mode terrain.
+
+  composition:
+    - zone: "en-tête du parcours"
+      role: "rappel du Parcours en cours (titre, auteur, badge éventuel) et indicateur de mode canapé actif"
+      entites_affichees: [Parcours]
+
+    - zone: "progression"
+      role: "récapitulatif des étapes vues, sautées et restantes ; compteur de progression"
+      entites_affichees: [Étape, "Historique de visite"]
+
+    - zone: "étape courante"
+      role: "Étape mise en évidence : Pin référencé (titre, teaser, médias d'aperçu), introduction d'étape éventuelle, position dans la séquence ; point d'accès vers la consultation approfondie du Pin"
+      entites_affichees: [Étape, Pin]
+
+    - zone: "liste des étapes"
+      role: "énumération ordonnée des Étapes ; chaque étape indique son état (vue, courante, à venir, sautée) ; tap pour consulter ou pour faire de cette étape la courante"
+      entites_affichees: [Étape, Pin]
+
+    - zone: "navigation manuelle entre étapes"
+      role: "permet de passer à l'étape suivante / précédente sans contrainte ; permet le saut explicite vers E-PARCOURS-SAUT-ETAPE"
+
+    - zone: "contrôles de déroulé"
+      role: "regroupe la bascule vers le mode terrain (sous condition de proximité et géoloc), l'abandon, le marquage de la dernière étape comme vue (qui déclenche C9)"
+
+  etats:
+    nominal_charge: "Parcours en cours, mode canapé actif, étape courante identifiée, navigation manuelle disponible"
+    chargement: "Récupération du contenu des étapes"
+    etape_consultee: "L'utilisateur a consulté l'étape courante via B2 ; au retour, l'étape est marquée vue dans l'Historique et l'app propose la suivante comme courante"
+    derniere_etape_marquee_vue: "L'utilisateur a marqué la dernière étape comme vue ; bascule vers E-PARCOURS-FIN-CELEBRATION (C9) ; P5.P2 disparaît"
+    bascule_terrain_proposee: "L'utilisateur tente de basculer en mode terrain ; vérification de la permission géoloc et de la proximité de l'étape courante ; succès → bascule vers E-PARCOURS-EN-COURS-TERRAIN, échec → message éphémère P5.M9 indiquant la condition manquante"
+    mode_presentation_active: "L'utilisateur est passé en P5.M4 (consultation d'un Pin sans chrome — cas Mme Martin) ; les surfaces persistantes P2, P1, P3 sont en sommeil visuel (P5.C2) ; l'état du Parcours est préservé ; retour de M4 ramène ici"
+    offline_avec_cache: "Réseau indisponible mais Parcours préchargé ; déroulé continue normalement ; bandeau P3 visible"
+    offline_sans_cache_etape_indisponible: "Une étape n'est pas téléchargée et le réseau est indisponible ; consultation dégradée pour cette étape ; possibilité de la sauter ou d'attendre la reconnexion"
+    issu_d_une_perte_de_permission: "Le déroulé était en mode terrain et la permission géoloc a été révoquée ; bascule automatique signalée par message éphémère P5.M9 ; reprise normale en canapé"
+    en_pause: "L'utilisateur a activé la pause (rare en canapé puisque la progression est déjà manuelle, mais utile pour suspendre l'enregistrement de progression)"
+
+  elements_interactifs:
+    - "Tap sur l'étape courante → bascule vers E-PIN-CONSULTATION-APPROFONDIE (B2) du Pin de l'étape ; le retour marque l'étape vue dans l'Historique"
+    - "Tap sur une étape de la liste → la rend courante (ou ouvre directement B2 sur son Pin selon le geste) ; les étapes sautées au passage sont marquées implicitement non complétées (cf. C8)"
+    - "Tap suivante / précédente → navigation manuelle entre étapes"
+    - "Tap saut d'étape explicite → flow C8, ouverture E-PARCOURS-SAUT-ETAPE (P5.M6)"
+    - "Tap bascule vers mode terrain → vérification puis bascule vers E-PARCOURS-EN-COURS-TERRAIN, ou message d'échec"
+    - "Tap abandon → ouverture E-TRANSVERSES-DIALOGUE-CONFIRMATION (P5.M8) ; si confirmé, Parcours en état 'abandonné', P5.P2 disparaît"
+    - "Bascule en mode présentation P5.M4 depuis un Pin consulté (B2) → P5.C2 met les persistantes en sommeil visuel"
+    - "Tap surface persistante P2 (E-TRANSVERSES-PARCOURS-PERSISTANT) depuis n'importe où → ramène ici"
+
+  flows_actifs:
+    - C6   # Mode canapé d'un parcours
+
+  surfaces_imbriquees:
+    - E-PIN-CONSULTATION-APPROFONDIE         # M3 quand on consulte le Pin d'une étape
+    - E-PIN-MODE-PRESENTATION                # M4 si bascule en mode présentation depuis un Pin
+    - E-PARCOURS-SAUT-ETAPE                  # M6 quand saut d'étape explicite
+    - E-PARCOURS-EN-COURS-TERRAIN            # M3 si bascule vers terrain
+    - E-PARCOURS-FIN-CELEBRATION             # M3 à la complétion de la dernière étape
+    - E-TRANSVERSES-DIALOGUE-CONFIRMATION    # M8 confirmation d'abandon
+    - E-TRANSVERSES-MESSAGE-EPHEMERE         # M9 bascule perdue, étape indisponible, etc.
+    - E-TRANSVERSES-PARCOURS-PERSISTANT      # P2 active (sauf en sommeil sous M4)
+    - E-TRANSVERSES-AUDIO-PERSISTANT         # P1 si narration audio en cours
+    - E-TRANSVERSES-BANDEAU-OFFLINE          # P3 si offline
+
+  questions_ouvertes:
+    - "Marquage d'étape comme vue : automatique au retour de B2, ou explicite ? Si explicite, que faire des étapes ouvertes mais pas terminées (lecture audio interrompue) ? — cf. cluster 03 historique"
+    - "Conservation de la position dans la liste quand on revient d'un B2 : remonter à l'étape suivante automatiquement, ou rester sur l'étape courante consultée ? — palier 10"
+    - "Cas Parcours personnel mixte 'lieu physique + patrimoine vivant immatériel' (étapes sans coordonnées) : le mode canapé reste-t-il l'option par défaut pour ces parcours ? — cf. cluster 02 question ouverte"

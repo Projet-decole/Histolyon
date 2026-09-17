@@ -1,0 +1,389 @@
+# =============================================================================
+# Palier 10 — Composants back-office
+# =============================================================================
+# Composants admin desktop pour Anaïs Lefèvre (palier 2 persona productrice de
+# contenu éditorial). PARTAGENT des atomes/molécules avec le grand public
+# (boutons, champs de saisie, headers, items de liste) — la spécificité
+# back-office vit dans la COMPOSITION et la sémantique d'interaction.
+#
+# 8 composants strictement alignés sur les 8 écrans E-ADMIN-* du palier 7
+# admin/. Toute proposition sans ancrage sur un de ces écrans est écartée
+# (gestionnaire-permissions, dashboard-stats-qualite, formulaire-amendement,
+# etc. sont hors périmètre).
+#
+# Important — distinction de périmètre avec palier 13 :
+#
+#   Le palier 10 livre les COMPOSANTS admin (anatomie, slots, états,
+#   intentions portées, machines d'état). Il NE livre PAS le LAYOUT desktop
+#   des écrans admin — disposition des panneaux, densité, ergonomie clavier,
+#   raccourcis, prévisualisation côté grand public depuis l'éditeur, etc.
+#   Ce layout desktop relèvera du palier 13 (admin) quand il sera lancé
+#   (cf. tracker palier 13 marqué « pas commencé » à date).
+#
+# Section machine_etats riche :
+#
+#   Un seul composant admin justifie une machine d'état détaillée à ce palier :
+#   comp-formulaire-saisie-pin-admin (création/édition d'un Pin éditorial avec
+#   persistance de brouillon, validation cross-fields, bascule explicite vers
+#   en_revue, gestion des amendements après demande_complément). Les autres
+#   composants admin ont des états interactifs simples (liste plate suffisante).
+# =============================================================================
+
+document:
+  type: palier_composants_back_office
+  numero: 10
+  fichier: "05-back-office.yaml"
+  version: "0.1"
+  date: "2026-05-06"
+  format: yaml
+  prerequis_de_lecture:
+    - "design/conception/10-composants/00-index.yaml v0.2 — § 4 état partagé, § 7 format de fiche"
+    - "design/conception/10-composants/03-fonctionnels.yaml v0.1 — pilote de format (machines d'état § 2)"
+    - "design/conception/07-ecrans/admin/ — 8 fiches E-ADMIN-* (composition, états, éléments interactifs)"
+    - "design/conception/06-flows.yaml — flows H1 à H6 (back-office)"
+    - "design/conception/04-donnees/ — cluster 04 (Commentaire, Trace de modération, Signalement, Retour de parcours), cluster 05 (Trace de validation, Template)"
+    - "design/conception/08-contenu/05-microcopy-admin.yaml — libellés admin (référence externe, pas dupliqués ici)"
+
+raison_d_etre: >-
+  Donner à Anaïs les composants UI nécessaires pour produire, valider, modérer,
+  promouvoir, retirer et réouvrir les contenus éditoriaux et communautaires
+  d'HistoLyon. Ces composants réifient les flows H1 à H6 du palier 6 et
+  s'ancrent strictement sur les 8 écrans admin du palier 7. Aucune invention
+  hors-périmètre.
+
+# -----------------------------------------------------------------------------
+# 1. Composants back-office — fiches
+# -----------------------------------------------------------------------------
+# 8 composants. Format compact pour 7 d'entre eux ; comp-formulaire-saisie-pin-admin
+# a sa machine d'état détaillée en § 2.
+composants:
+
+  - id: comp-tableau-bord-admin
+    nom: "Tableau de bord admin"
+    famille: back-office
+    raison_d_etre: >-
+      Surface d'accueil de l'espace admin — agrège les compteurs clés
+      (Pins en revue, Pins publiés, Soumissions communautaires en attente,
+      Commentaires en file de modération) et expose la navigation vers les
+      fonctionnalités back-office.
+    ancrage:
+      ecrans: [E-ADMIN-ACCUEIL]
+      composants_qui_l_integrent: []
+    composition:
+      - { id: comp-libelle-texte, slot: "titre", cardinalite: 1, note: "variante 'titre' (cf. dimension variante_semantique de comp-libelle-texte en 01-atomes)" }
+      - { id: comp-compteur-statistique, slot: "metriques", cardinalite: "0..n" }
+      - { id: comp-item-liste-simple, slot: "nav_links", cardinalite: "1..n" }
+    etats_interactifs: [nominal, loading, error, vide_aucune_metrique]
+    interactions_natives:
+      - "Tap nav_link → E3 navigue vers l'écran admin correspondant (catalogue, validation, modération…)"
+      - "Tap compteur → E3 navigue vers la file filtrée associée (optionnel)"
+    intention_portee:
+      parametrable: true
+      echelle: E3_navigationnelle
+      note: "Composant orchestrateur de la navigation admin — l'écran E-ADMIN-ACCUEIL câble les cibles."
+    couplage_etat_partage:
+      - { etat: ETAT-CONNEXION-RESEAU, role: consommateur, note: "compteurs non rafraîchis si offline, message gracieux" }
+    entites_affichees: [Pin, Parcours, "Trace de validation", "Trace de modération"]
+    consequences_variabilite:
+      - "Nombre de métriques variable (0..n) — état vide gracieux si aucune"
+      - "Compteurs i18n (longueurs FR/EN/JA) — palier 12 / 16"
+
+  - id: comp-catalogue-pins-admin
+    nom: "Catalogue Pins (admin)"
+    famille: back-office
+    raison_d_etre: >-
+      Vue catalogue des Pins éditoriaux ET communautaires côté admin avec
+      filtres par provenance et statut, recherche, et accès à la création.
+      Distinct du catalogue grand public (pas d'orientation découverte mais
+      gestion). Filtre provenance ajouté en décision corrective après relecture
+      palier 7.
+    ancrage:
+      ecrans: [E-ADMIN-CATALOGUE-PINS]
+      composants_qui_l_integrent: []
+    composition:
+      - { id: comp-header-titre-action, slot: "header", cardinalite: 1, note: "filtres + recherche" }
+      - { id: comp-grid-recherche, slot: "grid_pins", cardinalite: 1 }
+      - { id: comp-button-primary, slot: "cta_create", cardinalite: 1, note: "création nouveau Pin éditorial" }
+    variants:
+      - { dimension: filtre_provenance, valeurs: [editorial, communautaire, tous] }
+      - { dimension: filtre_statut, valeurs: [brouillon, en_revue, valide, publie, retire, tous] }
+    etats_interactifs: [nominal, loading, vide_aucun_pin, offline_local, error]
+    interactions_natives:
+      - "Tap filtre → E1 met à jour la grille (re-query)"
+      - "Saisie recherche → E1 (debounce, palier 11) → re-query"
+      - "Tap item Pin → E3 ouvre la fiche admin du Pin (édition ou validation selon statut)"
+      - "Tap cta_create → E3 ouvre E-ADMIN-SAISIE-PIN-TEMPLATE (nouveau brouillon)"
+    intention_portee:
+      parametrable: true
+      echelle: E2_inter_composant
+      note: "Navigation via cta_create est E3 ; reste E2 (filtres/recherche locaux à la grille)."
+    couplage_etat_partage:
+      - { etat: ETAT-CONNEXION-RESEAU, role: consommateur, note: "bascule offline_local — recherche limitée au cache, certains filtres dégradés" }
+    entites_affichees: [Pin, "Trace de validation"]
+    consequences_variabilite:
+      - "Nombre de Pins variable, état vide gracieux si filtres aucun résultat"
+      - "Titres de Pins i18n divergents — truncate (palier 12)"
+
+  - id: comp-formulaire-saisie-pin-admin
+    nom: "Formulaire de saisie Pin (admin)"
+    famille: back-office
+    raison_d_etre: >-
+      Formulaire dense pour saisir ou éditer un Pin éditorial côté admin.
+      Composant DISTINCT de comp-formulaire-saisie-pin (côté grand public,
+      flow G4) car contexte différent : Anaïs travaille avec Template actif,
+      validation scientifique en aval (Trace de validation cluster 05),
+      persistance de brouillon longue durée, amendement après
+      demande_complément ou retrait, prévisualisation potentielle. Machine
+      d'état riche détaillée en § 2.
+    ancrage:
+      ecrans: [E-ADMIN-SAISIE-PIN-TEMPLATE]
+      composants_qui_l_integrent: []
+    composition:
+      - { id: comp-champ-saisie-texte, slot: "titre", cardinalite: 1 }
+      - { id: comp-champ-saisie-textarea, slot: "teaser", cardinalite: 1 }
+      - { id: comp-chip-categorie, slot: "categorie", cardinalite: 1, note: "exactement 1 (I7 catalogue ouvert)" }
+      - { id: comp-chip-epoque, slot: "epoque", cardinalite: "1..n", note: "multi-sélection (I8)" }
+      - { id: comp-champ-saisie-lieu, slot: "localisation", cardinalite: "0..1", note: "optionnel (I9)" }
+      - { id: comp-champ-saisie-textarea, slot: "narration", cardinalite: 1 }
+      - { id: comp-zone-sources, slot: "sources", cardinalite: 1, note: "≥ 1 Source structurée requise (I4)" }
+      - { id: comp-carousel, slot: "medias", cardinalite: "0..1", note: "médias rattachés (image, audio, archive)" }
+      - { id: comp-viewer-3d, slot: "modeles_3d", cardinalite: "0..1", note: "Modèles 3D optionnels" }
+      - { id: comp-button-primary, slot: "cta_save_brouillon", cardinalite: 1 }
+      - { id: comp-button-primary, slot: "cta_envoyer_validation", cardinalite: 1, note: "bascule brouillon → en_revue (entrée H2)" }
+      - { id: comp-button-tertiary, slot: "cta_apercu", cardinalite: "0..1", note: "prévisualisation grand public — palier 13 décide de l'inclusion" }
+    variants:
+      - { dimension: contexte_ouverture, valeurs: [nouveau_brouillon, reprise_brouillon, amendement_apres_demande_complement, reouverture_apres_retrait] }
+    etats_interactifs: [empty, draft, filled, saving, saved, validating, sent_to_validation, error, offline_queued]
+    interactions_natives:
+      - "Saisie de chaque champ → E1 mise à jour locale + auto-save armé (palier 13 décide la périodicité)"
+      - "Tap cta_save_brouillon → E1 sauvegarde explicite locale + serveur"
+      - "Tap cta_envoyer_validation → E4 vérifie complétude (I4 sources, Catégorie, Époque, narration), bascule statut → en_revue, crée Trace de validation"
+      - "Tap cta_apercu → E3 ouvre overlay de prévisualisation (si présent, palier 13)"
+      - "Abandon de la saisie → brouillon survit (invariant fort, voir machine d'état)"
+    intention_portee:
+      parametrable: false
+      echelle: E4_systemique
+      intention: "creation_edition_pin_editorial"
+      cible_referencee: "flow H1 (saisie) + entrée flow H2 (validation scientifique)"
+      note: "Producteur implicite — création Pin + Trace de validation cluster 05. Non paramétrable (intention close pour les CTAs internes)."
+    couplage_etat_partage:
+      - { etat: ETAT-CONNEXION-RESEAU, role: consommateur, note: "queue offline si pas de réseau lors d'envoi en validation ; brouillon local toujours préservé" }
+    entites_affichees: [Pin, Template, Source, Média, "Modèle 3D", "Trace de validation"]
+    consequences_variabilite:
+      - "Brouillon long potentiellement très volumineux → persistance locale obligatoire"
+      - "Médias volumineux → upload progressif (palier 16)"
+      - "Template version dépréciée → bandeau d'invitation à migrer (état dérivé du contexte_ouverture)"
+      - "Média cassé rattaché → bascule en validation bloquée tant que non remplacé (cf. H1 D10.3 palier 6)"
+    machine_etats: "voir § 2"
+    questions_ouvertes:
+      - "Saisie en un seul écran dense vs assistant multi-étapes — palier 13"
+      - "Prévisualisation grand public intégrée ou écran séparé — palier 13"
+
+  - id: comp-validation-scientifique
+    nom: "Interface de validation scientifique"
+    famille: back-office
+    raison_d_etre: >-
+      Permet à Anaïs (ou un valideur scientifique) d'examiner un Pin éditorial
+      soumis en revue (statut en_revue), de vérifier les Sources, et de
+      décider entre approuver, rejeter ou retourner au rédacteur avec
+      demande de complément. Réifie le flow H2.
+    ancrage:
+      ecrans: [E-ADMIN-VALIDATION-SCIENTIFIQUE]
+      composants_qui_l_integrent: []
+    composition:
+      - { id: comp-header-titre-action, slot: "header", cardinalite: 1 }
+      - { id: comp-zone-narration, slot: "pin_detail", cardinalite: 1, note: "lecture seule du Pin soumis" }
+      - { id: comp-zone-sources, slot: "sources_avec_validation", cardinalite: 1, note: "Sources annotables individuellement" }
+      - { id: comp-button-secondary, slot: "cta_retourner_redacteur", cardinalite: 1, note: "demande_complément avec motif" }
+      - { id: comp-button-primary, slot: "cta_approuver", cardinalite: 1, note: "valide → publié" }
+      - { id: comp-button-secondary, slot: "cta_rejeter", cardinalite: 1, note: "rejet définitif avec motif" }
+    variants: []
+    etats_interactifs: [nominal, decision_en_cours, soumission_decision, decision_envoyee, error, offline_queued]
+    interactions_natives:
+      - "Tap cta_retourner_redacteur → E2 ouvre dialogue de saisie de motif → soumet decision demande_complément"
+      - "Tap cta_approuver → E2 ouvre dialogue de confirmation → valide Pin, statut → publié, crée Trace de validation"
+      - "Tap cta_rejeter → E2 ouvre dialogue de saisie de motif → rejet définitif"
+    intention_portee:
+      parametrable: false
+      echelle: E4_systemique
+      intention: "validation_scientifique"
+      cible_referencee: "flow H2 — création Trace de validation cluster 05 + bascule statut Pin"
+      note: "Intention close — les 3 CTAs sont sémantiquement définis (approuver, rejeter, retourner)."
+    couplage_etat_partage:
+      - { etat: ETAT-CONNEXION-RESEAU, role: consommateur, note: "queue offline si décision soumise sans réseau" }
+    entites_affichees: [Pin, Source, "Trace de validation"]
+    consequences_variabilite:
+      - "Sources nombreuses → scroll dans la zone sources_avec_validation"
+      - "Annotations longues sur Sources → palier 12 / 13 décide la densité"
+
+  - id: comp-moderation-communautaire
+    nom: "File de modération communautaire"
+    famille: back-office
+    raison_d_etre: >-
+      File de modération des Commentaires et Retours de parcours soumis par
+      la communauté (cluster 04). Permet d'approuver, rejeter ou marquer comme
+      signalement. Réifie le flow H3.
+    ancrage:
+      ecrans: [E-ADMIN-MODERATION-COMMUNAUTAIRE]
+      composants_qui_l_integrent: []
+    composition:
+      - { id: comp-header-titre-action, slot: "header", cardinalite: 1, note: "filtre type" }
+      - { id: comp-item-commentaire, slot: "liste_items", cardinalite: "1..n", note: "items modérables (Commentaire ou Retour)" }
+      - { id: comp-button-primary, slot: "cta_approuver", cardinalite: 1 }
+      - { id: comp-button-secondary, slot: "cta_rejeter", cardinalite: 1 }
+      - { id: comp-button-tertiary, slot: "cta_marquer_signalement", cardinalite: "0..1", note: "transforme en Signalement (cluster 04)" }
+    variants:
+      - { dimension: filtre_type, valeurs: [commentaire, retour_parcours, tous] }
+    etats_interactifs: [nominal, vide_aucun_item, decision_en_cours, decision_envoyee, error, offline_queued]
+    interactions_natives:
+      - "Tap item → E1 sélectionne l'item courant (les CTAs s'appliquent dessus)"
+      - "Tap cta_approuver → E2 émet décision approuver → crée Trace de modération"
+      - "Tap cta_rejeter → E2 émet décision rejeter → crée Trace de modération"
+      - "Tap cta_marquer_signalement → E2 transforme l'item en Signalement → crée Trace de modération"
+    intention_portee:
+      parametrable: false
+      echelle: E4_systemique
+      cible_referencee: "flow H3 — création Trace de modération cluster 04 (modèle unique pour Commentaire ET Retour, cf. décision palier 4)"
+    couplage_etat_partage:
+      - { etat: ETAT-CONNEXION-RESEAU, role: consommateur }
+    entites_affichees: [Commentaire, "Retour de parcours", Signalement, "Trace de modération"]
+    consequences_variabilite:
+      - "File potentiellement longue — pagination ou scroll infini (palier 13)"
+      - "État vide gracieux si file vidée"
+
+  - id: comp-moderation-soumissions
+    nom: "File de modération soumissions communautaires"
+    famille: back-office
+    raison_d_etre: >-
+      File de modération des Pins et Parcours soumis par la communauté
+      (statut en_revue côté soumissions communautaires). Permet l'examen
+      détaillé, l'approbation, le rejet. Réifie le flow H4. Couplage avec
+      Trace de modération unique (décision après relecture palier 6).
+    ancrage:
+      ecrans: [E-ADMIN-MODERATION-SOUMISSIONS]
+      composants_qui_l_integrent: []
+    composition:
+      - { id: comp-header-titre-action, slot: "header", cardinalite: 1, note: "filtre type" }
+      - { id: comp-item-liste-simple, slot: "liste_items", cardinalite: "1..n", note: "Pin ou Parcours soumis" }
+      - { id: comp-button-tertiary, slot: "cta_examiner_detail", cardinalite: 1, note: "ouvre la fiche détail du Pin/Parcours soumis" }
+      - { id: comp-button-primary, slot: "cta_approuver", cardinalite: 1 }
+      - { id: comp-button-secondary, slot: "cta_rejeter", cardinalite: 1, note: "rejet avec motif" }
+    variants:
+      - { dimension: filtre_type, valeurs: [pin, parcours, tous] }
+    etats_interactifs: [nominal, vide_aucune_soumission, examen_en_cours, decision_envoyee, error, offline_queued]
+    interactions_natives:
+      - "Tap cta_examiner_detail → E3 ouvre fiche détail du Pin ou Parcours soumis"
+      - "Tap cta_approuver → E2 valide soumission → publication communautaire + Trace de modération"
+      - "Tap cta_rejeter → E2 ouvre dialogue motif → rejet + Trace de modération"
+    intention_portee:
+      parametrable: false
+      echelle: E4_systemique
+      cible_referencee: "flow H4 — Trace de modération unique (cluster 04 décision après relecture palier 6 — modèle unifié Pin/Parcours)"
+    couplage_etat_partage:
+      - { etat: ETAT-CONNEXION-RESEAU, role: consommateur }
+    entites_affichees: [Pin, Parcours, "Trace de modération"]
+    consequences_variabilite:
+      - "Soumissions longues à examiner → cta_examiner_detail ouvre une surface dédiée"
+      - "État vide gracieux"
+
+  - id: comp-promotion-communautaire
+    nom: "Interface de promotion d'un Pin communautaire"
+    famille: back-office
+    raison_d_etre: >-
+      Permet la promotion d'un Pin communautaire (déjà validé en publié) en
+      Pin éditorial (provenance bascule, mais l'auteur communautaire est
+      CONSERVÉ en crédit — cf. invariant I10 cluster 01). Réifie le flow H5.
+    ancrage:
+      ecrans: [E-ADMIN-PROMOTION-COMMUNAUTAIRE]
+      composants_qui_l_integrent: []
+    composition:
+      - { id: comp-header-titre-action, slot: "header", cardinalite: 1 }
+      - { id: comp-zone-narration, slot: "pin_detail", cardinalite: 1, note: "lecture du Pin communautaire candidat" }
+      - { id: comp-champ-saisie-textarea, slot: "notes_promotion", cardinalite: 1, note: "notes éditoriales rattachées à la promotion" }
+      - { id: comp-button-secondary, slot: "cta_refuser", cardinalite: 1 }
+      - { id: comp-button-primary, slot: "cta_promouvoir", cardinalite: 1, note: "bascule provenance → editorial, crédit auteur conservé (I10)" }
+    variants: []
+    etats_interactifs: [nominal, decision_en_cours, decision_envoyee, error, offline_queued]
+    interactions_natives:
+      - "Saisie notes_promotion → E1 mise à jour locale"
+      - "Tap cta_refuser → E2 émet refus de promotion (Pin reste communautaire)"
+      - "Tap cta_promouvoir → E2 ouvre dialogue de confirmation → bascule provenance → editorial + Trace de modération"
+    intention_portee:
+      parametrable: false
+      echelle: E4_systemique
+      cible_referencee: "flow H5 — promotion conservant l'auteur communautaire (I10)"
+      note: "Intention close — le composant ne fait que promouvoir/refuser. La conservation du crédit auteur est invariant fort."
+    couplage_etat_partage:
+      - { etat: ETAT-CONNEXION-RESEAU, role: consommateur }
+    entites_affichees: [Pin, "Trace de modération"]
+    consequences_variabilite:
+      - "Notes potentiellement longues — textarea adaptative"
+
+  - id: comp-retrait-reouverture-pin
+    nom: "Interface de retrait ou réouverture d'un Pin"
+    famille: back-office
+    raison_d_etre: >-
+      Permet de retirer un Pin publié (avec motif, statut → retire) ou de
+      réouvrir un Pin retiré (statut → en_revue ou brouillon selon politique).
+      Réifie le flow H6. Couplage avec Trace audit (modération ou validation
+      selon nature de l'action).
+    ancrage:
+      ecrans: [E-ADMIN-RETRAIT-REOUVERTURE-PIN]
+      composants_qui_l_integrent: []
+    composition:
+      - { id: comp-header-titre-action, slot: "header", cardinalite: 1 }
+      - { id: comp-zone-narration, slot: "pin_detail", cardinalite: 1, note: "lecture seule du Pin concerné" }
+      - { id: comp-champ-saisie-textarea, slot: "motif_textarea", cardinalite: 1, note: "motif obligatoire pour audit" }
+      - { id: comp-button-secondary, slot: "cta_annuler", cardinalite: 1 }
+      - { id: comp-button-primary, slot: "cta_confirmer", cardinalite: 1 }
+    variants:
+      - { dimension: action, valeurs: [retrait, reouverture] }
+    etats_interactifs: [nominal, motif_en_saisie, soumission_action, action_envoyee, error, offline_queued]
+    interactions_natives:
+      - "Saisie motif_textarea → E1 mise à jour locale"
+      - "Tap cta_annuler → E3 retour vers le catalogue (rien n'est fait)"
+      - "Tap cta_confirmer → E4 bascule statut + crée Trace audit (Trace de modération ou Trace de validation selon la politique de l'action)"
+    intention_portee:
+      parametrable: false
+      echelle: E4_systemique
+      cible_referencee: "flow H6 — bascule statut Pin avec audit"
+      note: "Intention close. Le variant action paramètre la sémantique mais reste fermée (retrait OU réouverture, pas surchargeable au-delà)."
+    couplage_etat_partage:
+      - { etat: ETAT-CONNEXION-RESEAU, role: consommateur }
+    entites_affichees: [Pin, "Trace de modération", "Trace de validation"]
+    consequences_variabilite:
+      - "Motif obligatoire — cta_confirmer désactivé tant que vide"
+      - "Pin avec usages aval (Étape de Parcours référente) → message d'avertissement (palier 13 décide)"
+
+# -----------------------------------------------------------------------------
+# 2. Machine d'état détaillée — comp-formulaire-saisie-pin-admin
+# -----------------------------------------------------------------------------
+# Seul composant back-office à machine d'état riche. Les autres composants
+# admin ont des états interactifs simples (suffisamment couverts par la
+# liste plate dans leur fiche).
+machines_etats:
+
+  comp-formulaire-saisie-pin-admin:
+    etats: [empty, draft, filled, saving, saved, validating, sent_to_validation, error, offline_queued]
+    transitions:
+      - { de: empty, vers: draft, sur: premier_champ_renseigne }
+      - { de: draft, vers: filled, sur: tous_champs_requis_ok, condition: "Catégorie + ≥ 1 Époque + narration + ≥ 1 Source (I4)" }
+      - { de: filled, vers: draft, sur: champ_requis_efface }
+      - { de: 'draft|filled', vers: saving, sur: tap_cta_save_brouillon_ou_autosave }
+      - { de: saving, vers: saved, sur: sauvegarde_serveur_OK }
+      - { de: saving, vers: error, sur: sauvegarde_echec, note: "le contenu local reste éditable" }
+      - { de: saved, vers: draft, sur: edition_reprise }
+      - { de: filled, vers: validating, sur: tap_cta_envoyer_validation, condition: "validation locale OK + aucun Média cassé (cf. H1 D10.3)" }
+      - { de: validating, vers: sent_to_validation, sur: api_accepte_bascule_en_revue, note: "Trace de validation cluster 05 créée" }
+      - { de: validating, vers: error, sur: validation_serveur_KO_ou_timeout }
+      - { de: '*', vers: offline_queued, sur: ETAT-CONNEXION-RESEAU_perdu_pendant_action, note: "queue locale, retry au retour réseau" }
+      - { de: offline_queued, vers: 'saved|sent_to_validation', sur: ETAT-CONNEXION-RESEAU_retabli_et_replay_OK }
+    invariants:
+      - "Brouillon préservé localement à toutes étapes — l'utilisateur ne perd jamais sa saisie (y compris perte de réseau, fermeture accidentelle, abandon explicite)"
+      - "Bascule vers en_revue impossible tant que I4 (≥ 1 Source) n'est pas satisfait"
+      - "Bascule vers en_revue impossible tant qu'un Média rattaché est cassé (cf. H1 cas particulier D10.3 palier 6)"
+    note: >-
+      La périodicité d'auto-save, les courbes de feedback visuel (transition
+      saving → saved), les durées de timeout relèvent du palier 11. La densité
+      de l'écran et l'éventuelle prévisualisation grand public intégrée
+      relèvent du palier 13.

@@ -1,0 +1,747 @@
+# =============================================================================
+# Palier 11 — Réponse paramétrique aux changements d'état — INDEX
+# =============================================================================
+# Le palier 11 livre le PARAMÉTRAGE DYNAMIQUE de l'app. Tout ce qui ANIME,
+# TRANSITIONNE, INTERPOLE, ATTEND, VIBRE en réponse à un changement d'état
+# déclaré au palier 10 — avec valeurs et fonctions précises.
+#
+# Le palier 10 a posé QUI sont les composants, QUELS états ils ont, OÙ leurs
+# gestes pointent. Le palier 11 pose COMMENT ils réagissent dans le temps
+# (durées, courbes, haptiques, chorégraphies) ET COMMENT certaines valeurs
+# se modulent en fonction d'un contexte dynamique (slider d'Époque, parcours
+# en cours, mode offline, déjà visité).
+#
+# Frontière opérationnelle avec le palier 12 (tokens visuels statiques) :
+#   - Toute valeur INDEXÉE PAR UN ÉTAT DYNAMIQUE → palier 11
+#   - Toute valeur CONSTANTE → palier 12
+# Voir § 2.frontiere_palier_12 pour la règle complète et les exemples.
+#
+# Le palier 11 a été REPOSITIONNÉ le 2026-05-07. La formulation 'réponse
+# temporelle' du 2026-05-06 (timing pur) était trop étroite. Voir
+# design/conception/intention.yaml § 11 retours_d_experience entrée 2026-05-07 pour
+# l'historique du repositionnement.
+# =============================================================================
+
+document:
+  type: palier_reponse_parametrique_index
+  numero: 11
+  version: "0.1"
+  date: "2026-05-07"
+  audience:
+    - "Tout agent qui rédige les fichiers de contenu 01-05"
+    - "relecture"
+    - "Auteurs des paliers 12 (tokens), 15 (Figma), 16 (validation)"
+  role: >-
+    Index, anti-périmètre par palier aval, vocabulaire (qualifié + chiffré
+    admis), typologies des objets traités (durée, courbe, haptique,
+    chorégraphie, mapping paramétrique, comportement temporel pur),
+    articulation 10/11/12, persona check global, format de fiche par section,
+    décisions structurelles initiales.
+  format: yaml
+  prerequis_de_lecture:
+    - "design/conception/intention.yaml — § paliers num=11 (objet reformulé v2 2026-05-07), § 11 retours_d_experience entrée 2026-05-07"
+    - "design/conception/05-architecture-info.yaml — modes M1-M9, surfaces S1-S3, persistantes P1-P3, règles N1-N7 et C1-C6 (chorégraphies du palier 11 se branchent sur ces règles)"
+    - "design/conception/09-cartographie/00-index.yaml — décision D8 (axes paramétriques continus du fond carte)"
+    - "design/conception/09-cartographie/01-fond-et-epoques.yaml — 5 axes de transformation (température, désaturation, grain, vignettage, contraste), 10 ancres aux Époques, comportement_pendant_le_geste vs au_calage"
+    - "design/conception/09-cartographie/02-pins.yaml — variantes contextuelles des Pins (modulations qualifiées que le palier 11 chiffre)"
+    - "design/conception/10-composants/00-index.yaml v0.4 — § 3 échelles E1-E5, § 4 état applicatif partagé (7 états ETAT-XXX), § 5 patterns d'interaction (4 patterns PI-XXX), § 7 format de fiche enrichi avec machine_etats"
+    - "design/conception/10-composants/03-fonctionnels.yaml — § 2 machines d'état détaillées (Pin matrice variants + slider, carte, lecteur audio, formulaire saisie pin, recherche) que le palier 11 temporise. Note : comp-quiz a une machine d'état au palier 10 mais pas de chorégraphie inter-modes dédiée au palier 11 — ses transitions atomiques sont couvertes par les classes d'événement génériques du fichier 01."
+    - "design/conception/10-composants/04-shell.yaml — templates de mode (M2-M9) et surfaces persistantes (P1-P3) que le palier 11 chorégraphie"
+
+# -----------------------------------------------------------------------------
+# 1. Rôle du palier 11 — paramétrage dynamique
+# -----------------------------------------------------------------------------
+role:
+
+  ce_qu_il_livre:
+    - "Échelle de durées NOMMÉES + chiffrées (DUR-INSTANT, DUR-COURT, DUR-STANDARD, DUR-LONG, DUR-AMPLE) avec valeurs en ms"
+    - "Catalogue de courbes NOMMÉES + chiffrées (CRV-LINEAIRE, CRV-EASE-OUT, CRV-SPRING-DOUX, etc.) avec paramètres cubic-bezier ou spring physique"
+    - "Classes d'haptique NOMMÉES + chiffrées (HAP-LEGER, HAP-FRANC, HAP-NET) avec intensité/durée d'impulsion"
+    - "Mapping classes d'événement (ex. transition d'état atomique, calage du slider, apparition M9) ↔ DUR-X / CRV-Y / HAP-Z"
+    - "Graphes d'orchestration séquencés (chorégraphies CHO-XXX) pour les transitions inter-modes (M1↔M2↔M3↔M4, M6, M7, M8, M9), apparition/sommeil/disparition des surfaces persistantes P1/P2/P3"
+    - "Mappings paramétriques (MAP-XXX) : position du slider d'Époque → 5 axes carte palier 9 D8, contexte parcours → modulations Pins, mode offline → atténuation Carte, mode présentation M4 → sommeil P1/P2/P3"
+    - "Comportements temporels purs (TMP-XXX) : auto-dismiss délais, debounce fenêtres, throttle fréquences, durées de long-press, timeouts réseau"
+
+  ce_qu_il_ne_livre_pas:
+    - "Sémantique d'interaction (où ça pointe, ce qui est déclenché) — palier 10"
+    - "Inventaire des composants — palier 10"
+    - "Tokens visuels statiques (couleurs, typographies, spacing, radius, ombres, opacités constantes) — palier 12"
+    - "Mapping Catégorie → icône concrète, style graphique des icônes — palier 13"
+    - "Microcopy exacte — palier 8 (fait)"
+    - "Noms de widget Flutter (AnimationController, Tween, Curves.easeOut), API plateforme (impact light iOS, VIRTUAL_KEY Android) — relèvent de l'implémentation"
+    - "Seuils d'évaluation a11y (durée minimum perceptible, contraintes prefers-reduced-motion) — palier 16 (qui validera les valeurs posées ici)"
+
+  pourquoi_un_palier_dedie: >-
+    Sans le palier 11, le système se fragmenterait : durées et courbes
+    glisseraient dans le palier 12 (tokens), chorégraphies et mappings
+    paramétriques deviendraient orphelins, et les valeurs aux ancres Époque
+    palier 9 D8 finiraient inventées en cours d'implémentation. La cohérence
+    du dynamisme de l'app (geste fluide du slider, chorégraphies entre modes,
+    feedback haptique) exige un endroit dédié où toutes les valeurs et
+    fonctions du non-statique se posent ENSEMBLE et se référencent les unes
+    les autres.
+
+  raison_du_repositionnement_2026_05_07: >-
+    La formulation 'réponse temporelle aux changements d'état' du 2026-05-06
+    était trop étroite — elle laissait hors palier les mappings paramétriques
+    non-temporels (slider→axes, contexte→modulations Pins) et les valeurs
+    précises (durées en ms, courbes en cubic-bezier, valeurs aux ancres
+    Époque). Le palier 11 absorbe désormais TOUT le paramétrage dynamique :
+    timing + paramétrique. Le palier 12 redevient strictement 'tokens
+    visuels statiques'. Détails dans intention.yaml § 11 entrée 2026-05-07.
+
+# -----------------------------------------------------------------------------
+# 2. Périmètre et anti-périmètre strict
+# -----------------------------------------------------------------------------
+perimetre:
+
+  inclus:
+    - "Durées en ms (valeurs précises)"
+    - "Courbes en cubic-bezier ou spring physique (valeurs précises)"
+    - "Valeurs haptiques (intensité, durée d'impulsion en ms)"
+    - "Chorégraphies inter-modes (graphes d'orchestration séquencés)"
+    - "Mapping position slider d'Époque (0.0–1.0) → 5 axes carte palier 9 D8 (valeurs aux 10 ancres + courbes d'interpolation entre ancres)"
+    - "Modulations contextuelles (opacité Pin hors-parcours, mise en relief étape courante, halo, désaturation déjà-visité, atténuation segment parcouru)"
+    - "Délais d'auto-dismiss (M9, M7), fenêtres de debounce (recherche, validation), fréquences de throttle (drag, scroll), durées de long-press, timeouts"
+
+  exclus:
+    - "Sémantique d'interaction (palier 10)"
+    - "Inventaire de composants (palier 10)"
+    - "Tokens visuels statiques (palier 12)"
+    - "Icônes concrètes (palier 13)"
+    - "Microcopy (palier 8)"
+    - "Noms de widget Flutter, API plateforme natives — relèvent de l'implémentation"
+    - "Seuils d'évaluation a11y (palier 16)"
+
+  test_de_purete: |
+    Trois tests à passer fiche par fiche :
+
+    (1) IMPLÉMENTATION-AGNOSTIQUE MALGRÉ LES CHIFFRES — si demain on
+        bascule de Flutter à du natif iOS ou à un moteur web, les valeurs
+        et fonctions du palier 11 restent valides ? Si oui : on est bien
+        dans le palier 11 (les ms et cubic-bezier sont des standards
+        cross-plateforme). Si la fiche cite Curves.easeOut ou impact light :
+        contamination implémentation, à reformuler.
+
+    (2) PARAMÉTRIQUE VS CONSTANT — la valeur posée dans la fiche dépend-elle
+        d'un état dynamique de l'app (slider, contexte, mode, état réseau) ?
+        Si oui : palier 11. Si non : la valeur appartient au palier 12.
+
+    (3) RÉFÉRENCE AUX OBJETS PALIER 10 — la fiche réfère-t-elle un état
+        ou une machine d'état déclarés au palier 10 (etats_interactifs,
+        machine_etats § 2 de 03-fonctionnels) ? Si oui : la fiche se
+        branche correctement à l'amont. Si non : soit elle invente un
+        état (à corriger), soit elle est purement transverse (durée
+        de référence, courbe générique — à inscrire dans 01).
+
+  frontiere_palier_12:
+    regle_operationnelle: >-
+      Toute valeur INDEXÉE PAR UN ÉTAT DYNAMIQUE (slider, contexte
+      parcours, déjà-visité, hors-parcours, mode_offline, mode présentation
+      M4, ETAT-AUDIO-EN-COURS, etc.) → palier 11. Toute valeur CONSTANTE
+      (couleur primaire, taille de titre, spacing standard, radius modéré,
+      opacité du backdrop M6/M8) → palier 12.
+    exemples_au_palier_11:
+      - "Opacité 35% d'un Pin hors-parcours (modulation indexée par contexte_parcours)"
+      - "Désaturation du fond carte à l'Antiquité (valeur à une ancre du mapping paramétrique slider→axes)"
+      - "Halo +20% intensité étape courante (modulation indexée par contexte_parcours=etape_courante)"
+      - "Délai auto-dismiss 3000ms d'un message éphémère M9 (comportement temporel pur)"
+      - "Durée 250ms d'une transition default→pressed (DUR-STANDARD, indexée par état d'interaction)"
+    exemples_au_palier_12:
+      - "Couleur primaire de comp-button-primary (token visuel statique, ne dépend pas d'un état applicatif)"
+      - "Taille de titre 26px (typographie statique)"
+      - "Radius 12px d'une card (token visuel statique)"
+      - "Opacité 60% du backdrop d'un dialogue M8 (constante du composant shell)"
+      - "Couleur du tracé Parcours pour la provenance éditoriale (token de provenance, statique)"
+    cas_intermediaire_a_arbitrer_en_redaction: >-
+      Quelques cas-limites peuvent émerger. Règle de jugement : si la valeur
+      a une famille de variantes selon un état (ex. opacité Pin selon
+      contexte_parcours : 100% normal, 65% hors-parcours, +halo étape
+      courante), c'est palier 11 — on inscrit la table de variantes ici.
+      Si la valeur a une seule lecture (radius modéré qui ne change
+      jamais), c'est palier 12.
+
+  anti_perimetre_par_palier_aval:
+
+    palier_8:
+      titre: "Contenu et microcopy"
+      pas_au_palier_11:
+        - "Texte exact d'un message éphémère M9 (palier 8 fait)"
+        - "Libellé d'une alerte de proximité M7"
+      ce_que_le_palier_11_dit:
+        - "Délai d'auto-dismiss du message éphémère M9 (TMP-AUTO-DISMISS-M9, ex. 3000ms)"
+        - "Chorégraphie d'apparition/disparition de l'alerte M7 (CHO-APPARITION-M7)"
+
+    palier_10:
+      titre: "Composants et sémantique d'interaction"
+      pas_au_palier_11:
+        - "L'inventaire des composants (118 composants livrés palier 10)"
+        - "L'intention portée d'un composant (close vs ouverte, échelle E1-E4)"
+        - "Les états interactifs déclarés (default, pressed, focused, etc.)"
+        - "Les machines d'état (qui passe à quel état sur quel événement)"
+      ce_que_le_palier_11_dit:
+        - "QUELLE durée et courbe la transition default→pressed utilise (DUR-COURT + CRV-EASE-OUT)"
+        - "QUELLE chorégraphie l'ouverture d'un aperçu rapide M2 suit (CHO-OUVERTURE-M2)"
+        - "QUEL feedback haptique se déclenche au calage du slider (HAP-FRANC)"
+
+    palier_12:
+      titre: "Tokens visuels statiques"
+      pas_au_palier_11:
+        - "Couleurs (hex, RGB)"
+        - "Typographies (font-family, size, weight, line-height) statiques"
+        - "Spacing, radius, ombres constants"
+        - "Opacités constantes (backdrop M6/M8, séparateurs)"
+      reformulations_attendues:
+        - "AU LIEU DE 'le bouton primaire est orange #B85220' → cette assertion appartient au palier 12 et n'a rien à faire dans une fiche palier 11"
+        - "AU LIEU DE 'le radius est 12px' → palier 12"
+
+    palier_13:
+      titre: "Icônes"
+      pas_au_palier_11:
+        - "Mapping Catégorie → icône concrète"
+        - "Style graphique des icônes"
+
+    palier_15:
+      titre: "Construction Figma"
+      pas_au_palier_11:
+        - "Calibrage VISUEL effectif des 50 valeurs aux ancres Époque (5 axes × 10 ancres palier 9 D8)"
+      ce_que_le_palier_11_dit:
+        - "STRUCTURE complète de la table 5×10 (axes en lignes, Époques en colonnes)"
+        - "FORMAT de chaque cellule (ex. temperature_chromatique → delta en kelvin avec range indicatif)"
+        - "COURBES d'interpolation entre ancres (linéaire ? ease-in-out ? inflexion ?)"
+        - "MARQUAGE 'à calibrer en phase visuelle palier 15' pour les valeurs effectives"
+      pourquoi: >-
+        Le calibrage des 50 valeurs nécessite une cible visuelle réaliste
+        (carte Lyon vectorielle), absente avant le palier 15. Activation
+        MCP Figma différée au palier 15 (décision utilisateur 2026-05-07).
+
+    palier_16:
+      titre: "Validation"
+      pas_au_palier_11:
+        - "Seuils d'évaluation a11y chiffrés (durée minimum perceptible, fluidité 60fps, prefers-reduced-motion)"
+        - "Tests proxy-personas effectifs"
+      relation: >-
+        Le palier 11 POSE les valeurs (ex. DUR-COURT = 150ms). Le palier 16
+        VALIDE qu'elles satisfont les seuils a11y (ex. 'pas de transition
+        critique en dessous de 100ms perceptible', 'prefers-reduced-motion
+        désactive ou raccourcit les chorégraphies non essentielles').
+
+# -----------------------------------------------------------------------------
+# 3. Typologie des objets paramétriques (DUR / CRV / HAP / CHO / MAP / TMP)
+# -----------------------------------------------------------------------------
+# Six familles d'objets paramétriques. Chaque fichier de contenu (01-05) en
+# couvre une ou deux. Toutes les fiches portent un id préfixé selon la
+# famille. Les ids sont cités par d'autres fiches (ex. CHO-X référence
+# DUR-Y et CRV-Z et HAP-W) — c'est ce qui rend le système composable.
+typologie_des_objets_parametriques:
+
+  - famille: DUR
+    nom: "Durées"
+    description: >-
+      Durées NOMMÉES de transitions. Chaque DUR-X a un nom qualifié
+      (instant / court / standard / long / ample) ET une valeur en ms.
+      Inventaire fini (5–7 entrées).
+    fichier: "01-durees-et-courbes.yaml"
+    exemples_attendus: ["DUR-INSTANT", "DUR-COURT", "DUR-STANDARD", "DUR-LONG", "DUR-AMPLE"]
+
+  - famille: CRV
+    nom: "Courbes"
+    description: >-
+      Courbes d'interpolation NOMMÉES. Chaque CRV-X a un nom qualifié
+      (linéaire / décélération / accélération / spring doux / spring net)
+      ET des paramètres précis (cubic-bezier(x1, y1, x2, y2) ou spring
+      avec mass / stiffness / damping). Inventaire fini (4–7 entrées).
+    fichier: "01-durees-et-courbes.yaml"
+    exemples_attendus: ["CRV-LINEAIRE", "CRV-EASE-OUT", "CRV-EASE-IN-OUT", "CRV-SPRING-DOUX", "CRV-SPRING-NET"]
+
+  - famille: HAP
+    nom: "Haptiques"
+    description: >-
+      Classes de feedback haptique NOMMÉES. Chaque HAP-X a un nom
+      qualifié (léger / franc / net) ET une intensité + durée
+      d'impulsion en ms. Inventaire restreint (3–5 entrées). Politique
+      mode silencieux OS et prefers-reduced-motion documentée.
+    fichier: "02-haptique-et-feedback-non-visuel.yaml"
+    exemples_attendus: ["HAP-LEGER", "HAP-FRANC", "HAP-NET"]
+
+  - famille: CHO
+    nom: "Chorégraphies"
+    description: >-
+      Graphes d'orchestration séquencés pour les transitions inter-modes
+      (M1↔M2↔M3↔M4, M6, M7, M8, M9), apparition/sommeil/disparition des
+      surfaces persistantes (P1/P2/P3), chorégraphie de la transition
+      d'Époque (geste continu + calage), lancement/abandon/fin de Parcours.
+      Une chorégraphie est une SÉQUENCE D'ÉTAPES (chaque étape a un
+      acteur, une action, un t-début relatif, une durée référencée DUR-X,
+      une courbe référencée CRV-Y, optionnellement une haptique HAP-Z).
+    fichier: "03-chorégraphies.yaml"
+    exemples_attendus_indicatifs:
+      - "CHO-OUVERTURE-M2 (aperçu rapide depuis tap pin sur Carte)"
+      - "CHO-FERMETURE-M2"
+      - "CHO-OUVERTURE-M3 (consultation approfondie depuis M2)"
+      - "CHO-ENTREE-M4 (mode présentation depuis M3)"
+      - "CHO-SORTIE-M4"
+      - "CHO-OUVERTURE-M6 (surface ponctuelle)"
+      - "CHO-OUVERTURE-M7 (alerte ponctuelle)"
+      - "CHO-DISMISS-M7"
+      - "CHO-OUVERTURE-M8 (dialogue de confirmation)"
+      - "CHO-OUVERTURE-M9 (message éphémère) + CHO-DISMISS-M9"
+      - "CHO-APPARITION-P1 (surface persistante audio)"
+      - "CHO-APPARITION-P2 (surface persistante parcours)"
+      - "CHO-APPARITION-P3 (bandeau information offline)"
+      - "CHO-SOMMEIL-PERSISTANTES-EN-M4 / CHO-REVEIL-PERSISTANTES-A-LA-SORTIE-M4"
+      - "CHO-CALAGE-EPOQUE (snap du slider à la fin du geste)"
+      - "CHO-PILOTAGE-AUTOMATIQUE-EPOQUE (slider piloté par étape de parcours)"
+      - "CHO-LANCEMENT-PARCOURS / CHO-ABANDON-PARCOURS / CHO-FIN-PARCOURS"
+      - "CHO-SAUT-LATERAL-S1-S2-S3 (sélecteur de section principale, P5.N2)"
+      - "CHO-RETOUR-GRACIEUX (P5.N1)"
+
+  - famille: MAP
+    nom: "Mappings paramétriques"
+    description: >-
+      Fonctions qui prennent une variable d'entrée DYNAMIQUE (position du
+      slider, contexte parcours, état réseau, etc.) et produisent une ou
+      plusieurs valeurs de sortie. Inclut le mapping le plus complexe du
+      palier (slider → 5 axes × 10 ancres avec courbes d'interpolation),
+      les modulations contextuelles des Pins, l'atténuation Carte en mode
+      offline, le sommeil des persistantes en mode présentation M4.
+    fichier: "04-mappings-parametriques.yaml"
+    exemples_attendus_indicatifs:
+      - "MAP-SLIDER-VERS-AXES-CARTE (le mapping pivot, 5 axes × 10 ancres + courbes d'interpolation entre ancres)"
+      - "MAP-CONTEXTE-PARCOURS-VERS-PIN (5 valeurs de contexte_parcours × N modulations)"
+      - "MAP-DEJA-VISITE-VERS-PIN"
+      - "MAP-MODE-OFFLINE-VERS-CARTE"
+      - "MAP-MODE-M4-VERS-PERSISTANTES (sommeil P1/P2/P3)"
+
+  - famille: TMP
+    nom: "Comportements temporels purs"
+    description: >-
+      Valeurs temporelles attachées à des comportements qui ne sont ni
+      des transitions (DUR) ni des chorégraphies (CHO) : auto-dismiss,
+      debounce, throttle, long-press, double-tap, timeouts.
+    fichier: "05-comportements-temporels-purs.yaml"
+    exemples_attendus_indicatifs:
+      - "TMP-AUTO-DISMISS-M9 (délai du message éphémère)"
+      - "TMP-AUTO-DISMISS-M7 (délai de l'alerte de proximité non-acceptée)"
+      - "TMP-DEBOUNCE-RECHERCHE (fenêtre avant query)"
+      - "TMP-DEBOUNCE-VALIDATION-FORMULAIRE"
+      - "TMP-THROTTLE-DRAG-SLIDER (fréquence d'échantillonnage du drag)"
+      - "TMP-LONG-PRESS"
+      - "TMP-DOUBLE-TAP"
+      - "TMP-TIMEOUT-RESEAU"
+
+# -----------------------------------------------------------------------------
+# 4. Découpage en 5 fichiers de contenu
+# -----------------------------------------------------------------------------
+fichiers:
+
+  - id: "01"
+    nom: "Durées et courbes"
+    fichier: "01-durees-et-courbes.yaml"
+    cible_volume_estime: "~350-450 lignes"
+    role: >-
+      Échelle de durées DUR-X (5–7 entrées avec valeurs en ms). Catalogue
+      de courbes CRV-Y (4–7 entrées avec cubic-bezier ou spring physique).
+      Mapping classes d'événement ↔ DUR / CRV. Politique
+      prefers-reduced-motion (raccourcir / désactiver / quoi conserver
+      comme essentiel).
+    pilote: true
+    note: >-
+      PILOTE de la rédaction — calibre le format des fiches courtes
+      (DUR / CRV) et le ton chiffré qualifié. Les autres fichiers
+      référencent largement DUR-X et CRV-Y.
+
+  - id: "02"
+    nom: "Haptique et feedback non-visuel"
+    fichier: "02-haptique-et-feedback-non-visuel.yaml"
+    cible_volume_estime: "~150-220 lignes"
+    role: >-
+      Classes d'haptique HAP-X (3–5 entrées avec intensité + durée).
+      Mapping classes d'événement ↔ HAP. Politique mode silencieux OS,
+      prefers-reduced-motion. Note d'implémentation-agnosticisme : le
+      palier 11 dit 'impulsion 10ms intensité moyenne', l'implémenteur
+      mappe sur l'API native (impact light iOS, VirtualKey Android, etc.).
+    note: >-
+      Volume restreint, mais palier de définition important pour
+      Mme Martin (mode présentation M4 qui doit pouvoir désactiver les
+      haptiques) et pour le persona père lyonnais (vibration discrète
+      attendue à la proximité d'un Pin en mode Surprenez-moi).
+
+  - id: "03"
+    nom: "Chorégraphies"
+    fichier: "03-chorégraphies.yaml"
+    cible_volume_estime: "~600-800 lignes"
+    role: >-
+      Graphes d'orchestration des transitions inter-modes (M1↔M2↔M3↔M4,
+      M6, M7, M8, M9), apparition/sommeil/disparition des surfaces
+      persistantes (P1/P2/P3), chorégraphie de la transition d'Époque
+      (geste continu + calage), lancement/abandon/fin de Parcours,
+      saut latéral S1↔S2↔S3, retour gracieux. Chaque CHO-X est une
+      séquence d'étapes ordonnées qui référencent DUR / CRV / HAP.
+    note: >-
+      Fichier le plus volumineux du palier. Calibrer le format de
+      graphe pour qu'il reste lisible même avec 8–12 étapes par
+      chorégraphie complexe.
+
+  - id: "04"
+    nom: "Mappings paramétriques"
+    fichier: "04-mappings-parametriques.yaml"
+    cible_volume_estime: "~450-600 lignes"
+    role: >-
+      Fonctions du dynamisme. Le pivot : MAP-SLIDER-VERS-AXES-CARTE
+      (table 5×10 axes × ancres Époque + courbes d'interpolation entre
+      ancres). Les valeurs effectives de la table sont MARQUÉES 'à
+      calibrer en phase visuelle palier 15' — la STRUCTURE est complète
+      ici, le calibrage est différé. Autres mappings : modulations
+      contextuelles Pins, mode offline Carte, sommeil M4 persistantes.
+    note: >-
+      Décision utilisateur 2026-05-07 : 50 valeurs aux ancres reportées
+      au palier 15 (construction Figma) pour calibrage visuel itératif
+      sur la maquette cible plutôt qu'un banc de test ad-hoc. Les
+      autres valeurs (modulations Pins notamment) sont posées ici en
+      raisonnement direct.
+
+  - id: "05"
+    nom: "Comportements temporels purs"
+    fichier: "05-comportements-temporels-purs.yaml"
+    cible_volume_estime: "~250-350 lignes"
+    role: >-
+      Auto-dismiss (M9, M7), debounce (recherche, validation cross-fields
+      formulaire), throttle (drag du slider, scroll loading-more), durée
+      de long-press, durée de double-tap, timeouts réseau / queue offline.
+      Chaque TMP-X référence un état ou une machine d'état du palier 10.
+
+fichiers_total_estime: "~1800-2400 lignes pour le palier 11 — entre palier 9 (~1240 l) et palier 10 (~4250 l). Justifié par la combinaison valeurs précises + chorégraphies + mapping paramétrique pivot."
+
+# -----------------------------------------------------------------------------
+# 5. Format des fiches — adapté à la famille de l'objet
+# -----------------------------------------------------------------------------
+# Pas de template uniforme imposé. Chaque famille (DUR / CRV / HAP / CHO /
+# MAP / TMP) a son format propre, calibré sur la nature de l'objet. Une
+# charpente d'esprit commune relie les 6 familles.
+format_des_fiches:
+
+  charpente_d_esprit_commune:
+    - "id (préfixé selon famille : DUR-X, CRV-X, HAP-X, CHO-X, MAP-X, TMP-X)"
+    - "nom (court, qualifié)"
+    - "description fonctionnelle (à quoi ça sert dans l'expérience)"
+    - "valeur (chiffrée précise — le cœur du palier 11)"
+    - "classes d'événement ou cible (où c'est utilisé, références palier 10 par id)"
+    - "enjeux transversaux (a11y, perf, persona-check) si pertinents"
+
+  format_DUR_et_CRV:
+    structure: |
+      - id: DUR-COURT
+        nom: "Court"
+        description: "Transitions perceptibles mais brèves — feedback de tap, micro-interactions atomiques"
+        valeur_ms: 150
+        classes_evenement:
+          - "Transition d'état atomique (default → pressed) sur tout atome interactif (échelle E1)"
+          - "Apparition d'un message éphémère M9"
+        enjeux_a11y: "Au-dessus du seuil de perceptibilité (palier 16 valide ≥ 100ms)"
+        questions_ouvertes: []
+
+      - id: CRV-EASE-OUT
+        nom: "Décélération"
+        description: "Démarrage rapide, fin douce — sortie naturelle d'une transition (apparition d'une surface, fin d'un drag)"
+        cubic_bezier: [0.0, 0.0, 0.2, 1]
+        classes_evenement:
+          - "Apparition d'une surface (M2, M6, M7, M9)"
+          - "Calage du slider d'Époque (la transition de calage)"
+        questions_ouvertes: []
+
+  format_HAP:
+    structure: |
+      - id: HAP-LEGER
+        nom: "Léger"
+        description: "Confirmation tactile discrète — feedback de tap sur cible interactive"
+        intensite_relative: 0.4   # 0.0 (absent) à 1.0 (max device)
+        duree_impulsion_ms: 10
+        classes_evenement:
+          - "Tap sur atome interactif (E1)"
+        politique_mode_silencieux_os: "respecté — silence imposé par l'OS prime"
+        politique_prefers_reduced_motion: "conservé (haptique léger n'est pas une animation)"
+        note_implementation_agnostique: >-
+          Le palier 11 ne nomme pas l'API native. À l'implémentation,
+          mapper sur impact light (iOS Haptic Feedback) ou Virtual Key
+          (Android HapticFeedbackConstants), ou équivalent.
+
+  format_CHO:
+    structure: |
+      - id: CHO-OUVERTURE-M2
+        nom: "Ouverture aperçu rapide depuis tap pin sur Carte"
+        declencheur:
+          source: "tap sur comp-pin (palier 10 fonctionnels:49)"
+          contexte: "la Carte (S1) reste visible derrière (P5.C3)"
+        acteurs:
+          - "comp-pin (palier 10)"
+          - "comp-apercu-rapide-pin (palier 10 shell:121)"
+          - "comp-carte (palier 10 fonctionnels:138)"
+        graphe_d_etapes:
+          - etape: 1
+            t_debut_ms: 0
+            acteur: "comp-pin"
+            action: "transition vers état selected"
+            duree_ref: DUR-COURT
+            courbe_ref: CRV-EASE-OUT
+            haptique_ref: HAP-LEGER
+          - etape: 2
+            t_debut_ms: 0  # parallèle à étape 1
+            acteur: "comp-apercu-rapide-pin"
+            action: "apparition (transition de visible:false vers visible:true) avec slide-up + fade-in"
+            duree_ref: DUR-STANDARD
+            courbe_ref: CRV-EASE-OUT
+          - etape: 3
+            t_debut_ms: 100  # ~70% de l'étape 2
+            acteur: "comp-carte"
+            action: "léger recadrage centrant le Pin (si nécessaire)"
+            duree_ref: DUR-STANDARD
+            courbe_ref: CRV-EASE-OUT
+        couplage_etat_partage: []
+        cohabitation_persistantes: "P1/P2 restent visibles, l'aperçu rapide se superpose sans masquer la mini-bar parcours (cf. palier 10 shell:160)"
+        questions_ouvertes: []
+        reciproque: CHO-FERMETURE-M2
+
+  format_MAP:
+    structure: |
+      - id: MAP-CONTEXTE-PARCOURS-VERS-PIN
+        nom: "Modulations Pin selon le contexte parcours"
+        entree:
+          variable: "contexte_parcours du Pin (palier 10 fonctionnels:84, dimension de variant)"
+          domaine: ["normal", "etape_courante", "etape_complete", "etape_future", "hors_parcours"]
+        sortie:
+          axes_modulation:
+            - "opacite"
+            - "halo"
+            - "saturation"
+        table:
+          normal:        { opacite: 1.0,  halo: aucun,                        saturation_relative: 1.0 }
+          etape_courante:{ opacite: 1.0,  halo: { intensite: 0.8, taille: 1.4 }, saturation_relative: 1.1 }
+          etape_complete:{ opacite: 0.85, halo: aucun,                        saturation_relative: 0.9 }
+          etape_future:  { opacite: 1.0,  halo: aucun,                        saturation_relative: 1.0 }
+          hors_parcours: { opacite: 0.35, halo: aucun,                        saturation_relative: 0.7 }
+        contraintes_invariantielles:
+          - "PR1 palier 10 fonctionnels:94 — (etape_courante + deja_visite) → mise en relief prime"
+          - "PR2 palier 10 — (hors_parcours + deja_visite) → cumul des deux modulations"
+        couplage_etat_partage:
+          - { etat: ETAT-PARCOURS-EN-COURS, source: palier_10_index }
+        questions_ouvertes:
+          - "Halo de l'étape courante : statique ou pulsation qualifiée ? Si pulsation, c'est une CHO à part entière. à trancher plus tard."
+
+  format_TMP:
+    structure: |
+      - id: TMP-AUTO-DISMISS-M9
+        nom: "Délai d'auto-dismiss du message éphémère"
+        description: "M9 disparaît seul après ce délai si l'utilisateur n'agit pas (cohérent P5.M9, P5.C6)"
+        valeur_ms: 3000
+        comportement_si_message_remplace: "le message courant est immédiatement remplacé par le suivant (file simple, P5.C6)"
+        composants_concernes:
+          - "comp-message-ephemere (palier 10 shell)"
+        questions_ouvertes:
+          - "Délai différencié si message à long libellé (i18n japonais peut être long) ? à trancher plus tard."
+
+  vocabulaire_chiffre_admis:
+    - "ms (millisecondes) — durées"
+    - "Hz (hertz) — fréquences de throttle"
+    - "% relatif (multiplicateur d'opacité, de saturation, de scale)"
+    - "cubic-bezier(x1, y1, x2, y2) — courbes Bézier standard"
+    - "spring(mass, stiffness, damping) — courbes ressort physique"
+    - "intensité 0.0–1.0 (relative au max du device pour haptique)"
+    - "delta_kelvin (température chromatique du fond carte palier 9 D8)"
+    - "valeurs scalaires des 5 axes du fond carte (qualifiées par range indicatif)"
+
+  vocabulaire_a_eviter:
+    - "Curves.easeOut, AnimationController, Tween (Flutter)"
+    - "impact light, VIRTUAL_KEY (API plateforme)"
+    - "HEX d'une couleur, font-family, taille de typographie en px (palier 12)"
+    - "noms d'icônes concrètes (palier 13)"
+    - "microcopy entre guillemets (palier 8)"
+
+# -----------------------------------------------------------------------------
+# 6. Articulation avec les paliers en aval
+# -----------------------------------------------------------------------------
+articulation_paliers_aval:
+
+  - palier: 12
+    nom: tokens_visuels_statiques
+    transmission: >-
+      Le palier 12 fixe les VALEURS CONSTANTES (couleurs, typographies,
+      spacing, radius, ombres, opacités constantes). Aucun chevauchement
+      avec le palier 11. Frontière documentée § 2 frontiere_palier_12.
+
+  - palier: 13
+    nom: icones
+    transmission: >-
+      Indépendant du palier 11. Le palier 13 fixe le mapping Catégorie
+      → icône concrète et le style graphique des icônes.
+
+  - palier: 14
+    nom: surfaces_hors_app
+    transmission: >-
+      Indépendant. Les surfaces hors-app (page web, QR code, story
+      partageable) n'ont pas de chorégraphie inter-modes au sens du
+      palier 5 — elles sont gérées par le navigateur ou le système
+      de partage natif.
+
+  - palier: 15
+    nom: construction_figma
+    transmission: >-
+      Le palier 15 instancie en maquette Figma les composants palier 10,
+      les couleurs/typo palier 12, les icônes palier 13, et CALIBRE
+      visuellement les 50 valeurs aux ancres Époque (5 axes × 10 ancres)
+      du mapping pivot palier 11 04-mappings-parametriques. Le palier 11
+      pose la STRUCTURE et les courbes d'interpolation ; le palier 15
+      pose les valeurs effectives aux ancres.
+
+  - palier: 16
+    nom: validation
+    transmission: >-
+      Le palier 16 VALIDE les valeurs posées au palier 11 contre des
+      seuils a11y et de fluidité : durée minimum perceptible (≥ 100ms),
+      fluidité 60fps perçus pendant le drag du slider, conformité
+      prefers-reduced-motion (raccourcir / désactiver les chorégraphies
+      non essentielles), perceptibilité du feedback haptique en mode
+      présentation M4. Le palier 16 valide aussi la lisibilité des
+      modulations contextuelles aux extrêmes (Pin hors-parcours +
+      déjà-visité cumulés).
+
+# -----------------------------------------------------------------------------
+# 7. Conventions de référencement
+# -----------------------------------------------------------------------------
+conventions:
+  durees: "DUR-X (DUR-INSTANT, DUR-COURT, DUR-STANDARD, DUR-LONG, DUR-AMPLE)"
+  courbes: "CRV-X (CRV-LINEAIRE, CRV-EASE-OUT, etc.)"
+  haptiques: "HAP-X (HAP-LEGER, HAP-FRANC, HAP-NET)"
+  chorégraphies: "CHO-X (verbosité explicite : CHO-OUVERTURE-M2, CHO-CALAGE-EPOQUE, etc.)"
+  mappings: "MAP-X (MAP-SLIDER-VERS-AXES-CARTE, MAP-CONTEXTE-PARCOURS-VERS-PIN, etc.)"
+  comportements_temporels: "TMP-X (TMP-AUTO-DISMISS-M9, TMP-DEBOUNCE-RECHERCHE, etc.)"
+  composants_palier_10: "Référence par id (comp-XXX) + ligne du composant dans le fichier source palier 10 quand pertinent (ex. palier 10 fonctionnels:49 pour comp-pin)"
+  modes_surfaces_persistantes_palier_5:
+    regle: >-
+      Pour les MODES (M1-M9), les surfaces TOP-LEVEL (S1-S3) et les surfaces
+      PERSISTANTES (P1-P3), on utilise le nom court SANS préfixe (M2, S1,
+      P1) car le contexte palier 11 lève toute ambiguïté.
+    exception: >-
+      Pour les RÈGLES abstraites du palier 5 — N1-N7 (navigation), C1-C6
+      (coexistence), E1-E3 (entrées externes) — on utilise le préfixe
+      P5. (P5.N1, P5.C2, P5.E2) car les lettres N/C/E peuvent collider
+      avec d'autres conventions du projet (ex. familles de flows
+      A-H au palier 6).
+  etats_partages_palier_10: "ETAT-XXX (palier 10 § 4)"
+  axes_paliers_9_D8: "Référence par nom d'axe (temperature_chromatique, desaturation, grain_et_texture, vignettage, contraste)"
+
+# -----------------------------------------------------------------------------
+# 8. Persona check global
+# -----------------------------------------------------------------------------
+persona_check_global:
+
+  kenji:
+    impact: "élevé"
+    note: >-
+      Test_litmus 'comprendre l'app sans tutoriel, en japonais' : les
+      chorégraphies doivent être SUFFISAMMENT EXPLICITES pour suppléer
+      un texte d'aide. Apparition d'un M2 depuis tap pin, calage du
+      slider d'Époque avec haptique au snap, retour gracieux par
+      bouton-back — tout doit communiquer sans mot. Test_litmus 'vivre
+      80% de l'expérience sans regarder l'écran' : le feedback haptique
+      à la proximité d'un Pin (mode Surprenez-moi) est sa notification
+      principale. HAP-FRANC ou similaire à calibrer.
+
+  mme_dupont:
+    impact: "moyen"
+    note: >-
+      Création d'un Parcours en moins de 30 minutes : les chorégraphies
+      d'éditeur de Parcours (drag d'étape pour reorder, ajout/retrait
+      d'étape) doivent être fluides. La chorégraphie CHO-LANCEMENT-PARCOURS
+      apparaît P2 sans interruption. Le Lien universel reçu par les
+      parents accompagnateurs atterrit en M3 — la chorégraphie d'arrivée
+      depuis E2 (palier 5) est définie ici.
+
+  mme_martin:
+    impact: "MAJEUR"
+    note: >-
+      Test_litmus 'projection en classe, lecture depuis le fond' :
+      les chorégraphies doivent rester PERCEPTIBLES à distance et
+      RÉTROCOMPATIBLES avec prefers-reduced-motion (qu'on peut imaginer
+      activé en classe pour limiter les distractions). CHO-ENTREE-M4
+      met les surfaces persistantes en sommeil VISUELLEMENT — leur état
+      (audio en cours, parcours en cours) survit (P5.C2). Test_litmus
+      'défilement entre 3 époques en 30 secondes' : le mapping
+      MAP-SLIDER-VERS-AXES-CARTE doit être interpolé en continu pendant
+      le geste, calage net à la fin (CHO-CALAGE-EPOQUE) — c'est le
+      pivot du voyage temporel.
+
+  pere_lyonnais:
+    impact: "élevé"
+    note: >-
+      Mode Surprenez-moi : alerte de proximité M7 doit apparaître avec
+      une chorégraphie DOUCE (non-intrusive — il flâne, il ne veut pas
+      être dérangé) et auto-dismiss s'il ignore (TMP-AUTO-DISMISS-M7).
+      Aperçu rapide M2 depuis tap pin : ouverture rapide pour 'lire
+      avant que les enfants ne le tirent par la manche'. CHO-OUVERTURE-M2
+      utilise DUR-COURT ou DUR-STANDARD, pas DUR-LONG.
+
+  anais_back_office:
+    impact: "indirect"
+    note: >-
+      Le back-office desktop n'a pas de chorégraphie inter-modes au sens
+      du palier 5 (pas de M2/M3/M4 — c'est une app desktop classique avec
+      navigations, modales, panels). Mais les comportements temporels
+      purs (TMP-DEBOUNCE-VALIDATION-FORMULAIRE, TMP-TIMEOUT-RESEAU)
+      s'appliquent à comp-formulaire-saisie-pin-admin (palier 10
+      back-office). Drapeau rouge persona 'pas de prévisualisation' :
+      reste un drapeau pour le palier 13 admin, pas pour le palier 11.
+
+# -----------------------------------------------------------------------------
+# 9. Décisions structurelles prises
+# -----------------------------------------------------------------------------
+decisions_structurelles_prises:
+
+  - id: D1
+    decision: "Découpage en 5 fichiers (durées-et-courbes, haptique, chorégraphies, mappings paramétriques, comportements temporels purs)"
+    pourquoi: "6 familles d'objets paramétriques (DUR, CRV, HAP, CHO, MAP, TMP) → 5 fichiers (DUR et CRV regroupés en 01 car les chorégraphies les référencent ensemble). Chaque famille a son format de fiche propre."
+
+  - id: D2
+    decision: "Méthode allégée façon palier 5/9 — pas de production parallèle"
+    pourquoi: "Palier systémique : DUR/CRV/HAP sont référencés par CHO et MAP, qui se référencent eux-mêmes l'un l'autre. Production parallèle créerait des incohérences inter-fichiers. Rédaction séquentielle 01→02→03→04→05."
+
+  - id: D3
+    decision: "VALEURS CHIFFRÉES traitées au palier 11 (rupture avec le cadre 2026-05-06)"
+    pourquoi: >-
+      Le cadre 2026-05-06 (palier 11 = timing pur, valeurs chiffrées au
+      palier 12) excluait les mappings paramétriques (slider→axes carte,
+      contexte→modulations Pins) qui n'avaient nulle part où vivre.
+      Décision utilisateur 2026-05-07 : repositionner le palier 11 pour
+      absorber tout le paramétrage dynamique (timing + mappings + valeurs
+      précises). Voir intention.yaml § 11 entrée 2026-05-07.
+
+  - id: D4
+    decision: "Frontière 11/12 par règle 'valeur indexée par état dynamique → palier 11 ; valeur constante → palier 12'"
+    pourquoi: "Règle opérationnelle simple, applicable cas par cas en rédaction. Cas-limites tranchés au § 2 frontiere_palier_12 (voir exemples)."
+
+  - id: D5
+    decision: "50 valeurs aux ancres Époque (5 axes × 10 ancres palier 9 D8) MARQUÉES 'à calibrer en phase visuelle' dans 04-mappings-parametriques, calibrage REPORTÉ au palier 15"
+    pourquoi: >-
+      Le calibrage des 50 valeurs nécessite une cible visuelle réaliste
+      (carte Lyon vectorielle) absente avant le palier 15 (construction
+      Figma). Un banc de test ad-hoc serait jeté ensuite. Mieux vaut
+      poser la STRUCTURE complète au palier 11 (table 5×10, format de
+      cellule, courbes d'interpolation entre ancres) et CALIBRER les
+      valeurs effectives au palier 15. Activation MCP Figma différée.
+      Décision utilisateur 2026-05-07.
+
+  - id: D6
+    decision: "TYPOLOGIE 6 FAMILLES (DUR / CRV / HAP / CHO / MAP / TMP) inscrite dans l'index"
+    pourquoi: >-
+      Cadre commun obligatoire. Conditionne le format des fiches et la
+      structure des références inter-fichiers. Les CHO référencent
+      DUR/CRV/HAP ; les MAP référencent les états partagés palier 10 ;
+      les TMP référencent les machines d'état palier 10.
+
+  - id: D7
+    decision: "Pilote = 01-durees-et-courbes (pas une chorégraphie complète)"
+    pourquoi: >-
+      Calibre le format chiffré qualifié, le ton implémentation-agnostique
+      malgré les chiffres, la politique prefers-reduced-motion. Les autres
+      fichiers (02-05) référencent largement DUR/CRV. Logique de rédaction
+      ascendante : atomes paramétriques d'abord, puis composés.

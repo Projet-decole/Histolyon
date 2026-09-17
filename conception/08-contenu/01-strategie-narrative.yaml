@@ -1,0 +1,386 @@
+# =============================================================================
+# Palier 8 — 01-strategie-narrative — PILOTE du palier
+# =============================================================================
+# Premier fichier du palier 8. Pose le TON, la VOIX, les LONGUEURS QUALIFIÉES,
+# les patterns et anti-patterns qui colorent TOUS les autres fichiers du
+# palier 8 et qui doivent guider toute production de contenu (microcopy UI
+# autant que contenu narratif éditorial).
+#
+# Cohérence stricte avec l'essence (palier 1) : le triptyque sérendipité /
+# historicité / émerveillement, et l'atmosphère « chaud, sobre, conteur,
+# posé, chaleureux, sérieux sans austérité ». Tout ce qui suit n'est qu'une
+# concrétisation opérationnelle de ce que pose le palier 1.
+#
+# Sert d'EXEMPLE CANONIQUE de format et de ton pour les 5 autres fichiers
+# du palier 8.
+# =============================================================================
+
+document:
+  type: palier_contenu_strategie
+  version: "0.1"
+  date: "2026-05-05"
+  format: yaml
+  pilote: true
+
+# -----------------------------------------------------------------------------
+# 1. Périmètre
+# -----------------------------------------------------------------------------
+perimetre:
+
+  inclus:
+    - "Ton et voix narratifs (le conteur)"
+    - "Longueurs qualifiées (haïku / phrase / paragraphe / récit) — sans chiffrer en caractères"
+    - "Principes de rédaction qui s'appliquent à tout texte de l'app"
+    - "Patterns récurrents (confirmations, alertes, invitations, refus gracieux, etc.)"
+    - "Anti-patterns explicites — ce qu'on évite par principe"
+    - "Exemples canoniques pour fixer le ton concrètement"
+
+  exclus:
+    - "Libellés exhaustifs de l'app — voir 04-microcopy-grand-public et 05-microcopy-admin"
+    - "Structure interne des Templates Pin / Parcours — voir 02-template-pin et 03-template-parcours"
+    - "Stratégie i18n — voir 06-i18n"
+    - "Décisions techniques (longueurs en caractères, fontes) — paliers 12 et 16"
+
+  test_de_purete: >-
+    Si demain on bascule de Flutter à du natif, ou on remplace tous les
+    composants UI, est-ce que le ton reste applicable ? Si oui, c'est
+    bon. Si non, on a contaminé l'implémentation.
+
+# -----------------------------------------------------------------------------
+# 2. Le conteur — ton et voix
+# -----------------------------------------------------------------------------
+conteur:
+
+  metaphore_racine_rappel: >-
+    Du palier 1 : « Entre un audioguide et un conteur, il y a toute la
+    distance qu'on cherche. L'audioguide récite. Le conteur regarde dans
+    les yeux, ménage le suspense, fait sourire, fait frissonner. HistoLyon
+    doit toujours être du côté du conteur. »
+
+  ton:
+    chaud_sans_familier: "Le ton est chaleureux mais pas familier — on accueille, on n'embrasse pas. La distance respectueuse permet le frisson ; l'effusion l'éteint."
+    posé_sans_solennel: "On prend son temps mais on ne pose pas. La phrase est tendue par l'envie de raconter, pas alourdie par la peur de manquer de gravité."
+    précis_sans_pédant: "Les faits sont nets, les sources tracées (cf. cluster 04 I4) — mais le savoir ne s'exhibe pas. On nomme ce qui se passe, on n'aligne pas des dates."
+    chaleureux_sans_complaisant: "On a de l'affection pour Lyon et son histoire — sans en faire un éloge marketing. Ni « Lyon, c'est merveilleux ». Ni « bof ». Ce qui rend Lyon Lyon."
+    sérieux_sans_austère: "L'historicité (cluster 01) interdit le pittoresque romancé. La rigueur autorise la chaleur. Anaïs et la lead historienne sont garantes."
+
+  voix:
+    posture_narrative: >-
+      Le conteur s'adresse à UNE PERSONNE, pas à une foule. Imaginer
+      qu'on parle à un ami de passage qu'on emmène voir le quartier.
+      Pas un guide qui débite, pas un orateur qui projette — une
+      attention à la personne précise qui lit ou écoute.
+
+    deux_voix_distinctes:
+      voix_du_recit: |
+        Quand on RACONTE (contenu narratif d'un Pin, transitions d'étape,
+        célébration de fin de parcours, indications d'onboarding) : on
+        TUTOIE narrativement (« tu vois ce mur ? »). C'est le conteur
+        qui se penche à l'oreille (palier 1 § promesse). Le tu n'est
+        pas familier — c'est une intimité narrative qui inscrit
+        l'utilisateur DANS la scène.
+
+      voix_de_l_app: |
+        Quand l'app S'ADRESSE à l'utilisateur en tant qu'utilisateur
+        d'un produit (boutons, dialogues de confirmation, paramètres,
+        gestion de Compte, formulaires) : on VOUVOIE (« Confirmer la
+        suppression de votre Compte »). C'est le respect institutionnel
+        — l'app est un service, pas un copain.
+
+      regle_de_bascule: >-
+        La frontière est claire : si le texte raconte une histoire ou
+        contextualise un lieu, c'est la voix du récit (tu). Si le
+        texte décrit ou demande une action sur l'app, c'est la voix
+        de l'app (vous). Le doute se tranche en faveur du vouvoiement
+        — la familiarité forcée est plus blessante que la distance
+        respectueuse.
+
+  registres_par_persona:
+    note: >-
+      Les 4 personas grand public partagent le même ton conteur. Aucune
+      modulation par persona — l'app n'a pas plusieurs personnalités
+      selon qui lit. Les personas affectent le PARAMÉTRAGE (langue, mode
+      de notification, accessibilité) et l'attention aux test_litmus
+      (Mme Martin doit pouvoir projeter, Kenji doit pouvoir lire en
+      japonais, etc.), pas la voix elle-même.
+
+    backoffice_anais: >-
+      Anaïs (et tout rôle back-office) parle UN AUTRE registre : neutre,
+      précis, fonctionnel — voix de l'outil de travail. Pas de ton
+      conteur en back-office. Détail dans 05-microcopy-admin.
+
+# -----------------------------------------------------------------------------
+# 3. Longueurs qualifiées
+# -----------------------------------------------------------------------------
+# On ne chiffre pas en caractères ici — la portabilité du palier 8 l'exige.
+# On donne des qualificatifs qui orientent la rédaction sans figer une
+# implémentation.
+longueurs_qualifiees:
+
+  haïku:
+    description: "1 à 5 mots, parfois 1 seul mot"
+    usage_typique: "libellé de bouton, indicateur d'état, étiquette"
+    exemples:
+      - "Continuer"
+      - "Plus tard"
+      - "Lien copié"
+      - "Aujourd'hui"
+
+  phrase:
+    description: "une phrase, ~10 à 25 mots, idéalement une seule respiration"
+    usage_typique: "message éphémère, alerte, teaser, titre d'écran, accroche"
+    exemples:
+      - "Vous semblez vous éloigner du tracé."
+      - "Tu vois ce mur ? Voilà pourquoi il est là."
+      - "Le parcours est enregistré, prêt à être partagé."
+
+  paragraphe:
+    description: "2 à 5 phrases, une idée complète, ~50 à 150 mots"
+    usage_typique: "description courte, introduction d'étape, message de bienvenue, dialogue de confirmation explicatif, demande de permission, narration courte d'aperçu rapide"
+    exemple_voix_recit: >-
+      « Tu marches le long de cette rue depuis vingt ans, et tu n'as
+      jamais remarqué le médaillon. Pourtant il est là, discrètement
+      sculpté au-dessus de la porte. Ce qu'il dit du quartier,
+      personne ne te l'a jamais raconté. »
+    exemple_voix_app: >-
+      « La création d'un Compte vous permet de publier vos parcours
+      et de retrouver vos favoris sur tous vos appareils. Aucune
+      donnée personnelle n'est demandée — un pseudonyme suffit. »
+
+  récit:
+    description: "plusieurs paragraphes, ~200 à 800 mots typiquement, sans plafond éditorial mais avec respiration"
+    usage_typique: "narration complète d'un Pin (cœur du contenu narratif), texte d'introduction d'un parcours éditorial, exposé d'une thématique"
+    note: "Le récit reste UN RÉCIT — pas une fiche. Une seule voix le porte d'un bout à l'autre, même si plusieurs paragraphes le structurent."
+
+# -----------------------------------------------------------------------------
+# 4. Principes de rédaction
+# -----------------------------------------------------------------------------
+principes:
+
+  - id: P1
+    nom: "Raconter, jamais réciter"
+    enonce: >-
+      Toute affirmation factuelle est tissée dans une phrase qui dit
+      pourquoi cela compte. Pas de date sèche, pas d'énumération sans
+      contexte. Le savoir vit dans la trame, pas en marge.
+
+  - id: P2
+    nom: "Préciser, jamais alourdir"
+    enonce: >-
+      Le mot juste plutôt que le mot rare. La précision sert le récit ;
+      le vocabulaire savant sert l'auteur. Quand on hésite, on choisit
+      le mot que comprend un lyonnais qui n'a pas étudié l'histoire
+      à l'université.
+
+  - id: P3
+    nom: "Faire confiance au lecteur"
+    enonce: >-
+      Pas de surexplication, pas de redondance défensive. Si le
+      contexte est clair, on n'enfonce pas le clou. L'intelligence
+      du lecteur est un cadeau qu'on lui rend, pas une variable
+      qu'on contrôle."
+
+  - id: P4
+    nom: "Ne jamais culpabiliser"
+    enonce: >-
+      Pas de message qui reproche à l'utilisateur d'avoir fait ou
+      de ne pas avoir fait quelque chose. Une étape sautée est
+      légitime ; un parcours abandonné aussi. Le ton accueille
+      toujours la décision de l'utilisateur — y compris celle
+      d'arrêter.
+
+  - id: P5
+    nom: "Annoncer avant d'agir"
+    enonce: >-
+      Toute décision irréversible est précédée d'un texte qui dit ce
+      qu'elle fait. Pas d'effet de surprise désagréable. La
+      transparence est un acte de respect.
+
+  - id: P6
+    nom: "Sources visibles"
+    enonce: >-
+      Quand un contenu narratif s'appuie sur une Source (cluster 04
+      I4), la Source est lisible — pas reléguée en note de bas de
+      page invisible, pas non plus incrustée dans le récit comme un
+      tampon administratif. Trouver l'équilibre : crédibilité claire,
+      lecture fluide.
+
+  - id: P7
+    nom: "Cohérence terminologique"
+    enonce: >-
+      Une entité métier garde toujours le même nom dans les textes
+      utilisateur. « Pin » côté code reste « pin » dans la
+      microcopy ; on ne dit pas « point d'intérêt » ailleurs et
+      « pin » ici (sauf décision explicite de glossaire). Idem pour
+      « Parcours », « Étape », « Compte », « Favori ». Le palier 8
+      pose le glossaire de surface (cf. dictionnaire transversal en
+      04-microcopy-grand-public).
+
+# -----------------------------------------------------------------------------
+# 5. Patterns récurrents
+# -----------------------------------------------------------------------------
+patterns:
+
+  - id: PT1
+    nom: "Confirmation discrète"
+    contexte: "Une action a été prise par l'utilisateur, l'app le confirme sobrement"
+    structure: "Sujet + verbe au passé court, sans exclamation"
+    surface_typique: "P5.M9 message éphémère"
+    exemples:
+      - "Lien copié"
+      - "Parcours enregistré"
+      - "Modifications appliquées"
+    anti: "« Bravo ! Vous avez réussi à copier le lien ! » → trop, peppy"
+
+  - id: PT2
+    nom: "Alerte gracieuse"
+    contexte: "Un événement contextuel survient, l'app informe sans bloquer"
+    structure: "Constat doux, pas d'accusation, pas de panique"
+    surface_typique: "P5.M9 message éphémère, P5.M7 alerte ponctuelle"
+    exemples:
+      - "Vous semblez vous éloigner du tracé."
+      - "Connexion réseau perdue. Le contenu téléchargé reste disponible."
+    anti: "« Attention ! Vous êtes hors zone ! » → ton d'alerte, pas d'agression"
+
+  - id: PT3
+    nom: "Invitation sobre"
+    contexte: "L'app propose une opportunité, sans imposer ni vendre"
+    structure: "Phrase brève qui ouvre une porte, sans bonus marketing"
+    surface_typique: "P5.M7 (invitation micro-parcours), P5.M9 (autres)"
+    exemples:
+      - "Découvrir Lyon en quelques minutes ?"
+      - "Activer le mode Surprenez-moi pour recevoir des anecdotes en marchant."
+    anti: "« 🎉 Profitez d'une visite incroyable ! » → vente, hors registre"
+
+  - id: PT4
+    nom: "Demande de permission contextualisée"
+    contexte: "L'app a besoin d'une permission système — donner la raison"
+    structure: "Bénéfice fonctionnel concret + lien à l'usage immédiat de l'utilisateur"
+    surface_typique: "P5.M8 dialogue de permission (cf. flow A6)"
+    exemples_canoniques:
+      geoloc: "Pour vous proposer ce qui se trouve à proximité, l'app a besoin de connaître votre position. Aucune donnée n'est transmise au-delà de votre téléphone."
+      camera: "Pour superposer la reconstitution 3D au lieu réel, l'app a besoin d'accéder à votre caméra. La caméra n'est utilisée que pendant la consultation AR."
+      notifications: "Pour vous prévenir quand vous passez près d'un lieu intéressant, l'app a besoin de pouvoir vous envoyer des notifications. Vous pouvez les désactiver à tout moment."
+    anti: "« Acceptez l'accès à votre position » → impératif sec, pas de bénéfice"
+
+  - id: PT5
+    nom: "Refus gracieux"
+    contexte: "Une action n'est pas possible (cible retirée, hors-ligne, etc.)"
+    structure: "Constat sans drame + alternative ou point de retour proposé"
+    surface_typique: "P5.M3 surface dégradée, P5.M9 message éphémère"
+    exemples:
+      - "Ce parcours n'est plus disponible. Retour au catalogue."
+      - "Ce contenu n'a pas été téléchargé pour la consultation hors-ligne."
+    anti: "« Erreur 404 » → technique, frustrant ; « Désolé, ça ne marche pas » → vague"
+
+  - id: PT6
+    nom: "Reconnaissance de fin"
+    contexte: "L'utilisateur a complété une expérience (parcours, lecture longue, contribution publiée)"
+    structure: "Constat sobre de l'achèvement + ce que cela a permis (sans flatterie)"
+    surface_typique: "P5.M3 célébration de fin de parcours, P5.M9 confirmation de soumission"
+    exemples:
+      - "Vous avez parcouru les sept étapes du Vieux Lyon. Voici ce qu'on a vu ensemble."
+      - "Votre commentaire est en cours de modération. Il sera visible aux autres dès que l'équipe l'aura validé."
+    anti: "« 🏆 Bravo champion ! » → infantilisant ; « Score : 7/7 » → gamification"
+
+  - id: PT7
+    nom: "Tonalité de complétion partielle"
+    contexte: "L'utilisateur termine un parcours en ayant sauté des étapes"
+    structure: "Reconnaissance honnête sans culpabilisation ; le partiel est légitime"
+    surface_typique: "P5.M3 célébration"
+    exemple: "Vous avez vu trois des cinq étapes. Le reste vous attend quand vous voudrez."
+    note_critique: "Test_litmus persona — Mme Dupont avec sa classe doit pouvoir achever incomplet sans message qui blesse l'enseignante ou les enfants"
+    anti: "« Vous n'avez pas terminé le parcours » → reproche ; « 3/5 ⚠️ » → incomplet posé en problème"
+
+# -----------------------------------------------------------------------------
+# 6. Anti-patterns
+# -----------------------------------------------------------------------------
+# Ce qu'on évite par principe. Sortir du registre = sortir de l'essence.
+anti_patterns:
+
+  - nom: "Joyeux peppy à la Duolingo"
+    description: "Multiplication des emojis, exclamations, célébrations forcées, bonus visuels à chaque interaction"
+    pourquoi_on_refuse: "L'émerveillement vient du contenu, pas du chrome (essence § 6 emerveillement). Cf. § ce_qu_on_refuse du palier 1."
+    exemple_a_eviter: "🎉 Génial ! Vous avez débloqué un nouveau pin ! 🌟"
+
+  - nom: "Encyclopédique à la Wikipedia"
+    description: "Tournures impersonnelles, phrases à rallonge avec apposition, dates en début de phrase, vocabulaire académique"
+    pourquoi_on_refuse: "Le ton conteur EXCLUT la fiche. Wikipedia existe — pas besoin de le refaire. (palier 1 § ce_qu_on_refuse)"
+    exemple_a_eviter: "Bellecour, place située au centre de Lyon, France, fut aménagée à la fin du XVIIe siècle sous l'impulsion de Louis XIV..."
+
+  - nom: "Promotionnel à la appli touristique"
+    description: "Adjectifs valorisants à répétition (incroyable, magique, unique), appels à l'action commerciaux, ton d'office du tourisme"
+    pourquoi_on_refuse: "On parle de Lyon parce qu'on aime l'histoire de Lyon, pas pour vendre Lyon (palier 1 § ce_qu_on_refuse 'city branding')."
+    exemple_a_eviter: "Découvrez les trésors cachés du magnifique Vieux Lyon, joyau incontournable de la cité des Gones !"
+
+  - nom: "Mystique à la voix-off ARTE grave"
+    description: "Sentences solennelles, ralentissements pseudo-poétiques, ponctuation à effet"
+    pourquoi_on_refuse: "Le sérieux n'est pas l'austérité. Le frisson naît de la vérité du fait, pas d'une mise en scène emphatique."
+    exemple_a_eviter: "Et c'est ainsi... que dans le silence des siècles... une histoire oubliée se ravive..."
+
+  - nom: "Familiarité forcée"
+    description: "Tutoiement intrusif dans la voix de l'app, blagues de circonstance, complicité présupposée"
+    pourquoi_on_refuse: "La distinction voix du récit / voix de l'app (cf. § conteur.voix) protège l'utilisateur d'une intimité non choisie."
+    exemple_a_eviter: "Hé, t'as oublié de cocher la case ! 😉"
+
+  - nom: "Marketing déguisé"
+    description: "CTA promotionnels glissés dans la microcopy ; tracking valorisé comme service à l'utilisateur ; accumulation de bénéfices listés"
+    pourquoi_on_refuse: "Pas de growth hack (palier 1 § ce_qu_on_refuse). L'app n'a rien à vendre — elle raconte."
+    exemple_a_eviter: "Inscrivez-vous pour profiter de plus de 100 parcours exclusifs et débloquez les badges premium !"
+
+  - nom: "Émotion forcée"
+    description: "Demander à l'utilisateur de ressentir telle ou telle chose ; commenter sa propre prestation"
+    pourquoi_on_refuse: "Le conteur ne dit pas « c'est fascinant ». Il raconte de telle façon que ce soit fascinant."
+    exemple_a_eviter: "Cette anecdote incroyable va vous bluffer..."
+
+# -----------------------------------------------------------------------------
+# 7. Quelques exemples canoniques (vue d'ensemble)
+# -----------------------------------------------------------------------------
+# Petits cas concrets qui répondent à des écrans précis du palier 7.
+# Pas un inventaire exhaustif — juste assez pour que les fichiers suivants
+# du palier 8 (et les agents IA aval) puissent calibrer le ton.
+exemples_canoniques:
+
+  - contexte: "Premier lancement, atterrissage Carte (E-CARTE-PRINCIPALE — flow A1)"
+    voix: "voix du récit"
+    texte: "Lyon. Tu peux remonter le temps, ici, là où tu marches."
+    note: "L'app ne donne pas d'instruction — elle ouvre une porte. La Carte est déjà là, l'utilisateur a tout pour comprendre."
+
+  - contexte: "Aperçu rapide d'un Pin sur la Carte (E-CARTE-APERCU-PIN — flow B1)"
+    voix: "voix du récit"
+    texte_teaser: "Cette traboule traversait toute la maison. Les canuts l'utilisaient pour sortir leurs pièces de soie sans les abîmer dans la pluie."
+    note: "Une phrase, un fait, un pourquoi. Le lecteur peut s'arrêter là ou approfondir."
+
+  - contexte: "Confirmation de copie de lien (P5.M9 message éphémère)"
+    voix: "voix de l'app"
+    texte: "Lien copié."
+    note: "Haïku — deux mots suffisent."
+
+  - contexte: "Suppression de Compte (P5.M8 dialogue de confirmation)"
+    voix: "voix de l'app"
+    titre: "Supprimer votre Compte"
+    description: "La suppression efface vos données synchronisées (favoris, parcours créés, historique). Vos contributions publiques (commentaires, parcours partagés) restent visibles mais sans votre pseudonyme. Cette action est irréversible."
+    boutons: ["Supprimer", "Annuler"]
+    note: "Annoncer avant d'agir (P5). Le bouton dit ce qu'il fait — pas « OK »."
+
+  - contexte: "Fin de parcours partiellement complété (E-PARCOURS-FIN-CELEBRATION — flow C9)"
+    voix: "voix du récit"
+    texte: "Tu as parcouru trois étapes sur cinq aujourd'hui. Le Vieux Lyon t'attend pour les deux dernières."
+    note: "Test_litmus Mme Dupont — pas de jugement, le partiel est une étape, pas un échec."
+
+  - contexte: "Demande de permission caméra pour AR (E-TRANSVERSES-DIALOGUE-PERMISSION — flow A6, cible caméra)"
+    voix: "voix de l'app"
+    titre: "Activer la caméra"
+    description: "Pour superposer la reconstitution 3D à l'emplacement réel, l'app a besoin d'accéder à votre caméra. La caméra n'est utilisée que pendant la consultation AR — aucune image n'est enregistrée."
+    boutons: ["Autoriser", "Plus tard"]
+    note: "Pattern PT4. Bénéfice concret + garantie de cadre. Pas d'impératif."
+
+  - contexte: "Modération en attente (E-TRANSVERSES-MESSAGE-EPHEMERE après G2 commentaire)"
+    voix: "voix de l'app"
+    texte: "Votre commentaire est en cours de modération. Vous le verrez publié dès qu'il aura été validé."
+    note: "P5 annoncer avant d'agir. L'utilisateur sait pourquoi son commentaire n'apparaît pas immédiatement."
+
+  - contexte: "Hors zone Lyon avec géolocalisation (E-CARTE-PRINCIPALE — cas particulier)"
+    voix: "voix de l'app"
+    texte: "Vous n'êtes pas dans la zone couverte. La carte revient sur Lyon."
+    note: "PT5 refus gracieux. Constat + ce que l'app fait à la place."

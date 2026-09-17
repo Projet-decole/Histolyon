@@ -1,0 +1,461 @@
+# =============================================================================
+# Palier 7 — Écrans — INDEX
+# =============================================================================
+# Le palier 7 livre l'inventaire EXHAUSTIF des écrans de l'app HistoLyon. Pour
+# chaque écran : son mode (palier 5), sa surface parente, ses zones
+# fonctionnelles, ses états (vide, chargement, rempli, erreur, offline,
+# permission refusée, premier usage…), ses éléments interactifs, ses flows
+# actifs, ses surfaces imbriquées.
+#
+# C'est un palier de SYNTHÈSE — il assemble les modes (palier 5), les entités
+# (palier 4) et les flows (palier 6) en spécifications concrètes. Il ne
+# réinvente RIEN.
+#
+# Granularité : 1 fiche par ÉCRAN avec TOUS ses états (pas une fiche par
+# état). 1 fichier par écran (cf. brief intention.yaml). Les écrans sont
+# regroupés en 8 sous-dossiers par surface ou famille fonctionnelle.
+# =============================================================================
+
+document:
+  type: palier_ecrans_index
+  numero: 7
+  version: "0.1"
+  date: "2026-05-05"
+  role: "Index, format de fiche, inventaire des 48 écrans"
+  format: yaml
+  prerequis_de_lecture:
+    - "design/conception/04-donnees/00-index.yaml + clusters"
+    - "design/conception/05-architecture-info.yaml — modes M1-M9, surfaces S1-S3, persistantes P1-P3"
+    - "design/conception/06-flows/00-index.yaml + 8 fichiers de famille (A à H)"
+
+# -----------------------------------------------------------------------------
+# 1. Périmètre
+# -----------------------------------------------------------------------------
+perimetre:
+
+  inclus:
+    - "Pour chaque écran : mode (P5), surface parente, raison d'être, composition fonctionnelle (zones), états (vide/chargement/rempli/erreur/offline/permission refusée/premier usage), éléments interactifs, flows actifs, surfaces imbriquées"
+    - "Tous les écrans grand public (carte, pin, parcours, profil, communauté, partage)"
+    - "Surfaces transverses (persistantes P1-P3, dialogues M8 génériques, messages éphémères M9 génériques, alertes M7, demande de permission)"
+    - "Écrans back-office Anaïs (admin/) — décision utilisateur 2026-05-05 : Anaïs persona MAJEUR mérite ses écrans même si desktop hors palier 5"
+
+  exclus:
+    - "Composants UI nommés (BottomSheet, FAB, TabBar, Drawer) — palier 10"
+    - "Pixels, position spatiale précise, dimensions, mise en page détaillée — palier 10 + palier 12"
+    - "Couleurs, opacités, valeurs visuelles — paliers 9, 12"
+    - "Microcopy exacte (libellés, titres, messages) — palier 8"
+    - "Animations, courbes, timings — palier 11"
+    - "Mesures techniques chiffrées — palier 16"
+    - "Implémentation technique (router, gestion d'état, stockage)"
+
+  test_de_purete: >-
+    Si demain on bascule de Flutter à du natif iOS, ou on remplace tous
+    les composants UI par des analogues, la fiche d'écran reste-t-elle
+    valide ? Si oui, c'est bon. Si non, elle a contaminé le palier 10
+    (composants) ou le palier 12 (tokens).
+
+# -----------------------------------------------------------------------------
+# 2. Découpage en 8 sous-dossiers
+# -----------------------------------------------------------------------------
+sous_dossiers:
+
+  - id: "01"
+    nom: "carte/"
+    role: "Tout ce qui vit dans la surface principale Carte (P5.S1) : vue d'accueil, aperçu Pin, recherche, filtres de couches, alerte de proximité"
+    pilote: true
+
+  - id: "02"
+    nom: "pin/"
+    role: "Consultations approfondies de Pin (P5.M3, P5.M4) et variantes 3D / AR"
+
+  - id: "03"
+    nom: "parcours/"
+    role: "Tout ce qui vit dans la surface Parcours (P5.S2) : catalogue, filtres, fiche, lancement, déroulé terrain et canapé, saut d'étape, célébration, éditeur de Parcours personnel"
+
+  - id: "04"
+    nom: "profil/"
+    role: "Tout ce qui vit dans la surface Profil (P5.S3) : accueil, favoris, historique, paramètres, gestion du Compte (création / connexion / sync)"
+
+  - id: "05"
+    nom: "communaute/"
+    role: "Surfaces de production communautaire : rédaction d'un Commentaire, rédaction d'un Signalement, soumission d'un Pin, suivi des soumissions, rédaction d'un Retour de parcours"
+
+  - id: "06"
+    nom: "partage/"
+    role: "Surfaces de partage : Code visuel, écran de fin de parcours partageable"
+
+  - id: "07"
+    nom: "transverses/"
+    role: "Surfaces réutilisables : surfaces persistantes P1-P3, dialogue M8 générique, message éphémère M9 générique, dialogue de permission juste-à-temps, indication ponctuelle d'onboarding"
+
+  - id: "08"
+    nom: "admin/"
+    role: "Écrans back-office (desktop) pour Anaïs : tableau de bord, catalogue Pins, saisie via Template, validation scientifique, modération communautaire, modération soumissions, promotion communautaire, retrait/réouverture"
+
+# -----------------------------------------------------------------------------
+# 3. Inventaire des 46 écrans
+# -----------------------------------------------------------------------------
+inventaire:
+
+  carte:
+    - id: E-CARTE-PRINCIPALE
+      nom: "Carte d'accueil"
+      mode: P5.M1
+      surface_parente: P5.S1
+      flows_actifs: [A1, A3, A4, A5]
+    - id: E-CARTE-APERCU-PIN
+      nom: "Aperçu rapide d'un Pin sur la Carte"
+      mode: P5.M2
+      surface_parente: P5.S1
+      flows_actifs: [B1, E1]
+    - id: E-CARTE-RECHERCHE
+      nom: "Recherche depuis la Carte"
+      mode: P5.M6
+      surface_parente: P5.S1
+      flows_actifs: [A4]
+    - id: E-CARTE-FILTRES-COUCHES
+      nom: "Sélection des couches cartographiques"
+      mode: P5.M6
+      surface_parente: P5.S1
+      flows_actifs: [A3]
+    - id: E-CARTE-ALERTE-PROXIMITE
+      nom: "Alerte de proximité (Surprenez-moi ou arrivée à étape)"
+      mode: P5.M7
+      surface_parente: P5.S1
+      flows_actifs: [E1, E2]
+
+  pin:
+    - id: E-PIN-CONSULTATION-APPROFONDIE
+      nom: "Consultation approfondie d'un Pin"
+      mode: P5.M3
+      surface_parente: P5.S1
+      flows_actifs: [B2, B3, B6, F1, G1]
+      note: "Inclut comme zones/états la navigation multi-époque, la zone post-narrative, la section commentaires"
+    - id: E-PIN-MODE-PRESENTATION
+      nom: "Pin en mode présentation (sans chrome)"
+      mode: P5.M4
+      surface_parente: P5.S1
+      flows_actifs: [B2]
+    - id: E-PIN-CONSULTATION-3D
+      nom: "Viewer 3D d'un Modèle 3D rattaché à un Pin"
+      mode: P5.M3
+      surface_parente: P5.S1
+      flows_actifs: [B4]
+    - id: E-PIN-CONSULTATION-AR
+      nom: "Superposition AR d'un Modèle 3D"
+      mode: P5.M4
+      surface_parente: P5.S1
+      flows_actifs: [B5]
+
+  parcours:
+    - id: E-PARCOURS-PRINCIPAL
+      nom: "Surface Parcours (catalogue + mes parcours)"
+      mode: P5.M1
+      surface_parente: P5.S2
+      flows_actifs: [C1]
+      note: "Une seule surface avec deux vues internes (catalogue éditorial+communautaire / mes parcours personnels et en cours)"
+    - id: E-PARCOURS-FILTRES
+      nom: "Filtres du catalogue de parcours"
+      mode: P5.M6
+      surface_parente: P5.S2
+      flows_actifs: [C2]
+    - id: E-PARCOURS-FICHE-DETAIL
+      nom: "Fiche détaillée d'un Parcours"
+      mode: P5.M3
+      surface_parente: P5.S2
+      flows_actifs: [C3, F2, G6]
+      note: "Inclut comme zone l'aperçu d'une étape (pas d'écran APERCU-ETAPE distinct)"
+    - id: E-PARCOURS-LANCEMENT
+      nom: "Lancement d'un Parcours (choix mode terrain/canapé)"
+      mode: P5.M6
+      surface_parente: P5.S2
+      flows_actifs: [C4]
+    - id: E-PARCOURS-EN-COURS-TERRAIN
+      nom: "Parcours en cours, mode terrain"
+      mode: P5.M3
+      surface_parente: P5.S2
+      flows_actifs: [C5, C7, E2]
+    - id: E-PARCOURS-EN-COURS-CANAPE
+      nom: "Parcours en cours, mode canapé"
+      mode: P5.M3
+      surface_parente: P5.S2
+      flows_actifs: [C6]
+    - id: E-PARCOURS-SAUT-ETAPE
+      nom: "Sélecteur de saut d'étape"
+      mode: P5.M6
+      surface_parente: P5.S2
+      flows_actifs: [C8]
+    - id: E-PARCOURS-FIN-CELEBRATION
+      nom: "Célébration de fin de parcours"
+      mode: P5.M3
+      surface_parente: P5.S2
+      flows_actifs: [C9, F3]
+    - id: E-PARCOURS-EDITEUR
+      nom: "Éditeur d'un Parcours personnel (création + édition d'étapes)"
+      mode: P5.M3
+      surface_parente: P5.S2
+      flows_actifs: [C11, C12]
+      note: "Inclut comme états l'ajout, le retrait, le réordonnancement des étapes"
+
+  profil:
+    - id: E-PROFIL-PRINCIPAL
+      nom: "Surface Profil — accueil"
+      mode: P5.M1
+      surface_parente: P5.S3
+      flows_actifs: [D1]
+    - id: E-PROFIL-FAVORIS
+      nom: "Liste des Favoris"
+      mode: P5.M3
+      surface_parente: P5.S3
+      flows_actifs: [D2]
+    - id: E-PROFIL-HISTORIQUE
+      nom: "Historique de visite"
+      mode: P5.M3
+      surface_parente: P5.S3
+      flows_actifs: [D3, D4]
+    - id: E-PROFIL-PARAMETRES
+      nom: "Paramètres (langue, accessibilité, notifications, historique, mentions)"
+      mode: P5.M3
+      surface_parente: P5.S3
+      flows_actifs: [D5]
+    - id: E-PROFIL-CREATION-COMPTE
+      nom: "Création d'un Compte"
+      mode: P5.M6
+      surface_parente: P5.S3
+      flows_actifs: [D6]
+    - id: E-PROFIL-CONNEXION-COMPTE
+      nom: "Connexion à un Compte existant"
+      mode: P5.M6
+      surface_parente: P5.S3
+      flows_actifs: [D7]
+    - id: E-PROFIL-PARAMETRES-COMPTE
+      nom: "Paramètres de Compte (sync, déconnexion, suppression)"
+      mode: P5.M3
+      surface_parente: P5.S3
+      flows_actifs: [D8, D9]
+
+  communaute:
+    - id: E-COMMUNAUTE-REDACTION-COMMENTAIRE
+      nom: "Rédaction d'un Commentaire"
+      mode: P5.M6
+      surface_parente: "P5.S1 (depuis E-PIN-CONSULTATION-APPROFONDIE) ou P5.S3 (suivi)"
+      flows_actifs: [G2]
+    - id: E-COMMUNAUTE-REDACTION-SIGNALEMENT
+      nom: "Rédaction d'un Signalement (polymorphe)"
+      mode: P5.M6
+      surface_parente: "polymorphe (S1, S2 selon cible)"
+      flows_actifs: [G3]
+    - id: E-COMMUNAUTE-SOUMISSION-PIN
+      nom: "Soumission d'un Pin par un utilisateur"
+      mode: P5.M3
+      surface_parente: P5.S2
+      flows_actifs: [G4]
+      note: "Surface dense — saisie titre, catégorie, époque, localisation, contenu narratif, sources, médias. Un seul écran avec plusieurs zones (pas un wizard multi-écrans), à confirmer en rédaction"
+    - id: E-COMMUNAUTE-SUIVI-SOUMISSIONS
+      nom: "Suivi des contributions de l'utilisateur (Pins, Commentaires, Retours)"
+      mode: P5.M3
+      surface_parente: P5.S3
+      flows_actifs: [G2, G5, G6]
+      note: "Élargi aux 3 types de contributions communautaires (Pins, Commentaires, Retours) au lieu des Pins seuls — décision utilisateur 2026-05-05. Cohérent avec l'esprit Profil unifié."
+    - id: E-COMMUNAUTE-REDACTION-RETOUR-PARCOURS
+      nom: "Rédaction d'un Retour sur un Parcours communautaire"
+      mode: P5.M6
+      surface_parente: P5.S2
+      flows_actifs: [G6]
+
+  partage:
+    - id: E-PARTAGE-CODE-VISUEL
+      nom: "Génération et présentation du Code visuel"
+      mode: P5.M6
+      surface_parente: "P5.S1 ou P5.S2"
+      flows_actifs: [F4]
+    - id: E-PARTAGE-FIN-PARCOURS-IMAGE
+      nom: "Image partageable de fin de parcours"
+      mode: P5.M3
+      surface_parente: P5.S2
+      flows_actifs: [F3]
+      note: "Distincte de la célébration de fin (E-PARCOURS-FIN-CELEBRATION) — peut être ouverte depuis la célébration ou re-générée depuis l'historique"
+
+  transverses:
+    - id: E-TRANSVERSES-AUDIO-PERSISTANT
+      nom: "Surface persistante de lecture audio (P1)"
+      mode: P5.M5
+      surface_parente: "transverse"
+      flows_actifs: [B2]
+    - id: E-TRANSVERSES-PARCOURS-PERSISTANT
+      nom: "Surface persistante de parcours en cours (P2)"
+      mode: P5.M5
+      surface_parente: "transverse"
+      flows_actifs: [C5, C6, C7, C8, C9]
+    - id: E-TRANSVERSES-BANDEAU-OFFLINE
+      nom: "Bandeau d'information persistant (P3)"
+      mode: P5.M5
+      surface_parente: "transverse"
+      flows_actifs: ["template-générique"]
+    - id: E-TRANSVERSES-DIALOGUE-CONFIRMATION
+      nom: "Dialogue de confirmation (template M8)"
+      mode: P5.M8
+      surface_parente: "transverse"
+      flows_actifs: ["template-générique"]
+      note: "Instances : C7, C13, D4, D9 et tout autre flow avec dialogue de confirmation"
+    - id: E-TRANSVERSES-MESSAGE-EPHEMERE
+      nom: "Message éphémère (template M9)"
+      mode: P5.M9
+      surface_parente: "transverse"
+      flows_actifs: ["template-générique"]
+      note: "Instances multiples (lien copié, modération en cours, action confirmée, etc.)"
+    - id: E-TRANSVERSES-DIALOGUE-PERMISSION
+      nom: "Dialogue de demande de permission juste-à-temps"
+      mode: P5.M8
+      surface_parente: "transverse"
+      flows_actifs: [A6]
+    - id: E-TRANSVERSES-INDICATION-ONBOARDING
+      nom: "Indication ponctuelle d'onboarding (slider d'époque, etc.)"
+      mode: P5.M9
+      surface_parente: "transverse"
+      flows_actifs: ["template-générique"]
+      note: "Instances : slider d'époque (D5.4), point d'accès Couches, mode Surprenez-moi, sélecteur de section principale, etc. Pure M9 (disparition implicite). L'invitation au micro-parcours qui a deux issues explicites est modélisée séparément ci-dessous."
+    - id: E-TRANSVERSES-INVITATION-MICROPARCOURS
+      nom: "Invitation au micro-parcours découverte"
+      mode: P5.M7
+      surface_parente: "transverse"
+      flows_actifs: [A2]
+      note: "Splitté de E-TRANSVERSES-INDICATION-ONBOARDING le 2026-05-05 sur recommandation de relecture — comportement à deux issues explicites est de nature M7, pas M9."
+
+  admin:
+    - id: E-ADMIN-ACCUEIL
+      nom: "Tableau de bord back-office"
+      mode: "back-office"
+      surface_parente: "back-office"
+      flows_actifs: ["porte d'entrée vers H1-H6"]
+    - id: E-ADMIN-CATALOGUE-PINS
+      nom: "Catalogue des Pins éditoriaux (back-office)"
+      mode: "back-office"
+      surface_parente: "back-office"
+      flows_actifs: [H1]
+    - id: E-ADMIN-SAISIE-PIN-TEMPLATE
+      nom: "Saisie d'un Pin éditorial via Template"
+      mode: "back-office"
+      surface_parente: "back-office"
+      flows_actifs: [H1]
+    - id: E-ADMIN-VALIDATION-SCIENTIFIQUE
+      nom: "Validation scientifique d'un Pin éditorial"
+      mode: "back-office"
+      surface_parente: "back-office"
+      flows_actifs: [H2]
+    - id: E-ADMIN-MODERATION-COMMUNAUTAIRE
+      nom: "File de modération des Commentaires et Retours"
+      mode: "back-office"
+      surface_parente: "back-office"
+      flows_actifs: [H3]
+    - id: E-ADMIN-MODERATION-SOUMISSIONS
+      nom: "File de modération des soumissions communautaires (Pin / Parcours)"
+      mode: "back-office"
+      surface_parente: "back-office"
+      flows_actifs: [H4]
+    - id: E-ADMIN-PROMOTION-COMMUNAUTAIRE
+      nom: "Promotion d'un Pin communautaire en éditorial"
+      mode: "back-office"
+      surface_parente: "back-office"
+      flows_actifs: [H5]
+    - id: E-ADMIN-RETRAIT-REOUVERTURE-PIN
+      nom: "Retrait ou réouverture d'un Pin publié"
+      mode: "back-office"
+      surface_parente: "back-office"
+      flows_actifs: [H6]
+
+# -----------------------------------------------------------------------------
+# 4. Format d'une fiche d'écran
+# -----------------------------------------------------------------------------
+# Format strict, illustré par les fichiers du sous-dossier pilote carte/.
+format_des_fiches:
+
+  champs_obligatoires:
+    - id
+    - nom
+    - mode
+    - surface_parente
+    - raison_d_etre
+    - composition       # zones fonctionnelles, sans pixels
+    - etats             # tous les états pertinents (vide, chargement, erreur, offline, etc.)
+    - elements_interactifs
+    - flows_actifs
+
+  champs_recommandes:
+    - surfaces_imbriquees    # surfaces qui peuvent s'ouvrir par-dessus
+    - entites_affichees      # liste des entités du palier 4 affichées
+    - questions_ouvertes
+
+  consigne_composition: |
+    composition décrit les ZONES FONCTIONNELLES de l'écran — quoi
+    s'y passe, pas comment c'est rendu. Pas de pixels, pas de
+    composant UI nommé, pas de position spatiale précise.
+
+    Bon : "zone d'aperçu rapide affichant titre, catégorie, époque, teaser narratif"
+    Mauvais : "BottomSheet de 40% de hauteur en bas de l'écran, fond crème"
+
+  consigne_etats: |
+    Énumérer TOUS les états pertinents pour l'écran. Pour chacun, une
+    phrase qui décrit ce qui change fonctionnellement (pas le rendu).
+
+    États récurrents :
+      - nominal_charge : tout est chargé et l'écran fonctionne normalement
+      - chargement : données en cours de chargement
+      - vide : aucune donnée à afficher (favori vide, recherche sans résultat)
+      - offline_avec_cache : pas de réseau mais données locales disponibles
+      - offline_sans_cache : pas de réseau et pas de données locales
+      - erreur : échec de chargement ou d'opération
+      - permission_refusee : permission système requise non accordée
+      - premier_usage : première fois que l'utilisateur arrive ici
+      - état spécifique : tout autre état fonctionnellement signifiant
+
+  consigne_references:
+    mode: "Préfixe P5.M{1-9} ou « back-office »"
+    surface_parente: "Préfixe P5.S{1-3} ou P5.P{1-3} ou « transverse » ou « back-office »"
+    flows_actifs: |
+      Liste d'identifiants courts (A1, B2, C5, D6, E1, F5, G3, H1...).
+      INTERDIT : chaînes en français (« porte d'entrée vers H1, H2... », « tout flow émettant un message éphémère »).
+      EXCEPTION pour les écrans-templates et dispatchers : utiliser le marker
+      ["template-générique"] et lister les instances dans une note séparée
+      (cf. E-TRANSVERSES-DIALOGUE-CONFIRMATION, E-ADMIN-ACCUEIL).
+    entites_affichees: |
+      Nom métier (Pin, Parcours, Étape, Profil, Compte, Trace de modération...).
+      Position : préférer la position au niveau de chaque ZONE de la composition.
+      Au niveau racine de la fiche est admis seulement si toutes les zones
+      affichent les mêmes entités (rare).
+    surfaces_imbriquees: "Référence à un autre écran par son id (E-CARTE-RECHERCHE, E-TRANSVERSES-DIALOGUE-CONFIRMATION...)"
+    exemples_concrets_dans_les_fiches: |
+      Quand une fiche illustre une zone par un exemple éditorial concret
+      (« Antiquité / XVIIIe / Aujourd'hui sur Bellecour », un motif d'annotation
+      type « cette date est-elle exacte ? »), MARQUER explicitement comme
+      « (exemple — palier 8) » pour éviter la confusion avec une bavure
+      microcopy. Les exemples sont autorisés mais doivent être tracés.
+
+  contraintes_de_redaction:
+    - "Pas de composant UI nommé (BottomSheet, FAB, TabBar, Drawer)"
+    - "Pas de pixels, dimensions, position spatiale précise"
+    - "Pas de couleur, opacité, valeur visuelle"
+    - "Pas de microcopy exacte (libellés entre guillemets) — palier 8"
+    - "Pas d'animation ni de timing — palier 11"
+    - "Pas de mesure technique — palier 16"
+    - "Si en doute, mettre dans questions_ouvertes plutôt qu'inventer"
+
+# -----------------------------------------------------------------------------
+# 5. Conventions
+# -----------------------------------------------------------------------------
+conventions:
+
+  un_fichier_par_ecran: >-
+    Chaque écran a son propre fichier YAML dans son sous-dossier (ex.
+    07-ecrans/carte/01-principale.yaml). Numérotation dans le sous-dossier
+    pour ordonner. Un sous-dossier = un thème ; un fichier = un écran.
+
+  references_inter_ecrans: >-
+    Les surfaces_imbriquees citent un autre écran par son id (préfixe E-).
+    Permet de naviguer dans l'inventaire sans ambiguïté.
+
+  variantes_admises: >-
+    - admin/ ne référence pas P5.* (back-office hors palier 5)
+    - Les fiches transverses peuvent avoir surface_parente = "transverse"
+    - Les fiches polymorphes (E-COMMUNAUTE-REDACTION-SIGNALEMENT) peuvent
+      avoir surface_parente = "polymorphe (S1, S2…)"

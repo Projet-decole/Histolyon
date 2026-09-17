@@ -1,0 +1,28 @@
+# Outillage local
+_bmad/
+.claude/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Éditeurs / IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Build / dépendances (génériques, précisées par app au fil du socle)
+build/
+.dart_tool/
+.packages
+.pub-cache/
+.pub/
+*.log
+
+# Secrets locaux
+*.env
+.env
+*.pem
+*.key

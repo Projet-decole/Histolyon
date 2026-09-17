@@ -1,0 +1,381 @@
+# =============================================================================
+# Palier 4 — Données et contrats — INDEX (v0.2, 2026-05-04)
+# =============================================================================
+# Le palier 4 livre l'inventaire des entités logiques métier que l'application
+# manipule, leurs attributs, leurs relations et leurs contraintes. Il reste
+# CONCEPTUEL — entités au sens DDD, pas tables au sens DBA. Aucun SQL, aucun
+# framework, aucune décision d'implémentation.
+#
+# Cet index pose UNIQUEMENT ce qui est commun aux 6 clusters : périmètre,
+# liste des fichiers, invariants transversaux, glossaire, articulation avec
+# les paliers en aval. Tout ce qui relève des consignes de rédaction vit
+# dans le cluster pilote 01-contenu.yaml qui sert d'exemple canonique
+# de format.
+# =============================================================================
+
+document:
+    type: palier_donnees_index
+    numero: 4
+    role: "Index et invariants transversaux du palier 4"
+    format: yaml
+
+# -----------------------------------------------------------------------------
+# 1. Périmètre du palier
+# -----------------------------------------------------------------------------
+perimetre:
+    inclus:
+        - "Inventaire des entités logiques métier en 6 clusters"
+        - "Pour chaque entité : raison d'être, attributs métier, relations, contraintes"
+        - "Cycles de vie (états et transitions) quand fonctionnellement signifiants"
+        - "Invariants transversaux qui doivent être vrais quelle que soit l'implémentation"
+
+    exclus:
+        - "SQL, types techniques, schéma de stockage (Postgres / MongoDB / Firestore / etc.) — relève de l'implémentation"
+        - "Format des templates Anaïs (Sheets / CMS / JSON) — palier 13"
+        - "Structure d'API (endpoints, payloads, verbes) — relève de l'implémentation"
+        - "UI, écrans, composants nommés — paliers 7-10"
+        - "Microcopy, libellés exacts — palier 8"
+        - "Couleurs, icônes, valeurs visuelles — paliers 9-13"
+        - "Mesures techniques chiffrées (latences, fps, longueurs max, quotas) — palier 16"
+        - "Animations, gestes, timings — palier 11"
+
+    test_de_purete: >-
+        Si demain on remplace le stockage par un autre (Postgres → MongoDB,
+        Sheets → CMS, Firebase → Supabase), est-ce que la fiche reste
+        valide ? Si oui, c'est bon. Si non, elle a contaminé l'implémentation.
+
+    ce_qui_n_est_PAS_une_entite_au_palier_4:
+        note: >-
+            Plusieurs concepts évoqués dans les domaines D1-D11 ressemblent
+            à des entités mais sont en fait des surfaces, des états de
+            session ou des comportements applicatifs. Le palier 4 les
+            écarte explicitement.
+        liste:
+            - concept: "Carte, Slider d'époque, Recherche"
+              nature: "surfaces et opérations sur les entités"
+              ou: "paliers 5 architecture info, 7 écrans, 11 interactions"
+            - concept: "Mode Surprenez-moi / Balade libre / En parcours"
+              nature: "préférence utilisateur"
+              ou: "attribut de Profil (cluster 03)"
+            - concept: "Mode présentation sans chrome"
+              nature: "état d'écran temporaire"
+              ou: "palier 7 écrans, palier 11 interactions"
+            - concept: "Mode hors-ligne, préchargement"
+              nature: "politique d'implémentation (cache, sync)"
+              ou: "préférence dans Profil + implémentation backend"
+            - concept: "Permission système (géoloc, notif, caméra)"
+              nature: "état imposé par l'OS"
+              ou: "Profil mémorise si déjà demandée ; autorité reste à l'OS"
+            - concept: "Narration audio"
+              nature: "média rattaché à un Pin, pas entité distincte"
+              ou: "modélisée comme Média de type audio (cluster 01)"
+
+# -----------------------------------------------------------------------------
+# 2. Clusters et fichiers
+# -----------------------------------------------------------------------------
+clusters:
+    - id: C1
+      nom: "Contenu"
+      fichier: "01-contenu.yaml"
+      role: "Pin (cœur métier), Catégorie, Époque, Source, Média, Badge, Modèle 3D, Fragment musical, Couche cartographique"
+      pilote: true
+      note: "Cluster pilote — sert d'exemple canonique de format pour les autres clusters"
+
+    - id: C2
+      nom: "Parcours"
+      fichier: "02-parcours.yaml"
+      role: "Parcours (3 provenances : éditorial / communautaire / personnel) et Étape ordonnée"
+
+    - id: C3
+      nom: "Utilisateur"
+      fichier: "03-utilisateur.yaml"
+      role: "Profil (toujours présent, local par défaut), Compte (0..1, opt-in pour sync et publication), Favori, Historique de visite"
+
+    - id: C4
+      nom: "Communauté"
+      fichier: "04-communaute.yaml"
+      role: "Commentaire, Retour de parcours, Signalement (polymorphe)"
+
+    - id: C5
+      nom: "Production"
+      fichier: "05-production.yaml"
+      role: "Template (structure de saisie pour Anaïs), Trace de validation (audit du processus scientifique)"
+
+    - id: C6
+      nom: "Distribution"
+      fichier: "06-distribution.yaml"
+      role: "Lien universel, Image partageable, Code visuel"
+
+# -----------------------------------------------------------------------------
+# 3. Invariants transversaux
+# -----------------------------------------------------------------------------
+# Règles qui valent au-delà d'un cluster donné. Définies ici une seule fois,
+# référencées depuis les fiches d'entité concernées via leur identifiant
+# (I1, I2, …). Ces invariants sont des CONTRATS : ils doivent être vrais
+# quelle que soit l'implémentation.
+invariants_transversaux:
+    - id: I1
+      nom: "Identité civile jamais collectée"
+      enonce: >-
+          Aucune entité ne stocke d'identité civile (nom, prénom, date
+          de naissance, adresse postale, numéro de téléphone). Les
+          Profils et Comptes utilisent un pseudonyme et une représentation
+          graphique. L'email d'un Compte sert uniquement à
+          l'authentification et à la récupération.
+      s_applique_a:
+          [
+              Profil,
+              Compte,
+              Commentaire,
+              "Retour de parcours",
+              Signalement,
+              "Pin (provenance communautaire)",
+              "Trace de validation",
+              "Trace de modération",
+              "Lien universel",
+              "Image partageable",
+              "Code visuel",
+          ]
+
+    - id: I2
+      nom: "Compte requis pour publication"
+      enonce: >-
+          Toute production visible par d'autres utilisateurs (Pin de
+          provenance communautaire, Commentaire, Retour de parcours,
+          Parcours communautaire) requiert un Compte avec pseudonyme.
+          Le Profil seul (anonyme local) ne peut pas publier.
+      s_applique_a:
+          [
+              "Pin (provenance communautaire)",
+              Commentaire,
+              "Retour de parcours",
+              "Parcours (provenance communautaire)",
+          ]
+
+    - id: I3
+      nom: "Modération avant visibilité publique pour les contributions communautaires"
+      enonce: >-
+          Tout objet de contribution communautaire passe par un processus
+          de modération.
+            - Pour les Commentaires et les Retours de parcours :
+              modération A PRIORI (état d'attente avant visibilité publique).
+            - Pour les Pins ET les Parcours de provenance communautaire :
+              modération avec VISIBILITÉ IMMÉDIATE accompagnée d'une MARQUE
+              DISTINCTIVE indiquant que les sources / l'itinéraire sont en
+              cours de vérification ; la marque est levée quand la
+              modération a confirmé. La nuance permet à la communauté de
+              contribuer en visibilité réelle sans dégrader le contrat
+              d'historicité (la marque distingue clairement le statut).
+      s_applique_a:
+          [
+              "Pin (provenance communautaire)",
+              Commentaire,
+              "Retour de parcours",
+              "Parcours (provenance communautaire)",
+          ]
+
+    - id: I4
+      nom: "Sources documentaires obligatoires pour validation"
+      enonce: >-
+          Aucun Pin (toutes provenances confondues) ne peut atteindre
+          l'état validé sans au moins une Source documentaire rattachée.
+          Le contenu narratif sans source ne peut être que brouillon.
+      s_applique_a: [Pin, Source, Template]
+
+    - id: I5
+      nom: "Anonymat strict du signaleur"
+      enonce: >-
+          L'identité du Profil qui crée un Signalement n'est jamais
+          exposée à l'objet signalé ni à son auteur. Seuls les
+          modérateurs y ont accès, et uniquement à des fins de
+          modération.
+      s_applique_a: [Signalement]
+
+    - id: I6
+      nom: "Profil anonyme strictement local"
+      enonce: >-
+          Tant qu'un Profil n'a pas créé de Compte, ses données
+          (favoris, historique, préférences) restent strictement
+          locales au terminal. Aucune synchronisation cloud. La
+          création d'un Compte est l'acte qui ouvre la sync (avec
+          granularité opt-in).
+      s_applique_a:
+          [
+              Profil,
+              Compte,
+              Favori,
+              "Historique de visite",
+              "Image partageable",
+              "Lien universel",
+              "Parcours (provenance personnelle)",
+          ]
+
+    - id: I7
+      nom: "Catalogues Catégorie et Époque ouverts"
+      enonce: >-
+          Les Catégories et Époques sont des catalogues OUVERTS :
+          l'équipe éditoriale peut en ajouter de nouvelles à tout
+          moment. Pas d'archivage prévu (décision utilisateur
+          2026-05-04 — toute évolution de ces catalogues est une
+          addition).
+      s_applique_a: [Catégorie, Époque]
+
+    - id: I8
+      nom: "Multi-époques admis pour Pin et Parcours"
+      enonce: >-
+          Un Pin et un Parcours peuvent être associés à plusieurs
+          Époques (relation n-n). Cas typique : patrimoine vivant qui
+          traverse plusieurs siècles, parcours thématique qui couvre
+          une évolution.
+      s_applique_a: [Pin, Parcours, Étape, Template]
+
+    - id: I9
+      nom: "Pin localisé pour affichage cartographique"
+      enonce: >-
+          Un Pin sans coordonnées géographiques EXISTE dans le système
+          mais ne s'affiche pas sur la Carte. Cas légitime : patrimoine
+          vivant immatériel (traditions, fêtes) sans point fixe. Ces
+          Pins sont accessibles par recherche ou catégorie.
+      s_applique_a: [Pin, Étape]
+
+    - id: I10
+      nom: "Promotion de Pin communautaire vers éditorial"
+      enonce: >-
+          Un Pin de provenance communautaire peut être PROMU en
+          éditorial si l'équipe éditoriale décide de l'adopter. La
+          promotion change l'attribut provenance ; le pseudonyme de
+          l'auteur original reste tracé en crédit. La promotion
+          n'efface pas l'historique.
+      s_applique_a: [Pin]
+
+# -----------------------------------------------------------------------------
+# 4. Glossaire
+# -----------------------------------------------------------------------------
+# Termes utilisés transversalement, définis ici une seule fois.
+glossaire:
+    - terme: "provenance"
+      sens: >-
+          Origine d'un objet de contenu. Pour un Pin : éditorial (créé
+          par l'équipe HistoLyon) ou communautaire (créé par un
+          utilisateur avec Compte). Pour un Parcours : éditorial,
+          communautaire ou personnel (visible localement seulement).
+          Distinct du statut.
+
+    - terme: "statut"
+      sens: >-
+          Position d'un objet dans son cycle de vie (brouillon,
+          en_revue, validé, publié, retiré, etc.). Le statut évolue
+          dans le temps ; la provenance est en général stable (sauf
+          promotion communautaire → éditorial pour Pin).
+
+    - terme: "Profil vs Compte"
+      sens: >-
+          Profil = entité racine de l'utilisateur grand public,
+          TOUJOURS présente, locale par défaut. Compte = entité 0..1
+          rattachée au Profil, créée si l'utilisateur s'inscrit pour
+          publier ou synchroniser. Identité civile JAMAIS collectée
+          dans aucun des deux (cf. I1).
+
+    - terme: "validation scientifique"
+      sens: >-
+          Processus de relecture des Sources et de la cohérence
+          historique d'un Pin avant sa transition vers validé. Au
+          début du projet, peut être assurée par Anaïs elle-même
+          (auto-validation à acter dans le quality plan). Génère des
+          Traces de validation.
+
+    - terme: "modération communautaire"
+      sens: >-
+          Processus de relecture des contributions communautaires
+          (Commentaire, Retour, Pin de provenance communautaire) avant
+          ou pendant leur visibilité publique. Distincte de la
+          validation scientifique.
+
+    - terme: "marque distinctive"
+      sens: >-
+          Indication signalant qu'un objet a un statut particulier
+          (Pin communautaire en cours de vérification, Pin éditorial
+          officiel, etc.). La modélisation est ici (existence et
+          valeurs de l'attribut) ; le rendu visuel est en palier 9
+          cartographie ou palier 7 écrans.
+
+    - terme: "polymorphe"
+      sens: >-
+          Se dit d'un attribut qui pointe vers une cible dont le type
+          varie. Ex. Signalement.cible peut viser un Pin, un Parcours,
+          un Commentaire ou un Retour de parcours. La modélisation
+          explicite alors le type de cible en plus de la référence.
+
+# -----------------------------------------------------------------------------
+# 5. Articulation avec les paliers en aval
+# -----------------------------------------------------------------------------
+articulation_paliers_aval:
+    - palier: 5
+      nom: architecture_information
+      transmission: "Entités à présenter en surfaces, leurs relations hiérarchiques (Pin → Catégorie → Époque, Parcours → Étape → Pin) et cardinalités qui guident la navigation."
+
+    - palier: 6
+      nom: flows
+      transmission: "Cycles de vie des entités (états et transitions) qui structurent les flows. Invariants I1-I10 cadrent les chemins possibles."
+
+    - palier: 7
+      nom: ecrans
+      transmission: "Inventaire des attributs à afficher pour chaque entité. Le palier 4 dit QUOI ; le palier 7 dit COMMENT."
+
+    - palier: 8
+      nom: contenu_et_microcopy
+      transmission: "Structure des attributs textuels (contenu_narratif d'un Pin = teaser + narration + post-narratif ; sources structurées). Longueurs, ton et libellés exacts en palier 8."
+
+    - palier: 9
+      nom: cartographie
+      transmission: "Attributs qui pilotent le rendu cartographique (Catégorie, Époque, provenance, Couche). Couleurs, formes, opacités en palier 9."
+
+    - palier: 11
+      nom: interactions_et_motion
+      transmission: "Transitions de cycle de vie qui peuvent donner lieu à des animations chorégraphiées."
+
+    - palier: 13
+      nom: admin
+      transmission: "Inventaire complet des attributs à saisir pour Pin et Parcours via Template. Le palier 13 décide le format (Sheets, CMS) et l'ergonomie ; la STRUCTURE est ici."
+
+    - palier: 14
+      nom: surfaces_hors_app
+      transmission: "Artefacts persistants de partage (Lien universel, Image partageable, Code visuel). Le palier 14 décide leurs surfaces."
+
+    - palier: 16
+      nom: validation
+      transmission: "Invariants I1-I10 à tester comme contrats. Valeurs chiffrées (longueurs max, quotas, latences) à fixer ici."
+
+# -----------------------------------------------------------------------------
+# 6. Variantes de format acceptées
+# -----------------------------------------------------------------------------
+# Le format canonique d'une fiche d'entité est défini par le pilote
+# 01-contenu.yaml. Trois extensions ont été introduites au fil des
+# autres clusters et sont validées ici.
+variantes_de_format_acceptees:
+    - nom: "invariants_de_cluster"
+      introduit_par: "06-distribution.yaml"
+      role: >-
+          Liste de règles qui valent pour TOUTES les entités d'un même cluster
+          (ex. cluster 06 : pas de tracking, pas d'identité d'expéditeur
+          encodée, validité couplée à la cible). Posée une seule fois pour
+          éviter la répétition. Référencée depuis les fiches via
+          invariants_de_cluster_referenced.
+      quand_l_utiliser: "Quand 2 entités ou plus d'un même cluster partagent ≥ 2 invariants identiques."
+
+    - nom: "derives_non_stockes"
+      introduit_par: "02-parcours.yaml"
+      role: >-
+          Liste d'attributs CALCULABLES depuis l'état du système (ex. nombre
+          d'Étapes d'un Parcours, distance estimée) qu'on documente sans les
+          stocker. Évite de modéliser comme attributs persistants des valeurs
+          dérivables.
+      quand_l_utiliser: "Quand un attribut est techniquement dérivable et que sa modélisation comme attribut persistant introduirait un risque de désynchronisation."
+
+    - nom: "cycle_de_vie minimal pour entités immuables"
+      introduit_par: "05-production.yaml (Trace de validation), 04-communaute.yaml (Trace de modération)"
+      role: >-
+          Forme abrégée du cycle_de_vie pour les entités append-only :
+          `etats: [créée]` + `transitions: []` + `note_sur_l_immutabilite`
+          explicative. Préférable à l'omission du champ pour rendre
+          l'immutabilité explicite.

@@ -1,0 +1,402 @@
+# =============================================================================
+# Palier 13 — 02 Icônes catégories Pin
+# =============================================================================
+# 11 icônes signalant la catégorie d'un Pin sur la carte (palier 9 D1 réifié).
+# La catégorie est la DIMENSION VISUELLE PRIMAIRE du Pin (palier 9 D1 :
+# « catégories signalées par icône uniquement, pas par couleur »).
+#
+# Décision D6 palier 13 (utilisateur 2026-05-07) : Catégorie 6 'Lieu disparu'
+# utilise lucide:landmark-off (au lieu du cliché ghost).
+# Décision palier 9 D2 : Catégorie 4 renommée 'Personne / Célébrité' → 'Personne'.
+# =============================================================================
+
+document:
+  type: palier_icones_categories
+  numero: 13
+  fichier: "02-icones-categories.yaml"
+  version: "0.1"
+  date: "2026-05-07"
+  format: yaml
+  prerequis_de_lecture:
+    - "design/conception/13-icones/01-charte-graphique.yaml — style monoline strict, OUTLINED, optical correction XS"
+    - "design/conception/13-icones/00-index.yaml — § 5 format de fiche, § 9 décisions D5/D6"
+    - "design/conception/04-donnees/01-contenu.yaml — entité Catégorie (catalogue ouvert I7)"
+    - "design/conception/09-cartographie/02-pins.yaml — décision D1 (catégorie par icône)"
+
+raison_d_etre: >-
+  Sans ces 11 mappings, la catégorie d'un Pin reposerait uniquement sur
+  un libellé textuel — et l'app perdrait son langage visuel. Chaque
+  icône est choisie pour sa lisibilité à 14px (Pin sur carte) ET sa
+  reconnaissance immédiate sans tutoriel (test_litmus Kenji étranger).
+
+note_decision_palier_9_D10: >-
+  Le palier 9 décision D10 ('pas de signe distinctif sur la carte pour
+  pins à contenu immersif') est respectée par ABSENCE — aucune icône
+  catégorie ne signale la présence de Modèle 3D, AR, audio long ou
+  élément interactif. L'enrichissement se découvre à l'aperçu rapide
+  M2 ou en consultation approfondie M3 ; la carte n'a pas à le
+  pré-annoncer. Le présent fichier ne définit donc pas d'icône
+  'contenu immersif'.
+
+# -----------------------------------------------------------------------------
+# 1. Inventaire des 11 catégories
+# -----------------------------------------------------------------------------
+icones_categories:
+
+  - id: ICON-CAT-CLASSIQUE
+    nom_palier_13: "classique"
+    categorie_palier_4: "Classique"
+    source: "lucide:landmark"
+    metaphore: >-
+      Bâtiment classique avec toit triangulaire et colonnes — la
+      forme universelle du monument historique (musée, palais,
+      cathédrale). Reconnaissable à 14px car silhouette simple.
+    slot_palier_10:
+      - "comp-pin slot icone_categorie variant categorie=classique (palier 10 03-fonctionnels)"
+      - "comp-chip-categorie slot icone variant categorie=classique"
+      - "comp-tag-categorie slot icone variant categorie=classique"
+    variants:
+      tailles: [XS, MD]
+      etats: [default]   # Pas d'active/inactive — la catégorie est une propriété intrinsèque, pas un état
+    mapping_couleurs:
+      dans_pin_sur_carte: TOK-COLOR-BLANC-NARRATIF   # icône blanche sur fond Pin
+      dans_chip_categorie: TOK-COLOR-TEXTE-PRINCIPAL   # icône foncée sur fond chip neutre (palier 12 D7)
+    fichier_svg_attendu: "assets/categories/classique.svg"
+    optical_correction_XS: "production version dédiée 14×14 si lisibilité insuffisante palier 16 (à valider)"
+
+  - id: ICON-CAT-ANECDOTE
+    nom_palier_13: "anecdote"
+    categorie_palier_4: "Anecdote"
+    source: "lucide:sparkles"
+    metaphore: >-
+      Étincelles — métaphore universelle du 'oh ça alors !', de la
+      surprise narrative légère. Lisible à 14px car forme
+      caractéristique (3 étoiles asymétriques).
+    slot_palier_10:
+      - "comp-pin slot icone_categorie variant categorie=anecdote"
+      - "comp-chip-categorie slot icone variant categorie=anecdote"
+      - "comp-tag-categorie slot icone variant categorie=anecdote"
+    variants:
+      tailles: [XS, MD]
+      etats: [default]
+    mapping_couleurs:
+      dans_pin_sur_carte: TOK-COLOR-BLANC-NARRATIF
+      dans_chip_categorie: TOK-COLOR-TEXTE-PRINCIPAL
+    fichier_svg_attendu: "assets/categories/anecdote.svg"
+    note_conflit_potentiel: >-
+      sparkles est aussi candidat pour le mode Surprenez-moi (cf. fichier
+      03 question_ouverte). Conflit résolu fichier 03 : Surprenez-moi
+      utilise une icône distincte (ex. dice / shuffle). sparkles reste
+      réservé à la catégorie Anecdote.
+
+  - id: ICON-CAT-MUSEE-INSTITUTION
+    nom_palier_13: "musee_institution"
+    categorie_palier_4: "Musée / Institution"
+    source: "lucide:building-2"
+    metaphore: >-
+      Bâtiment urbain à plusieurs étages, fenêtres alignées —
+      symbolise l'institution moderne (musée, archives, mairie).
+      Distinct de landmark (monument classique antique/médiéval) par
+      sa silhouette plus structurée.
+    slot_palier_10:
+      - "comp-pin slot icone_categorie variant categorie=musee_institution"
+      - "comp-chip-categorie slot icone variant categorie=musee_institution"
+    variants:
+      tailles: [XS, MD]
+      etats: [default]
+    mapping_couleurs:
+      dans_pin_sur_carte: TOK-COLOR-BLANC-NARRATIF
+      dans_chip_categorie: TOK-COLOR-TEXTE-PRINCIPAL
+    fichier_svg_attendu: "assets/categories/musee-institution.svg"
+
+  - id: ICON-CAT-PERSONNE
+    nom_palier_13: "personne"
+    categorie_palier_4: "Personne"   # renommé de 'Personne / Célébrité' palier 9 D2
+    source: "lucide:user-round"
+    metaphore: >-
+      Silhouette humaine simple (tête ronde + buste). Volontairement
+      NEUTRE — convient autant pour un canut anonyme que pour une
+      figure illustre (cohérent palier 9 D2 inclusivité 'singularité
+      d'une vie').
+    slot_palier_10:
+      - "comp-pin slot icone_categorie variant categorie=personne"
+      - "comp-chip-categorie slot icone variant categorie=personne"
+    variants:
+      tailles: [XS, MD]
+      etats: [default]
+    mapping_couleurs:
+      dans_pin_sur_carte: TOK-COLOR-BLANC-NARRATIF
+      dans_chip_categorie: TOK-COLOR-TEXTE-PRINCIPAL
+    fichier_svg_attendu: "assets/categories/personne.svg"
+    note_renommage: "Catégorie renommée par palier 9 D2 (2026-05-06) — l'icône reste valide pour le sens élargi 'Personne' au lieu de 'Personne / Célébrité'."
+
+  - id: ICON-CAT-EVENEMENT
+    nom_palier_13: "evenement"
+    categorie_palier_4: "Événement"
+    source: "lucide:zap"
+    metaphore: >-
+      Éclair — métaphore universelle de la rupture, du moment qui
+      change tout (révolution, attentat, fondation, victoire). Pas
+      d'ambiguïté avec une intention 'rapide' (le contexte Pin
+      historique lève l'équivoque).
+    slot_palier_10:
+      - "comp-pin slot icone_categorie variant categorie=evenement"
+      - "comp-chip-categorie slot icone variant categorie=evenement"
+    variants:
+      tailles: [XS, MD]
+      etats: [default]
+    mapping_couleurs:
+      dans_pin_sur_carte: TOK-COLOR-BLANC-NARRATIF
+      dans_chip_categorie: TOK-COLOR-TEXTE-PRINCIPAL
+    fichier_svg_attendu: "assets/categories/evenement.svg"
+
+  - id: ICON-CAT-LIEU-DISPARU
+    nom_palier_13: "lieu_disparu"
+    categorie_palier_4: "Lieu disparu"
+    source: "custom:landmark-off"   # cascade palier 3 maquette : lucide:landmark-off renvoie 404 (lucide-static@1.21.0) → custom landmark + diagonale
+    metaphore: >-
+      Monument barré d'une diagonale (variante 'off' de landmark) —
+      métaphore fonctionnelle 'le bâtiment historique n'existe plus
+      physiquement'. Cohérent avec ICON-CAT-CLASSIQUE qui utilise
+      landmark non barré : le rapport visuel 'présent vs absent' se
+      lit directement.
+    note_correction_post_review: >-
+      Source corrigée 2026-05-07 (après relecture) — landmark-off
+      EXISTE dans Lucide moderne (vérifié en relecture). La fiche
+      indiquait précédemment custom — basculé en lucide:landmark-off.
+      CONFIRMÉ au palier 3 maquette : landmark-off renvoie 404 sur
+      lucide-static@1.21.0 → source rebasculée en custom:landmark-off
+      (silhouette landmark + diagonale « off » : path « m3 3 18 18 »).
+    slot_palier_10:
+      - "comp-pin slot icone_categorie variant categorie=lieu_disparu"
+      - "comp-chip-categorie slot icone variant categorie=lieu_disparu"
+    variants:
+      tailles: [XS, MD]
+      etats: [default]
+    mapping_couleurs:
+      dans_pin_sur_carte: TOK-COLOR-BLANC-NARRATIF
+      dans_chip_categorie: TOK-COLOR-TEXTE-PRINCIPAL
+    fichier_svg_attendu: "assets/categories/lieu-disparu.svg"
+    optical_correction_XS_obligatoire: >-
+      Production version dédiée 14×14 SYSTÉMATIQUE pour cette icône
+      (cohérent décision D10 palier 13 après relecture). La diagonale
+      portée par landmark-off est le signal sémantique critique — sa
+      lisibilité à 14px conditionne la lecture de la catégorie. Stroke
+      2 dans la version XS pour garantir perceptibilité.
+    decision_d6_palier_13: "Validé utilisateur 2026-05-07. Évite le cliché 'fantôme' infantile."
+
+  - id: ICON-CAT-VIE-QUOTIDIENNE
+    nom_palier_13: "vie_quotidienne"
+    categorie_palier_4: "Vie quotidienne"
+    source: "lucide:users"
+    metaphore: >-
+      Plusieurs silhouettes humaines — symbolise la vie populaire,
+      le commerce, la rue. Distinct de user-round (Personne — UNE
+      vie singulière) par la pluralité.
+    slot_palier_10:
+      - "comp-pin slot icone_categorie variant categorie=vie_quotidienne"
+      - "comp-chip-categorie slot icone variant categorie=vie_quotidienne"
+    variants:
+      tailles: [XS, MD]
+      etats: [default]
+    mapping_couleurs:
+      dans_pin_sur_carte: TOK-COLOR-BLANC-NARRATIF
+      dans_chip_categorie: TOK-COLOR-TEXTE-PRINCIPAL
+    fichier_svg_attendu: "assets/categories/vie-quotidienne.svg"
+
+  - id: ICON-CAT-ARCHITECTURE
+    nom_palier_13: "architecture"
+    categorie_palier_4: "Architecture"
+    source: "custom:archway"
+    metaphore: >-
+      Arche — métaphore parfaite de Lyon (les traboules, les
+      arcades). Évoque la durée, l'environnement bâti, le passage.
+      Forme caractéristique distincte de landmark / building-2.
+    note_custom: >-
+      archway N'EXISTE PAS dans Lucide (vérifié par relecture).
+      Production custom étape ultérieure — forme simple à dessiner : arche
+      semi-circulaire reposant sur deux pieds-droits verticaux. Stroke 1.5,
+      monoline, round caps — cohérence stricte avec la charte 01.
+      Alternatives Lucide envisagées (building-columns, gem) écartées
+      pour absence de la sémantique 'arche' / 'passage' propre à Lyon.
+    slot_palier_10:
+      - "comp-pin slot icone_categorie variant categorie=architecture"
+      - "comp-chip-categorie slot icone variant categorie=architecture"
+    variants:
+      tailles: [XS, MD]
+      etats: [default]
+    mapping_couleurs:
+      dans_pin_sur_carte: TOK-COLOR-BLANC-NARRATIF
+      dans_chip_categorie: TOK-COLOR-TEXTE-PRINCIPAL
+    fichier_svg_attendu: "assets/categories/architecture.svg"
+
+  - id: ICON-CAT-NATURE-GEOGRAPHIE
+    nom_palier_13: "nature_geographie"
+    categorie_palier_4: "Nature / Géographie"
+    source: "lucide:waves"
+    metaphore: >-
+      Vagues — évoque le Rhône et la Saône (les deux fleuves qui
+      définissent Lyon). S'étend par métonymie aux collines, aux
+      paysages naturels.
+    slot_palier_10:
+      - "comp-pin slot icone_categorie variant categorie=nature_geographie"
+      - "comp-chip-categorie slot icone variant categorie=nature_geographie"
+    variants:
+      tailles: [XS, MD]
+      etats: [default]
+    mapping_couleurs:
+      dans_pin_sur_carte: TOK-COLOR-BLANC-NARRATIF
+      dans_chip_categorie: TOK-COLOR-TEXTE-PRINCIPAL
+    fichier_svg_attendu: "assets/categories/nature-geographie.svg"
+
+  - id: ICON-CAT-PATRIMOINE-VIVANT
+    nom_palier_13: "patrimoine_vivant_traditions"
+    categorie_palier_4: "Patrimoine vivant & Traditions"
+    source: "lucide:heart-handshake"
+    metaphore: >-
+      Cœur dans une poignée de main — symbolise la transmission, le
+      savoir-faire qui se passe de génération en génération, le
+      vivant. Distinct du heart UI (favori) par la composition
+      poignée de main + cœur.
+    slot_palier_10:
+      - "comp-pin slot icone_categorie variant categorie=patrimoine_vivant"
+      - "comp-chip-categorie slot icone variant categorie=patrimoine_vivant"
+    variants:
+      tailles: [XS, MD]
+      etats: [default]
+    mapping_couleurs:
+      dans_pin_sur_carte: TOK-COLOR-BLANC-NARRATIF
+      dans_chip_categorie: TOK-COLOR-TEXTE-PRINCIPAL
+    fichier_svg_attendu: "assets/categories/patrimoine-vivant.svg"
+    note_distinction_heart: >-
+      heart-handshake (cette icône) ≠ heart (icône favori UI fichier 03).
+      La distinction visuelle est claire (composition vs cœur seul) ;
+      pas de risque de confusion à 14px car la composition heart-handshake
+      reste distinctive même réduite.
+
+  - id: ICON-CAT-GASTRONOMIE
+    nom_palier_13: "gastronomie"
+    categorie_palier_4: "Gastronomie"
+    source: "lucide:utensils"
+    metaphore: >-
+      Couverts (fourchette + couteau) — symbole universel de la
+      cuisine. Convient à la gastronomie lyonnaise (bouchons,
+      mâchons) sans cliché spécifique.
+    slot_palier_10:
+      - "comp-pin slot icone_categorie variant categorie=gastronomie"
+      - "comp-chip-categorie slot icone variant categorie=gastronomie"
+    variants:
+      tailles: [XS, MD]
+      etats: [default]
+    mapping_couleurs:
+      dans_pin_sur_carte: TOK-COLOR-BLANC-NARRATIF
+      dans_chip_categorie: TOK-COLOR-TEXTE-PRINCIPAL
+    fichier_svg_attendu: "assets/categories/gastronomie.svg"
+
+# -----------------------------------------------------------------------------
+# 2. Distinguabilité daltonisme — paires signalées par charte DA archivée
+# -----------------------------------------------------------------------------
+distinguabilite_daltonisme:
+
+  contexte: >-
+    Le palier 9 D1 a tranché : la catégorie est signalée par ICÔNE
+    UNIQUEMENT, pas par couleur. Le daltonisme n'affecte donc pas la
+    lecture de la catégorie d'un Pin. Cependant, la charte DA archivée
+    signalait deux paires de couleurs initialement potentiellement
+    confondues (qui n'existent plus puisque les couleurs catégories
+    sont abandonnées palier 9 D1) — les paires sont reconverties en
+    paires d'ICÔNES à valider pour distinguabilité de FORME.
+
+  paires_a_valider_palier_16:
+
+    - paire: "ICON-CAT-CLASSIQUE (landmark) vs ICON-CAT-VIE-QUOTIDIENNE (users)"
+      ancienne_proximite_couleur: "jaune-orange (palier 9 D1 invalide)"
+      analyse_distinguabilite_forme:
+        - "landmark : silhouette de bâtiment avec toit triangulaire et 4 colonnes (forme architecturale)"
+        - "users : 2 silhouettes humaines superposées (forme organique)"
+        - "VERDICT : formes radicalement distinctes (architectural vs humain). Distinguables à 14px par silhouette."
+      validation_palier_16: "Tester sur device cible avec proxy daltonisme (Sim Daltonism). Si insuffisant, examen icône de remplacement."
+
+    - paire: "ICON-CAT-ANECDOTE (sparkles) vs ICON-CAT-EVENEMENT (zap)"
+      ancienne_proximite_couleur: "rouge-orange (palier 9 D1 invalide)"
+      analyse_distinguabilite_forme:
+        - "sparkles : 3 étoiles asymétriques dispersées (forme étoilée)"
+        - "zap : éclair en zigzag (forme angulaire)"
+        - "VERDICT : formes distinctes (étoilé vs angulaire). Distinguables à 14px par silhouette."
+      validation_palier_16: "Tester sur device cible. Risque léger : à 14px les sparkles peuvent paraître diffuses ; optical correction XS dédiée si nécessaire."
+
+  conclusion: >-
+    Le palier 9 D1 a fondé l'app sur la distinguabilité par FORME
+    (icône) plutôt que par couleur. Le palier 13 hérite cette
+    contrainte et le palier 16 valide. Si une paire n'est pas
+    suffisamment distincte à 14px, l'icône concernée est ajustée
+    ICI (changement de Lucide:nom ou production custom).
+
+# -----------------------------------------------------------------------------
+# 3. Persona check
+# -----------------------------------------------------------------------------
+persona_check:
+
+  kenji:
+    impact: ÉLEVÉ
+    note: >-
+      Test 'comprendre l'app sans tutoriel' : les 11 métaphores sont
+      universelles (landmark, sparkles, building, user, zap, users,
+      archway, waves, heart-handshake, utensils + custom landmark-off).
+      Aucune référence culturelle obscure (pas de fleur de lys, pas
+      de symbole spécifique à Lyon).
+
+  mme_dupont:
+    impact: faible
+    note: "Pas d'enjeu spécifique sur les catégories — sa préoccupation est plutôt sur les Parcours (palier 11 chorégraphies)."
+
+  mme_martin:
+    impact: ÉLEVÉ
+    note: >-
+      Lisibilité catégories à 24px (chip catégorie en aperçu rapide
+      M2) depuis le fond de classe. Lisibilité à 14px (icône
+      intérieure du Pin) depuis le tableau projeté. Validation
+      palier 16 critique. Si XS insuffisant, optical correction
+      dédiée étape ultérieure.
+
+  pere_lyonnais:
+    impact: moyen
+    note: >-
+      Reconnaissance immédiate des catégories en flânerie. utensils
+      (gastronomie) et archway (architecture) particulièrement
+      pertinents pour son rapport à Lyon.
+
+  anais_back_office:
+    impact: ÉLEVÉ
+    note: >-
+      Anaïs sélectionne la catégorie d'un Pin lors de la saisie
+      (comp-formulaire-saisie-pin-admin). Les 11 icônes sont
+      affichées dans le sélecteur de catégorie de l'outil admin —
+      cohérence avec l'app mobile garantie par le mapping unique.
+
+# -----------------------------------------------------------------------------
+# 4. Enjeux transversaux
+# -----------------------------------------------------------------------------
+enjeux_transversaux:
+
+  accessibilite: >-
+    Distinguabilité par forme (cf. § 2). Label vocal de chaque
+    catégorie fourni par palier 8 microcopy. Cibles tactiles ≥ 44×44
+    via padding implicite (palier 13 charte 01).
+
+  performance: "11 SVG ~1-2 KB chacun = ~15 KB cumulés. Embedding direct dans l'app, pas de chargement dynamique."
+
+  vie_privee: "Aucun enjeu spécifique."
+
+  i18n: >-
+    Les icônes sont indépendantes de la langue ; le LIBELLÉ de la
+    catégorie est traduit (palier 8). Un utilisateur japonais voit
+    'クラシック' (Classique) avec l'icône landmark — la métaphore
+    architecturale est universelle.
+
+# -----------------------------------------------------------------------------
+# 5. Questions ouvertes
+# -----------------------------------------------------------------------------
+questions_ouvertes:
+  - "Optical correction XS 14px : produire les 11 icônes catégories en version dédiée 14×14 dès la production, ou attendre validation palier 16 ? Proposition : produire toutes les versions 24×24, et 14×14 dédiées pour les catégories à risque (Anecdote sparkles complexe, Patrimoine vivant heart-handshake complexe, Vie quotidienne users superposés). Validation palier 16 décide si étendre."
+  - "Distinguabilité Anecdote vs Événement à 14px : si insuffisant palier 16, alternative pour Anecdote (lucide:lightbulb 'idée' ? lucide:smile 'légèreté' ?). Reste une question palier 16."

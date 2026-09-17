@@ -1,0 +1,293 @@
+# =============================================================================
+# Palier 6 — 05-notifications — Famille E
+# =============================================================================
+# Famille E : notifications de proximité. Trois flows — un pour chaque
+# déclencheur fonctionnel distinct du domaine D4 :
+#   - E1 : passage à proximité d'un Pin en mode Surprenez-moi (D4.2)
+#   - E2 : arrivée à une étape d'un Parcours en cours en mode terrain (D4.3)
+#   - E3 : déclenchement manuel d'arrivée à étape, fallback géoloc (D4.3)
+#
+# Tous trois sont des ALERTES PONCTUELLES (P5.M7) au moment du déclenchement —
+# non bloquantes (P5.C4). Atterrissages distincts : E1 → P5.M2 aperçu rapide
+# ouvert depuis P5.S1 Carte ; E2 et E3 → P5.M3 consultation approfondie de
+# l'étape avec P5.P2 actif.
+# =============================================================================
+
+document:
+  type: palier_flows_cluster
+  cluster_id: "05-notifications"
+  nom: "Notifications de proximité"
+  version: "0.1"
+  date: "2026-05-05"
+  format: yaml
+
+raison_d_etre_du_cluster: >-
+  Les notifications de proximité sont la mécanique par laquelle le LIEU
+  (et non la requête) déclenche un contenu. C'est la matérialisation la
+  plus directe du principe de sérendipité de l'essence. La famille E
+  modélise les trois moments où une notification de proximité peut
+  surgir, avec leurs déclencheurs, leurs pré-requis et leurs atterrissages
+  distincts. Le mode Balade libre (D4.1) n'a PAS de flow propre — c'est
+  l'absence de notification, et le silence n'est pas un flow.
+
+# -----------------------------------------------------------------------------
+# Flows
+# -----------------------------------------------------------------------------
+flows:
+
+  # ---------------------------------------------------------------------------
+  - id: E1
+    nom: "Déclenchement d'une notification en mode Surprenez-moi"
+
+    declencheur: >-
+      L'utilisateur se trouve à proximité d'un Pin alors que le mode
+      Surprenez-moi est actif et qu'aucun Parcours n'est en cours.
+    acteurs: [utilisateur grand public]
+
+    pre_requis_specifiques:
+      - "Mode Surprenez-moi activé dans les préférences du Profil (mode_notification_proximité = surprenez_moi)"
+      - "Permission de géolocalisation accordée (la première demande aura été portée par A3 ou par l'activation du mode A5, pas par E1 lui-même)"
+      - "Permission de notification système accordée (sinon le mode reste utilisable au premier plan uniquement — cf. cas particuliers)"
+      - "Aucun Parcours dans l'état 'en cours' (Surprenez-moi est suspendu pendant un Parcours, cf. D4.2 / D4.3)"
+      - "Pin n'ayant pas déjà déclenché une notification dans la session courante (anti-rejeu)"
+
+    deroule:
+      - etape: 1
+        action: "L'app détecte localement (sans transmission de position à un serveur) que la position courante entre dans le rayon de proximité d'un Pin éligible"
+      - etape: 2
+        action: "Une alerte ponctuelle P5.M7 surgit sur la surface courante, accompagnée du signal sensoriel paramétrable du Profil. L'alerte ne bloque rien (P5.C4)"
+        surfaces_actives: [P5.M7]
+      - etape: 3
+        action: "Le Pin concerné est marqué comme 'déjà notifié dans la session' pour empêcher un rejeu immédiat"
+      - etape: 4
+        action: "Si l'utilisateur tape sur l'alerte, l'app bascule sur P5.S1 Carte (si elle ne s'y trouvait pas déjà) avec le Pin mis en évidence sur la Carte, et un aperçu rapide P5.M2 du Pin s'ouvre"
+        surfaces_actives: [P5.S1, P5.M2]
+
+    bifurcations:
+      - si: "L'utilisateur tape sur l'alerte"
+        alors: "atterrissage en aperçu rapide P5.M2 du Pin sur P5.S1 Carte (équivalent au flow B1 sans avoir tapé manuellement le Pin) ; depuis là, l'utilisateur peut bifurquer vers B2 (consultation approfondie)"
+      - si: "L'utilisateur ferme l'alerte par geste de rejet"
+        alors: "l'alerte disparaît, la surface courante reste inchangée, le Pin reste marqué 'déjà notifié dans la session'"
+      - si: "L'utilisateur ne réagit pas"
+        alors: "l'alerte disparaît seule après son délai (palier 11) ; la notification système (si OS l'autorise) reste consultable dans le centre de notifications"
+
+    sorties_normales:
+      - "Tap → bascule vers B1 (aperçu rapide du Pin) avec entrée par notification"
+      - "Geste de rejet ou expiration → silence, surface courante préservée"
+
+    cas_particuliers:
+      - cas: "Permission de notification système refusée"
+        comportement: "Aucune notification système hors-app. Si l'app est au premier plan, l'alerte ponctuelle P5.M7 reste émise (mode utilisable au premier plan, cf. D4.2 question ouverte)"
+      - cas: "App en arrière-plan ou écran verrouillé"
+        comportement: "L'OS gère la présentation de la notification. Le tap sur la notification ouvre l'app et atterrit en aperçu rapide P5.M2 du Pin (cf. P5.E3 entrée externe)"
+      - cas: "Mode silencieux ou Ne pas déranger système actif"
+        comportement: "Respect des paramètres système — la notification est émise mais sans signal sonore ni vibration (selon la politique OS)"
+      - cas: "Plusieurs Pins éligibles dans le rayon simultanément"
+        comportement: "Une seule alerte est émise, ciblée sur le Pin le plus proche (politique de priorité) ; les autres restent éligibles à un déclenchement ultérieur s'ils restent dans le rayon après mouvement"
+      - cas: "L'utilisateur a déjà consulté ce Pin récemment (visite dans l'Historique)"
+        comportement: "Politique conservatrice par défaut : pas de re-notification dans la même session. Politique inter-sessions à arbitrer (cf. D4.2 question ouverte)"
+      - cas: "Permission de géolocalisation révoquée pendant une session active de Surprenez-moi"
+        comportement: "La mécanique de proximité s'arrête. Un message éphémère P5.M9 informe au prochain retour au premier plan ; le mode reste actif dans les préférences du Profil mais inopérant"
+      - cas: "Engagement d'un Parcours pendant que Surprenez-moi est actif"
+        comportement: "Surprenez-moi est suspendu, le mode 'En parcours' (D4.3) prend le relais — bascule vers la mécanique du flow E2"
+
+    entites_impliquees: [Pin, Profil, "Historique de visite"]
+    surfaces_et_modes: [P5.M7, P5.M2, P5.S1, P5.C4]
+    references_palier_3: [D4.2, D5.5]
+    invariants_respectes: [I6]
+
+    questions_ouvertes:
+      - "Fenêtre de re-notification d'un même Pin entre sessions : jamais ? après N jours ? après reset explicite par l'utilisateur ? — recommandation D4.2 reportée ici"
+      - "Cooldown d'immobilité prolongée (terrasse de café) pour éviter le harcèlement passif d'un Pin proche — D4.2 question ouverte"
+      - "Le Pin marqué 'déjà notifié' compte-t-il aussi quand l'utilisateur a refusé l'aperçu (geste de rejet), ou seulement quand il l'a consulté ? — décision palier 7"
+
+  # ---------------------------------------------------------------------------
+  - id: E2
+    nom: "Déclenchement de l'arrivée à une étape en parcours"
+
+    declencheur: >-
+      L'app détecte que la position de l'utilisateur entre dans le rayon
+      de proximité d'une Étape du Parcours en cours, en mode terrain.
+    acteurs: [utilisateur grand public]
+
+    pre_requis_specifiques:
+      - "Parcours dans l'état 'en cours' avec mode terrain actif (cf. flow C5)"
+      - "Permission de géolocalisation accordée (la première demande aura été portée par C4 lors du choix mode terrain, pas par E2)"
+      - "Étape cible n'ayant pas déjà déclenché une notification dans la session de parcours courante (anti-rejeu)"
+      - "Étape cible référençant un Pin localisé (instanciation locale de I9)"
+
+    deroule:
+      - etape: 1
+        action: "L'app détecte localement l'entrée dans le rayon de proximité de l'Étape courante (ou d'une Étape suivante si saut implicite)"
+      - etape: 2
+        action: "Une alerte ponctuelle P5.M7 surgit sur la surface courante (typiquement P5.S1 Carte avec P5.P2 actif), avec signal sensoriel paramétrable"
+        surfaces_actives: [P5.M7, P5.P2]
+      - etape: 3
+        action: "L'Étape est marquée comme 'déclenchée dans la session de parcours' pour empêcher un rejeu (saut, retour, aller-retour)"
+      - etape: 4
+        action: >-
+          Si l'utilisateur tape sur l'alerte, l'app ouvre directement la
+          consultation approfondie P5.M3 du Pin de l'Étape — pas
+          d'aperçu intermédiaire, conformément au contrat D4.3 (l'utilisateur
+          s'est engagé sur le parcours, l'histoire vient à lui).
+        surfaces_actives: [P5.M3, P5.P2]
+      - etape: 5
+        action: "L'arrivée est enregistrée dans l'Historique de visite (cluster 03) — l'étape est marquée complétée. Le flow C5 reprend la main sur la suite (étape suivante mise en évidence dans P5.P2)"
+
+    bifurcations:
+      - si: "L'utilisateur tape sur l'alerte"
+        alors: "ouverture directe de P5.M3 (équivalent à un appel direct du flow B2 sur le Pin de l'Étape, sans étape d'aperçu) ; le flow C5 reprend au retour"
+      - si: "L'utilisateur ferme l'alerte ou ne réagit pas"
+        alors: "l'alerte disparaît mais l'Étape est tout de même marquée 'déclenchée' (l'arrivée a été détectée) ; l'utilisateur peut rouvrir la consultation manuellement via P5.P2 ou la liste des étapes"
+
+    sorties_normales:
+      - "Tap → ouverture P5.M3 + complétion de l'Étape ; retour au flow C5"
+      - "Geste de rejet ou expiration → l'Étape est techniquement déclenchée, l'utilisateur reprend la main (peut consulter plus tard via P5.P2)"
+
+    cas_particuliers:
+      - cas: "Géolocalisation imprécise (rues étroites du Vieux Lyon, traboule, intérieur)"
+        comportement: "Le déclenchement automatique peut ne pas se produire. L'utilisateur a alors recours au flow E3 (déclenchement manuel)"
+      - cas: "Permission de notification système refusée mais permission géoloc accordée"
+        comportement: "Mécanique de proximité fonctionnelle au premier plan ; en arrière-plan, pas de notification système poussée. Le repli E3 reste accessible. Pas de blocage du parcours (cohérent avec D4.3 DoD)"
+      - cas: "Permission de géolocalisation révoquée en cours de parcours"
+        comportement: "Le mode terrain bascule automatiquement vers le mode canapé (cas particulier de C5) ; E2 cesse de se déclencher ; E3 reste utilisable"
+      - cas: "Plusieurs Étapes du parcours dans le rayon simultanément (parcours dense)"
+        comportement: "Une seule alerte est émise, priorisée selon l'ordre du parcours (l'Étape la plus proche dans l'ordre attendu prime) ; cf. question ouverte de D3.5"
+      - cas: "Pin de l'Étape retiré pendant le parcours en cours"
+        comportement: "L'alerte est tout de même émise ; l'ouverture de P5.M3 affiche un message gracieux indiquant que le contenu n'est plus disponible ; l'Étape est marquée complétée (l'arrivée a été honorée géographiquement)"
+      - cas: "App en arrière-plan ou écran verrouillé"
+        comportement: "Notification système poussée par l'OS ; le tap atterrit directement en P5.M3 sur l'Étape (cf. P5.E3 entrée externe)"
+      - cas: "Mode silencieux ou Ne pas déranger système"
+        comportement: "Politique système respectée — alerte sans son ni vibration selon la configuration"
+
+    entites_impliquees: [Parcours, Étape, Pin, "Historique de visite"]
+    surfaces_et_modes: [P5.M7, P5.M3, P5.P2, P5.S1, P5.C4]
+    references_palier_3: [D4.3, D3.5, D5.5]
+    invariants_respectes: [I9]
+
+    questions_ouvertes:
+      - "Si l'utilisateur ne réagit pas à l'alerte, l'Étape doit-elle être considérée 'complétée' ou simplement 'déclenchée non consultée' ? — relève cluster 03 (Historique de visite) et cf. arbitrage J palier 4 sur la complétion implicite"
+      - "Comportement à l'aller-retour devant la même Étape : redéclenchement ou silence ? Recommandation D4.3 : silence (une fois par session de parcours), à confirmer"
+
+  # ---------------------------------------------------------------------------
+  - id: E3
+    nom: "Déclenchement manuel de l'arrivée à une étape (fallback)"
+
+    declencheur: >-
+      L'utilisateur active manuellement le contrôle 'je suis à l'étape'
+      depuis P5.P2 ou depuis la liste des étapes — typiquement parce que
+      la géolocalisation est imprécise, indisponible, ou refusée.
+    acteurs: [utilisateur grand public]
+
+    pre_requis_specifiques:
+      - "Parcours dans l'état 'en cours'"
+      - "Étape cible non encore complétée (un déclenchement sur étape déjà complétée est une re-consultation, pas un fallback — cf. C8 cas particulier)"
+
+    deroule:
+      - etape: 1
+        action: "L'utilisateur active le contrôle de fallback 'je suis à l'étape' depuis la surface persistante P5.P2 ou depuis la liste des étapes ouverte"
+        surfaces_actives: [P5.P2]
+      - etape: 2
+        action: "L'app n'effectue PAS de vérification géographique stricte (le fallback existe précisément parce que la géoloc n'est pas fiable). Aucun dialogue de confirmation — l'action est volontaire et révocable par retour"
+      - etape: 3
+        action: "L'Étape est marquée comme déclenchée et complétée dans l'Historique de visite — équivalent fonctionnel au déclenchement automatique de E2"
+      - etape: 4
+        action: "L'app ouvre directement la consultation approfondie P5.M3 du Pin de l'Étape (cohérence stricte avec E2)"
+        surfaces_actives: [P5.M3, P5.P2]
+      - etape: 5
+        action: "Au retour de P5.M3, le flow C5 (ou C6 si bascule canapé entre-temps) reprend, étape suivante mise en évidence"
+
+    bifurcations:
+      - si: "L'utilisateur active le fallback puis revient sans consulter"
+        alors: "l'Étape reste marquée complétée (l'utilisateur a déclaré être arrivé) ; il peut rouvrir P5.M3 plus tard via P5.P2 ou la liste"
+      - si: "L'utilisateur active le fallback sur une Étape NON courante (saut explicite)"
+        alors: "comportement équivalent au flow C8 (saut d'étape) — les Étapes intermédiaires sont marquées non complétées implicitement, l'Étape cible devient courante"
+
+    sorties_normales:
+      - "Étape complétée + ouverture P5.M3 + retour à C5/C6"
+      - "Étape complétée silencieusement (sans consultation) si l'utilisateur ferme P5.M3 immédiatement"
+
+    cas_particuliers:
+      - cas: "Permission de géolocalisation refusée dès le départ du parcours"
+        comportement: "E3 est le mécanisme principal d'avancement (pas de E2 possible) ; le contrôle de fallback est mis en avant dans P5.P2 (sans culpabilisation, cohérent avec D4.3 DoD)"
+      - cas: "Pin de l'Étape retiré entre-temps"
+        comportement: "Comme E2 cas particulier — message gracieux, Étape tout de même marquée complétée"
+      - cas: "L'utilisateur active le fallback alors qu'il est manifestement loin de l'Étape (cas extrême)"
+        comportement: "L'app n'oppose PAS de garde-fou — elle fait confiance à l'utilisateur. La cohérence du parcours vécu est sa responsabilité (ce n'est pas un GPS, ni un juge, cf. essence § ce_qu_on_refuse). L'Historique enregistre la complétion telle qu'elle est déclarée"
+      - cas: "Mode canapé actif (Parcours en C6)"
+        comportement: "Le contrôle utilisé est en réalité le 'passage à l'étape' propre au mode canapé. Le résultat est fonctionnellement équivalent — E3 et la navigation manuelle de C6 convergent dans la même action sur l'Étape"
+
+    entites_impliquees: [Parcours, Étape, Pin, "Historique de visite"]
+    surfaces_et_modes: [P5.P2, P5.M3]
+    references_palier_3: [D4.3, D3.5]
+    invariants_respectes: [I9]
+
+    questions_ouvertes:
+      - "Distinction fonctionnelle entre 'fallback E3' et 'navigation manuelle en mode canapé C6' : faut-il deux contrôles distincts ou un contrôle unique 'avancer à l'étape' qui s'adapte au mode ? — recommandation : contrôle unique avec libellé adapté (cf. palier 8). Tranchage palier 7"
+      - "Trace dans l'Historique de visite : différencier 'complétion auto E2' vs 'complétion manuelle E3' (utile pour Mme Dupont qui veut savoir si la classe a vraiment marché jusqu'aux lieux) ? — cluster 03 question ouverte, à confirmer"
+
+# -----------------------------------------------------------------------------
+# Persona check
+# -----------------------------------------------------------------------------
+persona_check:
+
+  kenji:
+    impact: "indirect"
+    note: >-
+      Kenji est l'utilisateur principal de E2 quand il marche un parcours
+      éditorial dans le Vieux Lyon avec son casque. La fluidité de E2
+      sert directement son test_litmus 'vivre 80% de l'expérience sans
+      regarder l'écran' : signal discret, ouverture directe de la
+      consultation, audio qui prend le relais via P5.P1. E3 lui sert de
+      filet quand il entre dans une traboule où la géoloc lâche. Les
+      cas 'permission notif refusée' et 'mode silencieux respecté'
+      sont importants pour lui (touriste qui peut ne pas vouloir tout
+      activer).
+
+  mme_dupont:
+    impact: "direct"
+    note: >-
+      E2 est CRITIQUE pour les parents accompagnateurs de la sortie
+      scolaire — la mécanique d'arrivée fait le travail à leur place,
+      ils n'ont rien à configurer (test_litmus 'parent qui sait quoi
+      faire en 30 secondes'). E3 leur garantit qu'ils ne resteront
+      jamais bloqués sur une étape (rues étroites, classe qui s'agglutine
+      dans une cour). Le cas 'permission notif refusée' est explicitement
+      couvert : pas de blocage, repli E3 disponible. La trace de
+      complétion auto vs manuelle (question ouverte de E3) la concerne
+      indirectement si elle veut vérifier le parcours réel.
+
+  mme_martin:
+    impact: "indirect"
+    note: >-
+      Mme Martin est en mode canapé en classe — ni E1, ni E2 ne se
+      déclenchent (Surprenez-moi désactivable, mode terrain inactif en
+      canapé, cf. D4.1 et D4.3). E3 converge fonctionnellement avec
+      la navigation manuelle de C6 ; elle utilise donc le même
+      contrôle pour avancer dans le parcours projeté en classe.
+      L'absence totale de notif pendant la projection est un triple
+      filet (Balade libre par défaut + canapé suspend E2 + mode
+      présentation P5.M4 met P5.P2 en sommeil — P5.C2).
+
+  pere_lyonnais:
+    impact: "MAJEUR"
+    note: >-
+      E1 est SON flow d'incarnation — Surprenez-moi est sa porte d'entrée
+      principale dans HistoLyon. Le test_litmus 'recevoir une anecdote
+      au bon moment, sans rien demander' est servi par E1 ligne par
+      ligne : alerte non bloquante (P5.C4), atterrissage en aperçu
+      rapide P5.M2 (lecture courte avant qu'un enfant ne le tire par la
+      manche), anti-rejeu intra-session (pas de harcèlement). Le cas
+      particulier 'cooldown d'immobilité' (question ouverte) le
+      concerne directement. E2 et E3 le concernent secondairement
+      s'il suit un parcours communautaire dominical.
+
+  anais_back_office:
+    impact: "indirect"
+    note: >-
+      Anaïs n'utilise pas ces flows. Elle PRODUIT le contenu poussé
+      (titre / teaser du Pin qui sert de base au texte de la
+      notification — palier 8) et définit les coordonnées du Pin
+      qui conditionnent le déclenchement (cluster 01). Question
+      transverse pour elle : prévoir au palier 8 un champ dédié
+      'texte de notification' ou réutiliser le titre/teaser ?

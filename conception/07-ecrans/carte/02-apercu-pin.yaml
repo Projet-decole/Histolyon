@@ -1,0 +1,80 @@
+# =============================================================================
+# E-CARTE-APERCU-PIN — Aperçu rapide d'un Pin sur la Carte
+# =============================================================================
+# Surface en P5.M2 imbriquée au-dessus de la Carte. S'ouvre au tap d'un Pin
+# ou à la suite d'une notification de proximité (Surprenez-moi). Permet à
+# l'utilisateur de décider en quelques secondes : approfondir, partager,
+# refermer.
+# =============================================================================
+
+document:
+  type: palier_ecrans_fiche
+  format: yaml
+
+ecran:
+  id: E-CARTE-APERCU-PIN
+  nom: "Aperçu rapide d'un Pin sur la Carte"
+
+  mode: P5.M2
+  surface_parente: P5.S1
+
+  raison_d_etre: >-
+    Consultation courte d'un Pin qui laisse la Carte visible derrière.
+    L'utilisateur peut lire le teaser, voir la Catégorie et l'Époque,
+    décider d'approfondir ou de refermer. Réversible d'un geste neutre.
+    C'est l'écran qui rend la sérendipité opérationnelle — il invite
+    sans embarquer.
+
+  composition:
+    - zone: "indicateur de provenance et de catégorie"
+      role: "affiche la Catégorie du Pin et, le cas échéant, sa marque distinctive (provenance communautaire en cours de vérification — I3)"
+      entites_affichees: [Catégorie, Pin, Badge]
+
+    - zone: "titre et époque(s)"
+      role: "titre du Pin et époques associées (multi-époques possibles, I8)"
+      entites_affichees: [Pin, Époque]
+
+    - zone: "teaser narratif"
+      role: "court extrait du contenu narratif (structure interne et longueur — palier 8)"
+      entites_affichees: [Pin]
+
+    - zone: "vignette ou média de couverture"
+      role: "premier média visuel rattaché au Pin si disponible"
+      entites_affichees: [Média]
+
+    - zone: "points d'accès actions courtes"
+      role: "favori (flow B7), partage (flow F1), point d'accès vers la consultation approfondie (flow B2)"
+
+  etats:
+    nominal_charge: "Pin chargé, teaser et vignette visibles, Carte visible derrière (P5.C3)"
+    chargement: "Données du Pin en cours de chargement, Carte visible, structure de l'aperçu présente sans contenu rempli"
+    pin_communautaire_en_revue: "Marque distinctive visible (cf. I3) signalant que les sources sont en cours de vérification ; aucune dégradation de l'aperçu, simplement une signalétique"
+    offline_avec_cache: "Pin préalablement préchargé, contenu disponible ; bandeau P3 reste visible derrière"
+    offline_sans_cache: "Données non préchargées, message gracieux invitant à se reconnecter pour voir le détail ; titre et localisation peuvent être affichés s'ils sont stockés au niveau de la Carte"
+    pin_sans_localisation: "L'aperçu peut tout de même apparaître si l'utilisateur a accédé au Pin par recherche (E-CARTE-RECHERCHE) — la Carte derrière ne montre pas de point géolocalisé (cf. I9)"
+    pin_retire: "Si le Pin a été retiré entre le chargement de la Carte et le tap, message gracieux indiquant que le contenu n'est plus disponible et fermeture proposée"
+    favori_deja_actif: "Le contrôle favori reflète l'état favori du Pin pour ce Profil (cluster 03)"
+
+  elements_interactifs:
+    - "Tap sur le point d'accès 'approfondir' → flow B2 (Consultation approfondie) — bascule vers E-PIN-CONSULTATION-APPROFONDIE"
+    - "Tap sur le contrôle favori → flow B7 (Marquage favori), bascule visuelle immédiate"
+    - "Tap sur le contrôle partage → flow F1 (Partage du Pin via partage natif système)"
+    - "Tap sur le contrôle signalement (uniquement si Pin de provenance communautaire) → flow G3 avec cible = pin_communautaire"
+    - "Geste neutre de fermeture → l'aperçu se referme, la Carte reprend pleinement"
+
+  flows_actifs:
+    - B1   # Aperçu rapide (cet écran est l'instanciation de B1)
+    - B2   # Bascule vers consultation approfondie
+    - B7   # Marquage favori
+    - F1   # Partage du Pin
+    - G3   # Signalement (si Pin communautaire)
+    - E1   # Atterrissage depuis notification de proximité Surprenez-moi
+
+  surfaces_imbriquees:
+    - E-PIN-CONSULTATION-APPROFONDIE   # bascule M3 si l'utilisateur approfondit
+    - E-COMMUNAUTE-REDACTION-SIGNALEMENT  # M6 si signalement (cible communautaire)
+    - E-TRANSVERSES-MESSAGE-EPHEMERE    # M9 confirmation après favori, partage, signalement
+
+  questions_ouvertes:
+    - "Surfaçage du contrôle signalement uniquement pour Pin communautaire (cf. cluster 04 question ouverte) — visibilité du contrôle conditionnelle à la provenance, palier 10 décide la modalité"
+    - "Si l'utilisateur revient à la Carte sans approfondir, l'aperçu rapide précédent doit-il rester en historique de visite (cluster 03) ou ne pas être tracé (consultation trop courte) ?"

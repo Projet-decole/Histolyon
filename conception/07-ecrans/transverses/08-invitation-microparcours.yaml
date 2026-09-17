@@ -1,0 +1,62 @@
+# =============================================================================
+# E-TRANSVERSES-INVITATION-MICROPARCOURS — Invitation au micro-parcours découverte
+# =============================================================================
+# Alerte ponctuelle (P5.M7) qui propose à l'utilisateur, au premier moment
+# pertinent du tout premier lancement, de suivre un micro-parcours découverte
+# (flow A2). Deux issues explicites : accepter ou reporter — pas de troisième
+# voie, pas de validation neutre obligatoire (D5.2).
+#
+# Splittée du template E-TRANSVERSES-INDICATION-ONBOARDING le 2026-05-05
+# (décision utilisateur sur recommandation de relecture) parce que
+# son comportement (deux issues explicites) est de nature M7 (alerte
+# ponctuelle non bloquante avec choix), pas M9 (message éphémère pur).
+# =============================================================================
+
+document:
+  type: palier_ecrans_fiche
+  format: yaml
+
+ecran:
+  id: E-TRANSVERSES-INVITATION-MICROPARCOURS
+  nom: "Invitation au micro-parcours découverte"
+
+  mode: P5.M7
+  surface_parente: "transverse"
+
+  raison_d_etre: >-
+    Proposer SOBREMENT à l'utilisateur, au premier lancement et au moment
+    pertinent (à arbitrer palier 7), de suivre un parcours d'introduction
+    qui révèle les capacités centrales de l'app (slider d'époque,
+    consultation d'un Pin, etc.). Cohérent avec D5.2 (« le report n'est
+    pas pénalisant ») et avec l'essence (pas de tutoriel imposé). Apparaît
+    UNE FOIS ; si reportée, n'est plus représentée.
+
+  composition:
+    - zone: "zone d'invitation"
+      role: "court texte qui propose le micro-parcours et donne la promesse fonctionnelle (microcopy palier 8 — par exemple : présenter une découverte de quelques minutes)"
+
+    - zone: "double choix accepter / reporter"
+      role: "deux issues EXPLICITES : accepter (déclenche le micro-parcours), reporter (l'invitation se ferme, n'est plus représentée). Pas de troisième option, pas de validation neutre. Conforme à D5.2."
+
+  etats:
+    nominal_emise: "L'invitation s'affiche à un moment pertinent du premier lancement ; surface principale derrière (Carte) reste utilisable"
+    acceptation: "L'utilisateur a tapé 'accepter' ; bascule vers le flow A2 (lancement du micro-parcours via C4 sur le parcours D5.3 dédié) ; l'invitation se ferme"
+    report: "L'utilisateur a tapé 'reporter' ; l'invitation se ferme ; flag 'reporté' posé sur le Profil (cluster 03) ; pas de réapparition aux lancements suivants. Le micro-parcours reste accessible depuis le catalogue P5.S2 (C1)"
+    ignoree: "L'utilisateur n'a pas tapé l'invitation et a commencé à manipuler la Carte (pan, zoom, tap d'un Pin) ; l'invitation se dissipe (équivalent à un report implicite, conformément à D5.2)"
+    sommeil_visuel_m4: "P5.C2 — en mode présentation (improbable au premier lancement), l'invitation ne s'affiche pas ; sa programmation est reportée au prochain retour en mode standard"
+
+  elements_interactifs:
+    - "Tap sur 'accepter' → bascule vers C4 (Lancement du micro-parcours D5.3) ; l'invitation se ferme"
+    - "Tap sur 'reporter' → ferme l'invitation, pas de relance ultérieure"
+    - "Manipulation de la surface principale derrière (geste neutre) → report implicite, l'invitation se dissipe"
+
+  flows_actifs:
+    - A2   # Invitation au micro-parcours découverte (instance unique de cet écran)
+
+  surfaces_imbriquees:
+    - E-PARCOURS-LANCEMENT   # bascule via C4 si l'utilisateur accepte
+
+  questions_ouvertes:
+    - "Délai exact entre l'apparition de la Carte au premier lancement et l'apparition de l'invitation — palier 7 (recommandation : laisser quelques secondes pour que l'utilisateur découvre la Carte sans pression)"
+    - "Forme visuelle de l'invitation (overlay au-dessus de la Carte, pose-toi à un coin, intégration au sélecteur de section) — palier 10 ; la fonction reste capturée ici"
+    - "Si l'utilisateur ferme l'app sans avoir tranché (ni accepté ni reporté ni manipulé la Carte), considérer comme reporté ou comme jamais émis ? Recommandation D5.2 : reporté (cohérent avec ne pas relancer agressivement)"

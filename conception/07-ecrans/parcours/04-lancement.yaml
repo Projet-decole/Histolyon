@@ -1,0 +1,72 @@
+# =============================================================================
+# E-PARCOURS-LANCEMENT — Lancement d'un Parcours (choix mode terrain/canapé)
+# =============================================================================
+# Surface ponctuelle (P5.M6) qui s'ouvre depuis E-PARCOURS-FICHE-DETAIL pour
+# laisser à l'utilisateur le choix du mode de déroulé (terrain ou canapé) en
+# fonction de sa position, de la permission géoloc et de sa préférence. Aboutit
+# à la bascule vers C5 ou C6.
+# =============================================================================
+
+document:
+  type: palier_ecrans_fiche
+  format: yaml
+
+ecran:
+  id: E-PARCOURS-LANCEMENT
+  nom: "Lancement d'un Parcours (choix mode terrain/canapé)"
+
+  mode: P5.M6
+  surface_parente: P5.S2
+
+  raison_d_etre: >-
+    Surface courte qui assoit la décision de mode : terrain (avec géoloc,
+    déclenchement d'alertes de proximité) ou canapé (consultation manuelle,
+    aucune alerte). L'app propose un mode par défaut (selon proximité de la
+    première étape et permission géoloc), l'utilisateur confirme ou bascule.
+    Aboutit à l'apparition de P5.P2 et au déclenchement de C5 ou C6.
+
+  composition:
+    - zone: "rappel du parcours sélectionné"
+      role: "titre, image d'ouverture réduite, première étape, durée et distance estimées"
+      entites_affichees: [Parcours, Étape]
+
+    - zone: "proposition du mode par défaut"
+      role: "indique quel mode est proposé (terrain si proximité + géoloc OK, canapé sinon) et pourquoi (court résumé des conditions)"
+
+    - zone: "choix du mode"
+      role: "deux options explicites — mode terrain et mode canapé — avec les conséquences fonctionnelles courtes (alertes de proximité OUI/NON, géoloc requise OUI/NON)"
+
+    - zone: "validation"
+      role: "action explicite de démarrage qui transitionne le Parcours en état 'en cours' et fait apparaître P5.P2"
+
+  etats:
+    nominal_terrain_propose: "Position et permission géoloc OK et utilisateur à proximité de la première étape ; mode terrain proposé par défaut, mode canapé disponible en option"
+    nominal_canape_propose: "L'une au moins des conditions du terrain n'est pas remplie ; mode canapé proposé par défaut, mode terrain grisé ou conditionné à une demande de permission"
+    permission_geoloc_refusee: "La permission de géoloc est refusée ; le mode terrain n'est pas proposé directement ; le flow A6 (demande de permission juste-à-temps) peut être proposé en option"
+    parcours_deja_en_cours_autre: "Un autre Parcours est déjà en cours pour cet utilisateur ; un dialogue de confirmation E-TRANSVERSES-DIALOGUE-CONFIRMATION (M8) demande s'il abandonne le précédent ou annule le nouveau lancement"
+    chargement: "Détermination du mode par défaut en cours (vérification position et permission)"
+    offline_avec_cache: "Réseau indisponible mais Parcours préchargé ; les deux modes restent disponibles ; bandeau P3 visible"
+    offline_sans_cache: "Réseau indisponible et Parcours non préchargé ; mode canapé limité au contenu déjà téléchargé ; message éphémère prévu en cours de déroulé pour les étapes non disponibles ; mode terrain reste possible si géoloc OK"
+    erreur: "Échec technique de la vérification des conditions ; message gracieux et fallback sur le mode canapé"
+
+  elements_interactifs:
+    - "Sélection explicite du mode (terrain ou canapé) si l'utilisateur veut basculer du défaut"
+    - "Validation du démarrage → bascule vers C5 ou C6 selon mode choisi (E-PARCOURS-EN-COURS-TERRAIN ou E-PARCOURS-EN-COURS-CANAPE)"
+    - "Demande de permission de géoloc si mode terrain choisi sans permission accordée → flow A6, bascule vers E-TRANSVERSES-DIALOGUE-PERMISSION"
+    - "Annulation explicite ou geste neutre de fermeture → la surface se ferme, retour à E-PARCOURS-FICHE-DETAIL sans démarrage (P5.N5)"
+    - "Confirmation d'abandon du parcours précédent (état parcours_deja_en_cours_autre) → ouverture E-TRANSVERSES-DIALOGUE-CONFIRMATION"
+
+  flows_actifs:
+    - C4   # Lancement d'un parcours
+
+  surfaces_imbriquees:
+    - E-PARCOURS-EN-COURS-TERRAIN              # M3 si terrain choisi
+    - E-PARCOURS-EN-COURS-CANAPE               # M3 si canapé choisi
+    - E-TRANSVERSES-DIALOGUE-PERMISSION        # M8 si demande géoloc
+    - E-TRANSVERSES-DIALOGUE-CONFIRMATION      # M8 si autre parcours déjà en cours
+    - E-TRANSVERSES-MESSAGE-EPHEMERE           # M9 récurrent
+
+  questions_ouvertes:
+    - "Délai d'attente de la détermination du mode par défaut avant fallback sur canapé (timeout réseau / GPS) — palier 16"
+    - "Mémorisation de la préférence de mode entre lancements successifs (ex. utilisateur qui prend toujours canapé) — relève cluster 03 préférences ou palier 10"
+    - "Cas Parcours personnel sans coordonnées sur certaines étapes (cf. cluster 02 question ouverte sur les Pins sans coord) : faut-il forcer le mode canapé ou autoriser le terrain partiel ?"

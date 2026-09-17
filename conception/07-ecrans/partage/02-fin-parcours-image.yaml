@@ -1,0 +1,75 @@
+# =============================================================================
+# E-PARTAGE-FIN-PARCOURS-IMAGE — Image partageable de fin de parcours
+# =============================================================================
+# Surface (P5.M3) qui génère et présente l'Image partageable d'une fin de
+# Parcours — synthèse atmosphérique combinant tracé, statistiques et signature
+# HistoLyon. Distincte de la célébration (E-PARCOURS-FIN-CELEBRATION) : peut
+# être ouverte depuis la célébration ou re-générée depuis l'historique (D3 / C10).
+# =============================================================================
+
+document:
+  type: palier_ecrans_fiche
+  format: yaml
+
+ecran:
+  id: E-PARTAGE-FIN-PARCOURS-IMAGE
+  nom: "Image partageable de fin de parcours"
+
+  mode: P5.M3
+  surface_parente: P5.S2
+
+  raison_d_etre: >-
+    Donner à une fin de Parcours une trace visuelle qui parle pour
+    elle-même sur les réseaux sociaux — atmosphérique, sobre, sans
+    identité d'expéditeur encodée (cluster 06 invariants D1, D2). C'est
+    ICI que Kenji partage en quelques secondes sur Instagram sans
+    composer un texte. La surface prépare la donnée (Image + Lien
+    universel) puis remet la main au mécanisme de partage natif système.
+
+  composition:
+    - zone: "prévisualisation de l'Image partageable"
+      role: "représentation de l'image générée — tracé du parcours, statistiques de fin, élément de signature de la marque (composition visuelle exacte palier 9) ; tracé par défaut = trajectoire idéale du parcours (cluster 06 invariant — jamais la trajectoire GPS personnelle sans opt-in explicite)"
+      entites_affichees: ["Image partageable", Parcours]
+
+    - zone: "rappel de la cible"
+      role: "rappel discret du Parcours synthétisé (titre, mode terrain/canapé, date d'achèvement) pour situer le contexte"
+      entites_affichees: [Parcours]
+
+    - zone: "point d'accès partage natif"
+      role: "remet la main au mécanisme de partage natif système avec la combinaison Image partageable + Lien universel canonique du Parcours (cf. F3 étape 3)"
+
+    - zone: "point d'accès enregistrement"
+      role: "enregistrement local de l'image (sans passer par le partage natif) — utile si l'utilisateur veut garder l'image avant de la partager plus tard"
+
+    - zone: "point d'accès régénération"
+      role: "regénère l'image (utile si re-partage depuis l'historique d'une fin de parcours passée — cf. cluster 06 cycle de vie générée → regénérée)"
+
+  etats:
+    nominal_charge: "Image générée et affichée, points d'accès partage / enregistrement / régénération actifs"
+    chargement_generation: "Génération en cours (court délai pour composition graphique) ; les points d'accès sont en sommeil"
+    erreur_generation_avec_fallback: "Échec de génération de l'image (composition graphique impossible, élément stylistique manquant) ; fallback gracieux proposant le partage du Lien universel seul (cf. F3 cas particulier) ; message éphémère P5.M9 informant que la trace visuelle n'a pas pu être générée"
+    offline_avec_cache_local: "Connexion indisponible mais Parcours préchargé localement avec ses éléments stylistiques ; génération purement locale, surface pleinement fonctionnelle"
+    offline_sans_cache_local: "Connexion indisponible et éléments stylistiques manquants ; message éphémère P5.M9 informant que le partage sera disponible à la reconnexion ; la fin de parcours reste enregistrée dans l'Historique pour partage ultérieur (cf. F3 cas particulier)"
+    parcours_cible_retire: "Parcours retiré entre la complétion et le partage (parcours communautaire dépublié) — l'image reste générable (l'expérience vécue compte, cf. C9 cas particulier) ; le Lien partagé pointera vers une cible retombée, résolution gracieuse côté destinataire (F5)"
+    regeneration_depuis_historique: "Surface ouverte depuis l'Historique (D3 ou relancement C10) sur une fin de parcours passée ; comportement dépend du choix d'implémentation persistance vs régénération (cluster 06 question ouverte) — soit l'image persistée est retrouvée, soit une nouvelle génération est déclenchée"
+    retour_de_partage_systeme: "Au retour du système après partage natif, la surface reprend son état précédent (P5.N7 préservation d'état) ; l'image reste affichée et re-partageable"
+
+  elements_interactifs:
+    - "Tap sur le point d'accès partage natif → flow F3 (étapes 3-5 — remise de main au système avec Image + Lien universel)"
+    - "Tap sur le point d'accès enregistrement → enregistrement local de l'image générée"
+    - "Tap sur le point d'accès régénération → nouvelle génération de l'image (rafraîchissement, cf. cluster 06 transition générée → regénérée)"
+    - "Tap sur le fallback partage du Lien seul (en état d'erreur) → F2 (partage du Lien universel sans image annexe)"
+    - "Geste de fermeture (geste neutre ou validation explicite) → retour à E-PARCOURS-FIN-CELEBRATION (si surface parente est la célébration) ou à E-PROFIL-HISTORIQUE / P5.S2 (si ouverte depuis l'historique)"
+
+  flows_actifs:
+    - F3   # Partage d'une fin de parcours (Image partageable)
+
+  surfaces_imbriquees:
+    - E-TRANSVERSES-MESSAGE-EPHEMERE  # M9 si erreur de génération, fallback, ou confirmation d'enregistrement
+
+  questions_ouvertes:
+    - "L'Image partageable est-elle proposée AVANT ou APRÈS la remise de main au système ? Cette fiche fait l'hypothèse d'une confirmation visuelle AVANT (Kenji veut voir avant de poster) — cf. F3 question ouverte, à confirmer en arbitrage palier 7"
+    - "Re-partage depuis l'Historique : on retrouve l'image persistée ou on en génère une nouvelle ? — D11.4 question ouverte, cluster 06 question ouverte, lien avec C10"
+    - "Variante par Parcours (badge associé visible discrètement sur l'image) — D11.4 question ouverte, paliers 9 et 13"
+    - "Statistiques exactes synthétisées (étapes complétées, durée, distance, époques traversées) — D11.4 question ouverte, palier 8"
+    - "Opt-in explicite pour exposer la trajectoire parcourue (GPS) plutôt que la trajectoire idéale — concerne la vie privée (cluster 06 invariant), à arbitrer hors palier 7"

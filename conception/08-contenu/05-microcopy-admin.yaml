@@ -1,0 +1,514 @@
+# =============================================================================
+# Palier 8 — 05-microcopy-admin
+# =============================================================================
+# Microcopy back-office à destination d'Anaïs et des rôles admin (validateur
+# scientifique, modérateur). Couvre les 8 écrans E-ADMIN-* (palier 7) et les
+# flows H1-H6 (palier 6).
+#
+# Registre TRÈS DIFFÉRENT de la microcopy grand public (cf. 04-microcopy-
+# grand-public) : pas de ton conteur, pas de tu narratif. Voix de l'app
+# uniquement, vouvoiement systématique, vocabulaire métier admis. Anaïs
+# maîtrise les termes du palier 4 (Trace de modération, provenance
+# communautaire, validé_sources_vérifiées) — on les expose sans pédagogie.
+#
+# Cohérence stricte avec le pilote 01-strategie-narrative § conteur.
+# registres_par_persona.backoffice_anais : neutre, précis, fonctionnel.
+# Pas froid pour autant — clair et respectueux. Voix de l'outil de travail.
+# =============================================================================
+
+document:
+  type: palier_contenu_microcopy_admin
+  version: "0.1"
+  date: "2026-05-05"
+  format: yaml
+
+# -----------------------------------------------------------------------------
+# 1. Périmètre
+# -----------------------------------------------------------------------------
+perimetre:
+  inclus:
+    - "Dictionnaire admin (verbes, états, filtres) commun aux 8 écrans"
+    - "Microcopy par écran admin (titres, actions, sections, états, audit)"
+    - "Microcopy des décisions de validation (cluster 05) et modération (cluster 04)"
+    - "Dialogues de confirmation back-office (actes sensibles)"
+    - "Messages éphémères back-office"
+    - "Cas particuliers : auto-validation, catalogue vide, conflit éditorial/communautaire"
+  exclus:
+    - "Microcopy grand public (voir 04-microcopy-grand-public)"
+    - "Stratégie i18n du back-office (Anaïs lit en français — voir 06-i18n)"
+    - "Format de saisie des Templates et composants UI (palier 13)"
+  test_de_purete: >-
+    Si demain l'environnement back-office bascule de tableurs structurés à
+    un CMS web dédié, les libellés ici restent-ils valides ? Si oui, c'est
+    bon — la microcopy ne dépend pas de l'implémentation.
+
+# -----------------------------------------------------------------------------
+# 2. Registre admin
+# -----------------------------------------------------------------------------
+registre:
+
+  principes:
+    neutre: "Pas de jugement, pas de félicitation, pas de commisération. La microcopy CONSTATE et NOMME — elle n'évalue pas l'opérateur."
+    precis: "Le terme métier exact est préféré au terme générique. « Trace de modération » plutôt que « historique » ; « validé_sources_vérifiées » plutôt que « approuvé »."
+    fonctionnel: "Chaque libellé répond à une question pratique : qu'est-ce que c'est, qu'est-ce que ça fait, qu'est-ce qui se passe maintenant. Pas d'ornement."
+
+  distinction_avec_grand_public:
+    voix_de_l_app_uniquement: >-
+      Pas de récit en back-office. La distinction « voix du récit / voix de
+      l'app » du pilote ne s'applique pas. Vouvoiement systématique.
+    pas_d_emerveillement_pas_d_invitation: >-
+      Pas de chrome chaleureux, pas de teaser, pas d'invitation marketing.
+      L'opérateur travaille — il ne « découvre » pas la file de modération,
+      il s'y rend parce que c'est son métier.
+    p4_reste_valable: >-
+      « Ne jamais culpabiliser » (pilote) reste vrai : une file pleine
+      n'est pas reprochée, une décision n'est pas commentée. L'outil reste
+      à sa place.
+
+  vocabulaire_metier_admis:
+    note: >-
+      Termes métier exposables tels quels sans pédagogie. Anaïs et les
+      rôles admin maîtrisent (palier 2 § Anaïs, palier 4 clusters 04+05).
+    termes:
+      - "Pin, Parcours, Étape, Catégorie, Époque, Source, Média"
+      - "Template, version de Template"
+      - "Trace de validation (cluster 05), Trace de modération (cluster 04)"
+      - "provenance éditoriale, provenance communautaire"
+      - "auteur communautaire, pseudonyme, signaleur"
+      - "Signalement, Commentaire, Retour de parcours"
+      - "brouillon, en_revue, validé, publié, retiré"
+      - "en_attente, refusé, masqué, démasqué, supprimé_par_auteur"
+      - "nouveau, en_examen, rejeté, remédié"
+      - "validé_sources_vérifiées, retiré_sources_insuffisantes"
+      - "auto_validation, validation_par_tiers"
+      - "marque distinctive (signalisation grand public d'une vérification en cours)"
+
+  ce_qu_on_evite:
+    - "Termes infantilisants ou ludiques (Bravo, Super, Yes)"
+    - "Émojis"
+    - "Tournures conteur (« Vous voici devant la file »)"
+    - "Adjectifs valorisants (« puissant outil », « riche bibliothèque »)"
+    - "Reformulation marketing des termes métier"
+    - "Tournures défensives ou excusantes (« Désolé, mais… »)"
+
+# -----------------------------------------------------------------------------
+# 3. Dictionnaire admin
+# -----------------------------------------------------------------------------
+dictionnaire:
+
+  verbes_d_action:
+    - { libelle: "Approuver",                       contexte: "validation Pin éditorial — décision approuvé" }
+    - { libelle: "Refuser",                         contexte: "validation ou modération — décision refusé" }
+    - { libelle: "Demander un complément",          contexte: "décision demande_complément" }
+    - { libelle: "Valider les sources",             contexte: "modération Pin communautaire — validé_sources_vérifiées" }
+    - { libelle: "Retirer pour sources insuffisantes", contexte: "modération Pin communautaire — retiré_sources_insuffisantes" }
+    - { libelle: "Publier",                         contexte: "modération Commentaire / Retour / Parcours — publié" }
+    - { libelle: "Masquer",                         contexte: "Commentaire ou Retour publié à masquer" }
+    - { libelle: "Démasquer",                       contexte: "levée d'un masquage" }
+    - { libelle: "Promouvoir en éditorial",         contexte: "promotion communautaire → éditorial (H5)" }
+    - { libelle: "Retirer le Pin",                  contexte: "retrait d'un Pin publié (H6)" }
+    - { libelle: "Rouvrir le Pin",                  contexte: "réouverture d'un Pin retiré après correction" }
+    - { libelle: "Rejeter le signalement",          contexte: "Signalement infondé — décision rejeté" }
+    - { libelle: "Remédier",                        contexte: "Signalement honoré — décision remédié" }
+    - { libelle: "Soumettre pour validation",       contexte: "saisie Pin éditorial — bascule brouillon → en_revue" }
+    - { libelle: "Enregistrer le brouillon",        contexte: "sauvegarde explicite" }
+    - { libelle: "Reprendre le brouillon",          contexte: "ouverture d'un Pin existant en brouillon" }
+    - { libelle: "Annoter",                         contexte: "validation — pose d'annotation granulaire sans modifier le rédactionnel" }
+    - { libelle: "Amender avant promotion",         contexte: "promotion — renvoi vers saisie pour enrichissement éditorial" }
+    - { libelle: "Annuler",                         contexte: "abandon d'une décision en cours (jamais sur Trace créée — immuabilité)" }
+    - { libelle: "Réinitialiser les filtres",       contexte: "remise à zéro des filtres d'un écran de file" }
+
+  etats:
+    pin: ["Brouillon", "En revue", "Validé", "Publié", "Retiré"]
+    commentaire_retour: ["En attente", "Publié", "Refusé", "Masqué", "Supprimé par l'auteur"]
+    signalement: ["Nouveau", "En examen", "Rejeté", "Remédié"]
+    template: ["Brouillon", "Actif", "Déprécié"]
+    note_correspondance: >-
+      Les libellés affichés correspondent un-à-un aux valeurs métier des
+      cycles de vie des clusters 01, 04, 05 (P7 cohérence terminologique).
+
+  filtres:
+    provenance: ["Toutes provenances", "Éditorial", "Communautaire"]
+    statut_pin: ["Tous statuts", "Brouillon", "En revue", "Validé", "Publié", "Retiré"]
+    type_contribution: ["Tous types", "Commentaires", "Retours de parcours"]
+    signalement: ["Toutes contributions", "Avec signalement actif", "Sans signalement"]
+    type_validation: ["Tous types", "Auto-validation", "Validation par tiers"]
+
+# -----------------------------------------------------------------------------
+# 4. Microcopy par écran admin
+# -----------------------------------------------------------------------------
+ecrans:
+
+  - id: E-ADMIN-ACCUEIL
+    titre: "Tableau de bord"
+    sections: ["Pins en saisie", "Pins en validation", "Commentaires et Retours en attente", "Soumissions communautaires en attente", "Signalements à traiter", "Pins publiés à surveiller"]
+    actions: ["Saisir un nouveau Pin", "Ouvrir le catalogue"]
+    indicateurs:
+      compteur_zero: "Aucun"
+      ancienneté_modele: "Plus ancien : il y a n jours"
+    etats:
+      vide: "Aucune file en attente. Vous pouvez saisir un nouveau Pin."
+      chargement: "Chargement des compteurs."
+      erreur_compteur: "Compteurs indisponibles. Les écrans spécialisés restent accessibles."
+      permission_partielle: "Certaines files ne sont pas accessibles avec votre rôle actuel."
+
+  - id: E-ADMIN-CATALOGUE-PINS
+    titre: "Catalogue des Pins"
+    sections: ["Liste des Pins", "Filtres", "Effectifs par statut"]
+    actions: ["Saisir un nouveau Pin", "Réinitialiser les filtres"]
+    colonnes: ["Titre", "Provenance", "Catégorie", "Époques", "Statut", "Dernière modification", "Auteur", "Version de Template"]
+    placeholder_recherche: "Rechercher par titre"
+    etats:
+      vide_apres_filtre: "Aucun Pin ne correspond aux filtres en cours. Élargissez les filtres ou saisissez un nouveau Pin."
+      catalogue_vide_initial: "Aucun Pin n'a encore été saisi. Saisissez le premier Pin éditorial pour commencer."
+      chargement: "Chargement du catalogue."
+      erreur_chargement: "Catalogue indisponible. Réessayez."
+      lecture_seule: "Catalogue accessible en lecture seule avec votre rôle actuel."
+
+  - id: E-ADMIN-SAISIE-PIN-TEMPLATE
+    titres:
+      nouveau: "Saisie d'un nouveau Pin"
+      reprise: "Reprise du brouillon"
+      amendement: "Amendement après demande de complément"
+    sections: ["Identité du Pin", "Contenu narratif", "Sources", "Médias", "Métadonnées éditoriales", "Notes du Template (guide non contraignant)", "Traces antérieures"]
+    actions: ["Enregistrer le brouillon", "Soumettre pour validation", "Abandonner la saisie"]
+    libelles_champs:
+      titre: "Titre"
+      categorie: "Catégorie"
+      epoques: "Époques (sélection multiple)"
+      localisation: "Localisation (optionnelle pour patrimoine vivant immatériel)"
+      teaser: "Teaser"
+      narration: "Narration"
+      post_narratif: "Post-narratif"
+      source_type: "Type de Source"
+      source_reference: "Référence"
+      source_credit: "Crédit (obligatoire)"
+      media_credit: "Crédit du Média (obligatoire)"
+    placeholders:
+      titre: "Saisissez le titre du Pin"
+      teaser: "Une phrase qui ouvre — le pourquoi"
+    etats:
+      pret_pour_bascule: "Tous les champs requis sont remplis. La soumission est activable."
+      bloque_source: "Au moins une Source est requise pour soumettre (I4)."
+      bloque_epoque: "Au moins une Époque est requise pour soumettre."
+      bloque_categorie: "La Catégorie est requise pour soumettre."
+      bloque_narration: "Le contenu narratif est requis pour soumettre."
+      media_casse: "Un Média rattaché est introuvable. Remplacez-le ou retirez-le pour pouvoir soumettre."
+      template_deprecie: "Ce Pin a été ouvert sous une version dépréciée du Template. Migration vers la version active recommandée."
+      sauvegarde_en_cours: "Sauvegarde en cours."
+      sauvegarde_effectuee: "Brouillon enregistré."
+      erreur_sauvegarde: "Sauvegarde impossible. Réessayez."
+
+  - id: E-ADMIN-VALIDATION-SCIENTIFIQUE
+    titre: "Validation scientifique"
+    sous_titre: "Pin éditorial en revue"
+    sections: ["File de validation", "Prévisualisation grand public", "Sources structurées", "Annotations", "Traces antérieures", "Décision", "Métadonnées d'audit"]
+    actions: ["Approuver", "Demander un complément", "Refuser", "Annoter le passage"]
+    placeholders:
+      motif_decision: "Motif de la décision (obligatoire pour demande de complément ou refus)"
+      annotation: "Note sur ce passage"
+    etats:
+      file_vide: "Aucun Pin en revue."
+      annotations_en_cours: "Annotations en cours. Aucune Trace n'est créée tant que la décision n'est pas tranchée."
+      auto_validation_signalee: "Auto-validation : vous êtes l'auteur de ce Pin. La Trace enregistrera type_de_validation = auto_validation."
+      decision_approuve: "Pin approuvé. Trace de validation créée. Le Pin transite vers validé."
+      decision_complement: "Demande de complément envoyée. Trace créée. Le Pin retourne en brouillon."
+      decision_refuse: "Pin refusé. Trace créée. Le Pin retourne en brouillon."
+      interruption: "Vous avez quitté l'écran sans trancher. Les annotations sont conservées comme brouillon."
+      chargement: "Chargement du Pin et des Sources."
+      erreur_chargement: "Pin ou Sources indisponibles. La décision est suspendue."
+
+  - id: E-ADMIN-MODERATION-COMMUNAUTAIRE
+    titre: "Modération des Commentaires et Retours"
+    sections: ["File unifiée", "Filtres", "Contexte de la cible", "Contenu de la contribution", "Signalements sur la cible", "Traces antérieures", "Décision"]
+    actions: ["Publier", "Refuser", "Masquer", "Démasquer", "Appliquer une réponse-type"]
+    placeholders:
+      motif_refus: "Motif transmis à l'auteur (sans humiliation, D9.1)"
+      motif_masquage: "Motif du masquage"
+    etats:
+      file_vide: "Aucune contribution en attente."
+      contribution_en_examen: "Contribution ouverte. Décision en cours."
+      cible_pin_retire: "Le Pin cible a été retiré entre-temps. La publication n'aura pas d'effet visible côté grand public ; le refus reste valable. Les deux décisions sont admises."
+      cible_auteur_supprime: "L'auteur de la contribution a supprimé son Compte. Le pseudonyme reste tracé pour audit ; aucune notification ne pourra lui parvenir."
+      contribution_priorisee: "Contribution remontée en tête de file après signalement."
+      decision_publie: "Contribution publiée. Trace de modération créée."
+      decision_refuse: "Contribution refusée. Trace créée. L'auteur a été notifié."
+      decision_masque: "Contribution masquée. Trace créée. La contribution n'est plus visible publiquement mais reste tracée."
+      decision_demasque: "Contribution rétablie. Trace créée."
+
+  - id: E-ADMIN-MODERATION-SOUMISSIONS
+    titre: "Modération des soumissions communautaires"
+    sections: ["File des soumissions", "Filtres", "Prévisualisation grand public", "Sources structurées", "Auteur communautaire", "Soumissions précédentes du même auteur", "Signalements éventuels", "Traces antérieures", "Décision sur Pin", "Décision sur Parcours"]
+    actions_pin: ["Valider les sources", "Demander un complément", "Retirer pour sources insuffisantes", "Marquer comme candidat à promotion"]
+    actions_parcours: ["Publier", "Demander une correction", "Refuser"]
+    placeholders:
+      motif_complement: "Précisez ce qui manque (Source, cohérence, etc.)"
+      motif_retrait: "Motif transmis à l'auteur"
+      motif_correction: "Précisez la correction attendue"
+    etats:
+      file_vide: "Aucune soumission en attente."
+      pin_en_examen: "Pin communautaire ouvert. Vérification des Sources et de la cohérence en cours."
+      parcours_en_examen: "Parcours communautaire ouvert. Vérification de la cohérence d'itinéraire en cours."
+      pin_valide: "Pin validé. Trace de modération créée. Le Pin transite vers publié, marque distinctive levée."
+      pin_complement: "Demande de complément envoyée. Le Pin retourne en brouillon côté auteur."
+      pin_retire: "Pin retiré pour sources insuffisantes. L'auteur a été notifié."
+      parcours_publie: "Parcours publié. Marque distinctive levée. Trace créée."
+      parcours_correction: "Correction demandée. Le Parcours reste publié avec marque distinctive le temps de la correction."
+      parcours_refuse: "Parcours retiré. L'auteur a été notifié."
+      parcours_pin_communautaire_en_cours: "Ce Parcours référence un Pin communautaire encore en vérification. Les marques distinctives coexistent."
+      parcours_pins_editoriaux: "Ce Parcours enchaîne uniquement des Pins éditoriaux validés. La modération porte sur la cohérence d'itinéraire seule."
+      auteur_supprime: "L'auteur a supprimé son Compte. Pseudonyme conservé pour audit ; aucune notification possible."
+      candidate_promotion: "Soumission marquée comme candidate à promotion éditoriale."
+
+  - id: E-ADMIN-PROMOTION-COMMUNAUTAIRE
+    titre: "Promotion en éditorial"
+    sections: ["Candidats à promotion", "Filtres", "Prévisualisation grand public", "Sources structurées", "Amendement éditorial préalable", "Traces antérieures", "Décision de promotion", "Notification de l'auteur original"]
+    actions: ["Promouvoir en éditorial", "Amender avant promotion"]
+    placeholders:
+      motif_promotion: "Mention spécifique : promotion communautaire → éditorial"
+      commentaire_promotion: "Commentaire éditorial (optionnel)"
+    etats:
+      pas_de_candidat: "Aucun candidat marqué pour promotion."
+      pin_candidat_ouvert: "Pin candidat ouvert. Décision pas encore prise."
+      pret_pour_promotion: "Pin conforme à la ligne éditoriale. Promotion activable."
+      amendement_decide: "Amendement préalable décidé. Renvoi vers la saisie pour enrichissement éditorial."
+      promotion_effectuee: "Pin promu en éditorial. Pseudonyme de l'auteur original conservé en crédit. Trace de validation créée."
+      auteur_compte_supprime: "L'auteur communautaire a supprimé son Compte. Le pseudonyme reste tracé en crédit ; aucune notification possible."
+      pin_avec_marque_distinctive: "Ce Pin porte encore une marque distinctive. La promotion est refusée tant que la modération n'est pas conclue."
+      reference_par_parcours: "Un Parcours communautaire référence ce Pin nommément. Promotion possible ; le Parcours reste communautaire et référencera un Pin devenu éditorial."
+
+  - id: E-ADMIN-RETRAIT-REOUVERTURE-PIN
+    titre: "Retrait ou réouverture d'un Pin"
+    sections: ["Pins publiés à surveiller", "Pins retirés candidats à réouverture", "Filtres", "Prévisualisation", "Sources et Médias", "Signalements honorés", "Traces antérieures", "Étapes de Parcours qui référencent ce Pin", "Commentaires associés", "Décision de retrait", "Décision de réouverture"]
+    actions: ["Retirer le Pin", "Rouvrir le Pin"]
+    placeholders:
+      motif_retrait: "Motif du retrait (obligatoire)"
+      motif_reouverture: "Motif de la réouverture"
+    etats:
+      pin_en_examen_retrait: "Pin publié sélectionné. Motif du retrait en cours de saisie."
+      retrait_editorial_effectue: "Pin éditorial retiré. Trace de validation négative ex post créée. Le Pin disparaît de la Carte et de la recherche grand public."
+      retrait_communautaire_effectue: "Pin communautaire retiré. Trace de modération créée (décision = remédié, action = cible_retirée). L'auteur a été notifié."
+      pin_en_examen_reouverture: "Pin retiré sélectionné. Vérification de la correction en cours."
+      reouverture_relance_h1: "Le Pin est renvoyé en brouillon pour amendement."
+      reouverture_relance_h2: "Le Pin amendé est renvoyé en revue pour un nouveau cycle de validation."
+      reouverture_effectuee: "Validation conclue. Le Pin transite vers publié. Une nouvelle Trace de validation a été créée. L'historique antérieur est conservé."
+      etapes_actives_alerte: "Ce Pin est référencé par des Étapes de Parcours en cours d'utilisation. La dégradation côté grand public est gérée automatiquement (cf. flow C5)."
+      correction_impossible: "La correction de ce Pin n'est pas possible. Il restera en retiré."
+
+# -----------------------------------------------------------------------------
+# 5. Microcopy des décisions de validation et modération
+# -----------------------------------------------------------------------------
+# Pour chaque valeur de décision : libellé du bouton (cf. § 3 dictionnaire),
+# statut résultant, contrainte sur le motif, confirmation après décision.
+decisions:
+
+  trace_de_validation_pin_editorial:
+    note: "Trace de validation cluster 05, RÉSERVÉE aux Pins éditoriaux."
+    valeurs:
+      - { decision: approuvé,            statut_resultant: "Pin validé",                                motif_obligatoire: false, placeholder_motif: "Commentaire éditorial (optionnel)",            confirmation: "Pin approuvé. Trace de validation créée. Le Pin est désormais en validé." }
+      - { decision: demande_complément,  statut_resultant: "Pin retourné en brouillon",                 motif_obligatoire: true,  placeholder_motif: "Précisez ce qui manque pour atteindre validé", confirmation: "Demande de complément enregistrée. Trace créée. Le Pin retourne en brouillon ; l'éditeur reprendra la saisie." }
+      - { decision: refusé,              statut_resultant: "Pin retourné en brouillon",                 motif_obligatoire: true,  placeholder_motif: "Motif du refus",                              confirmation: "Pin refusé. Trace créée. Le Pin retourne en brouillon." }
+
+  trace_de_moderation_commentaire_retour:
+    note: "Trace de modération cluster 04, sur Commentaire ou Retour de parcours."
+    valeurs:
+      - { decision: publié,              statut_resultant: "Contribution publiée",                                                       motif_obligatoire: false, placeholder_motif: "Commentaire de modération (optionnel)",      confirmation: "Contribution publiée. Trace de modération créée." }
+      - { decision: refusé,              statut_resultant: "Contribution refusée (jamais publiée)",                                      motif_obligatoire: true,  placeholder_motif: "Motif transmis à l'auteur (sans humiliation, D9.1)", confirmation: "Contribution refusée. Trace créée. L'auteur a été notifié avec votre motif." }
+      - { decision: masqué,              statut_resultant: "Contribution masquée (n'est plus visible publiquement, reste tracée)",       motif_obligatoire: true,  placeholder_motif: "Motif du masquage",                          confirmation: "Contribution masquée. Trace créée." }
+      - { decision: démasqué,            statut_resultant: "Contribution rétablie (à nouveau visible publiquement)",                     motif_obligatoire: false, placeholder_motif: "Motif de la levée (optionnel)",              confirmation: "Contribution rétablie. Trace créée." }
+
+  trace_de_moderation_signalement:
+    note: "Trace de modération cluster 04, sur Signalement."
+    valeurs:
+      - { decision: rejeté,              statut_resultant: "Signalement classé sans suite (cible inchangée)",                            motif_obligatoire: true,  placeholder_motif: "Motif du rejet",                             confirmation: "Signalement rejeté. Trace créée. La cible reste en l'état." }
+      - { decision: remédié,             statut_resultant: "Signalement honoré, action prise sur la cible",                              motif_obligatoire: true,  placeholder_motif: "Motif et nature de la remédiation",          confirmation: "Signalement honoré. Trace créée. Action consignée sur la cible." }
+    action_prise_sur_la_cible_libelles: ["Aucune", "Cible masquée", "Cible retirée", "Cible corrigée"]
+
+  trace_de_moderation_pin_communautaire:
+    note: >-
+      Trace de modération cluster 04 ÉTENDUE pour Pin communautaire (TRACE
+      UNIQUE 2026-05-05). Conjugue validation scientifique et modération en
+      un seul acte tracé.
+    valeurs:
+      - { decision: validé_sources_vérifiées,    statut_resultant: "Pin communautaire validé puis publié, marque distinctive levée", motif_obligatoire: false, placeholder_motif: "Commentaire éditorial (optionnel)", confirmation: "Sources vérifiées. Trace de modération créée. Le Pin est publié, marque distinctive levée." }
+      - { decision: demande_complément,          statut_resultant: "Pin retourné en brouillon côté auteur communautaire",            motif_obligatoire: true,  placeholder_motif: "Précisez ce qui manque (Source, cohérence, etc.)", confirmation: "Demande de complément envoyée. Trace créée. Le Pin retourne en brouillon côté auteur." }
+      - { decision: retiré_sources_insuffisantes, statut_resultant: "Pin retiré",                                                    motif_obligatoire: true,  placeholder_motif: "Motif transmis à l'auteur",          confirmation: "Pin retiré pour sources insuffisantes. Trace créée. L'auteur a été notifié." }
+
+  trace_de_moderation_parcours_communautaire:
+    note: "Modération d'un Parcours communautaire récemment publié avec marque distinctive (H4)."
+    valeurs:
+      - { decision: publié,              statut_resultant: "Parcours validé, marque distinctive levée",                               motif_obligatoire: false, placeholder_motif: "Commentaire (optionnel)",                    confirmation: "Parcours publié. Marque distinctive levée. Trace de modération créée." }
+      - { decision: demande_correction,  statut_resultant: "Parcours reste publié avec marque distinctive le temps de la correction", motif_obligatoire: true,  placeholder_motif: "Précisez la correction attendue",            confirmation: "Correction demandée. Trace créée. L'auteur a été notifié." }
+      - { decision: refusé,              statut_resultant: "Parcours retiré",                                                         motif_obligatoire: true,  placeholder_motif: "Motif transmis à l'auteur",                  confirmation: "Parcours retiré. Trace créée. L'auteur a été notifié." }
+
+  promotion_communautaire_editorial:
+    note: "Trace de validation cluster 05 avec décision = approuvé et mention spécifique en motif. Sortie du flow H5."
+    valeurs:
+      - { decision: approuvé_promotion,  statut_resultant: "Pin de provenance éditoriale (auteur_communautaire conservé en crédit)", motif_obligatoire: true, valeur_par_defaut: "Promotion communautaire → éditorial", placeholder_motif: "Mention spécifique + commentaire éditorial éventuel", confirmation: "Pin promu en éditorial. Pseudonyme de l'auteur original conservé en crédit. Trace de validation créée." }
+
+  retrait_editorial_ex_post:
+    note: "Trace de validation négative ex post (cluster 05) sur Pin éditorial publié, dans le cadre de H6."
+    valeurs:
+      - { decision: refusé_retrait_editorial, statut_resultant: "Pin retiré", motif_obligatoire: true, valeur_par_defaut: "Retrait éditorial", placeholder_motif: "Motif du retrait (erreur factuelle, source compromise, obsolescence)", confirmation: "Pin éditorial retiré. Trace de validation négative ex post créée. Le Pin disparaît de la Carte et de la recherche grand public." }
+
+# -----------------------------------------------------------------------------
+# 6. Dialogues de confirmation back-office
+# -----------------------------------------------------------------------------
+# Patterns pour actes sensibles. P5 du pilote — annoncer avant d'agir. Le
+# bouton dit ce qu'il fait (jamais « OK »). Voix de l'app, vouvoiement formel.
+dialogues_de_confirmation:
+
+  - id: confirmation_retrait_pin_publie
+    titre: "Retirer ce Pin"
+    description: >-
+      Le retrait fait disparaître ce Pin de la Carte et des résultats de
+      recherche côté grand public. Les Étapes de Parcours qui le référencent
+      afficheront un message de dégradation gracieuse. Les Commentaires
+      associés restent tracés mais cesseront d'être visibles publiquement.
+      Une Trace immuable enregistrera votre décision. Le retrait est
+      réversible par réouverture après correction.
+    boutons: ["Retirer le Pin", "Annuler"]
+
+  - id: confirmation_suppression_brouillon
+    titre: "Supprimer ce brouillon"
+    description: >-
+      Le brouillon sera supprimé définitivement. Les Sources et Médias
+      rattachés ne seront pas supprimés (ils peuvent être réutilisés).
+      Cette action est irréversible.
+    boutons: ["Supprimer le brouillon", "Annuler"]
+
+  - id: confirmation_promotion
+    titre: "Promouvoir ce Pin en éditorial"
+    description: >-
+      Le Pin passera en provenance éditoriale. Le pseudonyme de l'auteur
+      original sera conservé en crédit côté grand public. Une Trace de
+      validation enregistrera la promotion. La marque distinctive (s'il en
+      restait une) sera levée définitivement. Une notification de courtoisie
+      sera adressée à l'auteur original.
+    boutons: ["Promouvoir", "Annuler"]
+
+  - id: confirmation_refus_soumission
+    titre: "Retirer pour sources insuffisantes"
+    description: >-
+      Le Pin passera en retiré. L'auteur sera notifié avec votre motif. Une
+      Trace de modération immuable enregistrera la décision. Le Pin pourra
+      être re-soumis après correction des Sources si l'auteur le souhaite.
+    boutons: ["Retirer", "Annuler"]
+
+  - id: confirmation_masquage
+    titre: "Masquer cette contribution"
+    description: >-
+      La contribution ne sera plus visible publiquement. Elle reste tracée
+      et peut être démasquée ultérieurement. Une Trace de modération
+      enregistrera le masquage.
+    boutons: ["Masquer", "Annuler"]
+
+  - id: confirmation_abandon_saisie
+    titre: "Quitter la saisie"
+    description: >-
+      Des modifications n'ont pas été enregistrées. Le brouillon survivra
+      avec son contenu antérieur ; les modifications en cours seront perdues.
+    boutons: ["Enregistrer puis quitter", "Quitter sans enregistrer", "Annuler"]
+
+  - id: confirmation_migration_template
+    titre: "Migrer vers la version active du Template"
+    description: >-
+      Ce Pin a été saisi sous une version dépréciée du Template. La
+      migration vers la version active est recommandée. Le contenu déjà
+      saisi sera conservé ; les éventuels nouveaux champs requis devront
+      être complétés.
+    boutons: ["Migrer", "Conserver la version dépréciée"]
+
+# -----------------------------------------------------------------------------
+# 7. Messages éphémères back-office
+# -----------------------------------------------------------------------------
+# Pattern PT1 du pilote (confirmation discrète) appliqué au registre admin.
+# Sujet + verbe au passé court, sans exclamation, sans félicitation.
+messages_ephemeres:
+  trace_enregistree:        { libelle: "Trace enregistrée.",                                  contexte: "Création d'une Trace de validation ou de modération." }
+  brouillon_enregistre:     { libelle: "Brouillon enregistré.",                               contexte: "Sauvegarde explicite réussie." }
+  sauvegarde_automatique:   { libelle: "Sauvegarde automatique.",                             contexte: "Sauvegarde implicite pendant la saisie." }
+  modifications_appliquees: { libelle: "Modifications appliquées.",                           contexte: "Édition d'un Pin existant publiée." }
+  pin_publie:               { libelle: "Pin publié.",                                         contexte: "Bascule validé → publié." }
+  pin_retire:               { libelle: "Pin retiré.",                                         contexte: "Bascule publié → retiré." }
+  pin_promu:                { libelle: "Pin promu en éditorial.",                             contexte: "Sortie réussie du flow H5." }
+  contribution_publiee:     { libelle: "Contribution publiée.",                               contexte: "Sortie de modération avec décision publié." }
+  contribution_refusee:     { libelle: "Contribution refusée. L'auteur a été notifié.",       contexte: "Sortie de modération avec décision refusé." }
+  contribution_masquee:     { libelle: "Contribution masquée.",                               contexte: "Cible publiée passée en masqué." }
+  signalement_rejete:       { libelle: "Signalement rejeté.",                                 contexte: "Décision rejeté sur Signalement." }
+  signalement_remedie:      { libelle: "Signalement honoré.",                                 contexte: "Décision remédié sur Signalement." }
+  categorie_ajoutee:        { libelle: "Catégorie ajoutée au catalogue.",                     contexte: "Catalogue ouvert I7 — nouvelle Catégorie." }
+  epoque_ajoutee:           { libelle: "Époque ajoutée au catalogue.",                        contexte: "Catalogue ouvert I7 — nouvelle Époque." }
+  filtres_reinitialises:    { libelle: "Filtres réinitialisés.",                              contexte: "Action de réinitialisation depuis un écran avec filtres." }
+  erreur_validation_champ:  { libelle: "Champ requis manquant : <nom du champ>.",             contexte: "Tentative de bascule en en_revue avec champ requis vide. Le nom du champ vient du dictionnaire." }
+  erreur_sauvegarde:        { libelle: "Sauvegarde impossible. Réessayez.",                   contexte: "Échec d'écriture sur l'environnement back-office." }
+  erreur_chargement:        { libelle: "Chargement impossible. Réessayez.",                   contexte: "Échec de lecture sur l'environnement back-office." }
+  permission_insuffisante:  { libelle: "Action non autorisée avec votre rôle actuel.",        contexte: "Tentative d'action hors périmètre des rôles attribués au Compte." }
+
+# -----------------------------------------------------------------------------
+# 8. Cas particuliers
+# -----------------------------------------------------------------------------
+cas_particuliers:
+
+  - id: auto_validation_explicite
+    contexte: >-
+      Anaïs valide ses propres Pins (cumul des rôles éditeur + validateur
+      au démarrage). Le palier 4 cluster 05 acte cette posture via
+      type_de_validation = auto_validation, tracée comme telle (jamais
+      masquée — cluster 05 question ouverte tranchée).
+    surface: "E-ADMIN-VALIDATION-SCIENTIFIQUE"
+    libelles:
+      bandeau: "Auto-validation : vous êtes l'auteur de ce Pin. La Trace enregistrera type_de_validation = auto_validation."
+      mention_panneau_decision: "Cette validation sera enregistrée comme auto-validation."
+      libelle_trace: "Auto-validation"
+    intention: >-
+      Rendre visible le cumul des rôles sans le déguiser. Un partenaire
+      institutionnel arrivant ultérieurement basculera naturellement sur
+      validation_par_tiers sans reformulation côté libellé.
+
+  - id: premiere_saisie_catalogue_vide
+    contexte: "Premier lancement du back-office : aucun Pin saisi, catalogues Catégorie/Époque vides ou amorcés."
+    surfaces: ["E-ADMIN-ACCUEIL", "E-ADMIN-CATALOGUE-PINS", "E-ADMIN-SAISIE-PIN-TEMPLATE"]
+    libelles:
+      accueil_files_vides: "Aucune file en attente. Vous pouvez saisir un nouveau Pin."
+      catalogue_vide: "Aucun Pin n'a encore été saisi. Saisissez le premier Pin éditorial pour commencer."
+      categorie_vide: "Aucune Catégorie n'existe encore. Vous pouvez en ajouter une depuis ce champ."
+      epoque_vide: "Aucune Époque n'existe encore. Vous pouvez en ajouter une depuis ce champ."
+    intention: >-
+      Pas d'invitation marketing (« Bienvenue dans le back-office ! »).
+      Constat factuel + chemin d'action immédiat.
+
+  - id: conflit_editorial_communautaire_avant_promotion
+    contexte: >-
+      Un Pin communautaire publié est candidat à promotion. La microcopy
+      distingue le Pin communautaire en l'état du Pin éditorial qu'il
+      deviendrait, sans dévaloriser l'origine communautaire.
+    surface: "E-ADMIN-PROMOTION-COMMUNAUTAIRE"
+    libelles:
+      provenance_avant: "Provenance actuelle : communautaire"
+      provenance_apres: "Provenance après promotion : éditorial"
+      credit_apres: "Crédit côté grand public : pseudonyme de l'auteur original conservé"
+      avec_marque_distinctive: "Ce Pin porte encore une marque distinctive. La promotion est refusée tant que la modération n'est pas conclue."
+      reference_par_parcours: "Un Parcours communautaire référence ce Pin nommément. La promotion ne modifie pas le Parcours."
+    intention: >-
+      Pas de hiérarchisation valorisante (« enfin éditorial », « passage au
+      niveau supérieur »). La promotion est un acte de modélisation, pas
+      un trophée.
+
+  - id: cible_modifiee_pendant_examen
+    contexte: "Pendant qu'un modérateur examine une cible, l'auteur la modifie/supprime ou son Compte est supprimé."
+    surfaces: ["E-ADMIN-MODERATION-COMMUNAUTAIRE", "E-ADMIN-MODERATION-SOUMISSIONS"]
+    libelles:
+      auteur_supprime_compte: "L'auteur a supprimé son Compte. Le pseudonyme reste tracé pour audit ; aucune notification ne pourra lui parvenir."
+      cible_supprimee_par_auteur: "La cible a été supprimée par son auteur entre-temps. La modération est sans objet ; vous pouvez fermer la fiche."
+      pin_cible_retire: "Le Pin cible a été retiré entre-temps. La publication n'aura pas d'effet visible côté grand public ; le refus reste valable."
+
+  - id: signalement_sur_pin_editorial
+    contexte: >-
+      Le cluster 04 réserve les Signalements aux contenus communautaires.
+      Pour un Pin éditorial, la correction passe par E-ADMIN-RETRAIT-
+      REOUVERTURE-PIN. Cas marginal, à arbitrer en D10.5 — libellé
+      d'orientation prévu.
+    surface: "E-ADMIN-MODERATION-COMMUNAUTAIRE (cas marginal)"
+    libelles:
+      orientation: "Cette cible est un Pin de provenance éditoriale. La correction relève du retrait éditorial. Continuer dans la file de retrait."

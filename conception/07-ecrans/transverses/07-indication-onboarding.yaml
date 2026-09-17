@@ -1,0 +1,61 @@
+# =============================================================================
+# E-TRANSVERSES-INDICATION-ONBOARDING — Indication ponctuelle d'onboarding
+# =============================================================================
+# Indication ponctuelle non bloquante affichée au PREMIER passage sur une
+# fonctionnalité signifiante, conformément à D5.4 (onboarding traversant).
+# Cas typiques : slider d'époque (révélation de la temporalité de la Carte),
+# point d'accès Couches cartographiques, mode Surprenez-moi, sélecteur de
+# section principale au tout premier lancement.
+#
+# PURE M9 (message éphémère, disparition implicite). L'invitation au
+# micro-parcours découverte (flow A2), qui a deux issues explicites, est
+# modélisée séparément dans E-TRANSVERSES-INVITATION-MICROPARCOURS (M7) —
+# décision utilisateur 2026-05-05 sur la base du relecture.
+# =============================================================================
+
+document:
+  type: palier_ecrans_fiche
+  format: yaml
+
+ecran:
+  id: E-TRANSVERSES-INDICATION-ONBOARDING
+  nom: "Indication ponctuelle d'onboarding"
+
+  mode: P5.M9
+  surface_parente: "transverse"
+
+  raison_d_etre: >-
+    Au PREMIER passage, surfaçer brièvement une fonctionnalité signifiante
+    de l'app (slider d'époque, point d'accès Couches, etc.) pour que
+    l'utilisateur comprenne en quelques secondes ce qu'il peut faire —
+    sans tutoriel imposé, sans bloquer l'interaction (essence § ce_qu_on_refuse
+    'tutoriel obligatoire' + D5.4). Apparaît une seule fois ; si l'utilisateur
+    l'ignore, elle disparaît seule au bout d'un délai et n'insiste pas.
+
+  composition:
+    - zone: "zone d'ancrage contextuel"
+      role: "désigne l'élément concerné (slider d'époque, point d'accès, sélecteur, etc.) sans masquer la surface principale qui reste utilisable"
+
+    - zone: "zone message d'indication"
+      role: "court texte qui décrit l'usage de l'élément en langage utilisateur (microcopy palier 8 ; pas un manuel, une amorce)"
+
+  etats:
+    nominal_premier_passage: "L'utilisateur arrive pour la première fois sur la fonctionnalité ; l'indication s'affiche, la surface principale reste pleinement utilisable (P5.M9 non bloquant)"
+    interaction_avec_element_ancre: "L'utilisateur a manipulé l'élément concerné ; l'indication considère son rôle accompli et disparaît, le flag 'déjà vu' est posé sur le Profil (cluster 03)"
+    disparition_par_delai: "Pas d'interaction au bout du délai (durée précise palier 11) ; l'indication s'efface gracieusement ; le flag 'déjà vu' est posé pour ne pas la réafficher"
+    sommeil_visuel_m4: "P5.C2 — en mode présentation, l'indication ne s'affiche pas ; sa programmation est différée au prochain retour en mode standard"
+
+  elements_interactifs:
+    - "Interaction directe avec l'élément ancré (ex. manipulation du slider d'époque) → ferme l'indication implicitement"
+    - "Aucun comportement bloquant — la surface principale derrière reste pleinement utilisable"
+    - "Aucun bouton dédié — disparition par interaction ou par délai"
+
+  flows_actifs:
+    - "template-générique"   # Instances : slider d'époque (D5.4), point d'accès Couches, mode Surprenez-moi, etc.
+
+  surfaces_imbriquees: []   # M9 — pas d'imbrication
+
+  questions_ouvertes:
+    - "Inventaire exhaustif des points d'onboarding traversant qui invoquent ce template (slider d'époque D5.4 cité ; quels autres ?) — palier 7 fin / D5"
+    - "Politique de rejouabilité : si l'utilisateur efface ses données du Profil (cluster 03), les indications d'onboarding sont-elles ré-armées ? — palier 6 / cluster 03"
+    - "Forme visuelle de l'ancrage contextuel (pointage, halo, callout) — relève palier 10 ; la fonction d'ancrage est ici capturée"

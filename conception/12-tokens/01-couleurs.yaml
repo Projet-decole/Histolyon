@@ -1,0 +1,470 @@
+# =============================================================================
+# Palier 12 — 01 Couleurs (PILOTE)
+# =============================================================================
+# Palette de tokens chromatiques constants. Quatre sous-familles : marque
+# (terracotta primaire et déclinaisons, fonds parchemin, textes encre brune),
+# fonctionnelles (succès, erreur, info), palier 9 réifié (Pin éditorial,
+# Pin communautaire, contour de vérification), surfaces neutres (overlay).
+#
+# Pilote — calibre le format de fiche TOK-COLOR (id, hex,
+# usages, contrastes déclarés) et le ton de retraitement de la charte DA
+# archivée avec esprit critique (beaucoup de valeurs invalidées par les
+# décisions palier 9 D1/D6/D7).
+# =============================================================================
+
+document:
+  type: palier_tokens_couleurs
+  numero: 12
+  fichier: "01-couleurs.yaml"
+  version: "0.1"
+  date: "2026-05-07"
+  format: yaml
+  pilote: true
+  prerequis_de_lecture:
+    - "design/conception/12-tokens/00-index.yaml — § 5 format TOK-COLOR, § 9 décisions D3-D7 sur invalidations palier 9"
+    - "design/conception/09-cartographie/02-pins.yaml — couleurs provenance qualifiées"
+
+raison_d_etre: >-
+  Sans cette palette unique, chaque écran et composant inventerait sa
+  couleur — terracotta légèrement différent ici, fond parchemin variable
+  là. La cohérence visuelle de l'app exige un inventaire fini. Toute
+  couleur visible dans l'app DOIT exister dans cet inventaire. Si un
+  besoin nouveau émerge, il s'inscrit ICI puis se diffuse.
+
+# -----------------------------------------------------------------------------
+# Règle d'or
+# -----------------------------------------------------------------------------
+regle_d_or: >-
+  Pas de noir pur (#000000) ni de blanc pur (#FFFFFF) dans l'app. Tout
+  a une température. Le 'blanc' du fond est le parchemin (#F5E8D0) ; le
+  'noir' du texte est l'encre brune (#1C1108). Cette règle vient de la
+  charte DA archivée et est conservée — elle sert le triptyque essence
+  (historicité chaleureuse).
+
+# -----------------------------------------------------------------------------
+# 1. Couleurs de marque (palette principale)
+# -----------------------------------------------------------------------------
+couleurs_marque:
+
+  - id: TOK-COLOR-PRIMARY
+    nom: "Terracotta Lyon"
+    description: "Couleur primaire de l'app. Accents, boutons CTA, chips actifs. Évoque la terre cuite des toits de Lyon et la tuile romaine."
+    hex: "#B85220"
+    famille: marque
+    usages:
+      - "comp-button-primary fond actif"
+      - "comp-chip-* (epoque, categorie, couche-carte, filtre) en variant selected"
+      - "comp-pin variant provenance=editorial — DOUBLE USAGE, voir aussi TOK-COLOR-PIN-EDITORIAL ci-dessous (alias)"
+      - "comp-trace-parcours variant provenance=editorial"
+      - "Indicateur de progression actif"
+    contrastes_declares:   # recalculés par luminance relative WCAG (cascade palier 2 maquette)
+      sur_TOK-COLOR-FOND-PRINCIPAL: 4.06     # AA grand texte — PRIMARY surtout fill/accent, rarement texte courant
+      sur_TOK-COLOR-FOND-SECONDAIRE: 3.56    # AA grand texte
+      sur_TOK-COLOR-BLANC-NARRATIF: 4.57     # blanc chaud sur terracotta (bouton) — AA OK
+    note_double_usage: >-
+      TOK-COLOR-PRIMARY est utilisée À LA FOIS comme couleur d'action
+      (CTA) et comme couleur de provenance Pin éditorial. Choix assumé —
+      le terracotta est la signature visuelle de l'app, doublement
+      cohérent (CTA = invitation à agir, Pin éditorial = invitation à
+      découvrir). Les contextes spatiaux sont disjoints (bouton dans
+      chrome vs marqueur sur carte), donc pas de confusion possible.
+
+  - id: TOK-COLOR-PRIMARY-FONCE
+    nom: "Brique ancienne"
+    description: "Variante foncée du primaire. États pressed/hover des boutons, titres en overlay sombre."
+    hex: "#8B3A14"
+    famille: marque
+    usages:
+      - "comp-button-primary fond pressed/hover"
+      - "Titres en overlay sombre (palier 7 hero image avec gradient)"
+    contrastes_declares:   # recalculés par luminance relative WCAG (cascade palier 2 maquette)
+      sur_TOK-COLOR-FOND-PRINCIPAL: 6.39     # AA généreux
+      sur_TOK-COLOR-BLANC-NARRATIF: 7.19     # AAA
+
+  - id: TOK-COLOR-PRIMARY-CLAIR
+    nom: "Terracotta doux"
+    description: "Variante claire du primaire. Icônes sur fond sombre, badges décoratifs ponctuels."
+    hex: "#D4703A"
+    famille: marque
+    usages:
+      - "Icônes en variant darked (sur fond sombre — comp-button-back en mode présentation M4)"
+    contrastes_declares:   # recalculés par luminance relative WCAG (cascade palier 2 maquette)
+      sur_TOK-COLOR-TEXTE-PRINCIPAL: 5.45     # icône sur encre brune
+
+  - id: TOK-COLOR-FOND-PRINCIPAL
+    nom: "Parchemin"
+    description: "Fond principal de toutes les surfaces top-level S1/S2/S3 et de la majorité des écrans M3."
+    hex: "#F5E8D0"
+    famille: marque
+    usages:
+      - "Fond des layouts comp-layout-carte-principale (chrome non-carte), comp-layout-parcours, comp-layout-profil"
+      - "Fond des écrans M3 consultation approfondie hors hero image"
+
+  - id: TOK-COLOR-FOND-SECONDAIRE
+    nom: "Parchemin foncé"
+    description: "Cards, surfaces ponctuelles M6, dialogues M8, encarts."
+    hex: "#EDD9B5"
+    famille: marque
+    usages:
+      - "comp-card-parcours-large / -compact"
+      - "comp-surface-ponctuelle-* (recherche, filtres, lancement, saut-étape)"
+      - "comp-dialogue-confirmation / -permission"
+      - "comp-encart-information"
+      - "comp-chip-* en variant non-selected"
+
+  - id: TOK-COLOR-FOND-TERTIAIRE
+    nom: "Lin"
+    description: "Encarts sobres, séparateurs visuellement légers, état hover/pressed des cards."
+    hex: "#E5CCA0"
+    famille: marque
+    usages:
+      - "comp-card-* en état pressed"
+      - "Encarts décoratifs subtils dans la zone narrative"
+
+  - id: TOK-COLOR-TEXTE-PRINCIPAL
+    nom: "Encre brune"
+    description: "Corps de texte, titres. Le 'noir' de l'app — chaleureux, jamais pur."
+    hex: "#1C1108"
+    famille: marque
+    usages:
+      - "Tous les TOK-TYPO-DISPLAY-* (titres) sur fond clair"
+      - "Tous les TOK-TYPO-BODY-* (corps narratif) sur fond clair"
+      - "TOK-TYPO-UI-* (interface) sur fond clair"
+      - "TOK-COLOR-CONTOUR-VERIFICATION (alias — voir palier 9 réifié)"
+    contrastes_declares:   # recalculés par luminance relative WCAG (cascade palier 2 maquette)
+      sur_TOK-COLOR-FOND-PRINCIPAL: 15.3     # AAA généreux
+      sur_TOK-COLOR-FOND-SECONDAIRE: 13.41
+      sur_TOK-COLOR-FOND-TERTIAIRE: 11.89
+
+  - id: TOK-COLOR-TEXTE-SECONDAIRE
+    nom: "Brun doux"
+    description: "Labels, métadonnées, dates, sous-titres. Texte de second rang lisible."
+    hex: "#5C3D1E"
+    famille: marque
+    usages:
+      - "TOK-TYPO-UI-SM (métadonnées) sur fond clair"
+      - "Sous-titres et descriptions secondaires"
+      - "Citations — Lora Italic sur fond parchemin foncé (cohérent charte DA archivée)"
+    contrastes_declares:   # recalculés par luminance relative WCAG (cascade palier 2 maquette)
+      sur_TOK-COLOR-FOND-PRINCIPAL: 8.1      # AAA
+      sur_TOK-COLOR-FOND-SECONDAIRE: 7.1     # AAA
+
+  - id: TOK-COLOR-TEXTE-TERTIAIRE
+    nom: "Sable"
+    description: "Placeholders, texte désactivé hors état explicite, états inactifs des sélecteurs."
+    hex: "#9B7B5A"
+    famille: marque
+    usages:
+      - "comp-champ-saisie-texte placeholder"
+      - "comp-selecteur-section-principale variant section non-active (icône + libellé inactif)"
+    contrastes_declares:   # recalculés par luminance relative WCAG (cascade palier 2 maquette)
+      sur_TOK-COLOR-FOND-PRINCIPAL: 3.23     # AA grand texte uniquement (placeholders et inactifs OK car non porteurs d'information critique)
+    note_a11y: >-
+      Ratio 3.23 sur fond parchemin = AA grand texte mais en dessous du seuil
+      texte normal (4.5). Acceptable pour usages non-critiques
+      (placeholders, sélecteurs inactifs). Le palier 16 valide. Si
+      une situation requiert ce token comme texte porteur d'information,
+      basculer vers TOK-COLOR-TEXTE-SECONDAIRE.
+
+  - id: TOK-COLOR-OR-ACCENT
+    nom: "Or lyonnais"
+    description: "Accents décoratifs ponctuels. Évoque les dorures du Vieux-Lyon, les enluminures."
+    hex: "#C9901A"
+    famille: marque
+    usages:
+      - "Filets décoratifs des comp-encart-information variant savoir_anecdotique (la variante 'Le saviez-vous ?' du palier 8 — variant exact validé palier 13)"
+      - "Petits accents typographiques décoratifs ponctuels (numérotation des étapes — à confirmer palier 13)"
+    note_decision_palier_9: >-
+      La charte DA archivée associait cette couleur au badge 'Officiel'
+      à plume — ABANDONNÉ (palier 9 D6). Réaffectée ici aux usages
+      décoratifs ponctuels uniquement. PAS de couleur pour signifier
+      'éditorial' (la provenance est portée par TOK-COLOR-PIN-EDITORIAL).
+    contrastes_declares:   # recalculés par luminance relative WCAG (cascade palier 2 maquette)
+      sur_TOK-COLOR-FOND-PRINCIPAL: 2.32     # sous 3:1 — strictement décoratif, jamais de texte
+    usage_textuel: INTERDIT
+    note_usage_textuel: >-
+      Ratio réel 2.32 (recalculé WCAG, cascade palier 2) — sous le seuil
+      texte normal (4.5) ET sous le seuil grand texte / élément (3.0).
+      INTERDICTION stricte d'usage textuel : réservé aux filets et accents
+      purement décoratifs où le contraste n'est pas un enjeu de lecture.
+
+  - id: TOK-COLOR-BLANC-NARRATIF
+    nom: "Blanc chaud"
+    description: "Texte sur fond terracotta, texte sur image hero avec gradient sombre."
+    hex: "#FAF6F0"
+    famille: marque
+    usages:
+      - "Texte des labels comp-button-primary (sur fond terracotta)"
+      - "Titres en overlay sur image hero (palier 7 hero image avec gradient sombre)"
+    contrastes_declares:   # recalculés par luminance relative WCAG (cascade palier 2 maquette)
+      sur_TOK-COLOR-PRIMARY: 4.57           # bouton — AA OK
+      sur_TOK-COLOR-PRIMARY-FONCE: 7.19
+      sur_TOK-COLOR-TEXTE-PRINCIPAL: 17.21  # blanc sur encre brune — AAA généreux
+
+# -----------------------------------------------------------------------------
+# 2. Couleurs fonctionnelles
+# -----------------------------------------------------------------------------
+couleurs_fonctionnelles:
+
+  - id: TOK-COLOR-FONCTIONNEL-SUCCES
+    nom: "Vert succès"
+    description: "Quiz réussi, étape complétée, soumission acceptée."
+    hex: "#276D45"   # assombri (cascade palier 2 maquette : #2D7D4F était sous AA 4.5 sur parchemin)
+    famille: fonctionnelle
+    usages:
+      - "comp-message-success-inline"
+      - "Indicateur d'étape complète (cohérent palier 9 02-pins variant etape_complete avec atténuation)"
+      - "comp-message-ephemere variant succès"
+    contrastes_declares:   # recalculés par luminance relative WCAG (cascade palier 2 maquette)
+      sur_TOK-COLOR-FOND-PRINCIPAL: 5.16     # AA texte courant
+      sur_TOK-COLOR-FOND-SECONDAIRE: 4.52    # AA texte courant (fond des messages inline sur surfaces)
+      sur_TOK-COLOR-FOND-TERTIAIRE: 4.01     # grand texte / élément seulement
+      sur_TOK-COLOR-BLANC-NARRATIF: 5.81
+
+  - id: TOK-COLOR-FONCTIONNEL-ERREUR
+    nom: "Rouge erreur"
+    description: "Alertes, erreurs de formulaire, signalements rejetés."
+    hex: "#B03427"   # assombri (cascade palier 2 maquette : #C0392B était sous AA 4.5 sur parchemin)
+    famille: fonctionnelle
+    usages:
+      - "comp-message-erreur-inline"
+      - "Bordure de comp-champ-saisie-* en état error"
+      - "comp-message-ephemere variant erreur"
+    contrastes_declares:   # recalculés par luminance relative WCAG (cascade palier 2 maquette)
+      sur_TOK-COLOR-FOND-PRINCIPAL: 5.15     # AA texte courant
+      sur_TOK-COLOR-FOND-SECONDAIRE: 4.51    # AA texte courant (fond des messages inline sur surfaces)
+      sur_TOK-COLOR-FOND-TERTIAIRE: 4.00     # grand texte / élément seulement
+      sur_TOK-COLOR-BLANC-NARRATIF: 5.79
+
+  - id: TOK-COLOR-FONCTIONNEL-INFO
+    nom: "Bleu info"
+    description: "Infobulles, liens, indications neutres."
+    hex: "#2762A0"   # assombri (cascade palier 2 maquette : #2B6CB0 était sous AA 4.5 sur parchemin — réel 4.47, pas 5.6)
+    famille: fonctionnelle
+    usages:
+      - "comp-lien-texte (couleur du lien hypertexte dans le récit narratif)"
+      - "Infobulles (si introduit plus tard)"
+    contrastes_declares:   # recalculés par luminance relative WCAG (cascade palier 2 maquette)
+      sur_TOK-COLOR-FOND-PRINCIPAL: 5.19     # AA texte courant (lien dans le récit sur parchemin)
+      sur_TOK-COLOR-FOND-SECONDAIRE: 4.55    # AA texte courant
+      sur_TOK-COLOR-FOND-TERTIAIRE: 4.03     # grand texte / élément seulement
+
+# -----------------------------------------------------------------------------
+# 3. Couleurs palier 9 réifiées (Pin / tracé / contour)
+# -----------------------------------------------------------------------------
+couleurs_palier_9_reifie:
+
+  - id: TOK-COLOR-PIN-EDITORIAL
+    nom: "Pin éditorial"
+    description: >-
+      Teinte chaude affirmée signalant la provenance éditoriale d'un Pin
+      ou tracé Parcours (palier 9 D3 réifié). Token sémantiquement
+      distinct de TOK-COLOR-PRIMARY (CTA bouton) bien que la valeur hex
+      soit identique actuellement — la séparation des ids permet une divergence
+      future si besoin émerge sans casser le palier 10 qui référence
+      TOK-COLOR-PIN-EDITORIAL.
+    hex: "#B85220"
+    valeur_identique_a: TOK-COLOR-PRIMARY   # actuellement — divergence possible si besoin émerge
+    famille: palier_9_reifie
+    usages:
+      - "comp-pin (palier 10 03-fonctionnels:49) variant provenance=editorial"
+      - "comp-trace-parcours (palier 10 03-fonctionnels) variant provenance=editorial"
+      - "comp-cluster-densite variant provenance_dominante=editorial (palier 9 04-densite-zoom)"
+    contrastes_declares:
+      sur_fond_carte_aujourd_hui_indicatif: 4.5   # fond moderne neutre — palier 16 valide après calibrage palier 15
+      sur_fond_carte_antiquite_indicatif:   3.8   # fond ocre chaud — INDICATIF, à valider palier 16 (proximité chromatique avec terracotta)
+      sur_fond_carte_seconde_guerre_indicatif: 5.2  # fond monochrome — bon contraste
+    note_a11y_daltonisme: >-
+      Distinction TOK-COLOR-PIN-EDITORIAL (terracotta orange) vs
+      TOK-COLOR-PIN-COMMUNAUTAIRE (gris-brun neutre) reste perceptible
+      en daltonisme dichromatique (luminance distincte). À VALIDER
+      palier 16 avec simulateur (Sim Daltonism ou équivalent).
+
+  - id: TOK-COLOR-PIN-COMMUNAUTAIRE
+    nom: "Pin communautaire"
+    description: "Teinte neutre signalant la provenance communautaire (palier 9 D3 réifié)."
+    hex: "#7A6555"
+    famille: palier_9_reifie
+    usages:
+      - "comp-pin (palier 10 03-fonctionnels:49) variant provenance=communautaire"
+      - "comp-trace-parcours (palier 10 03-fonctionnels) variant provenance=communautaire"
+      - "comp-cluster-densite variant provenance_dominante=communautaire"
+    contrastes_declares:
+      sur_fond_carte_aujourd_hui_indicatif: 4.0
+      sur_fond_carte_antiquite_indicatif:   3.4   # fond ocre — proximité luminance, à valider palier 16
+      sur_fond_carte_haut_moyen_age_indicatif: 3.0  # fond brun manuscrit — RISQUE, à valider palier 16
+    note_a11y_daltonisme: "Cf. TOK-COLOR-PIN-EDITORIAL ci-dessus."
+    note_palier_16: >-
+      Si le contraste sur fond carte à certaines ancres Époque tombe
+      sous 3:1, ajustement du token (saturation/luminance) ici, ou
+      ajustement du fond Carte aux ancres concernées (palier 11
+      MAP-SLIDER-VERS-AXES-CARTE calibrage palier 15).
+
+  - id: TOK-COLOR-CONTOUR-VERIFICATION
+    nom: "Contour de vérification"
+    description: >-
+      Couleur du contour distinctif signalant 'sources en cours de
+      vérification' (I3, palier 9 D5 réifié). Forme : pointillé (palier 12
+      D6, suggestion non normative palier 9 retenue).
+    hex: "#1C1108"
+    valeur_identique_a: TOK-COLOR-TEXTE-PRINCIPAL   # encre brune réutilisée — divergence possible si besoin émerge
+    famille: palier_9_reifie
+    usages:
+      - "comp-pin (palier 10 03-fonctionnels:49) variant statut_verification=en_cours (palier 9 02-pins l. 71-89)"
+      - "comp-trace-parcours variant statut_verification=en_cours (palier 9 03-parcours-traces l. 64-71)"
+    forme: "pointillé (cohérent palier 12 D6, palier 9 D5 suggestion)"
+    note_perception_visuelle: >-
+      Le contour est un pointillé fin (épaisseur exacte au palier 10
+      anatomie du Pin, ~1.5px attendu). Contrairement à un texte qui
+      utilise la même teinte (encre brune), un pointillé fin produit
+      une perception visuelle DIFFÉRENTE : trame discontinue, légèreté
+      visuelle, signal 'provisoire'. Pas de risque de confusion avec
+      du texte en lecture.
+    contrastes_declares:   # recalculés par luminance relative WCAG (cascade palier 2 maquette)
+      sur_TOK-COLOR-PIN-COMMUNAUTAIRE: 3.37   # ≥3:1 élément OK (le 9.0 déclaré était FAUX) — perceptibilité du pointillé fin à valider palier 11
+      sur_TOK-COLOR-PIN-EDITORIAL:     3.76   # cas rare (un Pin éditorial n'est jamais en vérification — I3)
+    note_invariant_I3: >-
+      I3 contraint : seul un Pin/tracé communautaire peut être en
+      cours de vérification (l'éditorial est validé en interne avant
+      publication). Donc le contour s'applique en pratique uniquement
+      sur communautaire — paire critique = TOK-COLOR-CONTOUR-VERIFICATION
+      sur TOK-COLOR-PIN-COMMUNAUTAIRE = 3.37 (≥3:1, élément non textuel OK ;
+      perceptibilité du pointillé fin à valider palier 11 — le 9.0 déclaré était faux).
+
+# -----------------------------------------------------------------------------
+# 4. Surfaces neutres (overlays sombres)
+# -----------------------------------------------------------------------------
+surfaces_neutres:
+
+  - id: TOK-COLOR-OVERLAY-SOMBRE
+    nom: "Overlay sombre"
+    description: >-
+      Couleur du gradient sombre qui assombrit le bas d'une image hero
+      pour rendre lisible un titre en overlay. Aussi utilisable comme
+      filtre sombre fictif (mais pas pour les backdrops M6/M8 — voir
+      fichier 04 TOK-OPACITY-BACKDROP-* qui sont des opacités sur fond
+      noir-encre brune).
+    rgba: "rgba(28, 17, 8, 0.65)"
+    famille: surface_neutre
+    usages:
+      - "Gradient hero image (palier 7 hero image avec titre overlay)"
+    note: >-
+      Utilise la teinte encre brune (28, 17, 8) cohérente avec
+      TOK-COLOR-TEXTE-PRINCIPAL — pas de noir pur (cf. règle d'or).
+
+# -----------------------------------------------------------------------------
+# 5. Daltonisme et a11y globale
+# -----------------------------------------------------------------------------
+daltonisme_et_a11y:
+
+  paires_critiques_a_valider_palier_16:
+    - "TOK-COLOR-PIN-EDITORIAL vs TOK-COLOR-PIN-COMMUNAUTAIRE — distinction de PROVENANCE (cohérence palier 9 D3)"
+    - "TOK-COLOR-FONCTIONNEL-SUCCES vs TOK-COLOR-FONCTIONNEL-ERREUR — distinction succès/erreur"
+    - "TOK-COLOR-CONTOUR-VERIFICATION sur TOK-COLOR-PIN-COMMUNAUTAIRE — perceptibilité du pointillé en cas de vision basse"
+
+  paires_non_critiques_par_disjonction_spatiale:
+    description: >-
+      Certaines paires de tokens proches chromatiquement ne nécessitent
+      PAS de validation daltonisme parce que les contextes spatiaux
+      sont disjoints — l'utilisateur ne les voit jamais simultanément
+      dans une situation de comparaison.
+    cas:
+      - paire: "TOK-COLOR-FONCTIONNEL-INFO (#2762A0) vs TOK-COLOR-PIN-COMMUNAUTAIRE (#7A6555)"
+        justification: >-
+          TOK-COLOR-FONCTIONNEL-INFO est utilisé en LIEN-TEXTE INLINE
+          dans la zone narrative (M3 consultation approfondie d'un Pin).
+          TOK-COLOR-PIN-COMMUNAUTAIRE est utilisé sur la CARTE (S1) ou
+          en marqueur dans un catalogue de Parcours (S2). Aucun écran
+          ne les affiche simultanément en situation de comparaison.
+          Pas de paire critique daltonisme.
+
+  approche_globale: >-
+    L'app NE REPOSE JAMAIS sur la couleur seule pour porter une
+    information critique. Les Catégories sont signalées par icône
+    (palier 9 D1) — le daltonisme n'affecte donc pas la lecture
+    de la catégorie d'un Pin. La provenance est portée par couleur
+    + position (Pin éditorial vs Pin communautaire dans le catalogue
+    de Parcours sont aussi distingués par leur place dans la liste).
+    Les états fonctionnels (succès/erreur) sont doublés par texte
+    (palier 8 microcopy) et icône (palier 13).
+
+  test_simulation: >-
+    Tester avec simulateur de daltonisme (Sim Daltonism, Color
+    Oracle) en phase de test. Trois protanopies simulées : protanopie,
+    deutéranopie, tritanopie. Les paires critiques ci-dessus
+    DOIVENT rester distinguables. Si non, ajustement du token ici
+    (saturation, luminance).
+
+# -----------------------------------------------------------------------------
+# 6. Persona check
+# -----------------------------------------------------------------------------
+persona_check:
+
+  kenji:
+    impact: faible
+    note: "Aucun impact spécifique ici — la palette latine et neutre est universelle."
+
+  mme_dupont:
+    impact: moyen
+    note: >-
+      Contrastes texte/fond ≥ 4.5 sur paires principales — confortable
+      en plein soleil pour la création de Parcours en extérieur. À
+      VALIDER palier 16 sur device avec luminosité ambiante.
+
+  mme_martin:
+    impact: MAJEUR
+    note: >-
+      Test_litmus 'projection en classe, lecture depuis le fond' :
+      les paires TOK-COLOR-TEXTE-PRINCIPAL sur TOK-COLOR-FOND-PRINCIPAL
+      (14.6 — AAA généreux) et TOK-COLOR-TEXTE-SECONDAIRE sur fond
+      principal (7.2 — AAA) garantissent la lisibilité depuis 6-8m.
+      TOK-COLOR-PIN-EDITORIAL et COMMUNAUTAIRE sur fond carte aux
+      10 ancres Époque — VALIDATION palier 16 critique (les ratios
+      indicatifs ci-dessus sont à confirmer après calibrage palier 15).
+
+  pere_lyonnais:
+    impact: moyen
+    note: >-
+      Palette terracotta/parchemin évoque pour lui Lyon (cohérent
+      essence § triptyque historicité). Or accent rappelle les
+      dorures du Vieux-Lyon — détail symbolique apprécié.
+
+  anais_back_office:
+    impact: ÉLEVÉ
+    note: >-
+      Le back-office desktop consomme l'ensemble de la palette
+      (boutons primaires/secondaires, surfaces, textes). Cohérent
+      avec l'app mobile — Anaïs ne se sent pas dans 'un autre produit'
+      quand elle bascule entre desktop admin et prévisualisation
+      mobile.
+
+# -----------------------------------------------------------------------------
+# 7. Enjeux transversaux
+# -----------------------------------------------------------------------------
+enjeux_transversaux:
+
+  accessibilite: >-
+    Tous les contrastes des paires critiques sont DÉCLARÉS dans les
+    fiches. Palier 16 valide contre seuils WCAG AA (4.5 texte normal,
+    3.0 large) et AAA souhaité pour TOK-TYPO-BODY-* (texte narratif
+    long). Daltonisme : approche 'pas de couleur seule' garantit
+    robustesse. TOK-COLOR-TEXTE-TERTIAIRE (3.5 sur fond principal)
+    réservé aux usages non-critiques (placeholders, inactifs).
+
+  performance: "Aucun enjeu — couleurs statiques."
+
+  vie_privee: "Aucun enjeu spécifique."
+
+  i18n: >-
+    Indépendant de la locale. Les couleurs n'ont pas d'association
+    culturelle invalidante (vert=succès, rouge=erreur sont des
+    conventions universelles dans nos 3 locales fr/en/ja palier 8).
+
+# -----------------------------------------------------------------------------
+# 8. Questions ouvertes
+# -----------------------------------------------------------------------------
+questions_ouvertes:
+  - "TOK-COLOR-PIN-COMMUNAUTAIRE sur fond Carte au Haut Moyen Âge (ratio indicatif 3.0) — risque de perceptibilité limite. Si le palier 16 confirme insuffisant, ajuster le hex ici (luminance plus distincte du fond ocre/brun)."
+  - "TOK-COLOR-OR-ACCENT (#C9901A) sur fond principal (réel 2.32, recalculé WCAG) — sous le seuil texte normal ET grand texte. Réservé aux usages décoratifs non-textuels. Si un usage texte émerge, basculer vers TOK-COLOR-TEXTE-SECONDAIRE."
+  - "Cohabitation TOK-COLOR-PRIMARY (CTA bouton) et TOK-COLOR-PIN-EDITORIAL (Pin sur carte) sur un même écran : confusion possible ? À VALIDER palier 16 (proxy-personas) — proposition par défaut : non, les contextes spatiaux sont disjoints."
+  - "Niveaux de contraste indicatifs sur fond Carte aux 10 ancres Époque : posés en estimation. Validation effective palier 16 après calibrage palier 15 du MAP-SLIDER-VERS-AXES-CARTE."

@@ -1,0 +1,101 @@
+# =============================================================================
+# E-PROFIL-PRINCIPAL — Surface Profil — accueil
+# =============================================================================
+# Surface principale d'accueil de la section Profil (P5.S3 en P5.M1). Porte
+# d'entrée vers les sous-sections personnelles : Favoris, Historique,
+# Paramètres, et gestion du Compte (création/connexion ou paramètres si déjà
+# rattaché). Aucune création de contenu ici — espace de paramétrage et de
+# mémoire personnelle.
+# =============================================================================
+
+document:
+  type: palier_ecrans_fiche
+  format: yaml
+
+ecran:
+  id: E-PROFIL-PRINCIPAL
+  nom: "Surface Profil — accueil"
+
+  mode: P5.M1
+  surface_parente: P5.S3
+
+  raison_d_etre: >-
+    Surface centrale de la section Profil. Donne accès aux collections
+    personnelles (Favoris, Historique), aux paramètres et à la gestion du
+    Compte. Existe par défaut dès le premier lancement (jamais de mur
+    d'inscription, cf. I6). Différencie visuellement le cas Profil seul
+    (anonyme local) du cas Profil + Compte rattaché (sans rendre le
+    Compte indispensable pour quoi que ce soit qui ne le requiert pas).
+
+  composition:
+    - zone: "représentation du Profil"
+      role: "identifie l'utilisateur sur cet appareil ; si Compte rattaché, affiche pseudonyme et représentation graphique du Compte ; sinon affiche une représentation neutre (anonyme local)"
+      entites_affichees: [Profil, Compte]
+
+    - zone: "point d'accès Favoris"
+      role: "ouvre E-PROFIL-FAVORIS (flow D2) ; peut surfacer un compteur ou un aperçu (à confirmer palier 7)"
+      entites_affichees: [Favori]
+
+    - zone: "point d'accès Historique"
+      role: "ouvre E-PROFIL-HISTORIQUE (flow D3)"
+      entites_affichees: ["Historique de visite"]
+
+    - zone: "point d'accès Paramètres"
+      role: "ouvre E-PROFIL-PARAMETRES (flow D5)"
+
+    - zone: "point d'accès gestion Compte"
+      role: "si aucun Compte rattaché, expose deux entrées 'Créer un compte' (D6) et 'Se connecter' (D7), de manière discrète et non promotionnelle ; si Compte rattaché, expose une entrée vers E-PROFIL-PARAMETRES-COMPTE"
+      entites_affichees: [Compte]
+
+    - zone: "section engageante optionnelle"
+      role: "badges / statistiques (D6.6) — visible uniquement si Profil.affichage_section_engageante = vrai (opt-in)"
+      entites_affichees: ["Historique de visite"]
+
+    - zone: "point d'accès suivi des soumissions"
+      role: "ouvre E-COMMUNAUTE-SUIVI-SOUMISSIONS (flow G5) — visible uniquement si Compte rattaché ET au moins une soumission existe"
+
+  etats:
+    nominal_sans_compte: "Profil anonyme local ; représentation neutre ; les entrées 'Créer un compte' et 'Se connecter' sont visibles ; aucune entrée Paramètres de Compte ni Suivi des soumissions"
+    nominal_avec_compte: "Compte rattaché ; pseudonyme et représentation graphique affichés ; entrée 'Paramètres de Compte' visible (remplace Créer/Connexion) ; entrée Suivi des soumissions visible si applicable"
+    chargement: "Données du Profil locales en cours de lecture (généralement instantané — état rare)"
+    favoris_vides: "Le compteur ou aperçu Favoris reflète une collection vide ; l'entrée reste accessible"
+    historique_vide: "Le résumé ou aperçu Historique reflète une absence d'entrées ; l'entrée reste accessible"
+    historique_desactive: "Profil.enregistrement_historique_actif = faux ; un indicateur discret signale que l'enregistrement est en pause (sans culpabilisation) ; l'entrée Historique reste accessible pour consulter les entrées antérieures"
+    section_engageante_masquee: "Profil.affichage_section_engageante = faux (cas par défaut) — la zone correspondante n'apparaît pas"
+    offline_avec_cache: "Toutes les sections de Profil restent fonctionnelles (le Profil et ses collections sont locaux par défaut) ; bandeau persistant E-TRANSVERSES-BANDEAU-OFFLINE visible si pertinent"
+    offline_sans_cache: "Identique à offline_avec_cache pour le Profil local ; les opérations qui exigent réseau (création/connexion/sync/suppression de Compte) sont signalées indisponibles à leur tentative"
+    parcours_en_cours: "Surface persistante E-TRANSVERSES-PARCOURS-PERSISTANT (P2) visible en superposition (cf. P5.C1) ; sans incidence sur le Profil"
+    audio_en_cours: "Surface persistante E-TRANSVERSES-AUDIO-PERSISTANT (P1) visible en superposition (cf. P5.C1)"
+
+  elements_interactifs:
+    - "Tap sur Favoris → flow D2 (E-PROFIL-FAVORIS)"
+    - "Tap sur Historique → flow D3 (E-PROFIL-HISTORIQUE)"
+    - "Tap sur Paramètres → flow D5 (E-PROFIL-PARAMETRES)"
+    - "Tap sur Créer un compte (sans Compte) → flow D6 (E-PROFIL-CREATION-COMPTE)"
+    - "Tap sur Se connecter (sans Compte) → flow D7 (E-PROFIL-CONNEXION-COMPTE)"
+    - "Tap sur Paramètres de Compte (avec Compte) → E-PROFIL-PARAMETRES-COMPTE"
+    - "Tap sur Suivi des soumissions (avec Compte, si applicable) → E-COMMUNAUTE-SUIVI-SOUMISSIONS (flow G5)"
+    - "Bascule vers une autre surface top-level (P5.S1 Carte ou P5.S2 Parcours) via le sélecteur de section principale (P5.N2 — saut latéral)"
+
+  flows_actifs:
+    - D1   # Accès à l'espace personnel (entrée et dispatch)
+
+  surfaces_imbriquees:
+    - E-PROFIL-FAVORIS
+    - E-PROFIL-HISTORIQUE
+    - E-PROFIL-PARAMETRES
+    - E-PROFIL-CREATION-COMPTE
+    - E-PROFIL-CONNEXION-COMPTE
+    - E-PROFIL-PARAMETRES-COMPTE
+    - E-COMMUNAUTE-SUIVI-SOUMISSIONS
+    - E-TRANSVERSES-MESSAGE-EPHEMERE
+    - E-TRANSVERSES-AUDIO-PERSISTANT
+    - E-TRANSVERSES-PARCOURS-PERSISTANT
+    - E-TRANSVERSES-BANDEAU-OFFLINE
+
+  entites_affichees: [Profil, Compte, Favori, "Historique de visite"]
+
+  questions_ouvertes:
+    - "La représentation du Profil sans Compte affiche-t-elle une variante d'avatar neutre uniforme, ou un placeholder par défaut configurable ? — palier 9/10"
+    - "Faut-il surfacer un compteur (« 12 favoris ») ou un aperçu visuel (mini-vignettes) sur les points d'accès Favoris/Historique ? — palier 7/9"
+    - "Visibilité du point d'accès Suivi des soumissions : le rendre toujours visible avec Compte (même sans soumission) ou conditionner à l'existence d'au moins une soumission ? — palier 7"

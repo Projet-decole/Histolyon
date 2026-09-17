@@ -1,0 +1,532 @@
+# =============================================================================
+# Palier 6 — 07-communaute — Famille G
+# =============================================================================
+# Famille des flows de la couche communautaire grand public : consultation et
+# rédaction de Commentaires sur un Pin, Signalement polymorphe d'un contenu,
+# Soumission d'un Pin par un utilisateur, suivi du statut de cette soumission,
+# soumission d'un Retour de parcours.
+#
+# Pivot des invariants I2 (Compte requis pour publier), I3 (modération avant
+# visibilité publique — A PRIORI pour Commentaire et Retour, A POSTERIORI avec
+# marque distinctive pour Pin et Parcours communautaires), I5 (anonymat strict
+# du signaleur), I1 (jamais d'identité civile).
+#
+# Format strict cf. 00-index.yaml et pilote 03-parcours.yaml.
+# =============================================================================
+
+document:
+  type: palier_flows_cluster
+  cluster_id: "07-communaute"
+  nom: "Communauté"
+  version: "0.1"
+  date: "2026-05-05"
+  format: yaml
+
+raison_d_etre_du_cluster: >-
+  La couche communautaire est sous contrôle : Compte requis (I2), modération
+  avant visibilité publique (I3 dans ses deux nuances), identité civile
+  jamais collectée (I1), anonymat strict du signaleur (I5). Ces flows
+  déroulent ce que l'utilisateur grand public peut FAIRE — lire un fil
+  de Commentaires, en rédiger un, signaler un contenu communautaire,
+  proposer un nouveau Pin, suivre le sort de ses soumissions, donner un
+  Retour à un Parcours communautaire vécu. La modération côté back-office
+  (file, décisions, traces) est en famille H — ici on s'arrête à la sortie
+  utilisateur.
+
+# -----------------------------------------------------------------------------
+# Flows
+# -----------------------------------------------------------------------------
+flows:
+
+  # ---------------------------------------------------------------------------
+  - id: G1
+    nom: "Consultation des commentaires d'un Pin"
+
+    declencheur: "Activation de la section Commentaires depuis la consultation approfondie d'un Pin (B2)"
+    acteurs: [utilisateur grand public]
+
+    deroule:
+      - etape: 1
+        action: "Une surface dédiée à la conversation s'ouvre par-dessus ou en continuité de la consultation approfondie du Pin (le mode reste P5.M3 — la liste des Commentaires est une zone du même espace de consultation)"
+        surfaces_actives: [P5.M3]
+      - etape: 2
+        action: "L'utilisateur fait défiler la liste des Commentaires publiés du Pin. Chaque entrée affiche le pseudonyme et la représentation graphique de l'auteur, le contenu, l'horodatage de création, l'indication '(modifié)' si le Commentaire a été édité"
+      - etape: 3
+        action: >-
+          Aucun Compte n'est requis pour LIRE — la lecture est ouverte. Si
+          le Pin n'a aucun Commentaire publié, un état vide gracieux invite
+          (mais n'oblige pas) à être le premier à réagir.
+
+    bifurcations:
+      - si: "L'utilisateur active le contrôle de rédaction"
+        alors: "bascule vers G2 (Soumission d'un Commentaire)"
+      - si: "L'utilisateur active le contrôle de signalement sur un Commentaire affiché"
+        alors: "bascule vers G3 avec cible = Commentaire"
+      - si: "L'utilisateur (auteur d'un Commentaire affiché) active l'édition ou la suppression de son propre Commentaire"
+        alors: "édition en place (re-bascule éventuelle vers G2 selon politique de re-modération — cf. questions ouvertes du cluster 04) ou suppression avec dialogue P5.M8 ; reste en G1 avec liste mise à jour"
+      - si: "L'utilisateur ferme la section Commentaires"
+        alors: "retour à B2 sur la surface narrative du Pin"
+
+    sorties_normales:
+      - "Retour à B2"
+      - "Bascule vers G2 (rédaction)"
+      - "Bascule vers G3 (signalement d'un Commentaire)"
+
+    cas_particuliers:
+      - cas: "Connexion réseau indisponible"
+        comportement: "Si les Commentaires du Pin avaient été préalablement chargés, la liste reste consultable ; sinon un message gracieux signale qu'ils ne sont pas disponibles hors-ligne. Bandeau P5.P3 actif si pertinent."
+      - cas: "Pin retiré entre l'ouverture de B2 et l'ouverture de G1"
+        comportement: "Message gracieux ; les Commentaires existants ne sont plus visibles publiquement (cohérent avec invariant cluster 04 : un Commentaire dont le Pin cible passe en retiré reste tracé mais n'est plus exposé)"
+      - cas: "Commentaire signalé par l'utilisateur lui-même avec masquage local actif"
+        comportement: "Le Commentaire en question n'apparaît plus dans la liste pour ce signaleur, sans être retiré pour les autres (cf. G3 et cluster 04)"
+
+    entites_impliquees: [Commentaire, Pin, Compte]
+    surfaces_et_modes: [P5.M3, P5.P3]
+    references_palier_3: [D9.1]
+    invariants_respectes: [I1]
+
+    questions_ouvertes:
+      - "Pagination ou chargement progressif sur un Pin populaire — relève du palier 7 / palier 16"
+      - "Tri par défaut des Commentaires (chronologique récent, ancien, ou priorisation auteur de Pin) — palier 7"
+
+  # ---------------------------------------------------------------------------
+  - id: G2
+    nom: "Soumission d'un Commentaire"
+
+    declencheur: "Activation du contrôle de rédaction d'un Commentaire depuis G1"
+    acteurs: [utilisateur grand public]
+
+    pre_requis_specifiques:
+      - "Compte créé avec pseudonyme (instanciation locale de I2)"
+
+    deroule:
+      - etape: 1
+        action: "L'app vérifie la présence d'un Compte. Si absent, redirection vers D6 (Création d'un Compte) — au retour, on revient à l'étape suivante de G2 sans rejouer G1"
+      - etape: 2
+        action: "Une surface ponctuelle (P5.M6) de rédaction s'ouvre. L'utilisateur saisit le contenu de son Commentaire ; il voit son pseudonyme et sa représentation graphique tels qu'ils apparaîtront publiquement"
+        surfaces_actives: [P5.M6]
+      - etape: 3
+        action: "L'utilisateur valide la soumission ou annule"
+      - etape: 4
+        action: >-
+          À la validation, le Commentaire passe en état en_attente.
+          Conformément à I3 nuance Commentaire (modération A PRIORI),
+          il n'apparaît PAS encore publiquement. Un message éphémère
+          P5.M9 confirme la prise en compte (libellé exact en palier 8).
+      - etape: 5
+        action: "Retour à G1 ; la liste reste l'état d'avant ; l'utilisateur peut consulter le statut de son Commentaire depuis son Profil (D3 historique / D5 paramètres — surface précise palier 7)"
+
+    bifurcations:
+      - si: "L'utilisateur n'a pas de Compte et refuse d'en créer un"
+        alors: "annulation de la rédaction, retour à G1 sans modification"
+      - si: "L'utilisateur annule explicitement la rédaction (saisie en cours)"
+        alors: "dialogue P5.M8 si le contenu n'est pas vide ('abandonner cette saisie ?') ; sinon fermeture directe ; retour à G1"
+      - si: "Le Commentaire est ultérieurement modéré et publié (H3)"
+        alors: "il devient visible dans G1 ; notification au Profil de l'auteur (D3 / paramètres notification) si autorisée"
+      - si: "Le Commentaire est ultérieurement refusé (H3)"
+        alors: "l'auteur reçoit un retour sobre avec motif depuis son Profil ; le Commentaire n'apparaît jamais en G1"
+
+    sorties_normales:
+      - "Commentaire enregistré en état en_attente, retour à G1"
+      - "Annulation, retour à G1 inchangé"
+
+    cas_particuliers:
+      - cas: "Connexion réseau indisponible au moment de la validation"
+        comportement: "L'envoi est mis en attente locale, P5.M9 informe ; au retour de la connexion la soumission est tentée. Le brouillon est sauvegardé localement entre temps."
+      - cas: "Pin cible retiré entre l'ouverture de G2 et la validation"
+        comportement: "La validation échoue gracieusement avec message ; le contenu rédigé peut être copié par l'utilisateur s'il le souhaite, mais aucun Commentaire n'est créé sur un Pin retiré"
+
+    entites_impliquees: [Commentaire, Pin, Compte]
+    surfaces_et_modes: [P5.M6, P5.M8, P5.M9]
+    references_palier_3: [D9.1]
+    invariants_respectes: [I1, I2, I3]
+
+    questions_ouvertes:
+      - "Sauvegarde de brouillon de Commentaire (entre fermeture et réouverture de G2) — relève du cluster 04 question ouverte / palier 7"
+      - "Édition d'un Commentaire publié : redéclenche-t-elle un cycle de modération (re-passage en en_attente) ou édition libre ? Question cluster 04 ouverte — le déroulé ici suppose édition libre tant que pas re-signalé"
+
+  # ---------------------------------------------------------------------------
+  - id: G3
+    nom: "Signalement d'un contenu (polymorphe)"
+
+    declencheur: >-
+      Activation du contrôle de signalement sur un objet d'origine
+      communautaire — Pin de provenance communautaire (depuis B1/B2),
+      Parcours communautaire (depuis C3), Commentaire (depuis G1),
+      Retour de parcours (depuis C3 ou un espace de consultation des
+      retours d'un Parcours).
+    acteurs: [utilisateur grand public]
+
+    pre_requis_specifiques:
+      - "Compte créé avec pseudonyme (instanciation locale de I2)"
+      - "Cible d'origine communautaire (Pin éditorial exclu — voir cas particulier)"
+
+    deroule:
+      - etape: 1
+        action: >-
+          L'app détermine le type_de_cible parmi : pin, parcours,
+          commentaire, retour_de_parcours. Un Pin éditorial n'est PAS
+          une cible légitime (cf. cas particulier).
+      - etape: 2
+        action: "L'app vérifie la présence d'un Compte. Si absent, redirection vers D6 (Création d'un Compte) — au retour, on revient à l'étape suivante de G3"
+      - etape: 3
+        action: "Une surface ponctuelle (P5.M6) propose le choix du motif parmi un jeu fini : inapproprié, historiquement_faux, hors_sujet, atteinte_vie_privée, autre"
+        surfaces_actives: [P5.M6]
+      - etape: 4
+        action: "Si motif = autre, le signaleur saisit une précision libre (obligatoire pour ce motif). Pour les autres motifs, un texte de précision reste optionnel"
+      - etape: 5
+        action: "Le signaleur peut activer le masquage local — la cible cessera d'apparaître pour LUI sans être retirée pour les autres (D9.4)"
+      - etape: 6
+        action: "Le signaleur valide. Un Signalement est créé en état nouveau ; un message éphémère P5.M9 accuse la prise en compte ('signalement enregistré')"
+      - etape: 7
+        action: "Retour à la surface d'origine (B2 / C3 / G1 selon le déclencheur). Si masquage local activé, la cible disparaît immédiatement de la vue de ce signaleur"
+
+    bifurcations:
+      - si: "L'utilisateur n'a pas de Compte et refuse d'en créer un"
+        alors: "annulation, retour à la surface d'origine sans Signalement créé"
+      - si: "L'utilisateur tente de signaler un contenu qu'il a DÉJÀ signalé (Signalement ouvert : nouveau ou en_examen, même Compte sur même cible)"
+        alors: "message gracieux informant qu'un signalement précédent est en cours d'examen (libellé exact palier 8) ; pas de nouveau Signalement créé (invariant cluster 04)"
+      - si: "L'utilisateur annule la rédaction du motif"
+        alors: "fermeture de la surface ponctuelle, retour à la surface d'origine sans Signalement créé"
+      - si: "Le Signalement est ultérieurement traité par la modération (H3 ou H4 selon cible)"
+        alors: "le signaleur reçoit le retour sobre de la décision (cible retirée / maintenue) sur son espace de suivi des signalements (Profil)"
+
+    sorties_normales:
+      - "Signalement enregistré en état nouveau, retour à la surface d'origine"
+      - "Annulation, retour inchangé"
+
+    cas_particuliers:
+      - cas: "Cible = Pin éditorial (provenance editorial)"
+        comportement: >-
+          Selon arbitrage cluster 04, un Signalement ne vise QUE des objets
+          d'origine communautaire. Pour un Pin éditorial, le contrôle de
+          signalement n'est pas exposé en B2 ; un canal alternatif de
+          correction (« suggérer une correction sur ce Pin éditorial »)
+          relève d'un futur palier ou d'un sous-domaine non couvert ici.
+          Message gracieux orientant vers ce canal alternatif (libellé
+          exact palier 8).
+      - cas: "Cible = Retour de parcours signalé pendant que l'auteur du Parcours en consulte la liste"
+        comportement: "Le Signalement est créé normalement ; la liste de retours côté auteur n'est PAS mise à jour visuellement avant décision de modération (un Signalement n'est jamais visible publiquement — pas de marqueur 'signalé')"
+      - cas: "Connexion réseau indisponible"
+        comportement: "Le Signalement est mis en attente d'envoi local ; le masquage local PEUT être appliqué immédiatement côté terminal (préférence locale au Profil) ; au retour de la connexion l'envoi est tenté"
+      - cas: "Cible déjà retirée par modération entre déclenchement de G3 et validation"
+        comportement: "Validation échoue gracieusement ; message indique que la cible a déjà été traitée"
+
+    entites_impliquees: [Signalement, Pin, Parcours, Commentaire, "Retour de parcours", Compte]
+    surfaces_et_modes: [P5.M6, P5.M9]
+    references_palier_3: [D9.4]
+    invariants_respectes: [I1, I2, I5]
+
+    questions_ouvertes:
+      - "Canal alternatif de correction d'un Pin éditorial (motif 'erreur factuelle' Kenji) : signalement modifié pour accepter Pin éditorial, ou canal séparé futur palier ? Question ouverte cluster 04 à confirmer"
+      - "Le signaleur peut-il retirer son propre Signalement avant décision ? Recommandation cluster 04 = oui ; transition à modéliser explicitement si confirmé (état retiré_par_signaleur)"
+      - "Anonymisation rétroactive : si le Compte signaleur supprime son Compte, statut du Signalement en file ? — articulation cluster 03 / palier 6 famille D suppression de Compte"
+      - "Modélisation du masquage local : drapeau du Signalement OU entité 'Masquage personnel' rattachée au Profil — cluster 04 question ouverte (impact mineur sur le déroulé G3)"
+
+  # ---------------------------------------------------------------------------
+  - id: G4
+    nom: "Soumission d'un Pin par un utilisateur"
+
+    declencheur: >-
+      Activation du point d'accès « Proposer un pin » — depuis P5.S1 Carte
+      (point d'accès périphérique permanent), depuis P5.S3 Profil, ou
+      depuis C12 quand l'utilisateur ne trouve pas un Pin existant pour
+      construire une étape de Parcours personnel.
+    acteurs: [utilisateur grand public]
+
+    pre_requis_specifiques:
+      - "Compte créé avec pseudonyme (instanciation locale de I2)"
+
+    deroule:
+      - etape: 1
+        action: "L'app vérifie la présence d'un Compte. Si absent, redirection vers D6 (Création d'un Compte) — au retour, on revient à l'étape suivante de G4"
+      - etape: 2
+        action: "Bascule en P5.M3 sur un éditeur de soumission de Pin. Un nouveau Pin est instancié en provenance communautaire, état brouillon, attribut auteur_communautaire renseigné depuis le Compte"
+        surfaces_actives: [P5.M3]
+      - etape: 3
+        action: >-
+          L'utilisateur saisit la position géographique sur la carte (ou
+          l'omet si patrimoine vivant immatériel — cf. I9), choisit la
+          Catégorie dans le catalogue ouvert (I7), sélectionne ≥ 1
+          Époques (I8), saisit le titre, le contenu narratif, peut joindre
+          des Médias et déclarer ≥ 1 Sources documentaires.
+      - etape: 4
+        action: >-
+          L'utilisateur choisit son mode de crédit pour la publication :
+          anonyme, pseudonyme (par défaut), ou attribution explicite (le
+          libellé reste un pseudonyme — I1 : jamais d'identité civile,
+          même en attribution explicite).
+      - etape: 5
+        action: "L'utilisateur peut sauvegarder en brouillon (P5.M9 confirme) ou soumettre"
+      - etape: 6
+        action: >-
+          À la soumission, le Pin transite en état en_revue. Conformément
+          à I3 nuance Pin communautaire (visibilité immédiate AVEC marque
+          distinctive), le Pin apparaît dans le catalogue Carte P5.S1 dès
+          en_revue, avec sa marque distinctive signalant que les sources
+          sont en cours de vérification.
+      - etape: 7
+        action: "Un message éphémère P5.M9 confirme la soumission. Le flow back-office H4 (Modération de soumission communautaire) est ouvert."
+      - etape: 8
+        action: "Retour à la surface d'origine (Carte / Profil / C12 selon déclencheur). Le Pin soumis devient consultable comme tout Pin (B1/B2) avec sa marque distinctive."
+
+    bifurcations:
+      - si: "L'utilisateur n'a pas de Compte et refuse d'en créer un"
+        alors: "annulation, retour à la surface d'origine sans Pin créé"
+      - si: "L'utilisateur sauvegarde en brouillon"
+        alors: "le Pin reste en provenance communautaire, état brouillon, visible UNIQUEMENT par l'auteur depuis son espace de soumissions (G5) ; aucune visibilité publique"
+      - si: "L'utilisateur annule (sans sauvegarde)"
+        alors: "dialogue P5.M8 si saisie non vide ; à confirmation, le brouillon est jeté ; retour à la surface d'origine"
+      - si: "Sources documentaires absentes au moment de la soumission"
+        alors: "soumission possible (le Pin reste en en_revue avec marque distinctive et la modération peut demander complément) — l'invariant I4 ne bloque que la transition vers validé, pas en_revue"
+      - si: "L'utilisateur ouvre G4 depuis C12 (création de parcours personnel)"
+        alors: "à la sortie (soumission ou brouillon), retour à C12 avec le nouveau Pin candidat comme étape"
+      - si: "Le Pin est ultérieurement modéré et passe en état validé puis publié (H4)"
+        alors: "la marque distinctive est levée ; l'auteur reçoit une notification (Profil) si autorisée"
+      - si: "Le Pin est ultérieurement modéré et passe en demande de complément (en_revue → brouillon, H4)"
+        alors: "le Pin redevient brouillon, n'est plus visible publiquement ; l'auteur peut rouvrir G4 sur ce Pin pour compléter et resoumettre (cf. G5)"
+      - si: "Le Pin est refusé / retiré (H4)"
+        alors: "le Pin passe en retiré ; l'auteur reçoit un retour sobre avec motif (Profil / G5)"
+
+    sorties_normales:
+      - "Pin soumis en état en_revue, visible publiquement avec marque distinctive ; ouverture de H4 ; retour à la surface d'origine"
+      - "Brouillon sauvegardé localement ; retour à la surface d'origine"
+      - "Annulation après confirmation ; retour à la surface d'origine"
+
+    cas_particuliers:
+      - cas: "Connexion réseau indisponible au moment de la soumission"
+        comportement: "L'action est mise en attente locale ; le brouillon est sauvegardé. Au retour de la connexion la soumission est tentée. Message éphémère P5.M9 informe."
+      - cas: "Sortie inattendue de l'app (perte de focus, fermeture)"
+        comportement: "P5.N7 — l'état de l'éditeur est préservé ; au retour, l'utilisateur reprend là où il était. Le brouillon est sauvegardé localement à chaque modification (politique précise palier 13)"
+      - cas: "Médias joints contenant des métadonnées sensibles (position GPS, identifiant d'appareil)"
+        comportement: "Les métadonnées sensibles sont nettoyées avant traitement (cf. D9.2 vie_privee — politique d'implémentation)"
+      - cas: "Pin proposé avec localisation déjà couverte par un Pin existant (doublon potentiel)"
+        comportement: "Pas de blocage automatique ; la modération H4 traite la question de doublon (cf. cluster 04 question ouverte D9.2)"
+
+    entites_impliquees: [Pin, Catégorie, Époque, Source, Média, Compte]
+    surfaces_et_modes: [P5.S1, P5.S3, P5.M3, P5.M8, P5.M9]
+    references_palier_3: [D9.2]
+    invariants_respectes: [I1, I2, I3, I4, I8, I9]
+
+    questions_ouvertes:
+      - "Templates de soumission alignés sur les Templates éditoriaux (cluster 05) ou allégés ? Recommandation D9.2 : structure identique, exigence de remplissage allégée"
+      - "Politique de confiance accumulée (utilisateur dont les soumissions sont régulièrement validées passe en circuit allégé) — non couvert actuellement, à arbitrer si volume justifie"
+      - "Soumission depuis terrain avec connexion fluctuante : reprise gracieuse — relève du palier 16"
+
+  # ---------------------------------------------------------------------------
+  - id: G5
+    nom: "Suivi du statut d'une soumission"
+
+    declencheur: "Consultation de la section dédiée 'Mes soumissions' depuis le Profil (P5.S3)"
+    acteurs: [utilisateur grand public]
+
+    pre_requis_specifiques:
+      - "Compte créé avec pseudonyme (sans Compte, aucune soumission n'a pu être créée — section absente)"
+      - "Au moins une soumission de Pin par cet utilisateur dans l'un des états brouillon, en_revue, validé, publié, retiré"
+
+    deroule:
+      - etape: 1
+        action: "L'utilisateur arrive sur P5.S3 Profil et sélectionne la section 'Mes soumissions'"
+        surfaces_actives: [P5.S3, P5.M1]
+      - etape: 2
+        action: >-
+          L'app affiche la liste des Pins soumis par cet utilisateur, avec
+          pour chacun : titre, horodatage, état courant (brouillon, en_revue
+          avec marque distinctive, validé, publié, retiré), et — si état =
+          retiré ou demande de complément — motif transmis par la
+          modération.
+      - etape: 3
+        action: "L'utilisateur tape sur une soumission pour en consulter le détail"
+
+    bifurcations:
+      - si: "L'utilisateur tape sur un brouillon"
+        alors: "bascule vers G4 (édition / soumission depuis brouillon)"
+      - si: "L'utilisateur tape sur une soumission en demande de complément (état brouillon avec motif retour modération)"
+        alors: "bascule vers G4 pour compléter et resoumettre — au retour, le Pin repasse en en_revue (transition brouillon → en_revue)"
+      - si: "L'utilisateur tape sur une soumission en en_revue, validé ou publié"
+        alors: "bascule vers B2 (Consultation approfondie) sur le Pin — la marque distinctive reste visible tant que pas validé/publié"
+      - si: "L'utilisateur tape sur une soumission retirée"
+        alors: "détail consultable avec motif ; pas de bascule vers B2 (le Pin n'est plus accessible publiquement)"
+      - si: "L'utilisateur active le retrait d'une soumission (en_revue uniquement, pas après validation)"
+        alors: "dialogue P5.M8 ; à confirmation, le Pin repasse en brouillon ou est marqué retiré_par_auteur (politique cluster 01 / question ouverte) ; il n'est plus visible publiquement"
+
+    sorties_normales:
+      - "Bascule vers G4 (édition d'un brouillon, complément demande)"
+      - "Bascule vers B2 (consultation d'une soumission visible)"
+      - "Retour à P5.S3 Profil"
+
+    cas_particuliers:
+      - cas: "Section 'Mes soumissions' vide (Compte sans aucune soumission)"
+        comportement: "État vide gracieux, invitation à explorer G4 sans pression"
+      - cas: "Soumission dont l'auteur est en train de supprimer son Compte"
+        comportement: "Politique d'anonymisation rétroactive — articulation cluster 03 et famille D6/D9 du palier 6 ; soit les soumissions restent avec auteur_communautaire 'compte supprimé', soit elles sont retirées (à arbitrer)"
+      - cas: "Notification de changement d'état reçue (validation, refus, demande de complément)"
+        comportement: >-
+          La notification (cf. P5.E3 type 'modération') atterrit
+          directement sur la section 'Mes soumissions' positionnée sur
+          l'élément concerné. Le tap sur la notification ouvre
+          directement le détail.
+
+    entites_impliquees: [Pin, Compte, Profil]
+    surfaces_et_modes: [P5.S3, P5.M1, P5.M8]
+    references_palier_3: [D9.2]
+    invariants_respectes: [I1, I2]
+
+    questions_ouvertes:
+      - "Cycle de vie 'demande_complément' : représenté comme retour à brouillon (transition cluster 01) ou comme statut distinct ? Position retenue : retour à brouillon avec motif transmis depuis la dernière Trace de modération applicable (cohérent cluster 01)"
+      - "Retrait d'une soumission après publication (cas Pin déjà publié) : autorisé avec dépublication, ou interdit (passe par signalement) ? Question ouverte cluster 01"
+
+  # ---------------------------------------------------------------------------
+  - id: G6
+    nom: "Soumission d'un Retour de parcours"
+
+    declencheur: >-
+      Activation du contrôle de retour soit depuis C9 (fin de parcours
+      communautaire), soit depuis C3 (fiche d'un Parcours communautaire
+      déjà vécu — cf. Historique de visite).
+    acteurs: [utilisateur grand public]
+
+    pre_requis_specifiques:
+      - "Compte créé avec pseudonyme (instanciation locale de I2)"
+      - "Parcours cible de provenance communautaire (les Parcours éditoriaux ne sont pas notés — D9.3)"
+      - "Parcours cible avec retours activés (l'auteur du Parcours peut désactiver la fonctionnalité — préférence portée par Parcours, cluster 02)"
+      - "Le signaleur n'est pas l'auteur du Parcours (un auteur ne note pas son propre Parcours)"
+      - "Pas de Retour ouvert existant de ce Compte sur ce Parcours (recommandation cluster 04 : 1 Retour par Compte par Parcours, modifiable — cf. questions ouvertes)"
+
+    deroule:
+      - etape: 1
+        action: "L'app vérifie la présence d'un Compte. Si absent, redirection vers D6 (Création d'un Compte) — au retour, on revient à l'étape suivante de G6"
+      - etape: 2
+        action: "L'app vérifie les pré-requis (provenance communautaire, retours activés, non-auteur, pas de Retour ouvert) — sinon cas particulier"
+      - etape: 3
+        action: "Une surface ponctuelle (P5.M6) propose la saisie : évaluation discrète parmi un petit ensemble ordonné (forme exacte palier 7/8), commentaire libre optionnel"
+        surfaces_actives: [P5.M6]
+      - etape: 4
+        action: "L'utilisateur valide ou annule"
+      - etape: 5
+        action: >-
+          À la validation, le Retour passe en état en_attente.
+          Conformément à I3 nuance Retour (modération A PRIORI), il
+          n'apparaît PAS encore publiquement. Un message éphémère P5.M9
+          confirme la prise en compte (libellé exact palier 8).
+      - etape: 6
+        action: "Retour à la surface d'origine (C9 fin de célébration, ou C3 fiche du Parcours)"
+
+    bifurcations:
+      - si: "L'utilisateur n'a pas de Compte et refuse d'en créer un"
+        alors: "annulation, retour à la surface d'origine sans Retour créé — la fin de parcours fonctionne sans (D9.3 : retour facultatif)"
+      - si: "L'utilisateur annule la saisie"
+        alors: "dialogue P5.M8 si saisie non vide ; sinon fermeture directe ; retour à la surface d'origine"
+      - si: "Le Retour est ultérieurement modéré et publié (H3)"
+        alors: "il devient visible dans la consultation des retours du Parcours et contribue à la SYNTHÈSE si seuil minimal atteint (cluster 04)"
+      - si: "Le Retour est refusé (H3)"
+        alors: "l'auteur reçoit un retour sobre avec motif depuis son Profil ; le Retour n'apparaît jamais publiquement"
+      - si: "L'utilisateur a déjà un Retour publié sur ce Parcours et active à nouveau le contrôle"
+        alors: "bascule en MODE ÉDITION du Retour existant (P5.M6 pré-rempli) ; à validation, modification soumise — politique de re-modération à arbitrer (cf. cluster 04)"
+
+    sorties_normales:
+      - "Retour enregistré en état en_attente, retour à la surface d'origine"
+      - "Annulation, retour inchangé"
+
+    cas_particuliers:
+      - cas: "Auteur du Parcours a désactivé les retours pendant que G6 est ouvert"
+        comportement: "Validation échoue gracieusement avec message ; le contenu rédigé peut être copié par l'utilisateur s'il le souhaite"
+      - cas: "Parcours retiré entre déclenchement et validation"
+        comportement: "Validation échoue gracieusement ; message indique que le Parcours n'est plus disponible ; les Retours existants sont archivés (cf. cluster 04 question ouverte)"
+      - cas: "Connexion réseau indisponible"
+        comportement: "L'envoi est mis en attente locale ; au retour de la connexion la soumission est tentée"
+      - cas: "Tentative depuis C3 sur un Parcours qui n'est pas encore vécu (pas dans Historique de visite)"
+        comportement: "Le contrôle de retour n'est pas exposé tant que l'utilisateur n'a pas au moins lancé / parcouru ce Parcours (cf. C3 bifurcation 'parcours déjà vécu uniquement')"
+
+    entites_impliquees: ["Retour de parcours", Parcours, Compte, "Historique de visite"]
+    surfaces_et_modes: [P5.M6, P5.M8, P5.M9]
+    references_palier_3: [D9.3, D3.9]
+    invariants_respectes: [I1, I2, I3]
+
+    questions_ouvertes:
+      - "Forme exacte de l'évaluation discrète (échelle 1-5, palette de mots, étoiles, pouce) — relève du palier 7/8 ; le déroulé ici dit seulement 'valeur discrète parmi un ensemble ordonné'"
+      - "Unicité 1 Retour par Compte par Parcours, modifiable — recommandation cluster 04, à confirmer ; le déroulé G6 suppose ce choix (mode édition si Retour existant)"
+      - "Politique de re-modération sur édition d'un Retour publié — cluster 04 question ouverte, parallèle à la même question pour Commentaire"
+      - "Évaluation seule sans commentaire libre comptée dans le seuil minimal de synthèse — recommandation cluster 04 : oui (sans impact sur le déroulé G6)"
+
+# -----------------------------------------------------------------------------
+# Persona check
+# -----------------------------------------------------------------------------
+persona_check:
+
+  kenji:
+    impact: "direct"
+    note: >-
+      Kenji peut signaler une erreur factuelle (G3 motif historiquement_faux)
+      sur un Pin / Parcours communautaire vécu. Il peut aussi laisser un
+      Retour sur un Parcours communautaire qu'il a vécu (G6). La question
+      ouverte signalée en G3 (Pin éditorial non signalable selon arbitrage
+      cluster 04) le concerne directement : si Kenji repère une erreur sur
+      un Pin éditorial, il n'a pas de canal G3 — un canal alternatif reste
+      à arbitrer. Pour G2 et G6, le mur d'inscription reste un arbitrage
+      assumé en D9 (Kenji peut continuer à lire G1 et les retours sans
+      Compte).
+
+  mme_dupont:
+    impact: "direct"
+    note: >-
+      Mme Dupont est destinataire de Retours sur ses Parcours scolaires
+      (cf. C13 publication communautaire). Le flow G6 décrit ce que les
+      autres parents/enseignants vivent quand ils laissent un retour à
+      Mme Dupont. Elle peut aussi désactiver les retours sur un Parcours
+      expérimental (préférence portée par Parcours cluster 02 ; condition
+      pré-requis G6). En tant qu'autrice, elle reçoit les notifications
+      et consulte ses retours dans son Profil. Elle peut signaler (G3)
+      un Commentaire blessant sur l'un de ses Pins ou un Retour
+      inapproprié sans s'exposer (I5).
+
+  mme_martin:
+    impact: "indirect"
+    note: >-
+      Mme Martin consomme du contenu validé en classe. Elle ne contribue
+      pas en G2/G4/G6. Elle n'utilise G1 que de manière passive (lecture
+      des Commentaires sans rédaction). Le mode présentation P5.M4
+      garantit qu'aucun Commentaire ni marqueur de signalement n'est
+      affiché en projection (cf. cluster 04 persona-check Mme Martin et
+      P5.C2). Elle pourrait théoriquement utiliser G3 pour signaler une
+      erreur factuelle vue en classe — mais pas en pleine projection.
+
+  pere_lyonnais:
+    impact: "MAJEUR"
+    note: >-
+      Persona principal de la famille G. Le père lyonnais est l'usage
+      cible de G2 (anecdote familiale ajoutée à un Pin de son quartier),
+      G4 (soumission d'un Pin sur un fait que l'équipe n'avait pas
+      documenté), G3 (signalement avec motif atteinte_vie_privée pour
+      réagir vite à un contenu qui révélerait une adresse — masquage
+      local actif pour se protéger immédiatement), G5 (suivi de ses
+      soumissions). Points de vigilance hérités du cluster 04 :
+        - le flux de création de Compte (D6) doit rester ultra-court,
+          sinon la friction le bloquera dès G2 ;
+        - la modération a posteriori pour les Pins communautaires
+          (visibilité immédiate avec marque distinctive — I3 nuance Pin)
+          le sert particulièrement : son Pin proposé apparaît tout de
+          suite sur la carte, marque distinctive levée à validation ;
+        - la modération a priori pour les Commentaires (I3 nuance
+          Commentaire) introduit en revanche un délai entre G2 et la
+          publication — formulation du message éphémère de prise en
+          compte à soigner côté palier 8.
+
+  anais_back_office:
+    impact: "indirect"
+    note: >-
+      Anaïs (ou un modérateur dédié) reçoit les contributions de cette
+      famille G dans la file de modération côté back-office (famille H
+      du palier 6, modélisée ailleurs) :
+        - G2 → file de modération de Commentaires (H3)
+        - G4 → file de modération de soumissions communautaires (H4)
+        - G6 → file de modération de Retours (H3)
+        - G3 → file de signalements priorisée (H3 ou H4 selon cible)
+      La modélisation polymorphe du Signalement (cluster 04) lui rend
+      possible un traitement uniforme dans une file unique. Les Traces
+      de modération (cluster 04) sont produites côté famille H ; les
+      flows G ici se contentent de DÉCLENCHER ces files. Les
+      arbitrages cluster 04 ouverts (canal alternatif Pin éditorial,
+      retrait par signaleur, anonymisation rétroactive, masquage local
+      comme entité ou drapeau) impactent indirectement Anaïs et
+      remontent comme questions ouvertes ici.

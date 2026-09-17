@@ -1,0 +1,483 @@
+# =============================================================================
+# Palier 14 — Surfaces hors-app — INDEX
+# =============================================================================
+# Le palier 14 livre la conception SYSTÉMIQUE des artefacts qui sortent de
+# l'app : la forme du Lien universel quand il voyage par messagerie, la
+# structure de la version web lue par un destinataire qui n'a pas l'app,
+# la composition du Code visuel imprimable, la composition de l'Image
+# partageable de fin de parcours, le payload remis au mécanisme de partage
+# natif (avec son aperçu Open Graph), la redirection vers une page externe
+# « Pour aller plus loin », et la formalisation de la marque (logo
+# HistoLyon + app icon) qui signe ces surfaces.
+#
+# Le palier 14 N'EST PAS la fonctionnalité de partage (palier 3 D11), ni
+# l'écran d'app qui déclenche la génération (palier 7 partage/), ni le
+# mécanisme technique de redirection (Universal Links, App Links —
+# implémentation). C'est l'objet vu DU CÔTÉ DESTINATAIRE, indépendamment
+# de la pile technique qui l'achemine.
+# =============================================================================
+
+document:
+  type: palier_surfaces_hors_app_index
+  numero: 14
+  version: "0.1"
+  date: "2026-05-07"
+  audience:
+    - "Tout agent qui rédige les fichiers de contenu 01-07"
+    - "relecture"
+    - "Auteurs des paliers 15 (Figma) et 16 (validation)"
+    - "Devs Flutter (cahier des artefacts hors-app)"
+  role: >-
+    Cadre, anti-périmètre par palier amont/aval, frontière palier 3 D11 /
+    palier 7 partage/ / palier 14, format de fiche par artefact,
+    articulation 3/5/6/7/8/10/12/13/15/16, persona-check, décisions
+    structurelles initiales.
+  format: yaml
+  prerequis_de_lecture:
+    - "design/conception/intention.yaml — § paliers num=14, § 5.7 separation_des_responsabilites, § 11 retours_d_experience"
+    - "design/conception/03-fonctionnalites/11-surfaces-hors-app.yaml — D11.1 à D11.5 (matière fonctionnelle pure)"
+    - "design/conception/05-architecture-info.yaml — § 6 entrées externes E1-E3, § 7 surfaces hors-app rappel"
+    - "design/conception/06-flows/06-partage.yaml — F1 à F5 (flows entrants/sortants)"
+    - "design/conception/07-ecrans/partage/01-code-visuel.yaml — écran de génération (CÔTÉ APP)"
+    - "design/conception/07-ecrans/partage/02-fin-parcours-image.yaml — écran de génération (CÔTÉ APP)"
+    - "design/conception/13-icones/00-index.yaml — § 1 risque_orphelin_signale (LOGO)"
+
+# -----------------------------------------------------------------------------
+# 1. Rôle du palier 14
+# -----------------------------------------------------------------------------
+role:
+
+  ce_qu_il_livre:
+    - "FORME du Lien universel comme objet voyageur (lisibilité, robustesse, chaîne de fallback app→web→retombé gracieux)"
+    - "STRUCTURE de la version web responsive (3 vues consultables — Pin, Parcours, fin de parcours partagée — avec leurs sections, leur comportement responsive et le sous-ensemble de tokens / icônes / microcopy consommé)"
+    - "COMPOSITION du Code visuel imprimable (artefact + accompagnement, format d'export, lisibilité physique)"
+    - "COMPOSITION de l'Image partageable de fin de parcours (cadre, ratios, signature, déclinaisons éventuelles)"
+    - "PAYLOAD remis au mécanisme de partage natif système (lien seul / lien + image / lien + code) ET aperçu Open Graph / Twitter Card de la page web"
+    - "REDIRECTION vers une page externe « Pour aller plus loin » d'un Pin (sortie navigateur, retour gracieux)"
+    - "FORMALISATION de la marque visuelle qui signe ces surfaces : logo HistoLyon (favicon, signature image, signature optionnelle code) + app icon (springboard iOS, launcher Android)"
+
+  ce_qu_il_ne_livre_pas:
+    - "Définition fonctionnelle des objets (palier 3 D11 fait — capabilités, ce qu'on ne fait pas, critères de réussite)"
+    - "Écrans CÔTÉ APP qui déclenchent la génération (palier 7 partage/ fait — zones, états, points d'accès)"
+    - "Flows entrants/sortants (palier 6 06-partage fait — F1 à F5)"
+    - "Mécanismes de redirection (custom scheme, Universal Links iOS, App Links Android, Branch.io ou tout autre middleware) — RELÈVE DE L'IMPLÉMENTATION"
+    - "Texte exact entre guillemets — palier 8 fait (la page web, la story, le code visuel, la page externe consomment des patterns palier 8)"
+    - "Composants UI nommés — palier 10 fait (la page web peut consommer des composants équivalents mais sa structure est web, pas app)"
+    - "Tokens visuels statiques — palier 12 fait (la page web et l'image partageable consomment TOK-COLOR-X / TOK-TYPO-X / TOK-SPACE-X / TOK-RADIUS-X)"
+    - "Icônes concrètes — palier 13 fait (la page web et la story partageable consomment l'inventaire palier 13 — aucune icône propre au palier 14 hors logo / branding)"
+    - "Animations / chorégraphies — palier 11 fait (la page web a des transitions CSS standard ; pas de motion riche modélisée ici)"
+    - "Cibles tactiles, contrastes a11y, lisibilité d'impression chiffrés — palier 16 valide les artefacts posés ici"
+
+  test_de_purete: |
+    Trois tests à passer fiche par fiche :
+
+    (1) MÉCANISME-AGNOSTIQUE — si demain le mécanisme de redirection
+        change (custom scheme → Universal Links → Branch.io), le palier
+        14 reste-t-il intact ? Si oui : c'est de la conception, pas de
+        l'implémentation.
+
+    (2) DESTINATAIRE-CENTRÉ — chaque artefact est-il décrit du point de
+        vue de qui le reçoit (un parent qui ouvre un lien, un visiteur
+        qui scanne un code, un follower qui voit une story Instagram) ?
+        Si on retombe à décrire ce que l'app FAIT pour produire l'artefact,
+        on dérive vers palier 7 partage/.
+
+    (3) CONSOMMATION DES PALIERS AMONT — les tokens consommés sont-ils
+        cités par leur ID palier 12 (TOK-COLOR-X) ? Les icônes par leur
+        ID palier 13 (ICON-UI-X) ? Les patterns de microcopy par
+        référence palier 8 ? Pas de redéfinition.
+
+# -----------------------------------------------------------------------------
+# 2. Anti-périmètre par palier amont
+# -----------------------------------------------------------------------------
+# Trois paliers amont sont voisins — la frontière est nette mais doit être
+# explicitée pour que les fichiers 01-07 ne re-disent pas ce qui est déjà dit.
+anti_perimetre_amont:
+
+  palier_3_D11:
+    titre: "Palier 3 — Domaine D11 surfaces hors-app (matière fonctionnelle pure)"
+    ce_qu_il_a_dit: >-
+      D11.1 Lien universel, D11.2 Version web responsive, D11.3 Code visuel
+      imprimable, D11.4 Image partageable, D11.5 Partage natif système.
+      Pour chaque sous-domaine : raison_d_etre, comportement, regles_fonctionnelles,
+      capabilites, ce_qu_on_ne_fait_pas, criteres_de_reussite, definition_of_done,
+      enjeux_transversaux, persona check.
+    ce_que_le_palier_14_dit_en_plus: >-
+      LA FORME des objets : à quoi le lien ressemble dans une messagerie,
+      comment la page web est composée pour Mme Dupont qui la lit,
+      comment le code visuel est mis en page pour la photocopie, comment
+      l'image partageable se présente dans le flux Instagram de Kenji,
+      ce que l'aperçu Open Graph affiche quand le lien est collé dans
+      Slack. Le palier 3 dit le QUOI fonctionnel ; le palier 14 dit
+      le COMMENT IL APPARAÎT.
+    test_de_separation: >-
+      Si une affirmation du palier 14 est déjà dans D11 (ex. « le code
+      visuel encode le même lien que D11.1 »), on la cite par référence
+      au lieu de la redire.
+
+  palier_5_E2_et_paragraphe_7:
+    titre: "Palier 5 — entrée externe E2 (Lien universel reçu) + § 7 surfaces hors-app rappel"
+    ce_qu_il_a_dit: >-
+      L'entrée externe E2 décrit le comportement quand un Lien universel
+      est ouvert sur un terminal qui a l'app installée (atterrissage en
+      M3 sur la cible). Le cas app NON installée est explicitement renvoyé
+      au palier 14. Le § 7 mentionne aussi le partage natif système et
+      la page externe « Pour aller plus loin » comme surfaces hors-app.
+    ce_que_le_palier_14_dit_en_plus: >-
+      Le contenu du fallback web (la page elle-même, sa structure, son
+      ton), le payload du partage natif (pas seulement « on remet la main
+      au système » mais ce qu'on lui transmet), la composition de la
+      redirection « Pour aller plus loin » (ce qui se passe avant et
+      après la sortie navigateur).
+
+  palier_6_F5:
+    titre: "Palier 6 — flow F5 (Réception d'un Lien universel)"
+    ce_qu_il_a_dit: >-
+      Le déroulé app-side : l'OS transmet le Lien, l'app résout, elle
+      bascule vers B2 (Pin) ou C3 (Parcours). Le cas particulier app
+      NON installée mentionne le fallback web mais ne le modélise pas.
+      Modèle CAPABILITY tranché pour Parcours personnel non publié.
+    ce_que_le_palier_14_dit_en_plus: >-
+      Le déroulé web-side : ce qui se passe quand le lien tombe sur un
+      téléphone sans app, quelles vues s'affichent selon le type de cible,
+      comment le destinataire qui n'a pas l'app accède au contenu sans
+      mur, comment le Parcours personnel non publié résout côté web
+      (héritage strict du modèle CAPABILITY).
+
+  palier_7_partage:
+    titre: "Palier 7 — écrans partage/ (E-PARTAGE-CODE-VISUEL et E-PARTAGE-FIN-PARCOURS-IMAGE)"
+    ce_qu_il_a_dit: >-
+      Les deux écrans CÔTÉ APP qui déclenchent la génération du Code
+      visuel (P5.M6) et de l'Image partageable (P5.M3). Composition en
+      zones, états (nominal, chargement, erreur, offline avec/sans cache),
+      points d'accès (enregistrement, impression, partage natif),
+      surfaces parentes, flows actifs.
+    ce_que_le_palier_14_dit_en_plus: >-
+      L'OBJET généré lui-même : la composition graphique du Code visuel
+      imprimé une fois sorti de l'app (pas la zone d'écran qui le présente),
+      la composition de l'Image partageable affichée dans le flux d'un
+      réseau social (pas la zone d'écran qui la prévisualise). Plusieurs
+      questions ouvertes des écrans 07 sont DÉLÉGUÉES au palier 14
+      (composition exacte, format final).
+
+# -----------------------------------------------------------------------------
+# 3. Découpage en 7 fichiers de contenu
+# -----------------------------------------------------------------------------
+fichiers:
+
+  - id: "01"
+    nom: "Lien universel"
+    fichier: "01-lien-universel.yaml"
+    cible_volume_estime: "~120-180 lignes"
+    role: >-
+      L'objet lien comme voyageur : forme courte et lisible, robustesse
+      (pas d'identité encodée, pas de variantes ouvert vs ouvert-sinon-web),
+      chaîne de fallback (app installée → app, app absente → page web,
+      cible retombée → page de résolution gracieuse), comportement face
+      à l'aperçu généré par les messageries (heritage Open Graph délégué
+      au fichier 05).
+    pilote: true
+    note: >-
+      PILOTE — calibre le format de fiche par artefact (raison_d_etre,
+      forme, hierarchie_visuelle ou structure, etats, articulations,
+      questions_ouvertes) et le ton de retraitement (reprise du palier
+      3 D11 par référence, ajout de la couche destinataire-centrée).
+
+  - id: "02"
+    nom: "Page web responsive"
+    fichier: "02-page-web-responsive.yaml"
+    cible_volume_estime: "~250-350 lignes"
+    role: >-
+      Structure de la page web pour les 3 vues consultables (Pin,
+      Parcours, fin de parcours partagée) ; comportement responsive
+      téléphone/tablette/desktop ; sous-ensemble de tokens palier 12
+      consommé ; sous-ensemble d'icônes palier 13 consommé ; ce qui
+      n'existe PAS sur web (création, compte, favoris — héritage
+      D11.2 regles_fonctionnelles) ; proposition discrète d'app
+      (heritage D11.2).
+
+  - id: "03"
+    nom: "Code visuel imprimable"
+    fichier: "03-code-visuel.yaml"
+    cible_volume_estime: "~120-160 lignes"
+    role: >-
+      Composition de l'artefact imprimable : le code lui-même,
+      accompagnement textuel (rappel de la cible, lien universel
+      en clair pour accessibilité — héritage question ouverte D11.3
+      et écran 07), formats d'export (image fixe, vectoriel,
+      éventuellement PDF), seuils de lisibilité physique (à valider
+      palier 16).
+
+  - id: "04"
+    nom: "Image partageable de fin de parcours"
+    fichier: "04-image-partageable.yaml"
+    cible_volume_estime: "~180-240 lignes"
+    role: >-
+      Composition de l'image : zones (tracé stylisé du parcours,
+      statistiques discrètes, signature HistoLyon), ratios cibles
+      (story 9:16 confirmée par D11.4 ; arbitrage sur autres ratios :
+      square 1:1 et horizontal), héritage strict de la décision
+      « tracé idéal et non GPS personnel » (D11.4 question ouverte
+      tranchée), variantes éventuelles par parcours (badge associé
+      discret — D11.4 question ouverte).
+
+  - id: "05"
+    nom: "Partage natif — payload"
+    fichier: "05-partage-natif-payload.yaml"
+    cible_volume_estime: "~150-220 lignes"
+    role: >-
+      Ce que l'app prépare et remet à l'OS selon le contexte
+      (lien seul pour Pin / Parcours, lien + image partageable
+      pour fin de parcours, lien + code visuel pour partage non-
+      numérique) ; aperçu Open Graph / Twitter Card de la page web
+      quand le lien est collé dans WhatsApp / Slack / Twitter / un
+      mail (titre, image preview, description) ; mention « via
+      HistoLyon » dans le partage natif (arbitrage utilisateur).
+
+  - id: "06"
+    nom: "Page externe Pour aller plus loin"
+    fichier: "06-page-externe-pour-aller-plus-loin.yaml"
+    cible_volume_estime: "~50-90 lignes"
+    role: >-
+      Surface tierce pointée par le bloc « Pour aller plus loin »
+      d'un Pin (palier 5 § 7) — sortie navigateur système, retour
+      gracieux à l'app, comportement quand l'URL est cassée ou
+      indisponible. Pas une surface créée par HistoLyon, mais une
+      sortie à modéliser parce qu'elle est la dernière étape avant
+      de quitter l'app.
+
+  - id: "07"
+    nom: "Marque — logo HistoLyon et app icon"
+    fichier: "07-marque-logo-et-app-icon.yaml"
+    cible_volume_estime: "~150-220 lignes"
+    role: >-
+      Formalisation du logo HistoLyon (risque orphelin tracé palier 13
+      § risque_orphelin_signale) à partir du matériau Logo.png archivé
+      à la racine du projet : éléments constitutifs (lion héraldique,
+      skyline lyonnaise, dégradé terracotta, wordmark, tagline),
+      usages (favicon page web, signature image partageable, signature
+      optionnelle code visuel, app icon iOS/Android), arbitrages
+      ouverts (tagline « LYON IMMERSIVE » à conserver/retirer/remplacer ;
+      déclinaisons monochrome ; espace de respiration). App icon
+      springboard iOS / launcher Android comme première surface
+      hors-app.
+
+fichiers_total_estime: "~1020-1480 lignes pour le palier 14."
+
+# -----------------------------------------------------------------------------
+# 4. Format des fiches d'artefact
+# -----------------------------------------------------------------------------
+format_des_fiches:
+
+  charpente_commune:
+    - "id (préfixé selon objet : SHA-LIEN-X, SHA-WEB-X, SHA-CODE-X, SHA-IMG-X, SHA-PAYLOAD-X, SHA-EXTERNE-X, SHA-MARQUE-X)"
+    - "raison_d_etre (court paragraphe : pourquoi cet artefact existe sous cette forme)"
+    - "heritage_palier_3 (référence par id D11.X de la matière fonctionnelle déjà posée — pas de duplication)"
+    - "forme_ou_structure (description destinataire-centrée — ce que le destinataire perçoit)"
+    - "etats (le cas échéant : nominal, dégradé, retombé, hors connexion)"
+    - "consommation_paliers_amont (tokens palier 12, icônes palier 13, microcopy palier 8 cités par id)"
+    - "questions_ouvertes (rare — privilégier la décision)"
+    - "personas_servis (référence aux test_litmus déjà posés palier 2)"
+
+  vocabulaire_admis:
+    - "« le destinataire » (vue depuis qui reçoit — pas « l'utilisateur » qui est ambigu côté app/web)"
+    - "« l'artefact » (l'objet hors-app)"
+    - "« la cible » (le Pin ou le Parcours référencé par le Lien)"
+    - "Refs palier amont par id (D11.1, P5.E2, F5, E-PARTAGE-CODE-VISUEL, ICON-UI-X, TOK-COLOR-X)"
+    - "Termes courants neutres (« lien », « page », « code », « image », « partage », « aperçu »)"
+
+  vocabulaire_a_eviter:
+    - "Mention de mécanisme technique (Universal Links, App Links, Branch.io, custom scheme) sauf en note d'opacité explicite"
+    - "Valeurs en pixels nues (utiliser TOK-SPACE-X / TOK-RADIUS-X)"
+    - "Valeurs hex de couleur (utiliser TOK-COLOR-X)"
+    - "Microcopy entre guillemets (référer palier 8 par pattern)"
+    - "Animations / durées (palier 11)"
+    - "Mention de noms de framework web (React, Vue, Astro, etc.) — mécanisme technique"
+
+# -----------------------------------------------------------------------------
+# 5. Articulation avec les paliers en aval
+# -----------------------------------------------------------------------------
+articulation_paliers_aval:
+
+  - palier: 15
+    nom: construction_figma
+    transmission: >-
+      Le palier 15 instancie en maquette Figma : (a) la page web
+      responsive en pages dédiées (3 vues × 3 breakpoints), (b)
+      l'image partageable comme composition Figma exportable, (c)
+      le code visuel comme composition de référence (rendu réel
+      génératif), (d) le logo et l'app icon comme assets de marque
+      avec leurs déclinaisons. Le partage natif système n'est pas
+      maquetté (UI système). La page externe « Pour aller plus loin »
+      n'est pas maquettée (page tierce).
+
+  - palier: 16
+    nom: validation
+    transmission: >-
+      Le palier 16 valide : (a) test_litmus Mme Dupont (un parent
+      ouvre la page web sans formation et sait quoi faire en moins
+      de 30 secondes), (b) test_litmus Kenji (page web lisible en
+      mobilité, image partageable atmosphérique dans un flux
+      Instagram), (c) accessibilité de la page web (lecteurs
+      d'écran, navigation clavier, contraste, taille de texte
+      ajustable), (d) lisibilité physique du code visuel imprimé
+      (en petit format ou photocopié), (e) lisibilité de l'image
+      partageable en miniature (story qui défile), (f) cohérence
+      du logo et de l'app icon avec le ton de l'app.
+
+# -----------------------------------------------------------------------------
+# 6. Conventions de référencement
+# -----------------------------------------------------------------------------
+conventions:
+  ids_lien: "SHA-LIEN-X"
+  ids_web: "SHA-WEB-X"
+  ids_code: "SHA-CODE-X"
+  ids_image: "SHA-IMG-X"
+  ids_payload: "SHA-PAYLOAD-X"
+  ids_externe: "SHA-EXTERNE-X"
+  ids_marque: "SHA-MARQUE-X"
+  refs_palier_3: "D11.1 / D11.2 / D11.3 / D11.4 / D11.5"
+  refs_palier_5: "P5.E1 / P5.E2 / P5.E3 / P5.M3 / P5.M6 / P5.S1 / P5.S2"
+  refs_palier_6: "F1 / F2 / F3 / F4 / F5 (cluster 06-partage)"
+  refs_palier_7: "E-PARTAGE-CODE-VISUEL / E-PARTAGE-FIN-PARCOURS-IMAGE"
+  refs_palier_8: "patterns palier 8 par cluster (sans réécrire le texte)"
+  refs_palier_12: "TOK-COLOR-X / TOK-TYPO-X / TOK-SPACE-X / TOK-RADIUS-X / TOK-OPACITY-X"
+  refs_palier_13: "ICON-UI-X / ICON-CAT-X (la version web et la story partageable consomment l'inventaire)"
+  refs_essence: "essence § ce_qu_on_refuse (pas de mur, pas de city branding, pas de growth hack)"
+
+# -----------------------------------------------------------------------------
+# 7. Persona check global
+# -----------------------------------------------------------------------------
+persona_check_global:
+
+  kenji:
+    impact: ÉLEVÉ
+    note: >-
+      Bénéficiaire principal de l'image partageable (fichier 04 — story
+      Instagram atmosphérique) et du payload Open Graph (fichier 05 —
+      aperçu propre quand un ami lui envoie le lien). La page web
+      (fichier 02) doit servir son scénario « tomber sur le lien d'un
+      ami sans avoir l'app ». Elle est en français (palier 8 06-i18n
+      a tranché une application mono-langue) ; il peut la faire
+      traduire par son téléphone si besoin.
+
+  mme_dupont:
+    impact: MAJEUR
+    note: >-
+      Bénéficiaire principale de la page web (fichier 02) — c'est par
+      elle que les six parents accompagnateurs accèdent au parcours sans
+      compte ni installation. Modèle CAPABILITY hérité strictement (un
+      parcours personnel non publié résout normalement côté web pour
+      qui détient le lien). Le code visuel imprimable (fichier 03)
+      sert son scénario complémentaire « feuille distribuée aux
+      parents » — code et lien fonctionnent indifféremment.
+
+  mme_martin:
+    impact: modéré
+    note: >-
+      Le code visuel (fichier 03) sert son usage en classe (panneau
+      affiché, scan par les élèves sur tablettes scolaires sans app
+      → fallback page web). Pas de partage social. La lisibilité du
+      code en projection ou photocopie est un enjeu (palier 16).
+
+  pere_lyonnais:
+    impact: direct
+    note: >-
+      Bénéficiaire de la chaîne lien → page web → app (réception
+      ponctuelle d'une découverte d'un ami, et inversement). Le payload
+      Open Graph (fichier 05) lui permet d'envoyer un lien WhatsApp avec
+      un aperçu propre, sans avoir à composer un texte d'accompagnement.
+
+  anais_back_office:
+    impact: indirect
+    note: >-
+      Anaïs ne génère pas elle-même les artefacts hors-app. Mais le
+      logo HistoLyon (fichier 07) et l'app icon signent visuellement
+      l'écosystème dans lequel elle opère via le back-office ; cohérence
+      visuelle avec ce qu'elle voit côté app mobile.
+
+# -----------------------------------------------------------------------------
+# 8. Décisions structurelles initiales
+# -----------------------------------------------------------------------------
+decisions_structurelles_prises:
+
+  - id: D1
+    decision: "Découpage en 7 fichiers de contenu (lien / page web / code visuel / image partageable / payload partage natif / page externe / marque logo et app icon)"
+    pourquoi: >-
+      Sept artefacts distincts, chacun avec sa logique de composition
+      propre. Le découpage isole la page web responsive (fichier le
+      plus riche, ~250-350 lignes) et permet de traiter le logo
+      orphelin sans le diluer.
+
+  - id: D2
+    decision: "Méthode allégée séquentielle (façon paliers 5/9/11/12/13)"
+    pourquoi: >-
+      Palier systémique court et interconnecté. La page web consomme
+      tokens/icônes/microcopy ; le payload partage natif renvoie à
+      la page web pour son aperçu Open Graph ; le logo signe les
+      surfaces 02/03/04/05. Production parallèle inadaptée — un
+      seul agent en séquence préserve les frontières.
+
+  - id: D3
+    decision: "Inclusion du logo HistoLyon dans le palier 14 (risque orphelin levé)"
+    pourquoi: >-
+      Le palier 13 § risque_orphelin_signale renvoyait explicitement
+      le sujet au palier 14. Quatre usages concrets émergent ici
+      (favicon web, signature image partageable, signature optionnelle
+      code visuel, app icon) — le logo n'a de raison d'exister que
+      pour ces surfaces. Validé utilisateur 2026-05-07.
+      Matériau de référence : Logo.png à la racine du projet (lion
+      héraldique, skyline lyonnaise, dégradé terracotta, wordmark,
+      tagline « LYON IMMERSIVE »).
+
+  - id: D4
+    decision: "Inclusion de l'app icon (springboard iOS / launcher Android)"
+    pourquoi: >-
+      Validé utilisateur 2026-05-07. C'est littéralement la première
+      surface hors-app que l'utilisateur voit, avant même d'ouvrir
+      l'app. Cohérent avec le périmètre destinataire-centré du
+      palier 14. Variation par OS (iOS rounded square automatique,
+      Android adaptive icon foreground/background) tracée mais
+      systémique.
+
+  - id: D5
+    decision: "Inclusion de la page externe « Pour aller plus loin » (fichier 06)"
+    pourquoi: >-
+      Validé utilisateur 2026-05-07. Tracée par palier 5 § 7 comme
+      surface hors-app au sens littéral (sortie navigateur depuis
+      un Pin). Note brève (~50-90 lignes) : ouverture navigateur
+      système, retour gracieux, comportement URL cassée, ton du
+      libellé palier 8.
+
+  - id: D6
+    decision: "Inclusion de l'aperçu Open Graph / Twitter Card de la page web dans le fichier 05 (payload partage natif)"
+    pourquoi: >-
+      Validé utilisateur 2026-05-07. Quand le lien universel est collé
+      dans WhatsApp / Slack / Twitter / un mail, l'aperçu qui apparaît
+      est conditionné par les métadonnées de la page web. Cette strate
+      est solidaire du payload de partage : un même endroit qui dit
+      « ce qui voyage avec le lien » (dans l'app via le système OS, et
+      dans les messageries via les métadonnées web). Mutualisation
+      naturelle dans le fichier 05.
+
+  - id: D7
+    decision: "PWA install prompt non couvert au palier 14"
+    pourquoi: >-
+      Validé utilisateur 2026-05-07. La page web responsive est un
+      fallback gracieux, pas un mini-produit autonome installable.
+      Cohérent avec essence § ce_qu_on_refuse (pas de mur, pas de
+      growth hack). Le brief D11.2 dit « proposition discrète de
+      téléchargement de l'app », pas « installation PWA ». Sujet
+      pourra être ré-arbitré plus tard si pertinent.
+
+  - id: D8
+    decision: "Frontière palier 7 partage/ ↔ palier 14 actée par division ÉCRAN GÉNÉRATEUR vs ARTEFACT GÉNÉRÉ"
+    pourquoi: >-
+      Le palier 7 partage/01-code-visuel.yaml et 02-fin-parcours-image.yaml
+      décrivent les écrans CÔTÉ APP qui présentent et déclenchent la
+      génération (zones, états, points d'accès enregistrement /
+      impression / partage natif). Le palier 14 décrit l'OBJET généré
+      (composition graphique, format d'export, comportement chez le
+      destinataire). Plusieurs questions ouvertes des écrans 07 sont
+      DÉLÉGUÉES au palier 14 (composition graphique exacte, format
+      final, ratios) — elles trouvent leur réponse dans 03 et 04.

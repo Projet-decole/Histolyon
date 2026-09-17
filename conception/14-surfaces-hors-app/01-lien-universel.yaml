@@ -1,0 +1,223 @@
+# =============================================================================
+# Palier 14 — 01 Lien universel
+# =============================================================================
+# Fichier PILOTE du palier 14. Calibre le format de fiche par artefact :
+# raison_d_etre, heritage_palier_3 (référence sans duplication), forme
+# destinataire-centrée, états perçus, articulations avec les autres fichiers,
+# consommation des paliers amont, questions ouvertes.
+#
+# Le palier 3 D11.1 a posé la matière fonctionnelle pure (capabilités,
+# règles, ce qu'on ne fait pas, persona check). Ce fichier ajoute la
+# couche que D11.1 n'a pas : ce que le destinataire voit du lien quand
+# il l'ouvre, comment l'objet voyage à travers les canaux, comment il
+# se comporte aux trois extrémités de sa chaîne de fallback.
+# =============================================================================
+
+document:
+  type: palier_surfaces_hors_app_artefact
+  artefact: lien_universel
+  numero: 14
+  fichier_id: "01"
+  version: "0.1"
+  date: "2026-05-07"
+  format: yaml
+  prerequis_de_lecture:
+    - "design/conception/14-surfaces-hors-app/00-index.yaml — cadre, anti-périmètre, format de fiche"
+    - "design/conception/03-fonctionnalites/11-surfaces-hors-app.yaml — D11.1 (matière fonctionnelle)"
+    - "design/conception/06-flows/06-partage.yaml — F1, F2, F3, F5 (le lien comme donnée partagée et reçue)"
+    - "design/conception/05-architecture-info.yaml — § 6 entrée externe E2 (Lien universel reçu app installée)"
+
+# -----------------------------------------------------------------------------
+# 1. Raison d'être — pourquoi ce fichier existe en plus de D11.1
+# -----------------------------------------------------------------------------
+raison_d_etre: >-
+  Le palier 3 D11.1 a dit ce que le Lien universel FAIT (générer un lien,
+  diriger vers l'app ou la version web, rester valide tant que la cible
+  existe, ne pas encoder l'identité de l'expéditeur). Ce fichier dit ce
+  que le Lien EST quand il voyage : sa forme dans une messagerie, sa
+  silhouette dans la barre d'adresse, son comportement aux trois
+  extrémités de sa chaîne de fallback (app installée → app, app absente
+  → page web, cible retombée → page de résolution gracieuse). C'est la
+  vue depuis le destinataire — celui qui clique, pas celui qui partage.
+
+# -----------------------------------------------------------------------------
+# 2. Héritage palier 3 D11.1 — par référence, pas redit
+# -----------------------------------------------------------------------------
+heritage_palier_3:
+  reference: "design/conception/03-fonctionnalites/11-surfaces-hors-app.yaml § D11.1"
+  ce_qui_est_deja_pose:
+    - "Capabilités (générer pour Pin / Parcours / fin de parcours, diriger app vs web, maintenir validité, retour gracieux si cible disparue)"
+    - "Règles fonctionnelles (un seul lien par cible, pas de variantes app vs web, pas de code alphanumérique parallèle, pas d'identité encodée, lien lisible)"
+    - "Ce qu'on ne fait pas (pas de code à recopier, pas de lien personnalisé, pas de variantes manuelles, pas de lien forçant l'installation)"
+    - "Critères de réussite (test_litmus Mme Dupont, test_litmus Kenji, accès sans blocage si pas d'app)"
+    - "Definition of Done D11.1"
+    - "Enjeux transversaux (a11y du lien restitué par lecteur d'écran, ouverture perçue comme directe, pas d'identité encodée)"
+  ce_que_ce_fichier_n_a_pas_a_redire: >-
+    Tout ce qui précède est tenu pour acquis. Si une affirmation ci-dessous
+    paraît contredire D11.1, c'est D11.1 qui prime — remonter la tension
+    pour arbitrage avant de modifier le fichier 14.
+
+# -----------------------------------------------------------------------------
+# 3. Fiches d'artefact
+# -----------------------------------------------------------------------------
+artefacts:
+
+  # ===========================================================================
+  - id: SHA-LIEN-FORME
+    nom: "Forme du lien comme objet voyageur"
+
+    raison_d_etre: >-
+      Le lien universel transite par n'importe quel canal de messagerie,
+      mail, partage AirDrop, copier-coller, ou affichage en clair sous un
+      code visuel imprimé. Sa forme conditionne sa lisibilité physique,
+      son intégrité (pas de coupure, pas de transformation), et sa
+      reconnaissance — un destinataire doit pouvoir le lire sans hésiter
+      sur ce qu'il s'apprête à ouvrir.
+
+    forme_destinataire_centree:
+      composition: >-
+        Le lien se présente comme une URL courte construite autour d'un
+        domaine identifiable HistoLyon, suivi d'un segment de chemin
+        sémantique (un mot pour le type de cible — pin, parcours, fin
+        de parcours) et d'un identifiant lisible et stable de la cible
+        (slug humain plutôt que suite de caractères opaques).
+      lisibilite:
+        - "Tient en une ligne quand il est restitué dans une messagerie ou un mail (pas de retour à la ligne forcé qui couperait l'URL)"
+        - "Restitué intelligiblement par un lecteur d'écran (héritage D11.1 enjeu accessibilité — chaque segment a un sens prononçable)"
+        - "Reconnaissable visuellement quand il est imprimé sous un code visuel (héritage D11.3 enjeu accessibilité — le lien doit accompagner le code pour qui ne peut pas scanner)"
+      stabilite:
+        - "Le slug humain de la cible reste stable sur la durée de vie de l'élément (héritage cluster 06 palier 4 — identifiant lisible et stable)"
+        - "Aucune information personnelle de l'expéditeur n'est encodée (héritage D11.1 règle fonctionnelle stricte)"
+
+    consommation_paliers_amont:
+      microcopy_palier_8: >-
+        Aucune microcopy directement portée par le lien lui-même.
+        L'éventuel libellé d'invitation qui accompagne le lien dans
+        une messagerie (« Voici le parcours… ») est composé par
+        l'utilisateur partageur — l'app ne le génère pas.
+      reference_palier_4_cluster_06: >-
+        Le format technique du slug et du domaine relève du cluster 06
+        distribution palier 4. Ce fichier ne le redéfinit pas.
+
+    questions_ouvertes:
+      - "Domaine racine définitif et structure de chemin — délégué au palier 4 cluster 06 et à l'implémentation"
+      - "Comportement quand la cible a un identifiant lisible non disponible (collision de slug) — délégué cluster 06"
+
+  # ===========================================================================
+  - id: SHA-LIEN-CHAINE-FALLBACK
+    nom: "Chaîne de fallback du lien"
+
+    raison_d_etre: >-
+      Le lien universel a trois extrémités possibles selon le terminal
+      qui le reçoit et l'état de la cible. Cette fiche pose les trois
+      vues que le destinataire perçoit, dans l'ordre : ouverture
+      directe dans l'app si elle est là, ouverture de la page web si
+      l'app n'est pas là, page de résolution gracieuse si la cible a
+      disparu. Le palier 3 D11.1 a posé ces capabilités ; ce fichier
+      les regarde du point de vue du destinataire.
+
+    extremite_1_app_installee:
+      heritage_palier: "Palier 5 § 6 entrée externe E2 ; Palier 6 flow F5"
+      ce_que_le_destinataire_percoit: >-
+        L'app s'ouvre directement sur la cible (Pin en aperçu approfondi
+        M3 sur fond S1 Carte ; Parcours en fiche détaillée M3 sur fond
+        S2 Parcours). Aucun écran intermédiaire. Aucun bandeau
+        publicitaire. La transition est perçue comme une ouverture
+        normale d'app — c'est précisément ce qu'attendent Mme Dupont
+        et Kenji.
+      cas_premier_lancement: >-
+        Si l'app s'ouvre pour la première fois via ce lien, pas
+        d'onboarding bloquant — la cible reçue est prioritaire (palier 6
+        F5 cas particulier 'premier lancement via Lien universel').
+      remarques:
+        - "Le mécanisme technique de redirection (Universal Links iOS, App Links Android) est de l'implémentation — délégation explicite"
+
+    extremite_2_app_absente:
+      delegation: "Voir 02-page-web-responsive.yaml § structure et états"
+      ce_que_le_destinataire_percoit_en_resume: >-
+        Le navigateur système ouvre la page web responsive sur la cible
+        référencée. Le contenu est consultable en lecture, le ton conteur
+        est immédiatement reconnaissable, une proposition discrète de
+        téléchargement de l'app accompagne sans bloquer la lecture.
+
+    extremite_3_cible_retombee:
+      heritage_palier: "Palier 6 flow F5 cas 'Lien retombé' ; D11.1 règle 'retour gracieux si l'élément disparaît'"
+      ce_que_le_destinataire_percoit: >-
+        Le destinataire arrive sur une surface de résolution gracieuse
+        (côté app : P5.M3 avec point d'accès vers P5.S1 Carte ou P5.S2
+        Parcours ; côté web : page de résolution dédiée — voir 02). Le
+        ton est sobre, conteur, sans erreur brutale (« page non
+        trouvée » est PROHIBÉ — héritage essence § ce_qu_on_refuse, le
+        ton tient même hors de l'app). Microcopy patternée par palier 8.
+      cas_particulier_capability:
+        heritage_palier: "Palier 6 F5 cas 'Parcours personnel non publié'"
+        ce_que_le_destinataire_percoit: >-
+          Modèle CAPABILITY hérité strictement : un Parcours personnel
+          non publié résout normalement pour qui détient le lien. Aucun
+          message d'erreur, aucune demande de compte, aucun mur — la
+          cible apparaît exactement comme un parcours public côté
+          destinataire (sauf qu'elle n'est pas listée dans le catalogue
+          public, ce qui ne regarde pas le destinataire qui a déjà le
+          lien). Mme Dupont aux six parents.
+
+    consommation_paliers_amont:
+      modes_palier_5: "P5.M3 (consultation approfondie pour la résolution app-side et web-side), P5.S1 / P5.S2 (surfaces top-level pour le retour de la résolution gracieuse)"
+      flows_palier_6: "F5 (réception polymorphe du lien, lien retombé)"
+      microcopy_palier_8: "Pattern de résolution gracieuse (« cet élément n'est plus disponible » formulé en ton conteur — palier 8)"
+
+    questions_ouvertes:
+      - "Comportement précis quand un Parcours en cours est actif côté destinataire et qu'un nouveau Lien universel arrive — délégué palier 6 F5 question ouverte"
+
+  # ===========================================================================
+  - id: SHA-LIEN-APERCU-EN-MESSAGERIE
+    nom: "Aperçu généré quand le lien est collé dans une messagerie"
+
+    raison_d_etre: >-
+      Quand un utilisateur partage le lien via WhatsApp / Slack / Twitter /
+      LINE / un mail, la messagerie réceptrice génère automatiquement un
+      aperçu (image preview, titre, description) à partir des métadonnées
+      de la page web pointée. Cet aperçu fait partie de l'expérience du
+      destinataire AVANT qu'il clique — c'est ce qui le décide à ouvrir
+      ou pas.
+
+    delegation: "Voir 05-partage-natif-payload.yaml § Open Graph / Twitter Card"
+
+    ce_que_ce_fichier_dit: >-
+      Le lien universel A un aperçu structuré quand il est collé dans
+      une messagerie qui le génère. La forme exacte de cet aperçu (image,
+      titre, description par type de cible) est posée dans 05 — ici on
+      acte qu'il EXISTE et qu'il fait partie du voyage du lien.
+
+    consequences_pour_la_forme:
+      - "L'URL doit pointer vers une page web (D11.2) qui expose les métadonnées Open Graph standard"
+      - "L'image preview consommée par l'aperçu est une composition vue dans 05 (pas l'image partageable de fin de parcours qui est un artefact distinct vu en 04)"
+
+# -----------------------------------------------------------------------------
+# 4. Personas servis (héritage palier 2 par référence)
+# -----------------------------------------------------------------------------
+personas_servis:
+
+  mme_dupont:
+    test_litmus_servi: "Six parents accompagnateurs ouvrent le lien le jour J sans formation et savent quoi faire en moins de 30 secondes"
+    apport_du_fichier: >-
+      La forme courte et lisible (SHA-LIEN-FORME) le rend collable dans
+      un mail collectif. La chaîne de fallback (SHA-LIEN-CHAINE-FALLBACK)
+      garantit l'accès sans installation pour les parents qui n'ont pas
+      l'app — extrémité 2. Le modèle CAPABILITY assure que le parcours
+      personnel non publié résout pour les six parents.
+
+  kenji:
+    test_litmus_servi: "Recevoir un itinéraire d'un ami sans avoir à lire couramment le français"
+    apport_du_fichier: >-
+      L'aperçu en messagerie (SHA-LIEN-APERCU-EN-MESSAGERIE, délégué à
+      05) lui montre de quoi il s'agit avant de cliquer. Si l'app est
+      installée, ouverture directe (extrémité 1). Sinon, page web en
+      français (voir 02) — il peut la faire traduire par son téléphone.
+
+  pere_lyonnais:
+    test_litmus_servi: "Partager une découverte ponctuelle à un ami pour qu'il aille voir aussi"
+    apport_du_fichier: >-
+      La forme stable (SHA-LIEN-FORME) reste valide tant que le Pin
+      existe — il peut envoyer le lien aujourd'hui ou dans six mois.
+      L'extrémité 1 (app installée chez l'ami fidèle) ou 2 (ami qui
+      découvre HistoLyon) fonctionne sans rupture.

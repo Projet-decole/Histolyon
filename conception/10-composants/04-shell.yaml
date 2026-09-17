@@ -1,0 +1,950 @@
+# =============================================================================
+# Palier 10 — Composants shell
+# =============================================================================
+# Composants qui sont des TEMPLATES DE MODE (M2, M6, M7, M8, M9) ou des
+# LAYOUTS DE SURFACE (S1, S2, S3, M3) au sens du palier 5. Distincts des
+# fonctionnels (réifications métier ou machine d'état riche), distincts
+# des molécules (combinaisons d'atomes), distincts des atomes (briques
+# DRY pures).
+#
+# Trois sous-familles internes :
+#   (a) Templates de mode — surfaces ponctuelles, dialogues, messages,
+#       sélecteurs top-level, aperçus rapides, invitations
+#   (b) Surfaces persistantes — wrappers P1/P2/P3 du palier 5
+#   (c) Layouts — conteneurs des écrans M1 (S1/S2/S3) et M3
+#       (consultation approfondie d'un Pin)
+#
+# Format calibré sur le pilote 03-fonctionnels.yaml et le § 7 de l'index
+# v0.2 (intention_portee, échelles E1-E5, couplage_etat_partage,
+# patterns_attaches, slots nommés).
+# =============================================================================
+
+document:
+  type: palier_composants_shell
+  numero: 10
+  fichier: "04-shell.yaml"
+  version: "0.1"
+  date: "2026-05-06"
+  format: yaml
+  prerequis_de_lecture:
+    - "design/conception/10-composants/00-index.yaml v0.2 — § 3 échelles E1-E5, § 4 état partagé, § 5 patterns, § 7 format de fiche"
+    - "design/conception/10-composants/03-fonctionnels.yaml v0.1 (PILOTE) — calibre du format compact et des fiches enrichies"
+    - "design/conception/05-architecture-info.yaml — modes M1-M9, surfaces S1-S3, persistantes P1-P3, règles N1-N7 et C1-C6"
+  note_frontiere_palier_7: >-
+    Trois layouts de cette fiche (comp-layout-carte-principale,
+    comp-layout-parcours, comp-layout-profil, comp-layout-consultation-pin-approfondie)
+    sont à la frontière entre palier 7 (composition d'écran) et palier 10
+    (composant). Justification du maintien en palier 10 : ce sont des
+    PATRONS RÉUTILISABLES de structure (slots de chrome, slots de surfaces
+    persistantes coexistantes, slots de contenu) qui méritent une fiche
+    composant pour que les écrans (palier 7) les instancient sans
+    redéclarer la grille slot par slot. Le palier 7 décide la mise en
+    page concrète des slots ; le palier 10 fixe les slots et leur
+    cardinalité, et le couplage d'état (P1/P2/P3 visibles selon mode).
+  requalification_layouts_palier_5: >-
+    CASCADE PALIER 5 MAQUETTE 2026-06-25 (retour utilisateur) : les 4 comp-layout-*
+    (carte-principale, parcours, profil, consultation-pin-approfondie) ne sont PLUS
+    componentisés. Les matérialiser en composants Figma ne produisait que des ÉCRANS
+    BÂCLÉS : la mise en page d'écran (ordre des sections, lecteur audio en position
+    FIXE hors-scroll, centrage des médias, hiérarchie, « Pour aller plus loin » qui
+    EST les liens externes) relève intrinsèquement du PALIER 7 (composition d'écran).
+    DÉCISION : les 4 fiches ci-dessous deviennent des PATRONS D'ÉCRAN — la SPEC des
+    slots + cardinalité + règles de coexistence P1/P2/P3 que le palier 7 DOIT honorer,
+    sans composant shell intermédiaire. Famille shell recomptée 19 → 14.
+
+# -----------------------------------------------------------------------------
+# Raison d'être
+# -----------------------------------------------------------------------------
+raison_d_etre: >-
+  Les composants shell portent la STRUCTURE de présentation d'HistoLyon :
+  les templates des 9 modes (M2-M9) du palier 5, les surfaces persistantes
+  P1/P2/P3 qui survivent à la navigation, les layouts des trois surfaces
+  top-level S1/S2/S3 et celui de la consultation approfondie M3. Ils ne
+  réifient pas une matière métier (c'est le rôle des fonctionnels) — ils
+  fixent le contrat de slots et de coexistence dans lequel les fonctionnels
+  et les molécules viennent s'insérer. C'est ICI que la grille canonique
+  du palier 5 (modes / surfaces / règles N et C) se concrétise en
+  composants nommés et instanciables.
+
+# -----------------------------------------------------------------------------
+# 1. Composants shell — fiches
+# -----------------------------------------------------------------------------
+# 14 composants shell COMPONENTISÉS (cascade palier 5 maquette 2026-06-25 : 19 − 2
+# M6 absorbés [recherche, filtres-couches] − 4 layouts requalifiés patrons palier 7
+# + 1 comp-backdrop). Les fiches M6 absorbées et layouts requalifiés RESTENT (specs),
+# avec leur statut_maquette_palier_5 / requalification_layouts_palier_5.
+composants:
+
+  # ===========================================================================
+  # (a) Templates de mode — M2, M6, M7, M8, M9
+  # ===========================================================================
+
+  - id: comp-selecteur-section-principale
+    nom: "Sélecteur de section principale"
+    famille: shell
+    raison_d_etre: >-
+      Cible navigationnelle top-level pour basculer entre S1 Carte, S2 Parcours
+      et S3 Profil (P5.N2 — saut latéral, chaque section garde l'état de sa pile
+      interne). Intention CLOSE non paramétrable. Visible sur toutes les surfaces
+      top-level et leurs sous-surfaces (sauf M4 mode présentation, cf. P5.C2).
+
+    ancrage:
+      ecrans: [E-CARTE-PRINCIPALE, E-PARCOURS-PRINCIPAL, E-PROFIL-PRINCIPAL, "+ toutes sous-surfaces M2/M3/M6 sauf M4"]
+      composants_qui_l_integrent: [comp-layout-carte-principale, comp-layout-parcours, comp-layout-profil]
+
+    composition:
+      - { id: comp-libelle-texte, slot: "label_S1", cardinalite: 1 }
+      - { id: comp-libelle-texte, slot: "label_S2", cardinalite: 1 }
+      - { id: comp-libelle-texte, slot: "label_S3", cardinalite: 1 }
+      - { id: comp-icone, slot: "icone_S1", cardinalite: 1, note: "icône concrète palier 13" }
+      - { id: comp-icone, slot: "icone_S2", cardinalite: 1 }
+      - { id: comp-icone, slot: "icone_S3", cardinalite: 1 }
+
+    variants:
+      - { dimension: section_active, valeurs: [S1, S2, S3], registre: "section courante mise en relief" }
+
+    etats_interactifs: [default, pressed, focused, disabled_M4]
+
+    interactions_natives:
+      - "Tap section non-active → E3 saut latéral vers S1, S2 ou S3 (P5.N2)"
+      - "Tap section active → no-op (ou scroll-to-top selon arbitrage palier 11)"
+
+    intention_portee:
+      parametrable: false
+      echelle: E3_navigationnelle
+      intention: "saut_lateral_top_level"
+      cible_referencee: "P5.N2 — saut latéral S1/S2/S3, préservation de la pile interne de chaque section"
+      note: >-
+        Composant à intention CLOSE — le sélecteur sait qu'il bascule entre
+        les trois surfaces top-level, ce comportement est invariant et n'est
+        pas surchargeable par l'écran qui l'instancie.
+
+    couplage_etat_partage:
+      - { etat: ETAT-PARCOURS-EN-COURS, role: consommateur, note: "coexistence avec P2 — le sélecteur reste visible quand un parcours est actif" }
+      - { etat: ETAT-AUDIO-EN-COURS, role: consommateur, note: "idem pour P1" }
+
+    consequences_variabilite:
+      - "Libellés i18n (FR/EN/JA) — divergence de longueur compensée par taille adaptative ou icône-only en cas extrême (palier 12)"
+
+    questions_ouvertes:
+      - "Tap section active = scroll-to-top ou no-op ? — palier 11"
+
+  - id: comp-apercu-rapide-pin
+    nom: "Aperçu rapide Pin"
+    famille: shell
+    raison_d_etre: >-
+      Surface aperçu rapide d'un Pin — template P5.M2 imbriqué sur la Carte.
+      Laisse la Carte visible derrière (cf. P5.C3). Réversible d'un geste neutre.
+      Propose le passage à la consultation approfondie (M3) via un point d'accès
+      explicite (flow B1 → B2).
+
+    ancrage:
+      ecrans: [E-CARTE-APERCU-PIN]
+      composants_qui_l_integrent: [comp-layout-carte-principale]
+
+    composition:
+      - { id: comp-chip-categorie, slot: "categorie", cardinalite: 1 }
+      - { id: comp-libelle-texte, slot: "titre", cardinalite: 1 }
+      - { id: comp-libelle-texte, slot: "teaser", cardinalite: 1 }
+      - { id: comp-image-avatar-small, slot: "vignette", cardinalite: 0..1, note: "miniature optionnelle si Média visuel disponible" }
+      - { id: comp-controle-favori, slot: "favori", cardinalite: 1 }
+      - { id: comp-controle-partage, slot: "partage", cardinalite: 1 }
+      - { id: comp-button-tertiary, slot: "signalement", cardinalite: 0..1, note: "présent si Pin communautaire ; absent si Pin éditorial (cf. I3)" }
+      - { id: comp-button-primary, slot: "cta_approfondir", cardinalite: 1 }
+
+    etats_interactifs: [visible, dismissed]
+
+    interactions_natives:
+      - "Tap cta_approfondir → E3 ouvre M3 consultation approfondie (flow B2)"
+      - "Tap-hors → E3 ferme l'aperçu rapide (PI-TAP-HORS, cf. P5.N5)"
+
+    intention_portee:
+      parametrable: false
+      echelle: E3_navigationnelle
+      intention: "apercu_rapide_M2"
+      cible_referencee: "P5.M2 — aperçu rapide d'un Pin, ancrage E-CARTE-APERCU-PIN"
+      note: >-
+        Template fixe du mode M2 pour le Pin. La carte reste visible derrière
+        (P5.C3). Le retour est gracieux (P5.N5) — un seul geste de tap-hors
+        ferme.
+
+    couplage_etat_partage:
+      - { etat: ETAT-PARCOURS-EN-COURS, role: consommateur, note: "coexistence avec P2 ; aperçu superposé sans masquer la mini-bar parcours" }
+      - { etat: ETAT-AUDIO-EN-COURS, role: consommateur, note: "idem pour P1" }
+
+    patterns_attaches: [PI-TAP-HORS]
+
+    consequences_variabilite:
+      - "Vignette absente → mise en page sans image (palier 12)"
+      - "Teaser long → truncate avec ellipse (palier 12)"
+      - "Pin éditorial → slot signalement absent (I3)"
+
+  - id: comp-surface-ponctuelle-recherche
+    nom: "Surface ponctuelle de recherche"
+    famille: shell
+    statut_maquette_palier_5: "ABSORBÉE (cascade palier 5 maquette 2026-06-25, retour utilisateur) : pas de composant shell distinct matérialisé — comp-recherche-surface (fonctionnel) EST déjà la surface M6 complète (fond bindé + radius). L'écran l'instancie directement + comp-backdrop. La fiche reste la spec du scaffold M6 (DRY) que le fonctionnel porte."
+    raison_d_etre: >-
+      Wrapper M6 (P5.M6 surface ponctuelle) qui héberge le composant fonctionnel
+      comp-recherche-surface. Fournit le SCAFFOLD du mode M6 (overlay backdrop,
+      fermeture explicite et tap-hors) ; le contenu vivant (champ saisie, filtres,
+      résultats, états) est porté par le fonctionnel.
+
+    ancrage:
+      ecrans: [E-CARTE-RECHERCHE]
+      composants_qui_l_integrent: [comp-layout-carte-principale]
+
+    composition:
+      - { id: comp-recherche-surface, slot: "contenu_fonctionnel", cardinalite: 1, note: "fonctionnel — porte la machine d'état recherche" }
+      - { id: comp-button-fermeture-overlay, slot: "fermeture", cardinalite: 1 }
+
+    etats_interactifs: [visible, dismissed]
+
+    interactions_natives:
+      - "Tap fermeture → E3 ferme M6 (P5.N5)"
+      - "Tap-hors → E3 ferme M6 (PI-TAP-HORS)"
+      - "Sélection résultat → E3 propage vers écran parent (la cible est câblée par comp-recherche-surface)"
+
+    intention_portee:
+      parametrable: false
+      echelle: E3_navigationnelle
+      intention: "scaffold_M6"
+      cible_referencee: "P5.M6 — surface ponctuelle de recherche"
+      note: >-
+        Le scaffold M6 est invariant (intention close). Le contenu (recherche
+        fonctionnelle) est paramétrable via comp-recherche-surface.
+
+    patterns_attaches: [PI-TAP-HORS]
+
+    note: >-
+      Distinction wrapper/contenu : le shell sait fermer ; le fonctionnel sait
+      chercher. Cette séparation isole le scaffold M6 (réutilisé par les autres
+      surfaces ponctuelles ci-dessous) du contenu spécifique.
+
+  - id: comp-surface-ponctuelle-filtres-couches
+    nom: "Surface ponctuelle de filtres Couches"
+    famille: shell
+    statut_maquette_palier_5: "ABSORBÉE (cascade palier 5 maquette 2026-06-25, retour utilisateur) : pas de composant shell distinct — comp-filtres-couches (fonctionnel) EST déjà la surface M6 complète (fond + radius + × interne). L'écran l'instancie directement + comp-backdrop. La fiche reste la spec du scaffold M6 (DRY)."
+    raison_d_etre: >-
+      Wrapper M6 (P5.M6) qui héberge comp-filtres-couches (fonctionnel). Permet
+      d'activer/désactiver les Couches cartographiques sur la Carte.
+
+    ancrage:
+      ecrans: [E-CARTE-FILTRES-COUCHES]
+      composants_qui_l_integrent: [comp-layout-carte-principale]
+
+    composition:
+      - { id: comp-filtres-couches, slot: "couches", cardinalite: 1, note: "fonctionnel — 1..n chips de Couche" }
+      - { id: comp-button-fermeture-overlay, slot: "fermeture", cardinalite: 1 }
+
+    etats_interactifs: [visible, dismissed]
+
+    interactions_natives:
+      - "Tap fermeture → E3 ferme M6"
+      - "Tap-hors → E3 ferme M6 (PI-TAP-HORS, P5.N5)"
+
+    intention_portee:
+      parametrable: false
+      echelle: E3_navigationnelle
+      intention: "scaffold_M6_filtres_couches"
+      cible_referencee: "P5.M6"
+
+    patterns_attaches: [PI-TAP-HORS]
+
+  - id: comp-surface-ponctuelle-lancement-parcours
+    nom: "Surface ponctuelle de lancement de Parcours"
+    famille: shell
+    raison_d_etre: >-
+      Surface M6 (P5.M6) ouverte depuis la fiche détaillée d'un Parcours pour
+      choisir le mode (terrain ou canapé) avant lancement. Le mode par défaut
+      est suggéré selon la disponibilité de la géolocalisation
+      (ETAT-PERMISSIONS-SYSTEME). Détecte le conflit avec un Parcours déjà en
+      cours (ETAT-PARCOURS-EN-COURS) et propose alors un dialogue de
+      confirmation d'abandon préalable.
+
+    ancrage:
+      ecrans: [E-PARCOURS-LANCEMENT]
+      composants_qui_l_integrent: [comp-layout-parcours]
+
+    composition:
+      - { id: comp-libelle-texte, slot: "rappel_parcours", cardinalite: 1, note: "titre du Parcours à lancer" }
+      - { id: comp-button-secondary, slot: "choix_mode_terrain", cardinalite: 1, note: "variant 'mode_choix' — bouton mode terrain" }
+      - { id: comp-button-secondary, slot: "choix_mode_canape", cardinalite: 1, note: "variant 'mode_choix' — bouton mode canapé" }
+      - { id: comp-button-primary, slot: "cta_valider", cardinalite: 1 }
+      - { id: comp-button-fermeture-overlay, slot: "fermeture", cardinalite: 1 }
+
+    variants:
+      - { dimension: mode_propose_par_defaut, valeurs: [terrain, canape], note: "déduit de ETAT-PERMISSIONS-SYSTEME — terrain si géoloc accordée" }
+
+    etats_interactifs: [visible, dismissed, conflit_parcours_en_cours]
+
+    interactions_natives:
+      - "Tap choix_mode_* → sélectionne le mode"
+      - "Tap cta_valider → E4 lance le Parcours (producteur ETAT-PARCOURS-EN-COURS via comp-button-primary câblé sur flow C5/C6)"
+      - "Tap fermeture / tap-hors → E3 ferme M6 (PI-TAP-HORS)"
+      - "Si ETAT-PARCOURS-EN-COURS déjà actif → préalable comp-dialogue-confirmation (branche d'abandon des flows C5/C6 — Vivre un parcours en mode terrain/canapé) avant lancement"
+
+    intention_portee:
+      parametrable: false
+      echelle: E3_navigationnelle
+      intention: "scaffold_M6_lancement_parcours"
+      cible_referencee: "P5.M6, flows C5 (terrain) et C6 (canapé), branche d'abandon des flows C5/C6 (abandon préalable)"
+
+    couplage_etat_partage:
+      - { etat: ETAT-PARCOURS-EN-COURS, role: consommateur, note: "détection conflit — interception avant lancement" }
+      - { etat: ETAT-PERMISSIONS-SYSTEME, role: consommateur, note: "détermine mode_propose_par_defaut" }
+
+    patterns_attaches: [PI-TAP-HORS]
+
+  - id: comp-surface-ponctuelle-filtres-parcours
+    nom: "Surface ponctuelle de filtres Parcours"
+    famille: shell
+    raison_d_etre: >-
+      Surface M6 (P5.M6) qui héberge les filtres du catalogue Parcours
+      (Époque, catégorie, durée estimée — cf. cluster 02 attributs Parcours).
+
+    ancrage:
+      ecrans: [E-PARCOURS-FILTRES]
+      composants_qui_l_integrent: [comp-layout-parcours]
+
+    composition:
+      - { id: comp-barre-filtres, slot: "filtres_groupes", cardinalite: 1..n, note: "molécule — une barre par dimension de filtre (cf. 02-molecules)" }
+      - { id: comp-button-primary, slot: "cta_appliquer", cardinalite: 1 }
+      - { id: comp-button-secondary, slot: "cta_reset", cardinalite: 1 }
+      - { id: comp-button-fermeture-overlay, slot: "fermeture", cardinalite: 1 }
+
+    etats_interactifs: [visible, dismissed, dirty]
+
+    interactions_natives:
+      - "Tap cta_appliquer → E2 émet 'filtres_appliques' → écran parent recharge le catalogue"
+      - "Tap cta_reset → E1 réinitialise les filtres locaux"
+      - "Tap fermeture / tap-hors → E3 ferme M6 (PI-TAP-HORS)"
+
+    intention_portee:
+      parametrable: false
+      echelle: E3_navigationnelle
+      intention: "scaffold_M6_filtres_parcours"
+      cible_referencee: "P5.M6"
+
+    patterns_attaches: [PI-TAP-HORS]
+
+  - id: comp-surface-ponctuelle-saut-etape
+    nom: "Surface ponctuelle de saut d'Étape"
+    famille: shell
+    raison_d_etre: >-
+      Surface M6 (P5.M6) ouverte depuis P2 ou depuis E-PARCOURS-EN-COURS-* pour
+      sauter à une autre Étape du Parcours actif (flow C9 ou variante).
+      Consommateur de ETAT-PARCOURS-EN-COURS pour énumérer les Étapes
+      disponibles et marquer l'Étape courante.
+
+    ancrage:
+      ecrans: [E-PARCOURS-SAUT-ETAPE]
+      composants_qui_l_integrent: [comp-layout-parcours, comp-surface-persistante-parcours (point d'accès)]
+
+    composition:
+      - { id: comp-item-liste-etape, slot: "etapes_disponibles", cardinalite: 1..n, note: "molécule — une item par Étape (cf. 02-molecules)" }
+      - { id: comp-button-primary, slot: "cta_sauter", cardinalite: 1 }
+      - { id: comp-button-fermeture-overlay, slot: "fermeture", cardinalite: 1 }
+
+    etats_interactifs: [visible, dismissed, etape_selectionnee]
+
+    interactions_natives:
+      - "Tap item étape → E1 sélectionne l'Étape cible localement"
+      - "Tap cta_sauter → E4 modifie ETAT-PARCOURS-EN-COURS (étape courante = sélection) et ferme M6"
+      - "Tap fermeture / tap-hors → E3 ferme M6 (PI-TAP-HORS)"
+
+    intention_portee:
+      parametrable: false
+      echelle: E3_navigationnelle
+      intention: "scaffold_M6_saut_etape"
+      cible_referencee: "P5.M6 + flow C9"
+
+    couplage_etat_partage:
+      - { etat: ETAT-PARCOURS-EN-COURS, role: consommateur, note: "énumération étapes + marquage courante ; le saut effectif reconfigure l'état (cascade carte+pins)" }
+
+    patterns_attaches: [PI-TAP-HORS]
+
+  - id: comp-dialogue-confirmation
+    nom: "Dialogue de confirmation"
+    famille: shell
+    raison_d_etre: >-
+      Template P5.M8 — dialogue STRICTEMENT BLOQUANT (P5.N6) à deux issues
+      explicites pour les actions à effet sensible. À utiliser avec parcimonie
+      (cf. essence § ce_qu_on_refuse — pas de friction inutile).
+
+    ancrage:
+      ecrans: [E-PARCOURS-CONFIRMATION-ABANDON, E-PROFIL-CONFIRMATION-SUPPRESSION-COMPTE, E-PROFIL-CONFIRMATION-EFFACEMENT-HISTORIQUE, E-PARCOURS-CONFIRMATION-SUPPRESSION-PERSO]
+      composants_qui_l_integrent: ["transverse — peut surgir depuis tout layout sauf M4"]
+
+    composition:
+      - { id: comp-libelle-texte, slot: "titre", cardinalite: 1 }
+      - { id: comp-libelle-texte, slot: "description", cardinalite: 1 }
+      - { id: comp-button-secondary, slot: "cta_annuler", cardinalite: 1 }
+      - { id: comp-button-primary, slot: "cta_confirmer", cardinalite: 1, note: "registre destructif possible — palier 12" }
+
+    variants:
+      - { dimension: severite, valeurs: [neutre, destructif], registre: "le bouton cta_confirmer arbore un registre visuel destructif si severite=destructif (palier 12)" }
+
+    etats_interactifs: [visible, dismissed_par_annulation, dismissed_par_confirmation]
+
+    interactions_natives:
+      - "Tap cta_annuler → E2 émet 'annulation' → l'écran parent gère"
+      - "Tap cta_confirmer → E2 émet 'confirmation' → l'écran parent gère (peut être E4 selon contexte — abandon parcours = E4 sur ETAT-PARCOURS-EN-COURS)"
+      - "Pas de geste pour contourner (P5.N6 — strictement bloquant)"
+
+    intention_portee:
+      parametrable: true
+      echelle: E2_inter_composant
+      intention: "decision_bloquante"
+      contrats:
+        - "L'écran qui l'instancie DOIT câbler les deux callbacks (annulation + confirmation)"
+        - "Le titre et la description sont des libellés (pattern PT palier 8) — texte exact en palier 8"
+      note: >-
+        Composant à intention OUVERTE pour ses deux issues — l'écran parent
+        sait quelle action métier conclure. Le scaffold M8 lui-même (focus
+        trap, blocage) est invariant.
+
+    patterns_attaches: [PI-FOCUS-TRAP-DIALOGUE]
+
+    instances_typiques:
+      - "Abandon de Parcours en cours (branche d'abandon des flows C5/C6 — Vivre un parcours en mode terrain/canapé) — severite=destructif"
+      - "Suppression de Compte (flow D9) — severite=destructif"
+      - "Effacement de l'historique de visite (flow D4) — severite=destructif"
+      - "Suppression de Parcours personnel (flow C13) — severite=destructif"
+
+    consequences_variabilite:
+      - "Description i18n divergente — préserver perceptibilité de l'enjeu (palier 16)"
+
+    note: >-
+      Cohérent P5.C5 — au plus 1 dialogue M8 actif à la fois. Politique
+      des cascades à arbitrer en palier 6.
+
+  - id: comp-dialogue-permission
+    nom: "Dialogue de permission"
+    famille: shell
+    raison_d_etre: >-
+      Template P5.M8 spécialisé dans la demande de permission OS juste-à-temps
+      (palier 3 D5.5 — pas de demande en bloc à l'onboarding). Distinct de
+      comp-dialogue-confirmation par sa SÉMANTIQUE (système, pas métier) et
+      par son couplage producteur/consommateur de ETAT-PERMISSIONS-SYSTEME.
+
+    ancrage:
+      ecrans: ["transverse — apparaît sur la surface qui requiert la permission"]
+      composants_qui_l_integrent: [comp-layout-carte-principale (géoloc), comp-camera-ar (caméra), comp-rangee-profil-action (notification)]
+
+    composition:
+      - { id: comp-libelle-texte, slot: "titre", cardinalite: 1 }
+      - { id: comp-libelle-texte, slot: "explication", cardinalite: 1, note: "explique POURQUOI la permission est demandée à ce moment précis" }
+      - { id: comp-button-secondary, slot: "cta_refuser", cardinalite: 1 }
+      - { id: comp-button-primary, slot: "cta_accorder", cardinalite: 1 }
+
+    variants:
+      - { dimension: target_permission, valeurs: [geolocalisation, camera, notification], registre: "icône + microcopy adaptée (palier 8 + 13)" }
+
+    etats_interactifs: [visible, dismissed_par_refus, dismissed_par_acceptation]
+
+    interactions_natives:
+      - "Tap cta_refuser → E4 met à jour ETAT-PERMISSIONS-SYSTEME (refus) et ferme"
+      - "Tap cta_accorder → E4 délègue au système OS la demande native ; à la résolution, met à jour ETAT-PERMISSIONS-SYSTEME"
+
+    intention_portee:
+      parametrable: false
+      echelle: E4_systemique
+      intention: "demande_permission_juste_a_temps"
+      cible_referencee: "ETAT-PERMISSIONS-SYSTEME producteur ; palier 3 D5.5 ; flow A6"
+      note: >-
+        Intention CLOSE — le dialogue sait qu'il modifie ETAT-PERMISSIONS-SYSTEME.
+        L'écran parent fournit la cible (target_permission) en variant, pas en
+        callback.
+
+    couplage_etat_partage:
+      - { etat: ETAT-PERMISSIONS-SYSTEME, role: producteur, note: "via délégation OS pour cta_accorder ; directement pour cta_refuser" }
+
+    patterns_attaches: [PI-FOCUS-TRAP-DIALOGUE]
+
+    consequences_variabilite:
+      - "Refus définitif au niveau OS (l'utilisateur a déjà refusé deux fois) → l'app ne peut plus rappeler le dialogue système ; fallback message vers les paramètres OS (palier 8)"
+
+  - id: comp-message-ephemere
+    nom: "Message éphémère"
+    famille: shell
+    raison_d_etre: >-
+      Template P5.M9 — confirmation transitoire NON bloquante d'une action prise
+      (« lien copié », « parcours sauvegardé ») ou signal léger. Disparaît seul
+      après un délai (durée précise palier 11).
+
+    ancrage:
+      ecrans: ["transverse — peut surgir sur toute surface non-M4"]
+      composants_qui_l_integrent: ["transverse"]
+
+    composition:
+      - { id: comp-icone, slot: "icone", cardinalite: 0..1, note: "icône optionnelle de feedback (palier 13)" }
+      - { id: comp-libelle-texte, slot: "message", cardinalite: 1 }
+      - { id: comp-button-tertiary, slot: "action", cardinalite: 0..1, note: "action optionnelle (ex. 'Annuler' pour un undo léger)" }
+
+    variants:
+      - { dimension: type, valeurs: [success, error, info, warning], registre: "registre visuel + icône (palier 12+13)" }
+
+    etats_interactifs: [emise, expiration_implicite, dismissed_par_swipe, dismissed_par_remplacement]
+
+    interactions_natives:
+      - "Disparition implicite après délai (cf. P5.C6 — file simple de remplacement)"
+      - "Swipe latéral → E1 dismiss anticipé (PI-SWIPE-DISMISS — optionnel)"
+      - "Tap action → E2 émet l'action câblée par l'écran parent"
+
+    intention_portee:
+      parametrable: true
+      echelle: E1_atomique
+      note: >-
+        Le message lui-même est non interactif au sens navigationnel ; l'action
+        optionnelle est paramétrable par l'écran parent (E2). Pas de cible P5
+        — le message vit puis meurt.
+
+    patterns_attaches: [PI-SWIPE-DISMISS]
+
+    consequences_variabilite:
+      - "Message i18n divergente (FR/EN/JA) — truncate ou retour à la ligne (palier 12)"
+      - "File de remplacement (P5.C6) — un message en cours cède la place au suivant"
+
+    note: >-
+      Pas d'usage promotionnel ni décoratif (P5.M9 propriété stricte —
+      cohérence essence § ce_qu_on_refuse).
+
+  - id: comp-indication-onboarding
+    nom: "Indication onboarding"
+    famille: shell
+    raison_d_etre: >-
+      Variante de M9 dédiée à l'onboarding traversant (P5.E1 — pas de tutoriel
+      bloquant). Indication ponctuelle qui pointe un point d'accès découvrable
+      au premier usage (slider d'Époque, Couches, Surprenez-moi, sélecteur de
+      section). Distincte de comp-message-ephemere par sa fréquence (premier
+      usage uniquement, jamais répétée) et sa durée (jusqu'à découverte
+      effective, pas un délai fixe).
+
+    ancrage:
+      ecrans: [E-CARTE-PRINCIPALE (au premier lancement), E-CARTE-FILTRES-COUCHES (premier accès), E-PROFIL-PRINCIPAL (premier accès)]
+      composants_qui_l_integrent: ["transverse au premier usage uniquement"]
+
+    composition:
+      - { id: comp-icone, slot: "icone", cardinalite: 0..1, note: "icône fonctionnelle de pointage (palier 13)" }
+      - { id: comp-libelle-texte, slot: "message", cardinalite: 1 }
+      - { id: comp-libelle-texte, slot: "page_indicator", cardinalite: 0..1, note: "indicateur de progression si plusieurs indications enchaînées" }
+
+    etats_interactifs: [visible, decouverte_effectuee, skip_explicite]
+
+    interactions_natives:
+      - "Tap-hors / utilisation effective de l'élément pointé → E1 dismiss définitif (l'indication ne réapparaît plus)"
+      - "Tap skip → E1 dismiss définitif"
+
+    intention_portee:
+      parametrable: true
+      echelle: E1_atomique
+      intention: "indication_onboarding"
+      contrats:
+        - "L'écran parent câble l'élément pointé (l'indication ne sait pas vers quoi pointer — c'est l'écran qui le sait)"
+      note: >-
+        Cohérent P5.E1 — l'onboarding est traversant, non bloquant. Une fois
+        l'indication dismissée, elle est marquée 'vue' dans le Profil et ne
+        réapparaît plus (cf. cluster 03 préférences).
+
+    consequences_variabilite:
+      - "Message i18n divergent — taille adaptative (palier 12)"
+
+    questions_ouvertes:
+      - "Stockage de l'état 'vue' : local seul ou synchro Compte ? — palier 4 cluster 03 + arbitrage palier 6"
+
+  - id: comp-invitation-microparcours
+    nom: "Invitation à un micro-parcours"
+    famille: shell
+    raison_d_etre: >-
+      Template P5.M7 dédié à la PROPOSITION d'un micro-parcours découverte (flow
+      A2). Distinct de comp-alerte-proximite (qui est M7 mais réifie une
+      proximité géolocalisée) et distinct de comp-indication-onboarding (qui
+      est M9 et pointe un élément d'UI). Splitté de l'indication onboarding sur
+      recommandation relecture palier 7.
+
+    ancrage:
+      ecrans: [E-CARTE-INVITATION-MICROPARCOURS]
+      composants_qui_l_integrent: [comp-layout-carte-principale]
+
+    composition:
+      - { id: comp-libelle-texte, slot: "titre", cardinalite: 1 }
+      - { id: comp-libelle-texte, slot: "description", cardinalite: 1 }
+      - { id: comp-button-secondary, slot: "cta_decline", cardinalite: 1 }
+      - { id: comp-button-primary, slot: "cta_accepter", cardinalite: 1 }
+
+    etats_interactifs: [visible, dismissed_par_decline, dismissed_par_acceptation]
+
+    interactions_natives:
+      - "Tap cta_decline → E1 dismiss"
+      - "Tap cta_accepter → E3/E4 lance le micro-parcours (flow A2 — peut produire ETAT-PARCOURS-EN-COURS si le micro-parcours est instancié)"
+      - "Tap-hors → E1 dismiss (PI-TAP-HORS optionnel)"
+
+    intention_portee:
+      parametrable: false
+      echelle: E3_navigationnelle
+      intention: "invitation_microparcours_M7"
+      cible_referencee: "P5.M7 + flow A2"
+      note: >-
+        Alerte M7 NON BLOQUANTE (P5.C4) à 2 issues explicites. La cible cta_accepter
+        produit potentiellement un micro-parcours et déclenche la cascade
+        ETAT-PARCOURS-EN-COURS standard.
+
+    couplage_etat_partage:
+      - { etat: ETAT-PARCOURS-EN-COURS, role: consommateur, note: "ne s'affiche pas si un Parcours est déjà en cours" }
+
+    patterns_attaches: [PI-TAP-HORS]
+
+  - id: comp-backdrop
+    nom: "Voile / backdrop"
+    famille: shell
+    raison_d_etre: >-
+      Voile plein écran réutilisable posé DERRIÈRE toute surface flottante
+      (M2 aperçu, M6 ponctuelle, M7 alerte, M8 dialogue, pop-in/popup). Assombrit
+      et/ou floute le contenu de l'écran pour focaliser sur la surface au premier
+      plan, et capte le tap-hors. AJOUTÉ par cascade palier 5 maquette (idée
+      utilisateur) pour éviter de re-baker un scrim dans chaque surface.
+    ancrage:
+      ecrans: ["transverse — sous toute surface flottante non plein-écran sauf M4"]
+      composants_qui_l_integrent: ["instancié à l'ÉCRAN (palier 7), entre le contenu et la surface flottante"]
+    composition: []
+    variants:
+      - { dimension: type, valeurs: [assombri, flou, assombri_flou], registre: "scrim sombre / flou d'arrière-plan / les deux" }
+    etats_interactifs: [visible, dismissed]
+    interactions_natives:
+      - "Tap sur le voile → ferme la surface au premier plan (PI-TAP-HORS) — câblé à l'écran (palier 7/10)"
+    intention_portee:
+      parametrable: true
+      echelle: E3_navigationnelle
+      intention: "voile_focalisation"
+      note: "La cible de fermeture est câblée par l'écran (la surface qu'il recouvre)."
+    patterns_attaches: [PI-TAP-HORS]
+    consequences_variabilite:
+      - "EXCEPTION TOKEN (palier 5 maquette, validée utilisateur) : l'opacité du voile n'est PAS bindée à une variable couleur — l'opacité de scrim n'est pas un token, et le binding réinitialisait l'opacité à 1. Paint direct, couleur TEXTE-PRINCIPAL résolue. Intensités indicatives : assombri ~0.4 ; assombri_flou ~0.28 + flou ; flou ~0.05 + flou d'arrière-plan."
+    note: "Cohérent P5.C3 (la carte reste visible derrière M2) et P5.N5 (fermeture par tap-hors)."
+
+  # ===========================================================================
+  # (b) Surfaces persistantes — P1 audio, P2 parcours, P3 bandeau offline
+  # ===========================================================================
+
+  - id: comp-surface-persistante-audio
+    nom: "Surface persistante audio (P1)"
+    famille: shell
+    raison_d_etre: >-
+      Wrapper P5.M5 / P5.P1 — mini-player audio persistant qui survit à la
+      navigation entre S1/S2/S3 (sauf M4). Consommateur primaire de
+      ETAT-AUDIO-EN-COURS. L'action close éteint la lecture (producteur
+      secondaire).
+
+    ancrage:
+      ecrans: ["transverse — visible sur S1/S2/S3 et leurs sous-surfaces sauf M4"]
+      composants_qui_l_integrent: [comp-layout-carte-principale, comp-layout-parcours, comp-layout-profil]
+
+    composition:
+      - { id: comp-libelle-texte, slot: "titre_pin", cardinalite: 1, note: "titre du Pin dont la narration est en cours" }
+      - { id: comp-button-play-audio, slot: "controls", cardinalite: 1, note: "play/pause inline" }
+      - { id: comp-button-secondary, slot: "close", cardinalite: 1, note: "ferme et termine la lecture" }
+
+    variants:
+      - { dimension: mode_M4, valeurs: [visible, sommeil_visuel], note: "P5.C2 — sommeil visuel en M4, état préservé" }
+
+    etats_interactifs: [visible, sommeil_visuel_M4, dismissed_par_close, dismissed_par_fin_naturelle]
+
+    interactions_natives:
+      - "Tap zone titre → E3 retour à E-PIN-CONSULTATION-APPROFONDIE du Pin en cours (P5.M5 propriété)"
+      - "Tap controls → toggle play/pause (délégué à comp-button-play-audio E1)"
+      - "Tap close → E4 termine ETAT-AUDIO-EN-COURS (producteur secondaire)"
+
+    intention_portee:
+      parametrable: false
+      echelle: E3_navigationnelle
+      intention: "surface_persistante_audio_M5_P1"
+      cible_referencee: "P5.P1 + P5.C2 (sommeil M4)"
+      note: >-
+        Le tap-titre ramène à la consultation approfondie (P5.P1 propriété
+        invariante). Le close termine la lecture (P5.P1 cessation).
+
+    couplage_etat_partage:
+      - { etat: ETAT-AUDIO-EN-COURS, role: consommateur, note: "primaire — visibilité conditionnelle" }
+      - { etat: ETAT-AUDIO-EN-COURS, role: producteur, note: "secondaire — close termine l'état" }
+
+    consequences_variabilite:
+      - "Titre Pin long → truncate avec ellipse (palier 12)"
+
+    note: >-
+      Au plus 1 instance visible (P5.M5 propriété). Cohérent P5.C1 —
+      coexistence visuelle possible avec P2 (audio + parcours en cours).
+
+  - id: comp-surface-persistante-parcours
+    nom: "Surface persistante parcours (P2)"
+    famille: shell
+    raison_d_etre: >-
+      Wrapper P5.M5 / P5.P2 — mini-bar du Parcours en cours. Survit à la
+      navigation entre S1/S2/S3 (sauf M4). Consommateur primaire de
+      ETAT-PARCOURS-EN-COURS. L'action close déclenche l'abandon via
+      comp-dialogue-confirmation (P5.P2 cessation, branche d'abandon des flows C5/C6 — Vivre un parcours en mode terrain/canapé).
+
+    ancrage:
+      ecrans: ["transverse — visible sur S1/S2/S3 et leurs sous-surfaces sauf M4"]
+      composants_qui_l_integrent: [comp-layout-carte-principale, comp-layout-parcours, comp-layout-profil]
+
+    composition:
+      - { id: comp-libelle-texte, slot: "titre", cardinalite: 1, note: "titre du Parcours en cours" }
+      - { id: comp-libelle-texte, slot: "etape_courante", cardinalite: 1, note: "label Étape courante" }
+      - { id: comp-info-progress-etape, slot: "progression", cardinalite: 1, note: "molécule — étapes complétées / restantes" }
+      - { id: comp-button-secondary, slot: "close", cardinalite: 1, note: "déclenche la branche d'abandon des flows C5/C6 (Vivre un parcours en mode terrain/canapé)" }
+
+    variants:
+      - { dimension: mode_M4, valeurs: [visible, sommeil_visuel], note: "P5.C2" }
+      - { dimension: mode_terrain_canape, valeurs: [terrain, canape], note: "registre visuel selon mode actif (palier 12)" }
+
+    etats_interactifs: [visible, sommeil_visuel_M4, dismissed_par_completion, dismissed_par_abandon]
+
+    interactions_natives:
+      - "Tap zone principale → E3 retour à E-PARCOURS-EN-COURS-TERRAIN ou E-PARCOURS-EN-COURS-CANAPE selon mode (P5.P2 propriété)"
+      - "Tap close → ouvre comp-dialogue-confirmation (severite=destructif) ; à confirmation → E4 termine ETAT-PARCOURS-EN-COURS (branche d'abandon des flows C5/C6 — Vivre un parcours en mode terrain/canapé)"
+
+    intention_portee:
+      parametrable: false
+      echelle: E3_navigationnelle
+      intention: "surface_persistante_parcours_M5_P2"
+      cible_referencee: "P5.P2 + P5.C2 (sommeil M4) + branche d'abandon des flows C5/C6 — Vivre un parcours en mode terrain/canapé (abandon avec confirmation)"
+      note: >-
+        Le close ne termine PAS directement — il passe par M8 confirmation
+        (P5.P2 propriété stricte « l'utilisateur ne quitte pas par accident »).
+
+    couplage_etat_partage:
+      - { etat: ETAT-PARCOURS-EN-COURS, role: consommateur, note: "primaire — visibilité + données affichées" }
+      - { etat: ETAT-PARCOURS-EN-COURS, role: producteur, note: "secondaire — close après confirmation termine l'état" }
+
+    consequences_variabilite:
+      - "Titre Parcours long → truncate (palier 12)"
+      - "Mode présentation M4 → sommeil visuel (P5.C2)"
+
+    note: >-
+      Au plus 1 instance visible. Cohérent P5.C1 — coexiste avec P1 audio
+      et P3 bandeau offline.
+
+  - id: comp-bandeau-information-offline
+    nom: "Bandeau d'information persistant offline (P3)"
+    famille: shell
+    raison_d_etre: "Surface persistante P3 (P5.M5/P5.P3) — bandeau minimal qui signale le mode hors-ligne actif. Déplacé depuis 03-fonctionnels.yaml en correction après relecture (sa nature est shell au sens P5.M5, pas fonctionnel)."
+    ancrage:
+      ecrans: ["transverse — apparaît sur S1/S2/S3 quand ETAT-CONNEXION-RESEAU absent"]
+      composants_qui_l_integrent: [comp-layout-carte-principale, comp-layout-parcours, comp-layout-profil]
+    composition:
+      - { id: comp-icone, slot: icone_offline, cardinalite: 1 }
+      - { id: comp-libelle-texte, slot: message, cardinalite: 1 }
+    etats_interactifs: [visible, masque_M4]
+    interactions_natives: []
+    intention_portee: { parametrable: false, echelle: non_interactif, note: "Affichage informatif uniquement" }
+    couplage_etat_partage:
+      - { etat: ETAT-CONNEXION-RESEAU, role: consommateur, note: "visible si offline" }
+    consequences_variabilite:
+      - "Mode présentation M4 → masquage P5.C2"
+    note: >-
+      P3 surface persistante au sens P5.M5. Coexiste avec P1 (audio) et P2
+      (parcours) selon P5.C1.
+
+  # ===========================================================================
+  # (c) Layouts — surfaces principales S1/S2/S3 et consultation Pin M3
+  # ===========================================================================
+
+  - id: comp-layout-carte-principale
+    nom: "Layout Carte principale"
+    famille: shell
+    raison_d_etre: >-
+      Conteneur de la surface S1 Carte (P5.S1 / P5.M1). Fixe les SLOTS de la
+      carte plein-écran, du chrome navigationnel et des trois surfaces
+      persistantes coexistantes. Frontière palier 7/10 — voir document.note_frontiere_palier_7.
+
+    ancrage:
+      ecrans: [E-CARTE-PRINCIPALE]
+      composants_qui_l_integrent: ["aucun — c'est un layout de surface top-level"]
+
+    composition:
+      - { id: comp-carte, slot: "carte", cardinalite: 1, note: "fonctionnel central plein-écran" }
+      - { id: comp-selecteur-section-principale, slot: "nav", cardinalite: 1 }
+      - { id: comp-surface-persistante-audio, slot: "persistent_p1", cardinalite: 0..1, note: "visible si ETAT-AUDIO-EN-COURS" }
+      - { id: comp-surface-persistante-parcours, slot: "persistent_p2", cardinalite: 0..1, note: "visible si ETAT-PARCOURS-EN-COURS" }
+      - { id: comp-bandeau-information-offline, slot: "persistent_p3", cardinalite: 0..1, note: "visible si ETAT-CONNEXION-RESEAU absent (shell — fiche dans ce fichier)" }
+
+    variants:
+      - { dimension: mode_presentation, valeurs: [actif, inactif], note: "P5.C2 — si actif, nav et persistent_* en sommeil visuel" }
+
+    etats_interactifs: [nominal, mode_presentation_M4]
+
+    interactions_natives:
+      - "Aucune interaction propre au layout — délègue aux composants enfants"
+      - "Au-dessus de M2/M6/M7/M8/M9 instanciés depuis la Carte (overlay)"
+
+    intention_portee:
+      parametrable: false
+      echelle: non_interactif
+      note: "Layout structural ; pas d'intention propre. Hérite des intentions de ses enfants."
+
+    couplage_etat_partage:
+      - { etat: ETAT-AUDIO-EN-COURS, role: consommateur, note: "visibilité persistent_p1" }
+      - { etat: ETAT-PARCOURS-EN-COURS, role: consommateur, note: "visibilité persistent_p2" }
+      - { etat: ETAT-CONNEXION-RESEAU, role: consommateur, note: "visibilité persistent_p3" }
+
+    note: >-
+      Frontière palier 7 / palier 10 : ce layout fixe la GRILLE des slots et
+      la matrice de coexistence (P5.C1, C2). La mise en page concrète (où la
+      mini-bar P2 est placée par rapport à la nav, comment elles s'empilent)
+      est décidée en palier 7. Le fait de modéliser les slots et leurs
+      conditions de visibilité au palier 10 évite que chaque écran S1
+      redéclare l'arbre — d'où le maintien en composant shell.
+
+  - id: comp-layout-parcours
+    nom: "Layout Parcours"
+    famille: shell
+    raison_d_etre: >-
+      Conteneur de la surface S2 Parcours (P5.S2 / P5.M1). Accueille les deux
+      vues (catalogue + mes parcours) et le chrome partagé. Frontière
+      palier 7/10 — voir document.note_frontiere_palier_7.
+
+    ancrage:
+      ecrans: [E-PARCOURS-PRINCIPAL]
+      composants_qui_l_integrent: ["aucun — layout top-level"]
+
+    composition:
+      - { id: comp-selecteur-section-principale, slot: "nav", cardinalite: 1 }
+      - { id: comp-header-titre-action, slot: "header", cardinalite: 1, note: "molécule — titre section + bouton créer Parcours" }
+      - { id: comp-grid-recherche, slot: "content", cardinalite: 1, note: "fonctionnel — vue catalogue ou mes_parcours" }
+      - { id: comp-surface-persistante-audio, slot: "persistent_p1", cardinalite: 0..1 }
+      - { id: comp-surface-persistante-parcours, slot: "persistent_p2", cardinalite: 0..1 }
+      - { id: comp-bandeau-information-offline, slot: "persistent_p3", cardinalite: 0..1 }
+
+    variants:
+      - { dimension: vue_active, valeurs: [catalogue, mes_parcours], note: "deux vues internes ; bascule par sous-onglet ou geste — décidé palier 7" }
+      - { dimension: mode_presentation, valeurs: [actif, inactif], note: "P5.C2" }
+
+    etats_interactifs: [nominal, vide_aucun_parcours_personnel, mode_presentation_M4]
+
+    interactions_natives:
+      - "Aucune interaction propre — délègue aux enfants"
+
+    intention_portee:
+      parametrable: false
+      echelle: non_interactif
+
+    couplage_etat_partage:
+      - { etat: ETAT-AUDIO-EN-COURS, role: consommateur, note: "visibilité persistent_p1" }
+      - { etat: ETAT-PARCOURS-EN-COURS, role: consommateur, note: "visibilité persistent_p2" }
+      - { etat: ETAT-CONNEXION-RESEAU, role: consommateur }
+      - { etat: ETAT-COMPTE-CONNECTE, role: consommateur, note: "vue mes_parcours = parcours personnels locaux + favoris (toujours présent — I6)" }
+
+    note: >-
+      Frontière palier 7 / palier 10 : voir comp-layout-carte-principale.
+      L'articulation des deux vues (catalogue / mes_parcours) est mentionnée
+      comme variant ici, le mécanisme concret (sous-onglet, bascule par geste)
+      est décidé palier 7.
+
+  - id: comp-layout-profil
+    nom: "Layout Profil"
+    famille: shell
+    raison_d_etre: >-
+      Conteneur de la surface S3 Profil (P5.S3 / P5.M1). Liste de rangées de
+      paramétrage et de mémoire (favoris, historique, préférences, gestion
+      Compte). Frontière palier 7/10.
+
+    ancrage:
+      ecrans: [E-PROFIL-PRINCIPAL]
+      composants_qui_l_integrent: ["aucun — layout top-level"]
+
+    composition:
+      - { id: comp-selecteur-section-principale, slot: "nav", cardinalite: 1 }
+      - { id: comp-header-titre-action, slot: "header", cardinalite: 1 }
+      - { id: comp-rangee-profil-action, slot: "content", cardinalite: 1..n, note: "molécule — une rangée par item de Profil ; visibilité conditionnelle selon ETAT-COMPTE-CONNECTE" }
+      - { id: comp-surface-persistante-audio, slot: "persistent_p1", cardinalite: 0..1 }
+      - { id: comp-surface-persistante-parcours, slot: "persistent_p2", cardinalite: 0..1 }
+      - { id: comp-bandeau-information-offline, slot: "persistent_p3", cardinalite: 0..1 }
+
+    variants:
+      - { dimension: compte_connecte, valeurs: [oui, non], note: "rangées 'Mon Compte' / 'Déconnexion' / 'Suppression' visibles si oui ; rangée 'Créer un Compte' / 'Se connecter' visibles si non" }
+      - { dimension: mode_presentation, valeurs: [actif, inactif] }
+
+    etats_interactifs: [nominal, mode_presentation_M4]
+
+    interactions_natives:
+      - "Aucune interaction propre — délègue aux enfants"
+
+    intention_portee:
+      parametrable: false
+      echelle: non_interactif
+
+    couplage_etat_partage:
+      - { etat: ETAT-COMPTE-CONNECTE, role: consommateur, note: "détermine variant + visibilité des rangées (cohérent I6 — Profil toujours présent, Compte facultatif)" }
+      - { etat: ETAT-AUDIO-EN-COURS, role: consommateur }
+      - { etat: ETAT-PARCOURS-EN-COURS, role: consommateur }
+      - { etat: ETAT-CONNEXION-RESEAU, role: consommateur }
+
+    note: >-
+      Frontière palier 7 / palier 10. Le palier 10 fixe les slots et le
+      couplage compte_connecte ; la liste exhaustive des rangées (palier 4
+      cluster 03) et leur ordre est décidée palier 7.
+
+  - id: comp-layout-consultation-pin-approfondie
+    nom: "Layout consultation Pin approfondie"
+    famille: shell
+    raison_d_etre: >-
+      Conteneur du mode P5.M3 pour un Pin (consultation approfondie).
+      Orchestre la séquence canonique : hero, header, catégorie, narration,
+      sources, post-narratif, commentaires, lecteur audio optionnel, retour
+      Carte. Bascule possible vers M4 (mode présentation). Layout RICHE — à
+      la frontière palier 7/10 mais maintenu en composant shell pour
+      réutilisation par E-PIN-CONSULTATION-APPROFONDIE et
+      E-PIN-MODE-PRESENTATION.
+
+    ancrage:
+      ecrans: [E-PIN-CONSULTATION-APPROFONDIE, E-PIN-MODE-PRESENTATION]
+      composants_qui_l_integrent: ["aucun — layout M3"]
+
+    composition:
+      - { id: comp-image-hero, slot: "hero", cardinalite: 1, note: "fonctionnel — image principale du Pin" }
+      - { id: comp-header-retour-titre-action, slot: "header", cardinalite: 1, note: "molécule — comp-button-back + titre + actions (favori, partage, signalement, mode présentation)" }
+      - { id: comp-chip-categorie, slot: "category", cardinalite: 1 }
+      - { id: comp-libelle-texte, slot: "title", cardinalite: 1 }
+      - { id: comp-zone-narration, slot: "narration", cardinalite: 1, note: "molécule — zone narrative riche (texte + médias intégrés : avant/après, lecteur vidéo, frise chronologique)" }
+      - { id: comp-zone-sources, slot: "sources", cardinalite: 1, note: "molécule — sources citées (cluster 01 attribut Pin)" }
+      - { id: comp-zone-commentaires, slot: "comments", cardinalite: 1, note: "molécule — fil de commentaires (cluster 04)" }
+      - { id: comp-zone-post-narrative, slot: "post", cardinalite: 0..1, note: "molécule — quiz, anecdote, micro-action ; absente si pas définie pour ce Pin" }
+      - { id: comp-lecteur-audio, slot: "audio", cardinalite: 0..1, note: "fonctionnel — présent si Pin a une narration audio" }
+      - { id: comp-button-primary, slot: "cta_retour_carte", cardinalite: 1, note: "retour à la Carte centrée sur le Pin" }
+
+    variants:
+      - { dimension: mode_presentation_available, valeurs: [oui, non], note: "détermine présence du point d'accès M4 dans le header — oui par défaut" }
+      - { dimension: provenance_pin, valeurs: [editorial, communautaire], note: "communautaire → slot signalement présent dans le header (I3)" }
+      - { dimension: chrome_visible, valeurs: [oui, non], note: "non = M4 mode présentation actif (chrome masqué sauf un point de retour discret, P5.M4)" }
+
+    etats_interactifs: [nominal, M4_mode_presentation, loading_media, erreur_chargement]
+
+    interactions_natives:
+      - "Aucune interaction propre — délègue aux enfants"
+      - "Au M4 : chrome (header, sources, commentaires) masqué visuellement, narration plein-écran, retour discret"
+
+    intention_portee:
+      parametrable: false
+      echelle: non_interactif
+      note: "Layout structural M3 ; intentions portées par les composants enfants (button-back E3, mode_presentation_toggle E3 vers M4 via P5.N4)"
+
+    couplage_etat_partage:
+      - { etat: ETAT-AUDIO-EN-COURS, role: consommateur, note: "si lecture en cours, le slot audio est affiché ; cohérent avec P1 quand on quitte M3" }
+      - { etat: ETAT-COMPTE-CONNECTE, role: consommateur, note: "publication commentaire désactivée si pas de Compte (I2)" }
+
+    consequences_variabilite:
+      - "Pin sans Média audio → slot audio absent"
+      - "Pin sans zone post-narrative → slot post absent"
+      - "Sources nombreuses → zone repliable (palier 12 + arbitrage palier 11)"
+      - "Narration longue → scroll interne ; header peut devenir collant (palier 7 décidera)"
+      - "Pin éditorial → slot signalement absent dans le header (I3)"
+
+    note: >-
+      Frontière palier 7 / palier 10 RENFORCÉE — ce layout est riche (≥10
+      slots) et porte une séquence narrative canonique. Maintien en composant
+      shell justifié : (a) il est instancié par DEUX écrans (M3 nominal et
+      M4 mode présentation) qui partagent la même structure et diffèrent par
+      un variant, (b) la séquence des slots traduit la grammaire narrative
+      du Pin (D2.5 palier 3) et mérite un nom canonique. Le palier 7 décide
+      la mise en page des slots ; le palier 10 fixe les slots et leur
+      ordonnancement narratif.

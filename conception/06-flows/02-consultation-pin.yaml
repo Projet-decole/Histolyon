@@ -1,0 +1,567 @@
+# =============================================================================
+# Palier 6 — 02-consultation-pin
+# =============================================================================
+# Cluster B du palier 6. Couvre les 7 flows liés à la consultation d'un Pin :
+# aperçu rapide, consultation approfondie (qui absorbe la lecture audio),
+# navigation entre couches temporelles d'un Pin multi-époque, accès à la
+# consultation 3D, bascule AR avec permission caméra, engagement post-narratif
+# (quiz / énigme / pins liés), marquage favori.
+#
+# Format strict défini par 00-index.yaml et illustré par 03-parcours.yaml.
+# Préfixe P5. pour toutes les références au palier 5.
+# =============================================================================
+
+document:
+  type: palier_flows_cluster
+  cluster_id: "02-consultation-pin"
+  nom: "Consultation d'un Pin"
+  version: "0.1"
+  date: "2026-05-05"
+  format: yaml
+
+raison_d_etre_du_cluster: >-
+  Le Pin est l'unité atomique de contenu géolocalisé d'HistoLyon. Toute
+  consultation d'un Pin commence par un aperçu rapide qui laisse la Carte
+  visible derrière, puis peut s'approfondir en lecture pleine, écouter une
+  narration audio, naviguer entre les couches temporelles d'un même lieu,
+  ouvrir une reconstitution 3D voire la superposer en AR, prolonger le
+  récit dans une zone post-narrative, et marquer le Pin en favori. Ce
+  cluster déroule chacune de ces actions atomiquement, avec les bascules
+  vers les autres clusters quand l'action en sort (partage F1, parcours
+  C5/C6 pour l'arrivée à une étape, communauté G1/G3 pour commentaires
+  et signalements, profil D2 pour les favoris consultés ailleurs).
+
+# -----------------------------------------------------------------------------
+# Flows
+# -----------------------------------------------------------------------------
+flows:
+
+  # ---------------------------------------------------------------------------
+  - id: B1
+    nom: "Aperçu rapide d'un Pin"
+
+    declencheur: >-
+      Tap sur un Pin de la Carte (P5.S1), ou tap sur un résultat de la
+      surface ponctuelle de recherche (cf. A4), ou tap sur un Pin lié
+      depuis la zone post-narrative d'un autre Pin (cf. B6).
+    acteurs: [utilisateur grand public]
+
+    deroule:
+      - etape: 1
+        action: >-
+          Un aperçu rapide (P5.M2) s'ouvre par-dessus la Carte qui reste
+          visible derrière. La Carte garde son contexte (zoom, position,
+          époque sélectionnée par le slider).
+        surfaces_actives: [P5.S1, P5.M1, P5.M2]
+      - etape: 2
+        action: >-
+          L'aperçu présente le titre du Pin, sa Catégorie, un teaser
+          narratif court, une image, l'éventuelle navigation entre Époques
+          si le Pin est multi-époque (instanciation locale de I8 — cf. B3),
+          et la marque distinctive éventuelle (Pin de provenance
+          communautaire en cours de vérification, instanciation locale
+          de I3 ; Pin doté d'un Badge éditorial).
+      - etape: 3
+        action: "L'utilisateur lit le teaser et décide soit d'approfondir, soit d'agir, soit de refermer l'aperçu sans engagement."
+
+    bifurcations:
+      - si: "L'utilisateur active 'voir plus' ou tape la zone d'approfondissement"
+        alors: "bascule vers B2 (Consultation approfondie)"
+      - si: "L'utilisateur tape une Époque alternative dans la navigation multi-époque"
+        alors: "bascule vers B3 (Navigation entre couches temporelles)"
+      - si: "L'utilisateur tape le contrôle favori"
+        alors: "bascule vers B7 (Marquage favori) ; B1 reprend après"
+      - si: "L'utilisateur tape le contrôle de partage"
+        alors: "bascule vers F1 (Partage d'un Pin)"
+      - si: "L'utilisateur active 'Ajouter au parcours' (visible UNIQUEMENT pendant la création d'un Parcours, cf. C12)"
+        alors: "le Pin est ajouté à la liste d'étapes du Parcours en cours d'édition ; B1 reprend"
+      - si: "L'utilisateur tape un autre Pin de la Carte sans fermer l'aperçu"
+        alors: "B1 se rejoue avec le nouveau Pin (mise à jour fluide, pas de re-empilement — cf. D2.4)"
+      - si: "L'utilisateur referme l'aperçu (geste de fermeture ou tap hors aperçu)"
+        alors: "retour à P5.S1 Carte avec contexte préservé"
+
+    sorties_normales:
+      - "Bascule vers B2 (approfondissement)"
+      - "Bascule vers B3, B7, F1 puis reprise"
+      - "Fermeture gracieuse → retour à P5.S1 Carte"
+
+    cas_particuliers:
+      - cas: "Pin de provenance communautaire en cours de vérification (I3)"
+        comportement: "Marque distinctive visible dans l'aperçu, signalant que les sources sont en cours de vérification. L'aperçu reste pleinement consultable."
+      - cas: "Parcours actif en cours et Pin tapé hors du tracé du Parcours"
+        comportement: "L'aperçu signale discrètement 'ce lieu n'est pas dans votre parcours' (cf. D2.4). Aucune action bloquante. L'aperçu reste fonctionnel."
+      - cas: "Pin sans localisation ouvert depuis la recherche (I9)"
+        comportement: "L'aperçu fonctionne identiquement ; la Carte derrière n'est pas centrée sur le Pin (puisqu'il n'a pas de coordonnées). Le retour ramène à la surface ponctuelle de recherche, pas à un point sur la Carte."
+      - cas: "Pin retiré (cycle de vie 'retiré') ouvert via Pin lié depuis B6"
+        comportement: "Message gracieux 'ce contenu n'est plus disponible' (P5.M9) ; B1 ne s'ouvre pas, retour au B6 d'origine."
+
+    entites_impliquees: [Pin, Catégorie, Époque, Badge, Média]
+    surfaces_et_modes: [P5.S1, P5.M1, P5.M2]
+    references_palier_3: [D2.1, D2.4]
+    invariants_respectes: [I3, I8, I9]
+
+  # ---------------------------------------------------------------------------
+  - id: B2
+    nom: "Consultation approfondie d'un Pin"
+
+    declencheur: >-
+      Soit action explicite d'approfondissement depuis B1, soit réception
+      d'un Lien universel ciblant un Pin (entrée externe via F5), soit
+      arrivée géolocalisée à un Pin pendant un Parcours actif (depuis E2),
+      soit acceptation d'une notification de proximité en mode
+      Surprenez-moi (depuis E1).
+    acteurs: [utilisateur grand public]
+
+    deroule:
+      - etape: 1
+        action: >-
+          Bascule en P5.M3 (consultation approfondie). La Carte derrière
+          est temporairement cachée. La consultation occupe la surface
+          utile.
+        surfaces_actives: [P5.S1, P5.M3]
+      - etape: 2
+        action: >-
+          Le contenu se déploie en progression : mise en condition
+          d'ouverture, navigation entre Époques si le Pin est multi-époque
+          (cf. B3), accès aux contrôles audio si le Pin a une narration
+          audio (Média de type audio_narration), teaser de la zone
+          post-narrative si elle existe, récit principal avec contenus
+          complexes tissés (archives, citations, avant/après, puzzles,
+          'le saviez-vous', frise mini), Sources visibles sur chaque
+          archive et citation, accès conditionnel à la 3D/AR si le Pin
+          dispose d'un Modèle 3D (cf. B4), zone post-narrative en pied
+          si elle existe (cf. B6).
+      - etape: 3
+        action: >-
+          L'utilisateur lit, fait défiler, écoute, interagit. À tout moment
+          il peut activer le mode présentation sans chrome (P5.M4) — les
+          surfaces persistantes P1/P2/P3 passent en sommeil visuel
+          (P5.C2), le contenu reste, un point de retour minimal subsiste.
+
+    bifurcations:
+      - si: "L'utilisateur active la lecture audio"
+        alors: >-
+          La narration démarre. À la sortie de M3 (passage à une autre
+          surface, retour Carte, navigation latérale vers P5.S2 ou P5.S3),
+          la surface persistante de lecture audio P5.P1 apparaît et la
+          lecture continue selon D7.4 (canonique arrière-plan). Tap sur
+          P5.P1 ramène à B2 sur le Pin en cours de lecture.
+      - si: "L'utilisateur active l'accès à la 3D/AR (visible uniquement si Pin doté d'un Modèle 3D)"
+        alors: "bascule vers B4 (Accès à la consultation 3D)"
+      - si: "L'utilisateur tape une Époque alternative"
+        alors: "bascule vers B3"
+      - si: "L'utilisateur active le mode présentation"
+        alors: "bascule en P5.M4 sans étape de pile (P5.N4) ; retour gracieux ramène en B2 normal"
+      - si: "L'utilisateur active le contrôle favori"
+        alors: "bascule vers B7"
+      - si: "L'utilisateur active le contrôle de partage"
+        alors: "bascule vers F1"
+      - si: "L'utilisateur atteint la zone post-narrative (quiz / énigme / pins liés)"
+        alors: "bascule vers B6"
+      - si: "L'utilisateur active la section Commentaires"
+        alors: "bascule vers G1 (Consultation des commentaires)"
+      - si: "L'utilisateur active le signalement"
+        alors: "bascule vers G3 avec cible = Pin"
+      - si: "L'utilisateur active 'Pour aller plus loin' (lien externe d'une Source ou de la zone post-narrative)"
+        alors: "ouverture dans le navigateur du système (sortie hors-app — cf. palier 5 § 7)"
+      - si: "Retour"
+        alors: "retour à B1 si B2 a été ouvert depuis B1 (P5.N3) ; retour à P5.S1 Carte si B2 a été ouvert depuis F5 ou E1 ; retour au déroulé du Parcours (C5 ou C6) si B2 a été ouvert depuis E2"
+
+    sorties_normales:
+      - "Retour à B1, à la Carte, au Parcours en cours, ou à la source d'entrée externe"
+      - "Bascule vers B3, B4, B6, B7, F1, G1, G3"
+      - "Sortie en P5.M4 (mode présentation) puis retour gracieux"
+
+    cas_particuliers:
+      - cas: "Pin de provenance communautaire en cours de vérification (I3)"
+        comportement: "Marque distinctive visible dans la consultation, durable tant que la modération n'a pas confirmé. La consultation reste pleinement disponible."
+      - cas: "Connexion réseau indisponible et Pin non préchargé"
+        comportement: "Le récit textuel s'affiche s'il a été synchronisé. Les Médias volumineux non préchargés affichent un placeholder textuel. La narration audio n'est lançable que si l'audio a été préchargé. Bandeau P5.P3 signale le mode hors-ligne."
+      - cas: "Audio en cours de lecture sur un AUTRE Pin (P5.P1 actif) au moment où l'utilisateur entre en B2 sur ce Pin"
+        comportement: "Tap sur P5.P1 ramène à B2 du Pin de lecture. Démarrer une nouvelle lecture sur le Pin courant remplace la précédente — politique de remplacement à acter (cf. question ouverte D7.4 et D7.5)."
+      - cas: "App passée en arrière-plan pendant B2 avec audio en cours"
+        comportement: "P5.N7 — l'état est préservé. La lecture audio continue (D7.4). Au retour, B2 reprend exactement où il était."
+      - cas: "Mode présentation activé (P5.M4) — usage typique Mme Martin en classe ou Kenji en immersion"
+        comportement: "Toutes les surfaces persistantes (P5.P1, P5.P2, P5.P3) sont en sommeil visuel (P5.C2). L'audio en cours continue d'être audible. Sources et contextualisation restent visibles pour citation."
+      - cas: "Arrivée géolocalisée pendant un Parcours actif (depuis E2) — préférence par défaut"
+        comportement: "B2 s'ouvre en mode normal par défaut, pas en P5.M4 (recommandation D2.5). Une préférence du Profil peut basculer ce comportement."
+
+    entites_impliquees: [Pin, Catégorie, Époque, Source, Média, Badge, "Modèle 3D", "Fragment musical", Favori, "Historique de visite"]
+    surfaces_et_modes: [P5.S1, P5.M3, P5.M4, P5.P1, P5.P3, P5.N3, P5.N4, P5.C2, P5.N7]
+    references_palier_3: [D2.5, D2.6, D2.7, D7.1, D7.2, D7.3, D7.4, D7.5]
+    invariants_respectes: [I3, I4, I8]
+
+    questions_ouvertes:
+      - "Démarrer un nouvel audio pendant qu'un précédent joue : remplacement immédiat, confirmation, ou file ? (cf. D7.4 / D7.5 questions ouvertes)"
+      - "Activation du mode présentation : geste explicite ou point d'accès ? — palier 7"
+      - "Comportement audio pendant un basculement vers B4 puis B5 (l'audio narratif continue ou cède la place à une ambiance d'époque ?) — cf. D8.2 question ouverte"
+
+  # ---------------------------------------------------------------------------
+  - id: B3
+    nom: "Navigation entre couches temporelles d'un Pin multi-époque"
+
+    declencheur: >-
+      Sélection d'une Époque alternative depuis B1 ou B2, sur un Pin
+      associé à plusieurs Époques (instanciation locale de I8).
+    acteurs: [utilisateur grand public]
+
+    pre_requis_specifiques:
+      - "Pin associé à au moins 2 Époques avec contenu narratif distinct par Époque"
+
+    deroule:
+      - etape: 1
+        action: >-
+          L'utilisateur tape une Époque alternative dans la navigation
+          multi-époque (présente uniquement pour les Pins multi-époque).
+          La surface courante (B1 ou B2) reste ouverte — pas de
+          rechargement de Pin, pas de perte de contexte.
+      - etape: 2
+        action: >-
+          Le contenu affiché bascule sur la couche temporelle correspondante :
+          titre de la couche, teaser ou récit complet de cette Époque,
+          Médias spécifiques à cette Époque, Sources spécifiques à cette
+          Époque. Les contenus complexes tissés (D2.6) sont propres à
+          cette couche.
+      - etape: 3
+        action: >-
+          L'utilisateur peut continuer à naviguer librement entre les
+          Époques disponibles sans quitter B1 ou B2.
+
+    bifurcations:
+      - si: "L'utilisateur tape une autre Époque alternative"
+        alors: "B3 se rejoue sur la nouvelle Époque ; pas de re-empilement"
+      - si: "L'utilisateur active 'voir plus' depuis B1 sur la couche courante"
+        alors: "bascule vers B2 ouvert sur la même couche temporelle (la pré-sélection est conservée — cf. D2.3)"
+      - si: "L'utilisateur active la lecture audio sur la couche courante"
+        alors: "la narration démarre sur la couche affichée ; comportement audio identique à B2"
+      - si: "L'utilisateur referme la surface (B1 ou B2)"
+        alors: "sortie normale du flow appelant ; la dernière Époque consultée n'est PAS mémorisée comme préférence du Profil (à confirmer — cf. questions ouvertes)"
+
+    sorties_normales:
+      - "Reprise de B1 ou B2 sur la couche temporelle sélectionnée"
+      - "Bascule vers B2 sur la même couche depuis B1"
+
+    cas_particuliers:
+      - cas: "Pré-sélection à l'ouverture (depuis B1 ou B2)"
+        comportement: "La couche temporelle pré-sélectionnée à l'ouverture est celle pointée par le slider d'Époque (D1.2) si elle a du contenu pour ce Pin, sinon la première Époque disponible (cf. D2.3)."
+      - cas: "Mode 'Aujourd'hui' du slider (vue cumulée — cf. D1.2)"
+        comportement: "La pré-sélection se cale sur l'Époque la plus récente du Pin avec contenu. La marque distinctive multi-époque sur la Carte reste à arbitrer (question ouverte D2.3)."
+      - cas: "Couche temporelle dont le contenu narratif est en brouillon ou en cours de validation (Pin éditorial)"
+        comportement: "La couche n'apparaît PAS dans la navigation tant que cette Époque n'a pas de contenu publié. Pas de couche grisée."
+
+    entites_impliquees: [Pin, Époque, Média, Source]
+    surfaces_et_modes: [P5.M2, P5.M3]
+    references_palier_3: [D2.3, D1.2]
+    invariants_respectes: [I8]
+
+    questions_ouvertes:
+      - "Mémoriser la dernière Époque consultée par Pin dans le Profil ou repartir systématiquement de la pré-sélection slider ? — à arbitrer"
+      - "B3 est-il un flow distinct ou une simple action interne de B1/B2 ? Maintenu distinct ici car l'absence de re-empilement et la pré-sélection slider sont des comportements non triviaux ; à fusionner avec B1/B2 si cela s'avère redondant en palier 7"
+
+  # ---------------------------------------------------------------------------
+  - id: B4
+    nom: "Accès à la consultation 3D/AR d'un Pin"
+
+    declencheur: "Tap sur le point d'accès 3D depuis B2, sur un Pin doté d'un Modèle 3D."
+    acteurs: [utilisateur grand public]
+
+    pre_requis_specifiques:
+      - "Pin doté d'au moins un Modèle 3D validé scientifiquement"
+
+    deroule:
+      - etape: 1
+        action: >-
+          Le point d'accès 3D n'apparaît dans B2 QUE si le Pin a un Modèle
+          3D disponible (D8.1 — apparition conditionnelle, pas de version
+          grisée).
+      - etape: 2
+        action: >-
+          L'activation déclenche le chargement du Modèle 3D et bascule en
+          P5.M3 sur la consultation 3D immersive (qui s'inscrit dans la
+          famille du mode présentation P5.M4 — cf. D8.2).
+        surfaces_actives: [P5.M3, P5.M4]
+      - etape: 3
+        action: >-
+          Le Modèle 3D occupe l'espace principal. Le chrome non-essentiel
+          est masqué. Une contextualisation reste accessible (titre du
+          Modèle, Époque recréée, Sources). Les surfaces persistantes
+          P5.P1 / P5.P2 / P5.P3 sont en sommeil visuel (P5.C2).
+      - etape: 4
+        action: "L'utilisateur peut manipuler le Modèle (rotation, rapprochement, éloignement). Sortie possible vers B5 (bascule AR) ou retour à B2."
+
+    bifurcations:
+      - si: "L'utilisateur active la bascule AR (visible uniquement si contenu AR existe ET terminal compatible AR)"
+        alors: "bascule vers B5 (Consultation AR)"
+      - si: "L'utilisateur retourne à la consultation approfondie"
+        alors: "retour à B2 du Pin (P5.N3, sortie de P5.M4)"
+      - si: "L'utilisateur active le partage depuis la consultation 3D"
+        alors: "bascule vers F1 (Partage du Pin) — la consultation 3D reste en arrière (à confirmer en palier 7)"
+
+    sorties_normales:
+      - "Retour à B2"
+      - "Bascule vers B5"
+
+    cas_particuliers:
+      - cas: "Plusieurs Modèles 3D rattachés au même Pin (différents états ou différentes Époques — D8.4)"
+        comportement: "Une sélection préalable du Modèle est proposée ; la consultation s'ouvre sur le Modèle choisi. Si la sélection se cale sur l'Époque courante du slider, comportement à arbitrer (cf. question ouverte D8.4)."
+      - cas: "Audio narratif du Pin en cours de lecture au moment de B4"
+        comportement: "Comportement audio à acter (cf. D8.2 question ouverte) : continuation de la narration, remplacement par une ambiance d'époque, ou silence. À défaut, l'audio narratif continue selon D7.4."
+      - cas: "Connexion réseau indisponible et Modèle 3D non préchargé"
+        comportement: "Message éphémère P5.M9 ('reconstitution non disponible hors ligne') ; retour à B2. Politique de préchargement à acter en palier 13 / palier 16."
+      - cas: "Terminal aux ressources insuffisantes pour rendre le Modèle de manière fluide"
+        comportement: "À arbitrer avec le dev 3D/VR : fallback vers une version simplifiée du Modèle, ou pré-rendu vidéo, ou message gracieux. Pas de blocage de B2."
+
+    entites_impliquees: [Pin, "Modèle 3D", Époque, Source]
+    surfaces_et_modes: [P5.M3, P5.M4, P5.C2, P5.N3]
+    references_palier_3: [D8.1, D8.2]
+    invariants_respectes: []
+
+    questions_ouvertes:
+      - "Sélection du Modèle 3D quand plusieurs sont attachés au même Pin — flow dédié ou intégré à B4 ?"
+      - "Politique audio pendant B4 (continuation, remplacement, silence) — cf. D8.2"
+
+  # ---------------------------------------------------------------------------
+  - id: B5
+    nom: "Consultation 3D immersive et basculement AR"
+
+    declencheur: "Activation de la bascule AR depuis B4 (Modèle 3D doté d'un contenu AR ET terminal compatible AR)."
+    acteurs: [utilisateur grand public]
+
+    pre_requis_specifiques:
+      - "Modèle 3D doté d'un contenu AR (ancrage_géographique renseigné côté production — cf. D8.4)"
+      - "Terminal compatible AR (capacité détectée par l'app)"
+
+    deroule:
+      - etape: 1
+        action: >-
+          Si la permission caméra n'a pas encore été accordée, le flow A6
+          (Demande de permission juste-à-temps) est déclenché pour la
+          permission caméra (canonique D5.5).
+      - etape: 2
+        action: >-
+          Si la permission est accordée (ou déjà accordée), la vue caméra
+          du téléphone s'active. Le Modèle 3D est superposé à la vue
+          réelle. Quand l'utilisateur est sur place (à proximité de la
+          localisation du Pin et géolocalisation accordée), le Modèle
+          tente de s'ancrer à l'emplacement attendu (le pin du lieu).
+        surfaces_actives: [P5.M3, P5.M4]
+      - etape: 3
+        action: >-
+          L'utilisateur bouge autour du Modèle, change d'angle, s'approche.
+          La contextualisation (titre, Époque, Sources) reste accessible
+          discrètement. Les surfaces persistantes restent en sommeil
+          visuel (P5.C2).
+      - etape: 4
+        action: "L'utilisateur peut revenir à B4 (consultation 3D sans caméra) ou directement à B2."
+
+    bifurcations:
+      - si: "Permission caméra accordée"
+        alors: "la superposition AR s'active"
+      - si: "Permission caméra refusée"
+        alors: "retour propre à B4 (consultation 3D), aucun message culpabilisant, aucune dégradation perçue (D8.3)"
+      - si: "L'utilisateur retourne à la consultation 3D"
+        alors: "retour à B4 ; la caméra est libérée"
+      - si: "L'utilisateur retourne à la consultation approfondie"
+        alors: "retour à B2 ; la caméra est libérée et le Modèle 3D fermé"
+
+    sorties_normales:
+      - "Retour à B4 ou à B2"
+      - "Refus de permission caméra → retour à B4"
+
+    cas_particuliers:
+      - cas: "Permission caméra refusée définitivement (réglages OS) au moment du basculement"
+        comportement: "L'app détecte le refus système, ne propose pas la bascule AR (cf. D8.3 — pas de message culpabilisant). Retour à B4."
+      - cas: "Utilisateur PAS sur place (loin de la localisation du Pin)"
+        comportement: "La superposition AR reste fonctionnelle dans l'environnement actuel mais l'ancrage géographique exact n'est pas garanti (cf. D8.3 question ouverte)."
+      - cas: "Géolocalisation non accordée alors que l'utilisateur est sur place"
+        comportement: "L'ancrage géographique précis est dégradé (suivi visuel seul, sans recalage GPS). Pas de bascule de l'expérience ; message éphémère P5.M9 'précision réduite' optionnel."
+      - cas: "Conflit avec un parcours en cours (P5.P2 actif) sur une étape différente"
+        comportement: "Aucune action de progression du Parcours pendant B5. P5.P2 reste en sommeil visuel (P5.C2). Au retour de B5, le Parcours reprend où il était."
+      - cas: "Connexion réseau indisponible et contenu AR non préchargé"
+        comportement: "La bascule AR n'est pas proposée ; retour silencieux à B4."
+      - cas: "App passée en arrière-plan pendant B5"
+        comportement: "La caméra est libérée par l'OS (politique système). Au retour, B5 doit recharger ou repropose explicitement la bascule AR — comportement à acter."
+
+    entites_impliquees: [Pin, "Modèle 3D"]
+    surfaces_et_modes: [P5.M3, P5.M4, P5.C2]
+    references_palier_3: [D8.2, D8.3, D5.5, D1.1]
+    invariants_respectes: []
+
+    questions_ouvertes:
+      - "Reprise après mise en arrière-plan pendant B5 (recharger automatiquement ou requérir une re-activation explicite ?)"
+      - "Comportement quand l'utilisateur est à distance du Pin : superposition libre dans l'environnement courant, ou fallback en B4 sans caméra ? — cf. D8.3"
+
+  # ---------------------------------------------------------------------------
+  - id: B6
+    nom: "Engagement post-narratif"
+
+    declencheur: >-
+      Atteinte de la zone post-narrative d'un Pin pendant B2 (zone
+      séparée du récit principal par une frontière nette), ou tap sur
+      le teaser de la zone post-narrative présenté en haut de B2.
+    acteurs: [utilisateur grand public]
+
+    pre_requis_specifiques:
+      - "Pin doté d'une zone post-narrative non vide (au moins l'un parmi : quiz, énigme, lien externe 'Pour aller plus loin', ou ≥ 1 Pin lié)"
+
+    deroule:
+      - etape: 1
+        action: >-
+          La zone post-narrative s'affiche avec ses contenus disponibles :
+          quiz (questions sur le récit), énigme (texte ouvert,
+          observationnelle, sans validation automatique), liens 'Pour
+          aller plus loin' (sources externes ou pages web officielles),
+          Pins liés (suite de l'histoire, proximité géographique, thème).
+          Aucun de ces 4 types n'est obligatoire pour un Pin.
+        surfaces_actives: [P5.M3]
+      - etape: 2
+        action: >-
+          L'utilisateur interagit selon ce qui l'intéresse — répondre au
+          quiz, lire l'énigme, suivre un lien, sauter sur un Pin lié.
+
+    bifurcations:
+      - si: "L'utilisateur répond au quiz et le valide"
+        alors: "le score est enregistré dans l'Historique de visite (D6.3) ; la consultation reste en B6 ou retourne à B2"
+      - si: "L'utilisateur tape un Pin lié"
+        alors: "bascule récursive vers B1 sur le nouveau Pin (la pile préserve l'origine — retour ramène à B6 sur le Pin de départ)"
+      - si: "L'utilisateur tape un lien 'Pour aller plus loin'"
+        alors: "ouverture dans le navigateur du système (sortie hors-app)"
+      - si: "L'utilisateur retourne au récit principal"
+        alors: "retour à B2 sur la position antérieure"
+
+    sorties_normales:
+      - "Retour à B2"
+      - "Bascule récursive vers B1 sur un Pin lié"
+      - "Sortie hors-app vers le navigateur du système"
+
+    cas_particuliers:
+      - cas: "Parcours actif en cours et arrivée à une étape (depuis E2)"
+        comportement: >-
+          La liste des Pins liés est REMPLACÉE par l'accès à l'étape
+          suivante du Parcours en pied de consultation (cf. D2.7 et
+          D3.10). Quiz, énigme et liens externes restent disponibles.
+      - cas: "Quiz déjà répondu lors d'une visite antérieure (présent dans l'Historique)"
+        comportement: "L'app peut signaler que le quiz a déjà été fait avec son score, et permettre de le rejouer. La politique exacte (afficher ancien score ? réinitialiser ?) est à arbitrer en lien avec D6.3."
+      - cas: "Pin lié dont la cible a été retirée entre temps (cycle de vie 'retiré')"
+        comportement: "Tap → message gracieux P5.M9 ('ce contenu n'est plus disponible') ; B6 reste en place."
+      - cas: "Mode présentation actif (P5.M4)"
+        comportement: "Les contenus post-narratifs restent visibles. Les liens externes ouvrent le navigateur du système ce qui sort de l'app — à arbitrer si M4 doit suspendre cette possibilité (peu probable, M4 ne bloque pas les actions)."
+
+    entites_impliquees: [Pin, "Historique de visite", Média]
+    surfaces_et_modes: [P5.M3, P5.M4]
+    references_palier_3: [D2.7, D3.10, D6.3]
+
+    questions_ouvertes:
+      - "Politique de re-jeu du quiz et persistance des résultats (un score historique ou une série de tentatives ?) — relève de D6.3 / cluster 03"
+      - "Algorithme de génération des Pins liés (manuel par Anaïs, automatique catégorie/époque/distance, ou mixte) — cf. D2.7 question ouverte"
+
+  # ---------------------------------------------------------------------------
+  - id: B7
+    nom: "Marquage d'un Pin en favori"
+
+    declencheur: "Tap sur le contrôle favori durant B1 ou B2."
+    acteurs: [utilisateur grand public]
+
+    deroule:
+      - etape: 1
+        action: >-
+          L'utilisateur active le contrôle favori. L'action est instantanée
+          et n'interrompt PAS le flow appelant (B1 ou B2 reste actif).
+      - etape: 2
+        action: >-
+          Une entrée Favori est créée localement et rattachée au Profil
+          (cluster 03 — favoris locaux par défaut, cf. I6). Si un Compte
+          existe ET que la synchronisation des Favoris est activée, le
+          Favori est synchronisé en arrière-plan (cf. D8 du cluster 04
+          flows profil pour la sync).
+      - etape: 3
+        action: "Un message éphémère P5.M9 confirme silencieusement le marquage. Le contrôle favori reflète l'état marqué."
+
+    bifurcations:
+      - si: "L'utilisateur tape de nouveau le contrôle favori (action de retrait)"
+        alors: "le Favori est retiré du Profil ; message éphémère P5.M9 confirme le retrait"
+
+    sorties_normales:
+      - "Reprise immédiate de B1 ou B2 — l'utilisateur n'est jamais déplacé"
+
+    cas_particuliers:
+      - cas: "Connexion réseau indisponible alors qu'un Compte avec sync active est attaché"
+        comportement: "Le Favori est créé localement de manière fiable. La synchronisation est mise en attente et tentée au retour de la connexion. P5.P3 signale le mode hors-ligne mais B7 ne bloque pas."
+      - cas: "Pin retiré (cycle de vie 'retiré') alors qu'il était favorisé"
+        comportement: "Le Favori est CONSERVÉ côté Profil avec mention 'contenu indisponible' (à confirmer en cluster 03 flow D2 — Consultation des favoris). B7 ne purge pas automatiquement."
+      - cas: "Marquage depuis B1 puis approfondissement vers B2"
+        comportement: "L'état marqué est immédiatement reflété dans B2 (le contrôle favori dans B2 est cohérent avec celui de B1). Pas de conflit d'état."
+
+    entites_impliquees: [Pin, Profil, Favori, Compte]
+    surfaces_et_modes: [P5.M2, P5.M3, P5.M9, P5.P3]
+    references_palier_3: [D6.2]
+    invariants_respectes: [I6]
+
+    questions_ouvertes:
+      - "Limite max de Favoris par Profil (utile à acter en palier 16 ou laisser non borné ?) — relève de cluster 03"
+      - "Politique exacte sur Favoris pointant vers un Pin retiré : conservation avec marque, ou purge silencieuse ? — relève de cluster 03 flow D2"
+
+# -----------------------------------------------------------------------------
+# Persona check
+# -----------------------------------------------------------------------------
+persona_check:
+
+  kenji:
+    impact: "MAJEUR"
+    note: >-
+      B2 sert son scénario type — marche dans le Vieux Lyon avec son
+      casque, audio narratif lancé, mode présentation P5.M4 pour
+      immersion sans chrome. La surface persistante P5.P1 (audio en
+      arrière-plan, D7.4 canonique) lui permet de continuer l'écoute
+      en passant à un autre Pin ou en rangeant son téléphone. B5 (AR)
+      est l'argument qu'il rapportera au Japon — la révélation devant
+      un édifice. B6 (Pins liés) lui permet d'enchaîner sur une
+      découverte voisine sans friction. B7 (favori) est rapide et
+      n'interrompt pas son flux.
+
+  mme_dupont:
+    impact: "direct"
+    note: >-
+      B2 et B6 servent la préparation de sa sortie scolaire — elle
+      consulte les Pins, lit les quiz adaptés CM1-CM2, marque en
+      favori (B7) ceux qu'elle veut intégrer dans son Parcours
+      personnel (cf. C11). L'accès 'Ajouter au parcours' depuis B1
+      pendant la création (cf. C12) lui permet d'enrichir le Parcours
+      d'un seul geste. B3 (multi-époque) lui permet de varier les
+      registres dans une même sortie.
+
+  mme_martin:
+    impact: "MAJEUR"
+    note: >-
+      B2 + P5.M4 (mode présentation) répond directement à son test_litmus
+      'mode plein écran propre, sans chrome'. Toutes les Sources
+      restent visibles pour citation devant ses élèves. B3
+      (multi-époque) sert son scénario Bellecour — Antiquité / XVIIIe /
+      Aujourd'hui projetés successivement. B5 n'est pas son scénario
+      principal en classe (l'AR demande une caméra active, peu
+      pertinent pour projection) ; B4 (3D immersive en P5.M4) suffit.
+      La règle P5.C2 garantit qu'aucune surface persistante ne perturbe
+      la projection.
+
+  pere_lyonnais:
+    impact: "MAJEUR"
+    note: >-
+      B1 (aperçu rapide) répond à son besoin 'lire avant que les
+      enfants ne le tirent par la manche' — la Carte reste visible
+      derrière, retour gracieux d'un geste. B2 si le temps permet.
+      B3 sur sa rue préférée (multi-époque) produit le moment
+      d'émerveillement. B5 (AR) sur sa rue : 'voilà ce qui était là'
+      — sa citation persona. B7 lui permet de marquer ses pépites
+      dominicales pour y revenir.
+
+  anais_back_office:
+    impact: "indirect"
+    note: >-
+      Anaïs n'utilise pas ce cluster directement en tant qu'utilisatrice
+      grand public, mais elle PRODUIT tout le contenu consommé ici
+      (D2.5, D2.6, D2.7, D8.4). Indirectement, les flows B1-B7 sont
+      ce qu'elle PRÉVISUALISE depuis le back-office (cf. test_litmus
+      d'Anaïs sur la prévisualisation, palier 13). La marque
+      distinctive (I3) sur les Pins communautaires en cours de
+      vérification visible dans B1 et B2 lui sert de signal opérationnel
+      quand elle modère (flow H4).

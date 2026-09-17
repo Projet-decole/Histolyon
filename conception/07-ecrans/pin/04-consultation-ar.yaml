@@ -1,0 +1,73 @@
+# =============================================================================
+# E-PIN-CONSULTATION-AR — Superposition AR d'un Modèle 3D
+# =============================================================================
+# Surface en P5.M4 (mode présentation natif) qui superpose un Modèle 3D
+# ancré géographiquement à la vue de la caméra, à l'emplacement réel du
+# Pin. Permission caméra requise. Variante immersive de la consultation
+# 3D — entrée depuis E-PIN-CONSULTATION-3D via le flow B5.
+# =============================================================================
+
+document:
+  type: palier_ecrans_fiche
+  format: yaml
+
+ecran:
+  id: E-PIN-CONSULTATION-AR
+  nom: "Superposition AR d'un Modèle 3D"
+
+  mode: P5.M4
+  surface_parente: P5.S1
+
+  raison_d_etre: >-
+    Permettre à l'utilisateur de voir une reconstitution historique
+    superposée à l'emplacement réel via la caméra du terminal —
+    « voir le Forum romain de Lugdunum à l'endroit même où il se
+    tenait ». C'est l'aboutissement du couple 3D + géolocation : la
+    matière du passé prend place dans la rue d'aujourd'hui. Mode
+    présentation natif (M4) car aucun chrome ne doit interférer
+    avec le calage AR.
+
+  composition:
+    - zone: "vue caméra avec superposition AR"
+      role: "occupe la totalité de la surface ; le Modèle 3D est ancré géographiquement à l'emplacement du Pin (cf. cluster 01 Modèle 3D.ancrage_géographique) et reste calé au mouvement du terminal (mécanique technique relève palier 16)"
+      entites_affichees: ["Modèle 3D", Pin]
+
+    - zone: "indicateur de calage"
+      role: "informe discrètement de l'état du calage (recherche, calé, perdu) sans gêner la lecture du Modèle ; aide l'utilisateur à se positionner correctement"
+
+    - zone: "point d'accès Sources"
+      role: "rappel discret des Sources qui justifient la fidélité de la reconstitution (I4 instancié pour Modèle 3D) ; reste accessible mais ne perturbe pas l'immersion"
+      entites_affichees: [Source]
+
+    - zone: "point de retour"
+      role: "retour à E-PIN-CONSULTATION-3D (sortie du mode AR avec libération de la caméra) ; seul élément de chrome maintenu"
+
+  etats:
+    nominal_cale: "Modèle 3D superposé et calé sur la vue caméra ; l'utilisateur peut bouger autour pour observer sous différents angles"
+    recherche_du_calage: "Système AR en cours de calibration ; indicateur invitant l'utilisateur à bouger doucement le terminal pour aider le calage ; le Modèle peut apparaître provisoirement décalé"
+    calage_perdu: "Le système AR a perdu sa référence (changement brutal de luminosité, mouvement trop rapide, scène pauvre en repères) ; invitation gracieuse à reprendre la calibration ; pas de blocage"
+    chargement: "Modèle 3D en cours de téléchargement ou d'initialisation AR ; vue caméra active, Modèle invisible jusqu'au chargement complet"
+    permission_camera_refusee: "Cas anormal car la permission est demandée juste avant cette surface (flow A6) ; si refusée, retour à E-PIN-CONSULTATION-3D avec message éphémère P5.M9"
+    terminal_non_compatible_ar: "Cas anormal car le point d'accès AR n'aurait pas dû être visible ; sécurité — message gracieux et retour"
+    pas_d_ancrage_geographique: "Cas anormal car la 3D ne propose pas l'AR si le Modèle n'a pas d'ancrage ; sécurité"
+    eloignement_de_la_position_reelle: "L'utilisateur n'est pas à proximité du lieu d'ancrage ; message gracieux invitant à se rapprocher OU à utiliser la consultation 3D décontextualisée (E-PIN-CONSULTATION-3D)"
+    luminosite_insuffisante: "Conditions d'éclairage médiocres rendant le calage difficile ; message gracieux suggérant de revenir en plein jour"
+
+  elements_interactifs:
+    - "Mouvement physique du terminal pour observer le Modèle sous différents angles (interaction propre à l'AR — pas de gestes de manipulation 3D)"
+    - "Tap sur le point d'accès Sources → affichage des Sources sur une couche superposée discrète"
+    - "Retour → libération de la caméra et des ressources AR, bascule vers E-PIN-CONSULTATION-3D"
+
+  flows_actifs:
+    - B5   # Consultation 3D immersive et basculement AR (cet écran instancie la phase AR)
+    - A6   # Demande de permission caméra — déclenchée juste avant l'entrée sur cet écran si non encore accordée
+
+  surfaces_imbriquees:
+    - E-PIN-CONSULTATION-3D              # cible du retour de M4
+    - E-TRANSVERSES-MESSAGE-EPHEMERE     # M9 pour erreurs ponctuelles (calage perdu, éloignement, etc.)
+
+  questions_ouvertes:
+    - "Politique audio pendant l'AR (continuation de la narration du Pin, Fragment musical d'ambiance d'époque, silence) — analogue à E-PIN-CONSULTATION-3D ; recommandation : silence par défaut pour ne pas perturber la captation environnementale (cf. D8.2 / D8.3)"
+    - "Comportement quand l'utilisateur s'éloigne pendant la consultation AR (Pin reste-t-il actif tant qu'il est dans le rayon, ou retombe-t-il à un certain seuil ?) — relève palier 16"
+    - "Variantes esthétiques de la superposition (rendu réaliste, schématique, transparent fantôme) — palier 9 / 10 ; ne change pas la modélisation"
+    - "Capture / partage d'une vue AR (photo Modèle + caméra) — non couvert , mais à signaler comme évolution naturelle de F3 — relève palier futur"

@@ -1,0 +1,222 @@
+# =============================================================================
+# Palier 14 — 03 Code visuel imprimable
+# =============================================================================
+# Composition de l'artefact imprimable : le code lui-même, son accompagnement
+# textuel (rappel de la cible, lien universel en clair), formats d'export,
+# lisibilité physique. C'est le code une fois sorti de l'app — sur la feuille
+# distribuée par Mme Dupont aux six parents accompagnateurs, sur le panneau
+# de l'office du tourisme, sur l'affiche en classe.
+#
+# Le palier 3 D11.3 a posé la matière fonctionnelle (encode le même Lien que
+# D11.1, scan = comportement identique au lien, sobre, pas de variantes
+# décoratives). Le palier 7 partage/01-code-visuel.yaml a posé l'écran
+# d'app qui présente le code au moment de la génération. Ce fichier décrit
+# l'OBJET imprimé / scanné dans la vie physique.
+# =============================================================================
+
+document:
+  type: palier_surfaces_hors_app_artefact
+  artefact: code_visuel_imprimable
+  numero: 14
+  fichier_id: "03"
+  version: "0.2"
+  date: "2026-05-07"
+  format: yaml
+  prerequis_de_lecture:
+    - "design/conception/14-surfaces-hors-app/00-index.yaml"
+    - "design/conception/14-surfaces-hors-app/01-lien-universel.yaml — le code encode le lien"
+    - "design/conception/03-fonctionnalites/11-surfaces-hors-app.yaml — D11.3 (matière fonctionnelle)"
+    - "design/conception/07-ecrans/partage/01-code-visuel.yaml — écran générateur côté app"
+    - "design/conception/06-flows/06-partage.yaml — F4 (génération)"
+
+# -----------------------------------------------------------------------------
+# 1. Raison d'être
+# -----------------------------------------------------------------------------
+raison_d_etre: >-
+  Le palier 3 D11.3 dit ce que le Code visuel FAIT (encode le Lien
+  universel D11.1, scan = comportement identique, sobre, lisible
+  imprimé). Le palier 7 dit où dans l'app il est généré et présenté.
+  Ce fichier dit comment l'artefact se présente dans la vie physique :
+  ce qui apparaît à côté du code sur la feuille distribuée, comment
+  il survit à une photocopie, ce qu'on imprime quand on tape sur
+  'enregistrer' ou 'imprimer' depuis l'écran générateur.
+
+# -----------------------------------------------------------------------------
+# 2. Héritage palier 3 D11.3 — par référence, pas redit
+# -----------------------------------------------------------------------------
+heritage_palier_3:
+  reference: "design/conception/03-fonctionnalites/11-surfaces-hors-app.yaml § D11.3"
+  ce_qui_est_deja_pose:
+    - "Capabilités (générer, encoder le Lien, rester lisible imprimé, sobriété visuelle)"
+    - "Règles fonctionnelles (encode le même Lien D11.1, scan = comportement identique, sobre, pas de code alphanumérique parallèle)"
+    - "Ce qu'on ne fait pas (pas de promotion, pas de variantes décoratives par catégorie, pas de comportement de scan différent du lien)"
+    - "Critères de réussite (Mme Dupont feuille pour parents, lisibilité imprimé / photocopié, panneau OT)"
+    - "Definition of Done D11.3"
+    - "Enjeux transversaux (accessibilité — lien universel doit accompagner le code quand le support physique le permet, sobriété)"
+  questions_ouvertes_d11_3_a_arbitrer_ici:
+    - "Une mention textuelle du Lien universel accompagne-t-elle le code (a11y) ? — TRANCHÉE en SHA-CODE-COMPOSITION"
+    - "Une note d'instruction ('Scannez avec votre téléphone') accompagne-t-elle le code ? — TRANCHÉE en SHA-CODE-COMPOSITION"
+
+# -----------------------------------------------------------------------------
+# 3. Décisions structurelles propres au fichier 03
+# -----------------------------------------------------------------------------
+decisions_structurelles:
+
+  - id: D-CODE-1
+    decision: "Le Lien universel en clair accompagne SYSTÉMATIQUEMENT le code visuel à l'export"
+    pourquoi: >-
+      Tranche la question ouverte D11.3 enjeu accessibilité. Un destinataire
+      qui ne peut pas scanner (déficience visuelle l'empêchant de cadrer,
+      téléphone sans appareil photo, code abîmé, photocopie de mauvaise
+      qualité) doit pouvoir taper le lien à la main. Le format court et
+      lisible du lien (SHA-LIEN-FORME fichier 01) le rend tapable.
+
+  - id: D-CODE-2
+    decision: "Une note d'instruction courte accompagne SYSTÉMATIQUEMENT le code à l'export"
+    pourquoi: >-
+      Tranche la question ouverte D11.3 / écran 07 partage/01-code-visuel.
+      Sur un panneau d'office du tourisme ou une feuille distribuée à
+      des parents qui ne sont pas familiers du procédé, l'instruction
+      réduit la friction. Phrasé exact palier 8 (cluster transverse
+      'instruction code visuel'). Court, neutre — pas un slogan.
+
+  - id: D-CODE-3
+    decision: "Trois zones systématiques à l'export — code, rappel de la cible, accompagnement (lien clair + instruction)"
+    pourquoi: >-
+      Cohérence inter-export. Quel que soit le format d'export choisi
+      (image, vectoriel, PDF), ces trois zones sont présentes dans le
+      même ordre. L'utilisateur peut découper la zone code seule s'il
+      préfère un usage minimal — c'est son choix, mais l'export par
+      défaut inclut les trois.
+    frontiere_palier_7: >-
+      L'écran palier 7 partage/01-code-visuel.yaml présente le code à
+      l'utilisateur générateur — il peut afficher la zone code seule
+      en prévisualisation à l'écran (la zone rappel et la zone
+      accompagnement n'ont pas leur place dans la consultation rapide
+      sur petit écran avant export). La distinction rendu_ecran vs
+      export est donc : rendu_ecran = zone code + métadonnées d'écran
+      (palier 7) ; export = trois zones systémiques (palier 14).
+      Pas de double emploi.
+
+  - id: D-CODE-4
+    decision: "Formats d'export acceptés — image bitmap (PNG / JPG) et vectoriel (SVG ou PDF)"
+    pourquoi: >-
+      Image bitmap pour partage rapide (envoyé par messagerie ou intégré
+      dans un document Word). Vectoriel pour impression à grande échelle
+      sans perte (panneau OT, affiche A3). Le choix exact entre SVG et
+      PDF relève de l'implémentation et de ce que les canaux de partage
+      acceptent — décision finale à acter en palier 16 sur retours
+      d'usage. Note pour mémoire.
+
+  - id: D-CODE-5
+    decision: "Apparence VISUELLEMENT INVARIANTE — pas de variante par catégorie, pas de variante par parcours"
+    pourquoi: >-
+      Héritage strict D11.3 ce_qu_on_ne_fait_pas. Réaffirmé ici parce
+      que la tentation d'inclure ICON-CAT-X (catégorie du Pin) au
+      centre du code visuel est concrète mais doit être écartée. Le
+      code reste sobre, identique pour tous les Pins et tous les
+      Parcours. La cible est rappelée par le texte d'accompagnement,
+      pas par une décoration au centre du code.
+
+# -----------------------------------------------------------------------------
+# 4. Fiches d'artefact
+# -----------------------------------------------------------------------------
+artefacts:
+
+  # ===========================================================================
+  - id: SHA-CODE-COMPOSITION
+    nom: "Composition d'export du code visuel"
+
+    raison_d_etre: >-
+      Définit la mise en page de l'artefact final : ce qui est imprimé
+      sur la feuille distribuée, le panneau, l'affiche. Trois zones
+      systématiques (D-CODE-3) dans un ordre stable.
+
+    composition_destinataire_centree:
+      zone_1_code:
+        role: "Le code visuel scannable qui encode le Lien universel"
+        apparence: "Visuellement invariant (D-CODE-5) — pas de catégorie, pas de logo intégré au centre, pas de couleur autre que TOK-COLOR-TEXTE-PRINCIPAL palier 12 sur fond TOK-COLOR-FOND-PRINCIPAL palier 12 (ou monochrome strict si l'export l'exige)"
+        position: "Centré, dimension privilégiant la lisibilité (la zone occupe la majorité de la composition)"
+        marge_de_silence:
+          principe: >-
+            Une marge claire entoure le code pour que les scanners le
+            détectent fiablement. Cette marge fait partie de la composition
+            et n'est pas écrasable par un cadrage manuel.
+      zone_2_rappel_cible:
+        role: "Rappel discret de la cible (titre du Pin ou du Parcours, et son type)"
+        apparence: "TOK-TYPO-UI-MDpalier 12, taille modérée, TOK-COLOR-TEXTE-PRINCIPAL palier 12, alignement cohérent avec la zone code"
+        position: "Au-dessus du code (forme accroche) ou en-dessous (forme légende) — choix d'implémentation cohérent dans tout l'export"
+        contenu: "Microcopy palier 8 cluster 'rappel cible code visuel' — court, factuel"
+      zone_3_accompagnement:
+        role: "Lien universel en clair (D-CODE-1) + instruction courte (D-CODE-2)"
+        apparence: "TOK-TYPO-UI-XS palier 12, TOK-COLOR-TEXTE-SECONDAIRE palier 12 — discret mais lisible"
+        position: "Sous le code, en pied de la composition"
+        contenu:
+          - "Le Lien universel en clair (sélectionnable et tapable — héritage D-CODE-1)"
+          - "Instruction courte palier 8 cluster transverse 'instruction code visuel'"
+
+    apparence_marque:
+      principe: >-
+        La signature HistoLyon (logo palier 14 fichier 07) PEUT
+        apparaître discrètement dans l'export. Choix par défaut : NON
+        (sobriété stricte, héritage D11.3 ce_qu_on_ne_fait_pas 'pas
+        de logo géant'). Cas d'usage où le logo apparaît : panneau
+        d'office du tourisme où la marque émettrice est explicitement
+        attendue. Ce cas relève d'un EXPORT VARIANTE optionnel, hors
+        export par défaut. Référence fichier 07.
+
+    consommation_paliers_amont:
+      tokens_palier_12: "TOK-COLOR-TEXTE-PRINCIPAL (code), TOK-COLOR-FOND-PRINCIPAL (fond), TOK-COLOR-TEXTE-PRINCIPAL (rappel cible), TOK-COLOR-TEXTE-SECONDAIRE (accompagnement), TOK-TYPO-UI-MD, TOK-TYPO-UI-XS, TOK-SPACE-X (marges, espacement entre zones)"
+      icones_palier_13: "Aucune icône (cohérent D-CODE-5 apparence invariante)"
+      microcopy_palier_8: "Cluster 'rappel cible code visuel' + cluster transverse 'instruction code visuel'"
+
+  # ===========================================================================
+  - id: SHA-CODE-LISIBILITE-PHYSIQUE
+    nom: "Survie de l'artefact à l'impression et à la photocopie"
+
+    raison_d_etre: >-
+      Critère de réussite D11.3 : le code reste scannable même imprimé
+      en petit format ou photocopié une fois. Cette fiche pose les
+      contraintes systémiques qui garantissent cette survie, sans
+      chiffrer les seuils (palier 16 valide).
+
+    contraintes_systemiques:
+      - "Contraste élevé entre le motif du code et son fond (palier 12 — TOK-COLOR-TEXTE-PRINCIPAL sur TOK-COLOR-FOND-PRINCIPAL respecte le contraste minimal a11y, étendu ici à la lisibilité par scanner)"
+      - "Marge de silence préservée (SHA-CODE-COMPOSITION zone_1_code) — non écrasable"
+      - "Pas d'éléments décoratifs au centre du code (D-CODE-5)"
+      - "Format vectoriel disponible (D-CODE-4) — l'impression à grande taille n'introduit pas d'aliasing"
+
+    cas_de_survie_attendus:
+      - "Photocopie noir et blanc d'une page A4 — le code reste scannable"
+      - "Impression couleur sur papier ordinaire — le contraste tient"
+      - "Affichage agrandi A3 (panneau OT) — vectoriel ou bitmap haute résolution préservent les contours"
+      - "Photo du code prise par un scanner en faible lumière — la marge de silence et le contraste compensent"
+
+    questions_ouvertes:
+      - "Seuil minimum de taille d'impression sous lequel la lisibilité tombe — délégué palier 16 (validation chiffrée)"
+
+# -----------------------------------------------------------------------------
+# 5. Personas servis
+# -----------------------------------------------------------------------------
+personas_servis:
+
+  mme_dupont:
+    test_litmus_servi: "Imprimer une feuille pour les parents accompagnateurs avec le code et le lien — les deux fonctionnent indifféremment"
+    apport_du_fichier: >-
+      D-CODE-1 garantit que le lien est en clair pour le parent qui ne
+      veut pas scanner. D-CODE-2 réduit la friction par une instruction
+      courte. SHA-CODE-LISIBILITE-PHYSIQUE garantit la survie à la
+      photocopie.
+
+  mme_martin:
+    test_litmus_servi: "Affichage en classe d'un code que les élèves scannent sur tablette"
+    apport_du_fichier: >-
+      Le format vectoriel (D-CODE-4) supporte un agrandissement A3 sans
+      perte. La sobriété visuelle (D-CODE-5) cohérente avec un environnement
+      pédagogique sobre.
+
+  pere_lyonnais:
+    impact: "indirect — pas son cas d'usage central"
+
+  kenji:
+    impact: "indirect — il scanne plutôt qu'il n'imprime, mais le destinataire de son scan tombe en F5 / SHA-LIEN-CHAINE-FALLBACK"

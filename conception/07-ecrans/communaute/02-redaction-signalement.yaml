@@ -1,0 +1,88 @@
+# =============================================================================
+# E-COMMUNAUTE-REDACTION-SIGNALEMENT — Rédaction d'un Signalement (polymorphe)
+# =============================================================================
+# Surface ponctuelle (P5.M6) ouverte depuis la cible signalée — Pin communautaire
+# (depuis B1/B2 sur S1), Parcours communautaire (depuis C3 sur S2), Commentaire
+# (depuis G1 imbriqué dans B2), Retour de parcours (depuis la consultation des
+# retours d'un Parcours sur S2). Polymorphe par construction : un seul écran,
+# quatre types de cible. Compte requis (I2). Anonymat strict du signaleur (I5).
+# =============================================================================
+
+document:
+  type: palier_ecrans_fiche
+  format: yaml
+
+ecran:
+  id: E-COMMUNAUTE-REDACTION-SIGNALEMENT
+  nom: "Rédaction d'un Signalement"
+
+  mode: P5.M6
+  surface_parente: "polymorphe (P5.S1, P5.S2)"
+
+  raison_d_etre: >-
+    Permet à un utilisateur connecté de signaler un contenu d'origine
+    communautaire (Pin / Parcours / Commentaire / Retour) en choisissant
+    un motif parmi un jeu fini, en activant éventuellement un masquage
+    local de la cible (D9.4). L'identité du signaleur n'est jamais
+    exposée — ni à la cible, ni à son auteur, ni à un autre utilisateur
+    (I5). La cible Pin éditorial est exclue : message gracieux orientant
+    vers un canal alternatif de correction.
+
+  composition:
+    - zone: "rappel de la cible signalée"
+      role: "rappel synthétique de l'objet visé selon type_de_cible — titre + provenance pour Pin/Parcours, extrait pour Commentaire/Retour ; sans exposer la cible plus que nécessaire"
+      entites_affichees: [Pin, Parcours, Commentaire, "Retour de parcours"]
+
+    - zone: "sélecteur de motif"
+      role: "choix d'un motif parmi le jeu fini : inapproprié, historiquement_faux, hors_sujet, atteinte_vie_privée, autre (libellés exacts palier 8)"
+      entites_affichees: [Signalement]
+
+    - zone: "champ de précision libre"
+      role: "saisie libre — obligatoire si motif = autre, optionnelle pour les autres motifs ; permet au signaleur d'expliciter ce qu'il reproche"
+
+    - zone: "option de masquage local"
+      role: "activation facultative — la cible cessera d'apparaître pour CE signaleur en attendant la décision de modération, sans être retirée pour les autres (D9.4)"
+
+    - zone: "rappel de l'anonymat"
+      role: "mention discrète rappelant que l'identité du signaleur n'est pas exposée à la cible ni à son auteur (I5)"
+
+    - zone: "actions de soumission"
+      role: "valider (création du Signalement en état nouveau) ou annuler (referme la surface sans Signalement)"
+
+  etats:
+    nominal_saisie: "Surface ouverte, type_de_cible déterminé, motif en cours de sélection ou sélectionné, l'utilisateur peut valider ou annuler"
+    motif_non_choisi: "Aucun motif sélectionné ; l'action de validation est désactivée jusqu'à choix d'un motif"
+    motif_autre_sans_precision: "Motif = autre choisi mais champ de précision libre vide ; validation indisponible jusqu'à saisie non vide (invariant cluster 04)"
+    soumission_en_cours: "Soumission émise, en attente de confirmation ; l'utilisateur ne peut pas modifier ni re-valider tant que la réponse n'est pas reçue"
+    soumission_reussie: "Le Signalement est créé en état nouveau ; message éphémère P5.M9 confirme ; la surface se referme et retourne à la surface d'origine ; si masquage local activé, la cible disparaît immédiatement de la vue de ce signaleur"
+    soumission_echouee: "Échec d'envoi ; message gracieux invitant à réessayer ; le motif et la précision restent préservés"
+    offline_avec_attente_locale: "Connexion réseau indisponible ; le Signalement est mis en attente d'envoi local ; le masquage local PEUT être appliqué immédiatement côté terminal ; bandeau P5.P3 visible"
+    compte_absent: "Aucun Compte n'est associé à l'utilisateur ; redirection préalable vers E-PROFIL-CREATION-COMPTE déclenchée par G3 ; au retour, on revient sur cette surface"
+    cible_pin_editorial: "Cible = Pin de provenance editorial ; le contrôle de signalement n'aurait pas dû être exposé en B2 ; surface dégradée affichant un message gracieux orientant vers un canal alternatif de correction (cf. cluster 04 question ouverte) ; aucune action de signalement disponible"
+    cible_deja_signalee_par_meme_compte: "Le même Compte a déjà un Signalement ouvert (nouveau ou en_examen) sur cette même cible ; message gracieux informant qu'un signalement précédent est en cours d'examen ; pas de nouveau Signalement créé (invariant cluster 04)"
+    cible_retiree_pendant_redaction: "La cible a été retirée par modération entre déclenchement et validation ; validation impossible ; message indique que la cible a déjà été traitée"
+
+  elements_interactifs:
+    - "Sélection d'un motif dans le jeu fini"
+    - "Saisie au clavier dans le champ de précision libre"
+    - "Bascule de l'option de masquage local"
+    - "Validation de la soumission → flow G3 étape 6 (création en état nouveau)"
+    - "Annulation explicite → si motif sélectionné ou précision saisie, dialogue P5.M8 de confirmation d'abandon ; sinon fermeture directe"
+    - "Geste neutre de fermeture (équivalent annulation, P5.N5)"
+
+  flows_actifs:
+    - G3   # Signalement d'un contenu (polymorphe)
+
+  surfaces_imbriquees:
+    - E-TRANSVERSES-DIALOGUE-CONFIRMATION   # M8 si abandon avec saisie non vide
+    - E-TRANSVERSES-MESSAGE-EPHEMERE        # M9 confirmation ou erreur
+    - E-PROFIL-CREATION-COMPTE              # redirection préalable si compte_absent
+    - E-TRANSVERSES-BANDEAU-OFFLINE         # P3 si offline
+
+  entites_affichees: [Signalement, Pin, Parcours, Commentaire, "Retour de parcours", Compte]
+
+  questions_ouvertes:
+    - "Canal alternatif de correction d'un Pin éditorial (motif erreur factuelle Kenji) — le message gracieux pointe vers quoi ? Cluster 04 question ouverte à confirmer"
+    - "Le signaleur peut-il retirer son propre Signalement avant décision (recommandation cluster 04 = oui) ? Si oui, surface de gestion à prévoir — relève G5 ou écran dédié non encore inventorié"
+    - "Modélisation du masquage local — drapeau du Signalement OU entité Préférence de masquage rattachée au Profil ? Cluster 04 question ouverte (impact mineur sur l'écran lui-même)"
+    - "Composition de la zone rappel de la cible quand cible = Commentaire ou Retour : afficher le contenu intégral, un extrait, ou seulement l'auteur+date ? Arbitrage palier 8/10"

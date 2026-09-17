@@ -1,0 +1,568 @@
+# =============================================================================
+# Palier 4 — Cluster 03 — Utilisateur
+# =============================================================================
+# Cluster qui modélise tout ce qui appartient à l'utilisateur grand public :
+# son Profil (entité racine, toujours présente, locale par défaut), un
+# éventuel Compte (0..1, opt-in pour publication ou synchronisation), ses
+# Favoris et son Historique de visite.
+#
+# Logique cardinale du cluster, posée par l'invariant I6 et le domaine D6 :
+# le LOCAL est le défaut, le CLOUD est l'exception consentie. L'identité
+# civile n'est jamais collectée (I1) — ni dans le Profil, ni dans le Compte.
+# Tant qu'aucun Compte n'est créé, le Profil reste anonyme et strictement
+# local au terminal.
+#
+# Hors-périmètre rappelé : pas de modélisation détaillée du cache hors-ligne
+# (politique d'implémentation), pas d'entité Permission système (l'autorité
+# reste à l'OS — le Profil mémorise au plus si une demande a déjà été faite),
+# pas d'entité Mode de notification (préférence du Profil).
+# =============================================================================
+
+document:
+    type: palier_donnees_cluster
+    cluster_id: C3
+    nom: "Utilisateur"
+    format: yaml
+
+raison_d_etre_du_cluster: >-
+    HistoLyon promet de l'émerveillement sans contrepartie : pas de mur
+    d'inscription, pas de revente de données, pas d'identité civile demandée.
+    Ce cluster est le garant matériel de cette promesse. Il distingue ce qui
+    appartient à l'utilisateur sur SON terminal (Profil + Favoris +
+    Historique, locaux par défaut) de ce qui peut éventuellement être partagé
+    (Compte opt-in ouvrant la publication communautaire et la synchronisation
+    granulaire). Quatre entités, une asymétrie assumée : le Profil est riche
+    parce que c'est lui qui rend l'app personnalisable et personnelle ; le
+    Compte est intentionnellement maigre parce qu'il ne sert que deux usages
+    ciblés (publier, synchroniser).
+
+# -----------------------------------------------------------------------------
+# Entités
+# -----------------------------------------------------------------------------
+entites:
+    # ---------------------------------------------------------------------------
+    - id: profil
+      nom: "Profil"
+
+      raison_d_etre: >-
+          Entité racine de l'utilisateur grand public. Existe dès la première
+          ouverture de l'app, sans aucune saisie ni inscription. Réunit les
+          préférences, la trace fonctionnelle d'usage et les références aux
+          collections personnelles (Favoris, Historique). C'est ce qui rend
+          l'app personnalisable sans la rendre identifiante.
+
+      attributs:
+          obligatoires:
+              - nom: identifiant_local
+                nature: "identifiant local et anonyme"
+                note: >-
+                    Généré au premier lancement, jamais transmis hors du terminal
+                    tant qu'aucun Compte n'est rattaché. Ne porte aucune information
+                    identifiante ; il sert uniquement à distinguer le Profil de
+                    celui d'un autre terminal en cas de synchronisation future.
+
+              - nom: langue_préférée
+                nature: "valeur parmi un ensemble (catalogue de langues supportées)"
+                note: >-
+                    Liste fermée des locales offertes par l'app. Sélection initiale
+                    héritée de la langue système, modifiable depuis les paramètres.
+                    Le catalogue exact (fr / en / ja minimum pour les personas) est
+                    fixé en aval.
+
+              - nom: mode_notification_proximité
+                nature: "valeur parmi un ensemble"
+                valeurs: [balade_libre, surprenez_moi]
+                note: >-
+                    Préférence courante hors parcours engagé. Le mode 'En parcours'
+                    n'est PAS une troisième valeur ici : il est dérivé automatiquement
+                    de l'engagement d'un Parcours (cf. cluster 02) et n'écrase pas
+                    cette préférence — qu'on retrouve à la fin du parcours. Défaut :
+                    balade_libre (jamais surprenez_moi par défaut, cf. essence).
+
+              - nom: enregistrement_historique_actif
+                nature: "drapeau"
+                note: >-
+                    Quand faux, aucune nouvelle entrée n'est ajoutée à l'Historique
+                    de visite. N'efface PAS l'historique déjà présent (l'effacement
+                    est une action distincte sur Profil).
+
+              - nom: préférences_accessibilité
+                nature: "ensemble structuré de réglages"
+                note: >-
+                    Liste exacte des réglages (taille de texte, contraste augmenté,
+                    animations réduites, alternatives à l'audio, etc.) fixée en
+                    palier 12 / palier 16. Au palier 4 on garantit seulement
+                    l'EXISTENCE de cet ensemble, pas son contenu — pour que le palier
+                    13 admin et le palier 7 écrans puissent y faire référence.
+
+              - nom: première_ouverture_effectuée
+                nature: "drapeau"
+                note: >-
+                    Conditionne D5.2 (invitation discrète au micro-parcours) et
+                    D5.4 (indications ponctuelles au premier usage). Bascule à
+                    vrai à la première sortie de l'écran carte initial.
+
+              - nom: permissions_déjà_demandées
+                nature: "ensemble de marqueurs (1 par permission système concernée)"
+                note: >-
+                    L'autorité reste à l'OS (l'app ne stocke ni ne miroir l'état de
+                    la permission). Le Profil note seulement si l'app a DÉJÀ ouvert
+                    la demande pour une permission donnée (géolocalisation,
+                    notifications, caméra, etc.), afin de ne pas re-solliciter
+                    inutilement et d'orienter vers les paramètres système le cas
+                    échéant.
+
+          optionnels:
+              - nom: compte_associé
+                nature: "référence à Compte"
+                contrainte: "0..1"
+                note: >-
+                    Présent uniquement si l'utilisateur a créé ou s'est connecté
+                    à un Compte. Son absence est l'état par défaut et le cas le
+                    plus fréquent attendu.
+
+              - nom: granularité_synchronisation
+                nature: "ensemble de drapeaux par catégorie de données"
+                note: >-
+                    Pertinent uniquement si compte_associé est présent. Modélise
+                    le consentement granulaire à la sync cloud par catégorie :
+                    au minimum {favoris, parcours_personnels_créés, historique,
+                    préférences}. L'historique est traité distinctement (cf.
+                    invariant local du Profil ci-dessous). Désactivés par défaut,
+                    même après création de Compte. Le détail des catégories est
+                    une question ouverte.
+
+              - nom: affichage_section_engageante
+                nature: "drapeau"
+                note: >-
+                    Active ou masque la section badges/statistiques (D6.6 — si le
+                    temps). Recommandation : masqué par défaut, opt-in. Présence de
+                    l'attribut conditionnée à l'existence de la fonctionnalité.
+
+          pas_d_attributs:
+              - "Pas de pseudonyme ici — c'est un attribut du Compte (cf. arbitrage Profil vs Compte)"
+              - "Pas de représentation graphique ici — idem, attribut du Compte"
+              - "Pas d'email ici — idem, attribut du Compte"
+              - "Pas d'attribut 'identité civile' (cf. I1, jamais collectée)"
+
+      relations:
+          - "possède 0..1 Compte (compte_associé)"
+          - "possède 0..n Favoris (collection personnelle locale)"
+          - "possède 0..n entrées d'Historique de visite (collection personnelle locale)"
+          - "auteur de 0..n Parcours personnels (cluster 02 — visibles localement seulement)"
+
+      invariants:
+          - "Tant que compte_associé est absent, aucune donnée du Profil ni de ses collections (Favoris, Historique) ne quitte le terminal (instanciation locale de I6)"
+          - "L'identifiant_local n'est jamais réutilisé en cas de réinstallation : un nouveau Profil est créé, le précédent est effacé avec l'app"
+          - "Effacer l'Historique est une action sur le Profil (action atomique) ; elle n'altère ni les Favoris ni les préférences"
+          - "Le mode_notification_proximité est toujours défini ; il vaut balade_libre tant que l'utilisateur n'a pas activé Surprenez-moi (jamais activé silencieusement, cf. essence)"
+
+      invariants_transversaux_referenced: [I1, I6]
+
+      questions_ouvertes:
+          - "Survie du Profil entre installations : la sauvegarde système (iOS/Android backup) peut techniquement réinstancier un Profil sur un nouveau terminal sans Compte. À acter avec les devs : on désactive cette sauvegarde pour rester strict avec I6, ou on la tolère (le terminal reste 'le sien') ?"
+          - "Préférences accessibilité : la liste exacte (taille, contraste, animations réduites, alternatives audio…) sera fixée par le palier 12 / 16. Au palier 4 on en garantit seulement l'existence."
+          - "Mode présentation sans chrome (cas Mme Martin) : préférence persistante du Profil ou état d'écran temporaire ? Recommandation : pas une préférence (n'engage que la session courante), donc PAS un attribut ici. À confirmer avec le palier 7."
+          - "Désactivation de l'historique (enregistrement_historique_actif = faux) : pertinence d'un message d'avertissement quand l'utilisateur la coupe (perte de la fonctionnalité 'retrouver un pin du dimanche le mardi') — relève du palier 8."
+
+    # ---------------------------------------------------------------------------
+    - id: compte
+      nom: "Compte"
+
+      raison_d_etre: >-
+          Greffe optionnelle au Profil, créée uniquement quand l'un des deux
+          usages qui la justifient se présente : publier une contribution
+          communautaire (Pin, Commentaire, Retour de parcours, Parcours
+          communautaire) ou synchroniser ses données entre plusieurs appareils.
+          Hors de ces deux cas, le Compte n'apporte rien — et l'app le dit.
+          L'identité civile n'y est JAMAIS collectée (I1) : l'utilisateur
+          apparaît publiquement par un pseudonyme et une représentation
+          graphique qu'il choisit.
+
+      attributs:
+          obligatoires:
+              - nom: identifiant
+                nature: "identifiant lisible et stable"
+                note: "généré côté serveur à la création — distinct de l'identifiant_local du Profil"
+
+              - nom: pseudonyme
+                nature: "texte court"
+                contrainte: "non vide, unique parmi les Comptes actifs"
+                note: >-
+                    Seule identification visible publiquement quand l'utilisateur
+                    publie. Modifiable (à arbitrer : librement / avec délai / une
+                    fois). N'est PAS un nom civil — pas de contrainte 'prénom + nom'.
+
+              - nom: représentation_graphique
+                nature: "référence à un avatar (sélection dans un catalogue ou image)"
+                note: >-
+                    Forme exacte (catalogue d'avatars éditoriaux, photo libre,
+                    génération procédurale) à arbitrer en palier 7 / palier 13.
+                    Au palier 4 on garantit seulement qu'un Compte porte une
+                    représentation graphique, pas son format.
+
+              - nom: email
+                nature: "adresse électronique"
+                contrainte: "non vide à la création, unique parmi les Comptes actifs"
+                usage_strict: >-
+                    UNIQUEMENT pour l'authentification et la récupération de l'accès
+                    au Compte. Pas d'usage marketing, pas d'usage éditorial, pas
+                    d'affichage public. Ne figure jamais dans les contributions
+                    visibles d'un autre utilisateur.
+
+              - nom: méthode_authentification
+                nature: "valeur parmi un ensemble"
+                valeurs: [email_mot_de_passe, lien_magique, tiers_optionnel]
+                note: >-
+                    Énumération indicative — la méthode retenue (et les éventuels
+                    tiers offerts) est arbitrée avec les devs. Le tiers optionnel,
+                    s'il est offert, ne peut JAMAIS être obligatoire (essence §
+                    ce_qu_on_refuse — Facebook/Google obligatoire).
+
+              - nom: date_création
+                nature: "horodatage"
+
+              - nom: état
+                nature: "valeur parmi un ensemble (cycle de vie)"
+                valeurs: "voir cycle_de_vie ci-dessous"
+
+          optionnels:
+              - nom: date_dernière_connexion
+                nature: "horodatage"
+                note: "utilisé pour la sécurité (alerte changement d'appareil) et la suppression d'inactifs si politique adoptée"
+
+          pas_d_attributs:
+              - "Pas de nom, prénom, date de naissance, adresse postale, téléphone (I1 — identité civile jamais collectée)"
+              - "Pas d'attribut 'rôle' (utilisateur / contributeur / modérateur) ici : la modération est une opération côté admin (cluster 05 ou palier 13), pas un statut accroché au Compte grand public"
+
+      relations:
+          - "rattaché à exactement 1 Profil (relation 1-1 inversée du Profil.compte_associé)"
+          - "auteur de 0..n Pins de provenance communautaire (cluster 01 — pin.auteur_communautaire)"
+          - "auteur de 0..n Commentaires (cluster 04)"
+          - "auteur de 0..n Retours de parcours (cluster 04)"
+          - "auteur de 0..n Parcours de provenance communautaire (cluster 02)"
+          - "peut être à l'origine de 0..n Signalements (cluster 04 — anonymat strict du signaleur, cf. I5)"
+
+      cycle_de_vie:
+          etats: [actif, suspendu, supprimé]
+          transitions:
+              - "actif → suspendu (décision modération suite à abus répétés)"
+              - "suspendu → actif (réintégration après examen)"
+              - "actif → supprimé (suppression demandée par l'utilisateur)"
+              - "suspendu → supprimé (décision modération définitive ou demande utilisateur)"
+          effet_de_la_suppression: >-
+              La suppression d'un Compte efface effectivement les données
+              associées côté serveur (engagement de D6.5). Les contributions
+              publiées (Pins communautaires, Commentaires, Retours, Parcours
+              communautaires) restent visibles si elles ont été promues ou si
+              l'engagement éditorial l'exige : dans ce cas le pseudonyme est
+              remplacé par une mention neutre (« utilisateur supprimé » ou
+              équivalent — libellé exact en palier 8). Aucune trace identifiante
+              ne subsiste. Politique précise (rétention résiduelle, délai
+              effectif) à formaliser au palier 16.
+
+      invariants:
+          - "Un Compte rattaché est nécessaire pour publier (instanciation locale de I2)"
+          - "L'email n'apparaît jamais dans une vue publique"
+          - "Le pseudonyme et la représentation graphique sont les seules informations visibles par d'autres utilisateurs"
+          - "La suppression d'un Compte ne réactive pas son pseudonyme tant que la rétention résiduelle n'a pas expiré (éviter l'usurpation par recyclage immédiat)"
+          - "La création d'un Compte ne déclenche pas la synchronisation : la granularité_synchronisation du Profil reste désactivée par défaut"
+
+      invariants_transversaux_referenced: [I1, I2, I6]
+
+      questions_ouvertes:
+          - "Méthode d'authentification finale (email + mot de passe / lien magique / tiers optionnel) — arbitrage avec devs et équipe sécu"
+          - "Modification du pseudonyme : libre, avec délai, ou unique ? Impact sur les contributions déjà publiées (le pseudonyme historique est-il conservé en crédit, ou propagé) ?"
+          - "Format de la représentation graphique (catalogue éditorial vs photo libre vs avatar généré) — palier 7 / 13"
+          - "Politique exacte de suppression (délai effectif, rétention résiduelle, mention neutre dans les contributions conservées) — palier 16"
+          - "Suppression automatique d'un Compte resté inactif au-delà d'une certaine durée : règle adoptée ou non ?"
+
+    # ---------------------------------------------------------------------------
+    - id: favori
+      nom: "Favori"
+
+      raison_d_etre: >-
+          Marquage personnel d'un Pin ou d'un Parcours qui a touché
+          l'utilisateur, pour le retrouver ensuite. Sert directement les
+          moments de vérité du père lyonnais (« retrouver l'anecdote du
+          dimanche le mardi soir ») et de Kenji (« le soir à l'hôtel, refaire
+          le tour des choix de la journée »). Strictement local par défaut,
+          synchronisable seulement si Compte associé ET catégorie 'favoris'
+          activée dans la granularité_synchronisation.
+
+      choix_de_modélisation:
+          retenu: >-
+              Une seule entité Favori avec un attribut 'type_de_cible'
+              (pin / parcours) + une référence cible polymorphe.
+          pourquoi: >-
+              (a) Sémantique unifiée : « ce que j'ai aimé, peu importe la nature »,
+              cohérente avec une consultation chronologique mêlée. (b) Ergonomie
+              de filtrage homogène (filtrer par type est trivial). (c) Évite la
+              duplication des attributs communs (date_ajout, ordre de tri).
+              (d) Symétrie avec la modélisation polymorphe du Signalement
+              (cluster 04), qui accepte aussi plusieurs types de cibles.
+          alternatives_écartées:
+              - libellé: "deux entités distinctes (Favori_Pin, Favori_Parcours)"
+                pourquoi_écartée: "duplique les attributs communs sans bénéfice ; complique le tri chronologique unifié"
+              - libellé: "deux ensembles directement dans Profil (favoris_pins, favoris_parcours)"
+                pourquoi_écartée: "ne permet pas de porter d'attributs sur le marquage lui-même (date_ajout notamment) ni d'évoluer ; mélange les niveaux"
+          à_reconsidérer_si: >-
+              Un troisième type de cible apparaît avec des attributs spécifiques
+              forts (peu probable — Pin et Parcours couvrent déjà toute la
+              consommation), ou si la sémantique de favori diverge fortement
+              entre les deux types (ex. quotas distincts, transitions distinctes).
+
+      attributs:
+          obligatoires:
+              - nom: identifiant
+                nature: "identifiant lisible et stable"
+
+              - nom: type_de_cible
+                nature: "valeur parmi un ensemble"
+                valeurs: [pin, parcours]
+
+              - nom: cible
+                nature: "référence polymorphe (vers Pin ou Parcours selon type_de_cible)"
+
+              - nom: date_ajout
+                nature: "horodatage"
+                note: "utilisé pour le tri chronologique (récents en tête par défaut, à confirmer en palier 7)"
+
+          optionnels: []
+
+      relations:
+          - "appartient à exactement 1 Profil"
+          - "vise exactement 1 Pin OU 1 Parcours (selon type_de_cible)"
+          - "ne référence jamais directement un Compte (le Compte n'est porteur QUE de l'identifiant pseudonyme ; les Favoris suivent le Profil)"
+
+      invariants:
+          - "Un Profil ne possède pas deux Favoris pour la même cible (unicité de la paire (profil, cible))"
+          - "Si la cible (Pin ou Parcours) est retirée du contenu publié, le Favori N'EST PAS automatiquement supprimé : il reste visible avec une mention indiquant l'indisponibilité (le contenu narratif sous-jacent n'est plus accessible mais le souvenir l'est) — recommandation à confirmer (cf. question ouverte D6.2)"
+          - "Les Favoris sont strictement locaux tant que la sync 'favoris' n'a pas été activée explicitement par l'utilisateur (instanciation locale de I6)"
+          - "Pas de quota arbitraire imposé sur le nombre de Favoris (D6.2)"
+
+      invariants_transversaux_referenced: [I6]
+
+      questions_ouvertes:
+          - "Comportement quand la cible est retirée : conserver l'entrée en 'archivée' avec mention, ou supprimer le Favori ? Recommandation D6.2 : conserver. À acter."
+          - "Filtrage et tri par défaut (chronologique récents / par catégorie / par époque) — palier 7"
+          - "Possibilité d'organiser les Favoris en 'collections' / 'dossiers' personnels — pas dans le périmètre, à noter pour l'aval"
+
+    # ---------------------------------------------------------------------------
+    - id: historique_de_visite
+      nom: "Historique de visite"
+
+      raison_d_etre: >-
+          Trace fonctionnelle automatique de ce que l'utilisateur a consulté
+          ou complété, pour qu'il puisse retrouver un contenu sans avoir eu
+          le réflexe de le marquer en Favori. Donnée extrêmement sensible
+          (où l'utilisateur a porté son attention dans la ville) : c'est
+          pourquoi elle reçoit le traitement le plus strict du cluster.
+          Strictement locale par défaut, jamais transmise sans consentement
+          spécifique au-delà même de l'activation générale de la
+          synchronisation.
+
+          Granularité retenue : par Pin consulté et par Parcours (en cours,
+          complété). La complétion d'un Parcours est implicite via la présence
+          d'entrées par étape. Un Parcours est 'complété' quand chacune de ses
+          Étapes a au moins une entrée d'Historique correspondante (ou quand
+          l'utilisateur déclenche explicitement la fin du parcours). Les étapes
+          non visitées ne sont PAS modélisées comme état distinct (arbitrage
+          acté : pas d'« étape sautée » explicite).
+
+      attributs:
+          obligatoires:
+              - nom: identifiant
+                nature: "identifiant lisible et stable"
+
+              - nom: type_d_événement
+                nature: "valeur parmi un ensemble"
+                valeurs:
+                    - consultation_pin
+                    - étape_de_parcours_visitée
+                    - parcours_engagé
+                    - parcours_terminé
+                    - résultat_quiz_post_narratif
+                note: >-
+                    'parcours_engagé' marque le démarrage explicite d'un Parcours ;
+                    'parcours_terminé' marque la fin (atteinte de la dernière
+                    étape, ou clôture explicite). 'résultat_quiz_post_narratif'
+                    sert à conserver la trace fonctionnelle du quiz (cf. D2.7),
+                    sans construire de profil comportemental dérivé.
+
+              - nom: cible
+                nature: "référence polymorphe (Pin ou Parcours selon type_d_événement)"
+                note: "pour étape_de_parcours_visitée, la cible est l'Étape ; le Parcours parent est dérivable via la relation Étape → Parcours (cluster 02)"
+
+              - nom: horodatage
+                nature: "horodatage"
+                note: "minute près suffit ; aucune position GPS continue n'est stockée — seule la trace fonctionnelle de ce qui a été consulté l'est"
+
+          optionnels:
+              - nom: durée_consultation
+                nature: "expression de durée"
+                note: >-
+                    Estimation locale du temps passé sur le contenu (ex. teaser
+                    seul vs narration lue jusqu'au bout). Permet la distinction
+                    'consulté brièvement / consulté en profondeur' évoquée en
+                    D6.3 sans construire de profil comportemental serveur. Reste
+                    optionnel : si non collecté, l'historique reste fonctionnel.
+
+              - nom: score_quiz
+                nature: "valeur numérique simple"
+                note: "présent UNIQUEMENT si type_d_événement = résultat_quiz_post_narratif"
+
+      relations:
+          - "appartient à exactement 1 Profil"
+          - "vise exactement 1 Pin, 1 Parcours ou 1 Étape (selon type_d_événement)"
+          - "alimente le calcul des sections engageantes (badges, statistiques) côté Profil quand cette fonctionnalité est active (D6.6)"
+
+      invariants:
+          - "Append-only : une entrée existante n'est jamais MODIFIÉE en place ; seule l'effacement (individuel ou global, déclenché par l'utilisateur) la fait disparaître"
+          - "Aucune position GPS continue n'est stockée — seule la trace fonctionnelle des objets consultés l'est"
+          - "L'historique est strictement local et ne remonte JAMAIS au cloud sans consentement spécifique au-delà de l'activation générale de la synchronisation (politique plus stricte que les Favoris, cf. D6.5)"
+          - "Une Étape de Parcours peut figurer plusieurs fois (visite répétée) — chaque visite est une entrée distincte"
+          - "Quand Profil.enregistrement_historique_actif vaut faux, aucune nouvelle entrée n'est créée ; les entrées existantes ne sont pas effacées par la bascule"
+          - "L'effacement global de l'Historique est une action atomique sur le Profil — pas un état d'Historique"
+
+      invariants_transversaux_referenced: [I6]
+
+      rétention:
+          par_défaut: >-
+              Conservation illimitée tant que l'utilisateur n'efface pas
+              (recommandation D6.3, à acter).
+          à_arbitrer:
+              - "Rétention glissante (6 mois / 1 an) automatique : option offerte ou non ?"
+              - "Politique plus courte sur les entrées de type résultat_quiz_post_narratif (qui peuvent être ressenties comme intimes) ?"
+          cohérence_synchronisation: >-
+              Si la sync historique est activée explicitement (case granulaire
+              dédiée), la rétention serveur s'aligne sur la rétention locale.
+              L'utilisateur ne doit pas découvrir un historique cloud plus long
+              que son historique terminal.
+
+      questions_ouvertes:
+          - "Granularité étape de parcours : une entrée par étape ou seulement une entrée 'parcours engagé' / 'parcours terminé' ? Recommandation : par étape (permet la reprise depuis l'historique évoquée en D6.3)."
+          - "Profondeur temporelle conservée par défaut (illimité tant que pas d'effacement, ou rétention glissante) — D6.3 question ouverte."
+          - "Notion de 'reprise' depuis l'historique pour un parcours interrompu : doit-on enrichir l'entrée 'parcours_engagé' d'un drapeau 'en_cours' ou dériver l'état d'engagement depuis l'absence d'entrée 'parcours_terminé' associée ? Recommandation : dériver, ne pas dupliquer l'état."
+          - "Agrégation par session : pertinent pour les sections engageantes (« 3e parcours du mois »), mais pas une entité — calcul dérivé. À confirmer en palier 7 / 13."
+          - "Conservation des résultats de quiz : les conserver côté Historique ou les marquer plus sensible (rétention courte, non synchronisable) ? Tension avec D6.6 (statistiques) qui pourrait s'en nourrir."
+
+# -----------------------------------------------------------------------------
+# Cohérence inter-entités du cluster
+# -----------------------------------------------------------------------------
+# Quelques points qui concernent plusieurs entités à la fois et qu'il aurait
+# été artificiel de répéter dans chaque fiche.
+coherence_inter_entites:
+    asymetrie_profil_compte:
+        enonce: >-
+            Le Profil est riche (préférences, drapeaux, ensembles), le Compte est
+            maigre (pseudonyme, représentation graphique, email, état). Aucun
+            attribut n'est dupliqué. Quand un attribut pourrait raisonnablement
+            vivre des deux côtés (ex. langue préférée), il vit côté Profil — la
+            langue est une préférence d'usage, pas un attribut d'identité.
+
+    ce_qui_se_synchronise:
+        enonce: >-
+            La synchronisation cloud est portée par le Compte (elle ne peut pas
+            exister sans), mais sa CONFIGURATION granulaire (quoi synchroniser)
+            vit côté Profil (granularité_synchronisation), parce que c'est une
+            préférence d'usage qui n'a pas à survivre à un changement de Compte
+            sur le même terminal. Si l'utilisateur se déconnecte puis se
+            reconnecte avec un autre Compte, sa granularité_synchronisation est
+            ré-évaluée (à confirmer côté flow palier 6).
+
+    effacement_des_donnees_personnelles:
+        enonce: >-
+            Trois actions distinctes, à ne pas confondre :
+              (1) effacer une entrée d'Historique : opère sur 1 entrée
+              (2) effacer la totalité de l'Historique : action atomique sur le Profil
+              (3) supprimer le Compte : action côté serveur, efface les données
+                  cloud associées et désactive la sync ; n'efface pas les données
+                  locales (l'utilisateur peut le faire séparément en se
+                  déconnectant et en effaçant ses collections).
+            Aucune des trois ne touche aux Pins / Parcours éditoriaux ou
+            communautaires des autres utilisateurs.
+
+    permissions_systeme:
+        enonce: >-
+            L'app ne stocke ni ne miroir l'état d'une permission système — c'est
+            l'OS qui en est l'autorité. Le Profil mémorise au plus si une demande
+            a déjà été ouverte (permissions_déjà_demandées), pour éviter de
+            re-solliciter inutilement et pour orienter vers les paramètres
+            système quand une révocation est demandée. Aucune entité Permission
+            au palier 4.
+
+    mode_hors_ligne:
+        enonce: >-
+            Le mode hors-ligne n'est PAS modélisé comme entité (cache et
+            préchargement = politique d'implémentation). Il pourra à terme se
+            matérialiser comme une préférence du Profil (ex. drapeau
+            « précharger automatiquement les parcours favoris »), à acter
+            lorsque les devs Flutter auront cadré l'étendue du cache. Au palier 4
+            on note la place — pas le détail.
+
+# -----------------------------------------------------------------------------
+# Persona check
+# -----------------------------------------------------------------------------
+# Les 4 personas grand public sont concernés directement. Anaïs (back-office)
+# n'utilise pas ces entités — elle opère sur la production de contenu.
+persona_check:
+    kenji:
+        impact: "MAJEUR"
+        note: >-
+            Trois attributs du Profil le servent directement : langue_préférée
+            (japonais, à inclure dans le catalogue), enregistrement_historique_actif
+            (pour que ses Favoris du soir à l'hôtel reposent sur l'Historique
+            du jour), et la place laissée pour une future préférence de
+            préchargement hors-ligne (cf. cohérence_inter_entites). La modélisation
+            laisse passer les 4 scénarios proxy de Kenji (utilisation sans
+            compte, retrouver ses choix le soir, basculer en japonais, hors-ligne
+            à Bellecour).
+
+    mme_dupont:
+        impact: "MAJEUR"
+        note: >-
+            C'est le persona pour qui le Compte sert vraiment. La modélisation
+            Profil / Compte / granularité_synchronisation rend possibles ses
+            deux scénarios cardinaux : préparer sur tablette le dimanche puis
+            retrouver sur téléphone le jour J (sync favoris + parcours_personnels
+            à activer explicitement), et publier un parcours communautaire
+            (création de Compte au moment où elle veut publier — pas avant).
+            Les parents accompagnateurs, eux, ne créent pas de Compte : ils
+            consomment via Lien universel (cluster 06), sans Profil partagé.
+
+    mme_martin:
+        impact: "direct"
+        note: >-
+            Préférences accessibilité (taille de texte, contraste augmenté)
+            utiles pour la projection en classe. Mode présentation sans chrome
+            explicitement écarté du Profil ici (état d'écran temporaire, pas
+            préférence persistante — à confirmer palier 7). Pas de Compte
+            requis pour son usage en classe — confirmé par la modélisation
+            (consommation entièrement possible Profil seul). I4 (Sources
+            obligatoires sur les Pins, cluster 01) garantit la crédibilité ;
+            le cluster 03 ne touche pas à ce point.
+
+    pere_lyonnais:
+        impact: "MAJEUR"
+        note: >-
+            Trois points concrets : (a) mode_notification_proximité par défaut
+            à balade_libre (jamais surprenez_moi sans son consentement) ; la
+            bascule entre les deux est une simple écriture sur le Profil. (b)
+            Historique de visite append-only avec effacement individuel et
+            global, qui couvre exactement son scénario « retrouver le pin du
+            dimanche le mardi soir ». (c) Favoris locaux par défaut, qui
+            tiennent son scénario « marquer un pin pour le raconter à un ami »
+            sans qu'il ait à créer le moindre compte. La sobriété du Profil
+            (rien d'imposé, rien de joyeux/peppy) est un dû.
+
+    anais_back_office:
+        impact: "indirect"
+        note: >-
+            Anaïs ne touche PAS à ces entités. Elle peut éventuellement, en tant
+            qu'utilisatrice grand public hors travail, avoir un Profil et un
+            Compte comme tout le monde — mais c'est un usage privé. Côté
+            production, elle opère sur les Templates (cluster 05) et le contenu
+            éditorial (cluster 01). Les modérateurs (palier 14) accèderont aux
+            Comptes pour la modération via une autre surface, pas via cette
+            modélisation grand public. OK.
