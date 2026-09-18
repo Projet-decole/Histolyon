@@ -24,7 +24,7 @@ Trois sources sont supposées connues : les règles `AD-n` et les sections *Sta
 2. `pubspec.yaml` racine avec `workspace:` listant `apps/mobile`, `apps/admin`, `packages/*` ; section `melos:` pour les scripts (`analyze`, `test`, `format`, `gen`) ; melos 8.7 en dev dependency. Pas de `melos.yaml` (supprimé depuis melos 7).
 3. Arbre de dossiers de la spine (§ *Structural Seed*), avec un `README.md` d'une ligne dans chaque dossier encore vide pour dire ce qui y vivra.
 4. `apps/mobile` et `apps/admin` créés par `flutter create` (`--platforms=android` et `--platforms=web` respectivement), `resolution: workspace` dans chaque `pubspec.yaml`.
-5. `flutter_lints` 6 + `riverpod_lint` + une règle de lint d'imports (interdiction `features/* → features/*`, `core/* → features/*`) — AD-5.
+5. `flutter_lints` 6 + une règle de lint d'imports (interdiction `features/* → features/*`, `core/* → features/*`) — AD-5. `riverpod_lint` **différé à l'Epic 6** (Story 6.1+, quand Riverpod est réellement utilisé) : `custom_lint` (dont dépend `riverpod_lint`) exige `cli_util ^0.4.2` quelle que soit sa version, incompatible avec `melos` (`cli_util >=0.5.0 <0.7.0`) dans la résolution unifiée d'un workspace Pub natif — conflit vérifié empiriquement en Story 1.5, aucune version ne le résout. La règle de lint d'imports est implémentée sans dépendance tierce (`tools/check_import_direction.dart`, `dart:io` seul), branchée dans `melos run analyze`, pour la même raison.
 
 **Fini quand** : `melos run analyze` et `melos run test` passent sur les squelettes vides.
 
