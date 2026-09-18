@@ -1,1 +1,1 @@
-Apps Flutter du workspace (`mobile`, `admin`) — peuplées par la Story 1.4 (`flutter create`).
+Apps Flutter du workspace : `mobile` (Android) et `admin` (web), créées par `flutter create` en Story 1.4.
