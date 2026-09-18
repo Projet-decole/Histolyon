@@ -195,13 +195,13 @@ Afin de développer l'app Android et le back-office web dans la même stack (AD-
 ### Story 1.5: Lint d'imports et lints de base
 
 En tant que dev de l'équipe,
-Je veux `flutter_lints`, `riverpod_lint` et une règle de lint d'imports actifs,
+Je veux `flutter_lints` et une règle de lint d'imports actifs (`riverpod_lint` différé à l'Epic 6, voir AC ci-dessous),
 Afin qu'une violation de la direction des dépendances (AD-5) soit visible immédiatement, pas découverte en relecture.
 
 **Acceptance Criteria:**
 
 **Given** les apps du workspace créées (Story 1.4)
-**When** `flutter_lints` 6, `riverpod_lint` et une règle interdisant `features/* → features/*` et `core/* → features/*` sont configurés
+**When** `flutter_lints` 6 et une règle interdisant `features/* → features/*` et `core/* → features/*` sont configurés (`riverpod_lint` différé à l'Epic 6 — conflit de version `cli_util` avec `melos` dans le workspace Pub natif, vérifié en Story 1.5 ; voir `BOOTSTRAP.md` §1)
 **Then** `melos run analyze` passe sur les squelettes vides sans avertissement de lint
 **And** un import volontairement fautif (`features/x` important `features/y`) fait échouer `melos run analyze`
 
