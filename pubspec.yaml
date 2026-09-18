@@ -1,0 +1,25 @@
+name: histolyon
+publish_to: none
+
+environment:
+  sdk: ^3.13.3
+
+workspace: []
+
+dev_dependencies:
+  melos: ^8.7.0
+
+melos:
+  scripts:
+    analyze:
+      description: Analyse statique de tout le workspace.
+      run: dart analyze .
+    test:
+      description: Tests de tout le workspace.
+      run: dart test
+    format:
+      description: Vérifie le formatage de tout le workspace (sans corriger).
+      run: dart format --set-exit-if-changed .
+    gen:
+      description: Génération de code (build_runner) sur tout le workspace.
+      run: dart run build_runner build --delete-conflicting-outputs
