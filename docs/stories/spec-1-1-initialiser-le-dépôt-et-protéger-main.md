@@ -66,6 +66,27 @@ context:
 - Given un dépôt vide sans commit, when `git init` est exécuté et le premier commit est poussé vers `origin main`, then la branche `main` est protégée sur GitHub (PR obligatoire, statut CI requis, branche à jour requise, squash uniquement) — satisfait
 - Given la protection configurée, when un push direct sur `main` est tenté, then GitHub le refuse — satisfait (voir Implementation Notes)
 
+### Review Findings
+
+- [x] [Review][Decision] `docs/epics.md` Story 2.1 AC ("conception/ committée en un seul commit dédié, sans mélange") était déjà irréalisable telle quelle — résolu : AC reformulée dans `docs/epics.md:230` pour vérifier l'état réel (conception/ committée avec `docs/`/`.gitignore` dans `335d33e`, sans code mélangé) plutôt que d'exiger un commit dédié. [`docs/epics.md:230`, `spec-1-1-initialiser-le-dépôt-et-protéger-main.md:31`]
+- [x] [Review][Decision] Convention de nommage de branche divergente (`story/socle-NN-<slug>` vs AD-12 `story/<ID>-<slug>`) — résolu : `docs/epics.md:37` et `docs/stories/epic-1-context.md:27` mis à jour pour revenir à `story/<ID>-<slug>` (AD-12) dès la prochaine story ; la branche déjà utilisée pour Story 1.1 (`story/socle-01-cloture-doc`) est documentée comme exception non renommée rétroactivement. [`docs/epics.md:37`, `docs/stories/epic-1-context.md:27`]
+- [x] [Review][Patch] Désaccord de statut entre `sprint-status.yaml` et la story elle-même — résolu : `sprint-status.yaml` mis à jour à `done`. [`docs/stories/sprint-status.yaml:39`]
+- [x] [Review][Patch] `sprint-status.yaml` sans clé `action_items` — résolu : `action_items: []` ajouté. [`docs/stories/sprint-status.yaml`]
+- [x] [Review][Defer] `.gitignore` ne couvre pas `env/demo.json`, le seul fichier que NFR8 nomme explicitement comme ne devant jamais être versionné — deferred: `env/` n'existe pas encore (Epic 10) ; Story 10.1 porte déjà sa propre AC couvrant `env/demo.json` ; hors du périmètre mono-zone (AD-12) de cette story. [`.gitignore:24-28`]
+- [x] [Review][Defer] `.gitignore` ne couvre pas encore les artefacts Flutter/Dart spécifiques (`.flutter-plugins`, `.flutter-plugins-dependencies`, `*.iml`, `local.properties`) — deferred: `apps/mobile`/`apps/admin` n'existent pas encore (Story 1.4, backlog) ; `flutter create` gère typiquement ses propres entrées à ce moment. [`.gitignore:16-22`]
+
+**Rejected**
+
+- `false` — Story 11.4 (`sprint-status.yaml` initialisé en fin de socle) ne contredit pas sa création dès la Story 1.1 : sa précondition d'AC est « ce document d'épics et de stories approuvé », pas « épics 1 à 10 terminés » — cette précondition était déjà vraie avant même la Story 1.1.
+- `false`/rejeté — AC de `spec-1-1` (« when `git init` est exécuté ») ne correspond pas au Code Map (dépôt déjà initialisé) ni aux Tasks (aucune tâche `git init`) : correction rejetée, le correctif éditerait la spec sous revue elle-même.
+- rejeté — Section Verification (`curl` avec PAT) décrite comme périmée par les Implementation Notes (automatisation abandonnée) : correction rejetée, le correctif éditerait la spec sous revue elle-même (section Verification).
+- rejeté — Bloc gelé (« Always » : API classique + PAT/curl) non amendé après le passage à la configuration manuelle : correction rejetée, le correctif éditerait la spec sous revue elle-même (bloc gelé) ; les Implementation Notes documentent déjà la dérogation autorisée par l'humain.
+- rejeté — La commande `curl` de Verification est annoncée comme retournant aussi le statut squash-only, que cet endpoint ne renvoie pas : correction rejetée, le correctif éditerait la spec sous revue elle-même (champs attendus de Verification).
+- `low` — Format de date incohérent (`sprint-status.yaml` en `MM-DD-YYYY HH:MM` vs ISO 8601 ailleurs) : champs de métadonnée interne, jamais lus au quotidien dans ce diff, probablement le format par défaut de l'outillage BMAD plutôt qu'une erreur de saisie.
+- `false` — Prérequis NFR9 (org Supabase, dossier médias, Figma) absents de `epic-1-context.md` : omission volontaire, ce contexte ne porte que ce dont l'Epic 1 a réellement besoin (AD-15) ; ces prérequis sont couverts par les Epics 3/5/6.
+- `false` — Story 3.2 (la plus grosse du socle) sans relecture renforcée : le risque est explicitement reconnu et accepté par `epics.md` lui-même (« c'est voulu par la contrainte, pas un défaut de découpe »), pas un angle mort.
+- `low` — Saut volontaire de la revue automatisée non capturé dans un champ structuré : déjà documenté en clair dans les Implementation Notes de cette story, exactement où un relecteur le cherche ; structurer ce champ demanderait d'inventer un nouveau schéma `sprint-status.yaml`, plus qu'une correction directe.
+
 ## Implementation Notes
 
 - Sous-agent d'implémentation : `.gitignore` créé, premier commit `335d33e` (`docs/` + `conception/` + `.gitignore`, 144 fichiers, ni `_bmad/` ni `.claude/`), poussé directement sur `origin main` (création de la branche distante). Vérifié : `git log`/`git ls-remote` cohérents, working tree propre.
