@@ -1,0 +1,1 @@
+Contenu éditorial en fichiers YAML (époques, catégories, pins) et manifeste de médias — peuplé à partir des Epics 4 et 5 (Story 5.1-5.2). `content/parcours/` et `content/modeles3d/` sont dans l'arbre cible d'`ARCHITECTURE-SPINE.md` mais aucune story du socle ne les peuple encore (hors périmètre socle : Epic 8 traite les pins hors parcours, la 3D est différée).
