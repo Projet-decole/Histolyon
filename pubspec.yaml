@@ -4,7 +4,9 @@ publish_to: none
 environment:
   sdk: ^3.13.3
 
-workspace: []
+workspace:
+  - apps/mobile
+  - apps/admin
 
 dev_dependencies:
   melos: ^8.7.0
@@ -15,11 +17,11 @@ melos:
       description: Analyse statique de tout le workspace.
       run: dart analyze .
     test:
-      description: Tests de tout le workspace.
-      run: dart test
+      description: Tests de chaque package du workspace qui a un dossier test/.
+      run: dart run melos exec --dir-exists=test -- "flutter test || dart test"
     format:
       description: Vérifie le formatage de tout le workspace (sans corriger).
       run: dart format --set-exit-if-changed .
     gen:
-      description: Génération de code (build_runner) sur tout le workspace.
-      run: dart run build_runner build --delete-conflicting-outputs
+      description: Génération de code (build_runner) pour chaque package qui en dépend.
+      run: dart run melos exec --depends-on=build_runner -- "dart run build_runner build --delete-conflicting-outputs"
