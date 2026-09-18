@@ -14,8 +14,8 @@ dev_dependencies:
 melos:
   scripts:
     analyze:
-      description: Analyse statique de tout le workspace.
-      run: dart analyze .
+      description: Analyse statique de tout le workspace, plus la règle de lint d'imports maison (AD-5).
+      run: dart analyze . && dart run tools/check_import_direction.dart
     test:
       description: Tests de chaque package du workspace qui a un dossier test/.
       run: dart run melos exec --dir-exists=test -- "flutter test || dart test"
