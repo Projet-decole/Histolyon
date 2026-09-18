@@ -23,7 +23,8 @@ context:
 ## Implementation Notes
 
 - `pubspec.yaml` racine créé : `workspace: []` (vide — `apps/mobile`, `apps/admin`, `packages/*` n'existent pas encore ; les stories 1.3–1.5 y ajouteront leurs entrées au fur et à mesure) ; `environment.sdk: ^3.13.3` (version Dart figée par la spine) ; `melos: ^8.7.0` en `dev_dependencies` ; section `melos.scripts` déclarant `analyze` (`dart analyze .`), `test` (`dart test`), `format` (`dart format --set-exit-if-changed .`), `gen` (`dart run build_runner build --delete-conflicting-outputs`). Pas de `melos.yaml`.
-- Vérification non exécutable dans cet environnement : ni `dart` ni `flutter` ni `melos` ne sont installés ici (`dart`/`flutter` absents du `PATH`). `melos run analyze` n'a donc pas pu être lancé pour confirmer l'AC — le fichier est écrit selon les conventions Dart workspace/melos 8.x connues, mais reste à vérifier sur un poste avec Flutter 3.47.4 installé (prérequis NFR9). Tracé dans `sprint-status.yaml.action_items` (`verify-1-2-melos-toolchain`).
+- Vérification non exécutable dans cet environnement au moment de l'implémentation : ni `dart` ni `flutter` ni `melos` n'étaient installés (`dart`/`flutter` absents du `PATH`). Tracé dans `sprint-status.yaml.action_items` (`verify-1-2-melos-toolchain`).
+- **Mise à jour post-installation** : Flutter 3.47.4 installé via `fvm` (`fvm install 3.47.4` puis `fvm use 3.47.4`), `.fvmrc` et `.gitignore` (`.fvm/`) ajoutés par `fvm use`. AC vérifiées en exécution réelle : `fvm dart run melos run analyze` → `No issues found!` ; `melos.yaml` toujours absent. `pubspec.lock` généré (38 dépendances transitives, dont `melos 8.7.0`). Action item `verify-1-2-melos-toolchain` clos.
 
 ## Review Triage Log
 

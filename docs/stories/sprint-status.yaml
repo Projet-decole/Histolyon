@@ -29,16 +29,17 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 # - Retrospective appends its action items to action_items; the status view surfaces open ones
 generated: 09-17-2026 15:58
-last_updated: 09-18-2026 10:30
+last_updated: 09-18-2026 10:45
 project: ESP
 project_key: NOKEY
 tracking_system: file-system
 story_location: docs/stories
 action_items:
   - id: verify-1-2-melos-toolchain
-    status: open
+    status: done
     summary: "Vérifier `melos run analyze`/`test`/`format`/`gen` sur un poste avec Flutter 3.47.4 / melos 8.7 installés — non vérifiable dans l'environnement d'implémentation (ni dart, ni flutter, ni melos dans le PATH)."
     source: 1-2-workspace-pub-et-scripts-melos
+    resolution: "Flutter 3.47.4 installé via fvm ; `melos run analyze` exécuté, No issues found."
 development_status:
   epic-1: in-progress
   1-1-initialiser-le-dépôt-et-protéger-main: done

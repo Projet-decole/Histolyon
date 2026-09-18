@@ -26,3 +26,6 @@ build/
 .env
 *.pem
 *.key
+
+# FVM Version Cache
+.fvm/
