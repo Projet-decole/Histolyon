@@ -24,7 +24,7 @@ Epic 1 met en place le socle technique sur lequel toute story ultérieure du pro
 - Versions figées à vérifier : `flutter_lints` 6, `riverpod_lint`. Toute autre techno/version passe par amendement d'architecture.
 - Cible Android uniquement pour `apps/mobile` ; `apps/admin` cible le web. Pas d'iOS (pas de Mac/licence Apple — hors périmètre pour l'instant).
 - Pour cet épic (pas de code testable), la règle « tests d'abord » est satisfaite par la vérification du critère « Fini quand »/les checks CI, pas par un commit de tests rouges.
-- Le process complet s'applique dès la Story 1.1 : issue labellisée `socle` → branche `story/socle-01-<slug>` → PR → squash merge, mais l'approbation obligatoire de PR n'est activée qu'après la relecture groupée de fin de socle (les PR de cet épic peuvent fusionner sans relecture préalable pendant cette période).
+- Le process complet s'applique dès la Story 1.1 : issue labellisée `socle` → branche `story/<ID>-<slug>` (ex. `story/1-2-<slug>`), conformément à AD-12 → PR → squash merge, mais l'approbation obligatoire de PR n'est activée qu'après la relecture groupée de fin de socle (les PR de cet épic peuvent fusionner sans relecture préalable pendant cette période). Exception : la branche de Story 1.1 (`story/socle-01-cloture-doc`) a précédé cette clarification et n'est pas renommée rétroactivement.
 - Prérequis hors dépôt à avoir avant de commencer : org GitHub, Flutter 3.47.4, Docker, Supabase CLI 2.117, lefthook 2.1, Android SDK.
 
 ## Technical Decisions

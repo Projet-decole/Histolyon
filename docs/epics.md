@@ -34,7 +34,7 @@ Le mapping `CAP-n` ↔ `socle-NN` est stable et imposé par la SPEC : chaque Cap
 ### NonFunctional Requirements
 
 - NFR1 : Ordre imposé `socle-01 → 11` (chemin de BOOTSTRAP) ; les checks CI cités en 02–05 sont câblés en 09 et s'exécutent en local d'ici là.
-- NFR2 : Chaque story du socle est livrée avec le process qu'elle installe : issue label `socle` → branche `story/socle-NN-<slug>` → PR → squash ; `main` protégé (PR, CI, branche à jour, squash) dès le premier push (AD-12, AD-13).
+- NFR2 : Chaque story du socle est livrée avec le process qu'elle installe : issue label `socle` → branche `story/<ID>-<slug>` (ex. `story/1-2-workspace-melos`), conformément à AD-12 → PR → squash ; `main` protégé (PR, CI, branche à jour, squash) dès le premier push (AD-12, AD-13). Exception : la branche de Story 1.1 (`story/socle-01-cloture-doc`) a précédé cette clarification et n'est pas renommée rétroactivement.
 - NFR3 : Relecture différée : pendant le socle, les PR fusionnent sans relecture préalable ; un coéquipier relit toutes les PR `socle` en une fois à la fin, ses constats deviennent des issues `socle` ; l'approbation obligatoire n'est activée qu'après, avant la première session.
 - NFR4 : Sorties BMAD dans `docs/` : `docs/specs/` (specs), `docs/` (épics, `docs/architecture/` pour le run d'architecture), `docs/stories/` (stories, `sprint-status.yaml`).
 - NFR5 : Stack et versions figées par la spine (vérifiées 2026-09-17) ; toute autre techno ou version passe par amendement ; Android seulement ; Supabase Free = `dev` + `demo`, budgets Storage AD-19 ; zéro euro.
@@ -224,10 +224,10 @@ Afin de disposer du « quoi » (15 paliers) sans le réécrire (AD-15).
 
 **Acceptance Criteria:**
 
-**Given** l'Epic 1 terminé
-**When** `conception/` est copiée telle quelle dans le dépôt
-**Then** son contenu est identique à la source, aucun fichier n'est édité
-**And** `conception/` est committée en un seul commit dédié, sans mélange avec du code
+**Given** le premier commit de Story 1.1 (`335d33e`), qui a déjà committé `conception/` avec `docs/` et `.gitignore`
+**When** le contenu de `conception/` est comparé à la source
+**Then** il est identique à la source, aucun fichier n'a été édité
+**And** aucun code n'a été mélangé au commit qui contient `conception/` (seuls `docs/` et `.gitignore` l'accompagnent)
 
 ### Story 2.2: `tools/ctx` et `conception/INDEX.md`
 
