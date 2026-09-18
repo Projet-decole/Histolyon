@@ -94,14 +94,14 @@ development_status:
   1-5-lint-d-imports-et-lints-de-base: done
   epic-1-retrospective: done
 
-  epic-2: backlog
+  epic-2: in-progress
   2-1-importer-conception-telle-quelle: backlog
   2-2-tools-ctx-et-conception-index-md: backlog
   2-3-agents-md-racine-et-locaux: backlog
   2-4-tools-sync-agents: backlog
   2-5-docs-spine-conventions-guides: backlog
   2-6-templates-de-story-et-de-pr: backlog
-  2-7-prompts: backlog
+  2-7-prompts: done
   epic-2-retrospective: optional
 
   epic-3: backlog
