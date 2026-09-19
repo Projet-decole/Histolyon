@@ -123,7 +123,7 @@ development_status:
 
   epic-6: in-progress
   6-1-composition-root: done
-  6-2-core-router-core-session-core-models-core-log: backlog
+  6-2-core-router-core-session-core-models-core-log: done
   6-3-core-db-drift-et-core-profile: backlog
   6-4-packages-design_tokens-et-tools-check-tokens: backlog
   6-5-packages-ui_kit-composants-de-la-carte: backlog
