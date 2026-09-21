@@ -1,0 +1,10 @@
+# borne_fin = année courante (placeholder à rafraîchir périodiquement,
+# pas de convention "présent ouvert" dans le schéma — borne_fin est
+# obligatoire). borne_debut placeholder — à valider par un·e historien·ne
+# (question ouverte D1.2, conception/09-cartographie/01-fond-et-epoques.yaml).
+id: d428b876-df1e-4876-94de-e6190d65223d
+slug: aujourd_hui
+libelle: "Aujourd'hui"
+borne_debut: 2000
+borne_fin: 2026
+ordre: 10
