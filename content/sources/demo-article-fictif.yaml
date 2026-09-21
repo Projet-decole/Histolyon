@@ -1,0 +1,11 @@
+# FICTIF — démonstration structurelle uniquement (Story 5.2).
+id: ecadda2d-6af3-4017-af8b-59b04d242b3a
+slug: demo-article-fictif
+type: article
+reference: "« Les automates oubliés du Rhône », revue imaginaire Lyon Curiosités, 2019"
+credit: "Revue fictive, projet HistoLyon (démonstration)"
+lien: "https://example.org/lyon-curiosites/automates-oublies"
+description: >-
+  Source inventée pour démontrer le type "article" et le pattern
+  "lien_externe_consultable" — le lien est un domaine réservé à la
+  documentation (RFC 2606), pas une vraie page.

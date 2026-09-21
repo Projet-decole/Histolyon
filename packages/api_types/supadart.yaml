@@ -1,0 +1,28 @@
+# Config de `dart run tools/gen_types.dart` (Story 4.2). URL/clé jamais ici
+# (AD-16, convention Config & secrets) — passées en --url/--key, lues dans
+# l'environnement par tools/gen_types.dart.
+SUPABASE_URL:
+SUPABASE_API_KEY:
+
+# Auto-rempli par tools/gen_types.dart depuis le schéma (introspection),
+# jamais tenu à jour ici — supadart lui-même ne le génère pas tout seul
+# (cf. spike Story 4.1, .memlog.md de la spine).
+enums:
+
+output: packages/api_types/lib/
+separated: false
+dart: false
+
+mappings:
+
+exclude:
+  - copyWith
+  - New
+
+# Geography sur pin.localisation (I9) — cf. spike Story 4.1 (.memlog.md) :
+# Geometry? nullable correctement traversé sans même ce flag, mais on
+# l'active explicitement puisque c'est bien à ça qu'il sert.
+postGIS: true
+jsonbToDynamic: false
+
+jsonb:
