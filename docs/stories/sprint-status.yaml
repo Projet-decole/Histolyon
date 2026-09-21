@@ -141,8 +141,8 @@ development_status:
   8-1-pins-publiés-sur-la-carte-de-lyon: backlog
   epic-8-retrospective: optional
 
-  epic-9: backlog
-  9-1-lefthook: backlog
+  epic-9: in-progress
+  9-1-lefthook: done
   9-2-ci-mobile-et-ci-admin: backlog
   9-3-ci-supabase: backlog
   9-4-ci-content-et-ci-docs: backlog
