@@ -43,23 +43,27 @@ void main() {
           .select()
           .single();
 
-      final ligne = await client
-          .from(Pin.table_name)
-          .select()
-          .eq('id', pinInsere['id'])
-          .single();
-      final pin = Pin.converterSingle(ligne);
+      try {
+        final ligne = await client
+            .from(Pin.table_name)
+            .select()
+            .eq('id', pinInsere['id'])
+            .single();
+        final pin = Pin.converterSingle(ligne);
 
-      expect(pin.titre, 'Pin de test (tools/gen-types)');
-      expect(pin.statut, STATUT_PIN.brouillon);
-      expect(pin.provenance, PROVENANCE_PIN.editorial);
-      expect(pin.localisation, isNull);
-
-      await client.from(Pin.table_name).delete().eq('id', pin.id);
-      await client
-          .from(Categorie.table_name)
-          .delete()
-          .eq('id', categorie['id']);
+        expect(pin.titre, 'Pin de test (tools/gen-types)');
+        expect(pin.statut, STATUT_PIN.brouillon);
+        expect(pin.provenance, PROVENANCE_PIN.editorial);
+        expect(pin.localisation, isNull);
+      } finally {
+        // Nettoyage même si une assertion échoue — sinon un échec laisse le
+        // pin/catégorie de test orphelins en base locale.
+        await client.from(Pin.table_name).delete().eq('id', pinInsere['id']);
+        await client
+            .from(Categorie.table_name)
+            .delete()
+            .eq('id', categorie['id']);
+      }
     },
     skip: url == null || key == null
         ? 'SUPABASE_URL/SUPABASE_SERVICE_ROLE_KEY absentes — test contre '

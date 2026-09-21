@@ -35,6 +35,15 @@ project_key: NOKEY
 tracking_system: file-system
 story_location: docs/stories
 action_items:
+  - id: pin-cour-des-voraces-audio-et-verification-historienne
+    status: open
+    summary: "content/pins/cour-des-voraces.yaml (Story 5.2) : contenu réel sourcé
+      publiquement (Wikipédia, Musée Gadagne), pas de recherche archivistique primaire.
+      Manque encore pour clore vraiment la story : (1) un fichier audio de narration
+      (aucun n'existe, aucun outil de synthèse vocale disponible dans l'environnement
+      d'implémentation) ; (2) une relecture par une lead historienne avant de dépasser
+      le statut brouillon."
+    source: 5-2-premier-pin-réel-sourcé
   - id: regle-branche-a-jour-avant-fusion
     status: open
     summary: "Story 9.5 : activer manuellement, dans Paramètres → Branches
@@ -164,7 +173,7 @@ development_status:
   10-4-keep-alive-et-export-hebdomadaires: backlog
   epic-10-retrospective: optional
 
-  epic-11: in-progress
+  epic-11: done
   11-1-labels-et-github-projects: done
   11-2-tools-report-v0: done
   11-3-roles-md-retros-et-rétro-du-bootstrap: done

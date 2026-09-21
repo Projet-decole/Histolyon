@@ -10,15 +10,21 @@ class ProfileRepository {
   final AppDatabase _db;
   final Uuid _uuid;
 
+  /// Le select-puis-insert est englobé dans une transaction Drift : deux
+  /// appels concurrents (ex. deux widgets qui attendent le provider de
+  /// profil au démarrage) sont sérialisés par la connexion SQLite unique,
+  /// donc un seul insère effectivement le Profil local.
   Future<ProfilData> assurerProfilLocal() async {
-    final existant = await _db.select(_db.profil).getSingleOrNull();
-    if (existant != null) return existant;
+    return _db.transaction(() async {
+      final existant = await _db.select(_db.profil).getSingleOrNull();
+      if (existant != null) return existant;
 
-    final nouveauProfil = ProfilCompanion.insert(
-      id: _uuid.v4(),
-      creeLe: DateTime.now(),
-    );
-    await _db.into(_db.profil).insert(nouveauProfil);
-    return _db.select(_db.profil).getSingle();
+      final nouveauProfil = ProfilCompanion.insert(
+        id: _uuid.v4(),
+        creeLe: DateTime.now(),
+      );
+      await _db.into(_db.profil).insert(nouveauProfil);
+      return _db.select(_db.profil).getSingle();
+    });
   }
 }

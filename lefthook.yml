@@ -23,7 +23,11 @@ pre-commit:
       glob: "*.dart"
       run: dart run melos run analyze
     content:
-      glob: "content/**/*.yaml"
+      glob:
+        - "content/**/*.yaml"
+        - "tools/validate_content.dart"
+        - "tools/seed.dart"
+        - "supabase/migrations/**"
       run: dart run tools/validate_content.dart
 
 pre-push:

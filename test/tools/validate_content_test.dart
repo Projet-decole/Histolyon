@@ -247,5 +247,34 @@ medias:
         1,
       );
     });
+
+    test('medias avec une clé inconnue -> refus (1)', () {
+      File('${tempDir.path}/content/pins/medias-cle-inconnue.yaml')
+          .writeAsStringSync('''
+id: 969de5f0-ae71-4869-ac48-fbff8134d677
+slug: demo
+titre: Demo
+categorie: anecdote
+contenu_narratif:
+  teaser: t
+medias:
+  - role: narration_audio
+    media_slug: demo-narration
+    licence_bricolee_a_la_main: CC-BY
+''');
+      expect(
+        evaluerValidationContent(contentExiste: true, schemaExiste: true),
+        1,
+      );
+    });
+
+    test('YAML invalide -> refus (1), sans planter le run', () {
+      File('${tempDir.path}/content/pins/yaml-invalide.yaml')
+          .writeAsStringSync('titre: ["liste ouverte jamais refermée');
+      expect(
+        evaluerValidationContent(contentExiste: true, schemaExiste: true),
+        1,
+      );
+    });
   });
 }
