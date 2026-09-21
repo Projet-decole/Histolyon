@@ -44,6 +44,14 @@ action_items:
       d'implémentation) ; (2) une relecture par une lead historienne avant de dépasser
       le statut brouillon."
     source: 5-2-premier-pin-réel-sourcé
+  - id: regle-branche-a-jour-avant-fusion
+    status: open
+    summary: "Story 9.5 : activer manuellement, dans Paramètres → Branches
+      → règle de protection de main, l'option « Require branches to be up
+      to date before merging ». Hors de portée sans accès à l'UI GitHub
+      (même famille que la protection initiale de main, Story 1.1)."
+    source: 9-5-règle-de-branche-à-jour-et-nightly-e2e
+    owner: "porteur"
   - id: verify-1-2-melos-toolchain
     status: done
     summary: "Vérifier `melos run analyze`/`test`/`format`/`gen` sur un poste avec
@@ -153,9 +161,9 @@ development_status:
   epic-9: in-progress
   9-1-lefthook: done
   9-2-ci-mobile-et-ci-admin: done
-  9-3-ci-supabase: backlog
-  9-4-ci-content-et-ci-docs: backlog
-  9-5-règle-de-branche-à-jour-et-nightly-e2e: backlog
+  9-3-ci-supabase: done
+  9-4-ci-content-et-ci-docs: done
+  9-5-règle-de-branche-à-jour-et-nightly-e2e: in-progress
   epic-9-retrospective: optional
 
   epic-10: backlog
