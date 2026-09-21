@@ -100,12 +100,24 @@ int evaluerValidationContent({
       continue;
     }
 
-    final schema =
-        jsonDecode(fichierSchema.readAsStringSync()) as Map<String, dynamic>;
+    final Map<String, dynamic> schema;
+    try {
+      schema =
+          jsonDecode(fichierSchema.readAsStringSync()) as Map<String, dynamic>;
+    } catch (e) {
+      violations.add(Violation(fichierSchema.path, 'JSON invalide : $e.'));
+      continue;
+    }
 
     for (final fichier in dossierContenu.listSync()) {
       if (fichier is! File || !fichier.path.endsWith('.yaml')) continue;
-      final document = loadYaml(fichier.readAsStringSync());
+      final dynamic document;
+      try {
+        document = loadYaml(fichier.readAsStringSync());
+      } catch (e) {
+        violations.add(Violation(fichier.path, 'YAML invalide : $e.'));
+        continue;
+      }
       violations.addAll(_validerContreSchema(fichier.path, document, schema));
     }
   }
@@ -177,6 +189,7 @@ List<Violation> _validerContreSchema(
           valeur.every(
             (v) =>
                 v is YamlMap &&
+                v.keys.every((k) => k == 'role' || k == 'media_slug') &&
                 v['role'] is String &&
                 (v['role'] as String).isNotEmpty &&
                 v['media_slug'] is String &&

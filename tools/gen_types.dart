@@ -60,6 +60,15 @@ Future<void> main() async {
     exitCode = 1;
     return;
   }
+  if (swaggerComplet['definitions'] is! Map) {
+    stderr.writeln(
+      'tools/gen-types : réponse de $url/rest/v1/ sans champ "definitions" '
+      'exploitable — SUPABASE_URL pointe-t-il bien vers un projet Supabase '
+      'local démarré (`supabase status`) ?',
+    );
+    exitCode = 1;
+    return;
+  }
   final definitionsCompletes = (swaggerComplet['definitions'] as Map)
       .cast<String, dynamic>();
 
@@ -176,6 +185,13 @@ Future<void> _genererApiTypes({
   required Map<String, dynamic> definitions,
 }) async {
   final configStatique = File(_configStatique).readAsStringSync();
+  final marqueurEnums = RegExp(r'^enums:\s*$', multiLine: true);
+  if (!marqueurEnums.hasMatch(configStatique)) {
+    throw 'marqueur "enums:" introuvable dans $_configStatique — '
+        'ce script doit pouvoir le remplacer par le bloc introspecté, '
+        'vérifie que le fichier commité porte toujours une ligne '
+        '`enums:` seule, sans valeurs.';
+  }
   final blocEnums = StringBuffer('enums:\n');
   enums.forEach((nom, valeurs) {
     blocEnums.writeln('  $nom: [${valeurs.join(', ')}]');
@@ -184,7 +200,7 @@ Future<void> _genererApiTypes({
   // le bloc introspecté — le fichier commité documente juste que ce bloc
   // est auto-rempli, il ne le porte jamais lui-même.
   final configComplete = configStatique.replaceFirst(
-    RegExp(r'^enums:\s*$', multiLine: true),
+    marqueurEnums,
     blocEnums.toString().trimRight(),
   );
 

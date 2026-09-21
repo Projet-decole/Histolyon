@@ -45,39 +45,49 @@ Future<void> main() async {
   final pins = _chargerParSlug('content/pins');
 
   for (final categorie in categories.values) {
-    await db.upsert('categorie', {
-      'id': categorie['id'],
-      'slug': categorie['slug'],
-      'libelle': categorie['libelle'],
-      if (categorie['description'] != null)
-        'description': categorie['description'],
-      'ordre': categorie['ordre'],
-    }, onConflict: 'slug');
+    await _essayer(
+      "categorie '${categorie['slug']}'",
+      () => db.upsert('categorie', {
+        'id': categorie['id'],
+        'slug': categorie['slug'],
+        'libelle': categorie['libelle'],
+        if (categorie['description'] != null)
+          'description': categorie['description'],
+        'ordre': categorie['ordre'],
+      }, onConflict: 'slug'),
+    );
   }
   stdout.writeln('tools/seed : ${categories.length} catégorie(s).');
 
   for (final epoque in epoques.values) {
-    await db.upsert('epoque', {
-      'id': epoque['id'],
-      'slug': epoque['slug'],
-      'libelle': epoque['libelle'],
-      'borne_debut': epoque['borne_debut'],
-      'borne_fin': epoque['borne_fin'],
-      'ordre': epoque['ordre'],
-    }, onConflict: 'slug');
+    await _essayer(
+      "epoque '${epoque['slug']}'",
+      () => db.upsert('epoque', {
+        'id': epoque['id'],
+        'slug': epoque['slug'],
+        'libelle': epoque['libelle'],
+        'borne_debut': epoque['borne_debut'],
+        'borne_fin': epoque['borne_fin'],
+        'ordre': epoque['ordre'],
+      }, onConflict: 'slug'),
+    );
   }
   stdout.writeln('tools/seed : ${epoques.length} époque(s).');
 
   for (final source in sources.values) {
-    await db.upsert('source_documentaire', {
-      'id': source['id'],
-      'slug': source['slug'],
-      'type': source['type'],
-      'reference': source['reference'],
-      'credit': source['credit'],
-      if (source['lien'] != null) 'lien': source['lien'],
-      if (source['description'] != null) 'description': source['description'],
-    }, onConflict: 'slug');
+    await _essayer(
+      "source '${source['slug']}'",
+      () => db.upsert('source_documentaire', {
+        'id': source['id'],
+        'slug': source['slug'],
+        'type': source['type'],
+        'reference': source['reference'],
+        'credit': source['credit'],
+        if (source['lien'] != null) 'lien': source['lien'],
+        if (source['description'] != null)
+          'description': source['description'],
+      }, onConflict: 'slug'),
+    );
   }
   stdout.writeln('tools/seed : ${sources.length} source(s).');
 
@@ -106,48 +116,81 @@ Future<void> main() async {
       payload['localisation'] =
           'POINT(${localisation['lon']} ${localisation['lat']})';
     }
-    await db.upsert('pin', payload, onConflict: 'slug');
+    final pinOk = await _essayer(
+      "pin '${pin['slug']}'",
+      () => db.upsert('pin', payload, onConflict: 'slug'),
+    );
+    if (!pinOk) continue;
 
     final pinId = pin['id'] as String;
 
-    await db.delete('pin_epoque', 'pin_id=eq.$pinId');
-    for (final slugEpoque in (pin['epoques'] as List? ?? const [])) {
-      final epoqueId = epoques[slugEpoque]?['id'];
-      if (epoqueId == null) {
-        stderr.writeln(
-          "tools/seed : pin '${pin['slug']}' référence l'époque inconnue "
-          "'$slugEpoque'.",
+    if (await _essayer(
+      "purge pin_epoque de '${pin['slug']}'",
+      () => db.delete('pin_epoque', 'pin_id=eq.$pinId'),
+    )) {
+      for (final slugEpoque in (pin['epoques'] as List? ?? const [])) {
+        final epoqueId = epoques[slugEpoque]?['id'];
+        if (epoqueId == null) {
+          stderr.writeln(
+            "tools/seed : pin '${pin['slug']}' référence l'époque inconnue "
+            "'$slugEpoque'.",
+          );
+          exitCode = 1;
+          continue;
+        }
+        await _essayer(
+          "pin_epoque '${pin['slug']}' -> '$slugEpoque'",
+          () => db.upsert('pin_epoque', {
+            'pin_id': pinId,
+            'epoque_id': epoqueId,
+          }, onConflict: 'pin_id,epoque_id'),
         );
-        exitCode = 1;
-        continue;
       }
-      await db.upsert('pin_epoque', {
-        'pin_id': pinId,
-        'epoque_id': epoqueId,
-      }, onConflict: 'pin_id,epoque_id');
     }
 
-    await db.delete('pin_source', 'pin_id=eq.$pinId');
-    for (final slugSource in (pin['sources'] as List? ?? const [])) {
-      final sourceId = sources[slugSource]?['id'];
-      if (sourceId == null) {
-        stderr.writeln(
-          "tools/seed : pin '${pin['slug']}' référence la source inconnue "
-          "'$slugSource'.",
+    if (await _essayer(
+      "purge pin_source de '${pin['slug']}'",
+      () => db.delete('pin_source', 'pin_id=eq.$pinId'),
+    )) {
+      for (final slugSource in (pin['sources'] as List? ?? const [])) {
+        final sourceId = sources[slugSource]?['id'];
+        if (sourceId == null) {
+          stderr.writeln(
+            "tools/seed : pin '${pin['slug']}' référence la source inconnue "
+            "'$slugSource'.",
+          );
+          exitCode = 1;
+          continue;
+        }
+        await _essayer(
+          "pin_source '${pin['slug']}' -> '$slugSource'",
+          () => db.upsert('pin_source', {
+            'pin_id': pinId,
+            'source_id': sourceId,
+          }, onConflict: 'pin_id,source_id'),
         );
-        exitCode = 1;
-        continue;
       }
-      await db.upsert('pin_source', {
-        'pin_id': pinId,
-        'source_id': sourceId,
-      }, onConflict: 'pin_id,source_id');
     }
   }
   stdout.writeln('tools/seed : ${pins.length} pin(s).');
 
   db.close();
   if (exitCode == 0) stdout.writeln('tools/seed : terminé.');
+}
+
+/// Exécute une écriture PostgREST en rapportant un échec (réseau, contrainte,
+/// RLS) comme une ligne stderr + `exitCode = 1`, sans interrompre le reste du
+/// seed — même politique de tolérance que les lookups de clé étrangère
+/// ci-dessus plutôt qu'un crash qui abandonnerait tout le contenu restant.
+Future<bool> _essayer(String description, Future<void> Function() action) async {
+  try {
+    await action();
+    return true;
+  } catch (e) {
+    stderr.writeln('tools/seed : $description a échoué — $e');
+    exitCode = 1;
+    return false;
+  }
 }
 
 /// Charge tous les `*.yaml` d'un dossier de contenu, indexés par leur

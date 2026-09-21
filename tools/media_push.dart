@@ -43,15 +43,36 @@ Future<void> main() async {
     return;
   }
 
-  final entrees = loadYaml(manifeste.readAsStringSync()) as YamlList;
+  final contenuManifeste = loadYaml(manifeste.readAsStringSync());
+  if (contenuManifeste is! YamlList) {
+    stderr.writeln(
+      'tools/media_push : content/medias.yaml vide ou mal formé — attendu '
+      'une liste au premier niveau.',
+    );
+    exitCode = 1;
+    return;
+  }
+  final entrees = contenuManifeste;
   final client = HttpClient();
   var succes = 0;
 
   for (final entree in entrees) {
-    final bucket = entree['bucket'] as String;
-    final slug = entree['slug'] as String;
-    final fichier = entree['fichier'] as String;
-    final mediaSlug = entree['media_slug'] as String;
+    final bucket = entree['bucket'];
+    final slug = entree['slug'];
+    final fichier = entree['fichier'];
+    final mediaSlug = entree['media_slug'];
+    if (bucket is! String ||
+        slug is! String ||
+        fichier is! String ||
+        mediaSlug is! String) {
+      stderr.writeln(
+        'tools/media_push : entrée invalide dans content/medias.yaml — '
+        "'bucket', 'slug', 'fichier' et 'media_slug' doivent tous être "
+        'renseignés en chaîne ($entree).',
+      );
+      exitCode = 1;
+      continue;
+    }
     final cheminSource = '$dossierSource/$fichier';
     final sourceFile = File(cheminSource);
 

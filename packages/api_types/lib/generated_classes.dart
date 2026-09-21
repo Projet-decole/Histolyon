@@ -487,7 +487,7 @@ class TraceValidation implements SupadartClass<TraceValidation> {
   final String pinId;
   final String validateur;
   final String decision;
-  final String typeDeValidation;
+  final String? typeDeValidation;
   final String? motif;
   final DateTime horodatage;
 
@@ -496,7 +496,7 @@ class TraceValidation implements SupadartClass<TraceValidation> {
     required this.pinId,
     required this.validateur,
     required this.decision,
-    required this.typeDeValidation,
+    this.typeDeValidation,
     this.motif,
     required this.horodatage,
   });
@@ -544,7 +544,7 @@ class TraceValidation implements SupadartClass<TraceValidation> {
     required String pinId,
     required String validateur,
     required String decision,
-    required String typeDeValidation,
+    String? typeDeValidation,
     String? motif,
     DateTime? horodatage,
   }) {
@@ -589,7 +589,7 @@ class TraceValidation implements SupadartClass<TraceValidation> {
       decision: jsonn['decision'] != null ? jsonn['decision'].toString() : '',
       typeDeValidation: jsonn['type_de_validation'] != null
           ? jsonn['type_de_validation'].toString()
-          : '',
+          : null,
       motif: jsonn['motif'] != null ? jsonn['motif'].toString() : null,
       horodatage: jsonn['horodatage'] != null
           ? DateTime.parse(jsonn['horodatage'].toString())

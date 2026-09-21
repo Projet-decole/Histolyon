@@ -82,10 +82,14 @@ double _mediane(List<double> valeurs) {
 String _genererMarkdown(List<_LigneRapport> lignes) {
   final parDomaine = <String, List<_LigneRapport>>{};
   for (final ligne in lignes) {
-    final domaine = ligne.issue.labels.firstWhere(
-      _domaines.contains,
-      orElse: () => 'socle (bootstrap, sans domaine produit)',
-    );
+    final domainesTrouves = ligne.issue.labels
+        .where(_domaines.contains)
+        .toList();
+    final domaine = switch (domainesTrouves.length) {
+      0 => 'socle (bootstrap, sans domaine produit)',
+      1 => domainesTrouves.single,
+      _ => 'ambigu (${domainesTrouves.join('+')})',
+    };
     parDomaine.putIfAbsent(domaine, () => []).add(ligne);
   }
 
@@ -173,6 +177,14 @@ String _genererMarkdown(List<_LigneRapport> lignes) {
       'mergées, puis repli sur un commentaire de rattrapage) : leur délai '
       "est calculé depuis la fermeture de l'issue, qui peut ne pas "
       'refléter la date réelle de fusion.',
+    );
+  }
+  final ambigues = parDomaine.keys.where((d) => d.startsWith('ambigu'));
+  if (ambigues.isNotEmpty) {
+    buffer.writeln(
+      '- ${ambigues.length} groupe(s) « ambigu » : issue(s) portant plus '
+      "d'un label de domaine D1…D11 à la fois — classement non tranché "
+      'automatiquement plutôt que de choisir arbitrairement un des labels.',
     );
   }
 
@@ -349,8 +361,18 @@ class _GitHub {
   Future<bool?> ciVerte(String? sha) async {
     if (sha == null) return null;
     try {
-      final data = await _get('/repos/$_owner/$_repo/commits/$sha/check-runs');
-      final runs = data['check_runs'] as List;
+      final runs = <dynamic>[];
+      var page = 1;
+      while (true) {
+        final data = await _get(
+          '/repos/$_owner/$_repo/commits/$sha/check-runs',
+          query: {'per_page': '100', 'page': '$page'},
+        );
+        final lot = data['check_runs'] as List;
+        runs.addAll(lot);
+        if (lot.length < 100) break;
+        page++;
+      }
       if (runs.isEmpty) return null;
       return runs.every((r) => r['conclusion'] == 'success');
     } catch (_) {
