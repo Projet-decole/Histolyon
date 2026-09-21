@@ -157,7 +157,7 @@ development_status:
   epic-10-retrospective: optional
 
   epic-11: in-progress
-  11-1-labels-et-github-projects: backlog
+  11-1-labels-et-github-projects: done
   11-2-tools-report-v0: backlog
   11-3-roles-md-retros-et-rétro-du-bootstrap: done
   11-4-sprint-status-yaml: backlog
