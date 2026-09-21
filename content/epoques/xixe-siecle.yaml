@@ -1,0 +1,10 @@
+# Bornes placeholder — étendu jusqu'à 1939 pour couvrir l'entre-deux-guerres
+# sans trou avant l'ancre Seconde Guerre mondiale. À valider par un·e
+# historien·ne (question ouverte D1.2,
+# conception/09-cartographie/01-fond-et-epoques.yaml).
+id: c0715e21-4bec-4a63-b0c5-dba4f17138d4
+slug: xixe_siecle
+libelle: XIXe siècle
+borne_debut: 1815
+borne_fin: 1939
+ordre: 7
