@@ -1,0 +1,42 @@
+name: ci-supabase
+
+on:
+  pull_request:
+    paths:
+      - "supabase/**"
+      - "tools/check_migration_order.dart"
+      - ".github/workflows/ci-supabase.yml"
+
+jobs:
+  db-reset-et-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # fetch-depth: 0 nécessaire pour comparer les migrations à
+          # origin/main (tools/check_migration_order.dart) plus bas.
+          fetch-depth: 0
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.47.4"
+          channel: "stable"
+
+      - name: Ordre des migrations (AD-16)
+        run: dart run tools/check_migration_order.dart origin/main
+
+      - uses: supabase/setup-cli@v1
+        with:
+          version: 2.117.0
+
+      # start amorce la stack locale (Docker, préinstallé sur les runners
+      # ubuntu-latest) ; db reset rejoue ensuite toutes les migrations
+      # depuis une base vide — une migration cassée ou mal ordonnée
+      # échoue ici, avant test db.
+      - name: supabase start && db reset
+        run: |
+          supabase start
+          supabase db reset
+
+      - name: supabase test db (pgTAP)
+        run: supabase test db
