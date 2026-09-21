@@ -1,0 +1,57 @@
+name: ci-docs
+
+on:
+  pull_request:
+    paths:
+      - "AGENTS.md"
+      - "apps/*/AGENTS.md"
+      - "supabase/AGENTS.md"
+      - "tools/sync_agents.dart"
+      - "tools/gen_types.dart"
+      - "supabase/migrations/**"
+      - ".github/workflows/ci-docs.yml"
+
+jobs:
+  regenerer-et-verifier-diff:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.47.4"
+          channel: "stable"
+
+      - run: flutter pub get
+
+      - name: Régénérer CLAUDE.md / .cursor / copilot-instructions depuis les AGENTS.md
+        run: dart run tools/sync_agents.dart
+
+      - uses: supabase/setup-cli@v1
+        with:
+          version: 2.117.0
+
+      - name: Supabase local (pour gen-types)
+        run: |
+          supabase start
+          supabase db reset
+
+      - name: Récupérer les clés locales
+        run: |
+          STATUS=$(supabase status -o json)
+          echo "SUPABASE_URL=$(echo "$STATUS" | jq -r .API_URL)" >> "$GITHUB_ENV"
+          echo "SUPABASE_SERVICE_ROLE_KEY=$(echo "$STATUS" | jq -r .SERVICE_ROLE_KEY)" >> "$GITHUB_ENV"
+
+      - name: Régénérer packages/api_types et content/schema/
+        run: dart run tools/gen_types.dart
+
+      # TODO(Story 6.4) : ajouter `dart run tools/check-tokens.dart` ici
+      # une fois packages/design_tokens et tools/check-tokens écrits —
+      # bloqué par l'export Figma à ce jour (cf. docs/stories/sprint-status.yaml).
+
+      - name: Refuser tout diff après régénération
+        run: |
+          git diff --exit-code -- CLAUDE.md .cursor .github/copilot-instructions.md packages/api_types content/schema || (
+            echo "::error::La documentation ou les types générés ne sont pas à jour — relancer dart run tools/sync_agents.dart et dart run tools/gen_types.dart, committer le résultat." &&
+            exit 1
+          )

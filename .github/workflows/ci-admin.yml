@@ -1,0 +1,45 @@
+name: ci-admin
+
+on:
+  pull_request:
+    paths:
+      - "apps/admin/**"
+      - "pubspec.yaml"
+      - "pubspec.lock"
+      - "tools/coverage_ratchet.dart"
+      - ".github/workflows/ci-admin.yml"
+
+jobs:
+  analyze-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # fetch-depth: 0 nécessaire pour lire coverage_baseline.txt sur
+          # origin/main (cliquet de couverture) plus bas.
+          fetch-depth: 0
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.47.4"
+          channel: "stable"
+
+      - run: flutter pub get
+
+      - name: Analyse statique (workspace, cf. Story 1.5/AD-5)
+        run: dart run melos run analyze
+
+      - name: Tests + couverture
+        working-directory: apps/admin
+        run: flutter test --coverage
+
+      - name: Cliquet de couverture (ne doit pas baisser vs main)
+        working-directory: apps/admin
+        run: |
+          git show origin/main:apps/admin/coverage_baseline.txt > coverage_baseline.txt 2>/dev/null || echo "0.0" > coverage_baseline.txt
+          dart run ../../tools/coverage_ratchet.dart coverage/lcov.info coverage_baseline.txt
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: admin-coverage
+          path: apps/admin/coverage/lcov.info

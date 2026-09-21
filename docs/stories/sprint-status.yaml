@@ -35,6 +35,14 @@ project_key: NOKEY
 tracking_system: file-system
 story_location: docs/stories
 action_items:
+  - id: regle-branche-a-jour-avant-fusion
+    status: open
+    summary: "Story 9.5 : activer manuellement, dans Paramètres → Branches
+      → règle de protection de main, l'option « Require branches to be up
+      to date before merging ». Hors de portée sans accès à l'UI GitHub
+      (même famille que la protection initiale de main, Story 1.1)."
+    source: 9-5-règle-de-branche-à-jour-et-nightly-e2e
+    owner: "porteur"
   - id: verify-1-2-melos-toolchain
     status: done
     summary: "Vérifier `melos run analyze`/`test`/`format`/`gen` sur un poste avec
@@ -47,12 +55,15 @@ action_items:
       exec`, donc ne testaient/généraient jamais les packages membres. Les 4 scripts
       sont maintenant vérifiés fonctionnels avec de vrais packages (apps/mobile, apps/admin)."
   - id: github-dir-not-created-story-1-3
-    status: open
+    status: done
     summary: "`.github/` volontairement non créé en Story 1.3 (collision avec le README
-      affiché de GitHub en l'absence de README racine). Story 2.6 (templates) et Story
-      9.1+ (workflows) doivent créer ce dossier elles-mêmes en y ajoutant leur premier
-      fichier réel."
+      affiché de GitHub en l'absence de README racine). Prévision initiale erronée :
+      ce n'est pas Story 2.6 (templates) ni Story 9.1+ (workflows) qui créent ce dossier
+      en premier, mais Story 2.4 (`tools/sync_agents.dart`), avec `.github/copilot-instructions.md`
+      comme premier fichier réel."
     source: 1-3-arbre-de-dossiers-de-la-spine
+    resolution: "`.github/` créé par Story 2.4 (`tools/sync_agents.dart`), qui y écrit
+      `copilot-instructions.md` généré depuis les AGENTS.md."
   - id: android-cmdline-tools-missing
     status: open
     summary: "`flutter build apk` non vérifiable sur ce poste (`cmdline-tools` Android
@@ -94,31 +105,31 @@ development_status:
   1-5-lint-d-imports-et-lints-de-base: done
   epic-1-retrospective: done
 
-  epic-2: backlog
-  2-1-importer-conception-telle-quelle: backlog
-  2-2-tools-ctx-et-conception-index-md: backlog
-  2-3-agents-md-racine-et-locaux: backlog
-  2-4-tools-sync-agents: backlog
-  2-5-docs-spine-conventions-guides: backlog
-  2-6-templates-de-story-et-de-pr: backlog
-  2-7-prompts: backlog
+  epic-2: done
+  2-1-importer-conception-telle-quelle: done
+  2-2-tools-ctx-et-conception-index-md: done
+  2-3-agents-md-racine-et-locaux: done
+  2-4-tools-sync-agents: done
+  2-5-docs-spine-conventions-guides: done
+  2-6-templates-de-story-et-de-pr: done
+  2-7-prompts: done
   epic-2-retrospective: optional
 
-  epic-3: backlog
-  3-1-bootstrap-supabase-local: backlog
-  3-2-migration-socle-0001_socle-sql-schéma-rls-rpc-tests-pgtap: backlog
+  epic-3: done
+  3-1-bootstrap-supabase-local: done
+  3-2-migration-socle-0001_socle-sql-schéma-rls-rpc-tests-pgtap: done
   epic-3-retrospective: optional
 
-  epic-4: backlog
-  4-1-spike-supadart-geography-et-enum-nullables: backlog
-  4-2-tools-gen-types: backlog
+  epic-4: done
+  4-1-spike-supadart-geography-et-enum-nullables: done
+  4-2-tools-gen-types: done
   epic-4-retrospective: optional
 
-  epic-5: backlog
-  5-1-époques-et-catégories-en-yaml: backlog
-  5-2-premier-pin-réel-sourcé: backlog
-  5-3-tools-media-push: backlog
-  5-4-tools-seed: backlog
+  epic-5: in-progress
+  5-1-époques-et-catégories-en-yaml: done
+  5-2-premier-pin-réel-sourcé: in-progress
+  5-3-tools-media-push: done
+  5-4-tools-seed: done
   epic-5-retrospective: optional
 
   epic-6: in-progress
@@ -138,12 +149,12 @@ development_status:
   8-1-pins-publiés-sur-la-carte-de-lyon: backlog
   epic-8-retrospective: optional
 
-  epic-9: backlog
-  9-1-lefthook: backlog
-  9-2-ci-mobile-et-ci-admin: backlog
-  9-3-ci-supabase: backlog
-  9-4-ci-content-et-ci-docs: backlog
-  9-5-règle-de-branche-à-jour-et-nightly-e2e: backlog
+  epic-9: in-progress
+  9-1-lefthook: done
+  9-2-ci-mobile-et-ci-admin: done
+  9-3-ci-supabase: done
+  9-4-ci-content-et-ci-docs: done
+  9-5-règle-de-branche-à-jour-et-nightly-e2e: in-progress
   epic-9-retrospective: optional
 
   epic-10: backlog
@@ -153,9 +164,9 @@ development_status:
   10-4-keep-alive-et-export-hebdomadaires: backlog
   epic-10-retrospective: optional
 
-  epic-11: backlog
-  11-1-labels-et-github-projects: backlog
-  11-2-tools-report-v0: backlog
-  11-3-roles-md-retros-et-rétro-du-bootstrap: backlog
-  11-4-sprint-status-yaml: backlog
+  epic-11: in-progress
+  11-1-labels-et-github-projects: done
+  11-2-tools-report-v0: done
+  11-3-roles-md-retros-et-rétro-du-bootstrap: done
+  11-4-sprint-status-yaml: done
   epic-11-retrospective: optional

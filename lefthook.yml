@@ -1,0 +1,32 @@
+# Hooks Git (Story 9.1, AD-14) : une erreur doit être visible avant qu'un
+# autre membre la voie. Nécessite le binaire lefthook (https://lefthook.dev)
+# puis `lefthook install` — non vérifié en exécution réelle dans cet
+# environnement (binaire absent).
+#
+# Simplifications assumées faute d'outillage existant à ce stade du
+# bootstrap (à réviser quand les stories citées existent) :
+# - `analyze` tourne sur tout le workspace (`melos run analyze`), pas
+#   seulement sur les fichiers stagés : `dart analyze` n'a pas de mode
+#   "uniquement ces fichiers" utile sur un workspace multi-packages.
+# - `test` (pre-push) tourne sur tout le workspace (`melos run test`), pas
+#   seulement le package touché : aucun outil de détection de package
+#   modifié n'existe encore dans `tools/`.
+
+pre-commit:
+  parallel: true
+  commands:
+    format:
+      glob: "*.dart"
+      run: dart format {staged_files}
+      stage_fixed: true
+    analyze:
+      glob: "*.dart"
+      run: dart run melos run analyze
+    content:
+      glob: "content/**/*.yaml"
+      run: dart run tools/validate_content.dart
+
+pre-push:
+  commands:
+    test:
+      run: dart run melos run test

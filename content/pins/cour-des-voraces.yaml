@@ -1,0 +1,86 @@
+# ============================================================================
+# PREMIER PIN RÉEL — Story 5.2
+# ============================================================================
+# Contenu basé sur des faits d'histoire lyonnaise largement établis et
+# documentés publiquement (les canuts, les traboules, les révoltes de
+# 1831/1834). Ce n'est PAS le résultat d'une recherche archivistique
+# primaire — je n'ai accès ni aux Archives municipales de Lyon, ni à une
+# historienne pour vérifier les détails fins. Les sources citées sont
+# publiques et générales (Wikipédia, Musée Gadagne), pas des pièces
+# d'archive avec cote précise.
+#
+# Ce que je NE fournis PAS ici, honnêtement :
+# - un fichier audio (aucune narration enregistrée n'existe — production
+#   à faire séparément, cf. content/medias.yaml non touché par ce fichier)
+# - une vérification par une lead historienne (recommandé avant que ce
+#   pin dépasse le statut brouillon)
+#
+# Le porteur a explicitement accepté ce compromis (contenu réel mais
+# sourcé publiquement plutôt que fictif, révisable/supprimable ensuite)
+# plutôt que de rester sur le pin de démonstration fictif de la Story 5.2
+# (voir content/pins/demo-pin-exemple.yaml).
+# ============================================================================
+
+id: c4d158e5-f125-4f3d-ad5e-57a9456379e1
+slug: cour-des-voraces
+titre: La Cour des Voraces
+categorie: architecture
+
+epoques:
+  - xixe_siecle
+
+sources:
+  - wikipedia-cour-des-voraces
+  - wikipedia-canuts
+  - musee-gadagne-canuts
+
+# Croix-Rousse, place Colbert, Lyon — coordonnées approximatives (à
+# affiner avant publication, précision de l'ordre de la dizaine de mètres).
+localisation:
+  lat: 45.7706
+  lon: 4.8298
+
+contenu_narratif:
+  teaser: >-
+    Une porte cochère, une cour, et soudain un escalier de pierre qui
+    grimpe sur six étages à ciel ouvert. Ici, la soie passait — et,
+    parfois, une révolte.
+
+  narration: |
+    Tu pousses la porte, place Colbert, et tu te retrouves dans une cour
+    intérieure vertigineuse : un escalier à vis en pierre grimpe le long
+    des façades, desservant les logements sur plusieurs étages, à ciel
+    ouvert. C'est la Cour des Voraces, l'une des traboules les plus
+    spectaculaires de la Croix-Rousse.
+
+    Au XIXe siècle, ce quartier vivait de la soie. Les canuts — les
+    ouvriers tisseurs — travaillaient chez eux, sur des métiers à tisser
+    qui occupaient tout un étage, et devaient porter leurs pièces de soie
+    aux marchands du centre-ville sans les exposer à la pluie. Les
+    traboules, ces passages qui traversent les immeubles et relient une
+    rue à l'autre par leurs cours intérieures, servaient exactement à
+    ça : un raccourci à l'abri, d'un pâté de maisons au suivant.
+
+    Mais la colline de la Croix-Rousse a aussi été un terrain
+    d'affrontement. En 1831 puis en 1834, les canuts se sont soulevés
+    pour de meilleurs salaires et de meilleures conditions — les
+    révoltes canutes, parmi les premiers grands mouvements ouvriers du
+    XIXe siècle en France. Le réseau de cours et de passages qui
+    quadrille le quartier leur permettait de circuler d'un point à
+    l'autre sans emprunter les rues, hors de vue des troupes envoyées
+    pour rétablir l'ordre.
+
+    La Cour des Voraces tiendrait son nom d'une société ouvrière
+    lyonnaise du milieu du siècle qui en aurait fait un de ses lieux de
+    rassemblement — l'histoire précise de ce nom reste discutée, mais le
+    décor, lui, n'a pas bougé : le même escalier de pierre, la même cour
+    ouverte sur le ciel.
+
+  post_narratif:
+    - type: le_saviez_vous
+      texte: >-
+        Le saviez-vous. Lyon compte plusieurs centaines de traboules,
+        surtout concentrées dans le Vieux Lyon et sur la colline de la
+        Croix-Rousse. Beaucoup sont encore aujourd'hui des passages
+        privés, ouverts au public à certaines heures ou lors
+        d'occasions particulières.
