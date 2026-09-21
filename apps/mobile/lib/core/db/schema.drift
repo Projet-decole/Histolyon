@@ -1,0 +1,15 @@
+-- Base Drift unique du terminal (AD-4) : le serveur possède l'éditorial et le
+-- communautaire, le terminal possède le Profil et les Parcours personnels
+-- dans cette seule base locale. `id` en TEXT (uuid v4 généré côté client).
+
+CREATE TABLE profil (
+  id TEXT NOT NULL PRIMARY KEY,
+  cree_le DATETIME NOT NULL
+);
+
+CREATE TABLE preference (
+  profil_id TEXT NOT NULL REFERENCES profil(id),
+  cle TEXT NOT NULL,
+  valeur TEXT NOT NULL,
+  PRIMARY KEY (profil_id, cle)
+);
