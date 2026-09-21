@@ -1,0 +1,70 @@
+# Guide — Écrire un test de widget
+
+**AD source :** AD-14 (« Tests d'abord, dans cet ordre, par couche » — pour `presentation` : « widget tests des composants `ui_kit` touchés » ; « le premier commit d'une branche de story contient ses tests (rouges) », [`ARCHITECTURE-SPINE.md`](../ARCHITECTURE-SPINE.md)).
+
+## 1. Où placer le test
+
+Chaque fichier de la couche `presentation` a son test dans le dossier `test/` miroir, avec le suffixe `_test.dart`. Pour une feature :
+
+```
+apps/mobile/lib/features/<slug>/presentation/mon_widget.dart
+apps/mobile/test/features/<slug>/presentation/mon_widget_test.dart
+```
+
+Point de départ concret déjà présent dans le dépôt : `apps/mobile/test/widget_test.dart`, qui teste `apps/mobile/lib/main.dart` (squelette généré par `flutter create`, non encore réorganisé en `app/`+`features/`). C'est le seul test de widget existant à ce jour — utilise-le comme gabarit de structure (imports, `testWidgets`, `WidgetTester`), pas comme exemple de contenu à reproduire (le compteur est un squelette temporaire, pas une feature du produit).
+
+## 2. Quoi couvrir en priorité
+
+AD-14 fixe la priorité pour la couche `presentation` : les **composants `ui_kit` touchés** par ta story. Concrètement, avant de tester un écran entier :
+
+1. Identifie quels composants `comp-*` de `packages/ui_kit` ta feature utilise ou modifie.
+2. Écris (ou complète) le widget test de ce composant dans `packages/ui_kit/test/` s'il n'existe pas déjà.
+3. Ensuite seulement, teste l'assemblage dans `presentation/` de ta feature (l'écran qui utilise ces composants).
+
+Un `integration_test` de bout en bout n'est **pas** ta responsabilité par story : un seul existe pour tout le produit (le parcours démo), exécuté en nightly.
+
+## 3. Structure Arrange / Act / Assert
+
+Chaque test suit ce squelette :
+
+```dart
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_test/flutter_test.dart';
+
+import 'package:mobile/features/<slug>/presentation/mon_widget.dart';
+
+void main() {
+  testWidgets('<comportement attendu, en une phrase>', (WidgetTester tester) async {
+    // Arrange : construire le widget (avec un ProviderScope si des providers Riverpod sont lus)
+    await tester.pumpWidget(
+      ProviderScope(
+        child: MaterialApp(home: MonWidget()),
+      ),
+    );
+
+    // Act : simuler l'interaction utilisateur (ou ne rien faire pour un test d'état initial)
+    await tester.tap(find.byIcon(Icons.add));
+    await tester.pump();
+
+    // Assert : vérifier le résultat observable
+    expect(find.text('résultat attendu'), findsOneWidget);
+  });
+}
+```
+
+Points spécifiques à ce projet :
+
+- Si le widget lit un provider `@riverpod` de `domain/`, enveloppe-le dans un `ProviderScope` avec des `overrides` pour isoler le test du vrai `data/` (pas d'appel réseau réel dans un test `presentation`).
+- Un widget qui dépend de `go_router` (navigation nommée, voir [`docs/conventions/etat.md`](../conventions/etat.md)) se teste avec un `GoRouter` de test minimal plutôt qu'en lançant l'app entière.
+- Le test ne doit jamais attendre une exception Supabase/Drift : si le widget affiche un état d'erreur, on l'obtient en fournissant un `override` de provider qui renvoie un `Failure` (voir [`docs/conventions/erreurs.md`](../conventions/erreurs.md)), pas en simulant une vraie panne réseau.
+
+## 4. Premier commit rouge
+
+Avant d'écrire l'implémentation : écris le test avec le comportement final attendu, lance-le (`flutter test apps/mobile/test/features/<slug>/presentation/mon_widget_test.dart`), vérifie qu'il **échoue** pour la bonne raison (widget/texte introuvable, pas une erreur de compilation), puis committe ce test seul comme premier commit de la branche. Le relecteur vérifiera cet ordre avant le squash merge (AD-14).
+
+## 5. Vérifier avant de pousser
+
+- `flutter test` sur le package touché passe (les tests ajoutés sont maintenant verts).
+- `melos run analyze` ne remonte aucune régression.
+- La couverture du package ne baisse pas (cliquet CI, AD-14).
