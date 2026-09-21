@@ -7,10 +7,12 @@ environment:
 workspace:
   - apps/mobile
   - apps/admin
+  - packages/api_types
 
 dev_dependencies:
   melos: ^8.7.0
   test: ^1.25.0
+  supadart: ^1.9.3
 
 melos:
   scripts:

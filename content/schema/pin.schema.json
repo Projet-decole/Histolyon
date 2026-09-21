@@ -1,0 +1,76 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "pin",
+  "description": "Unité atomique de contenu géolocalisé (cluster C1, palier 4). auteur_communautaire différé à l'épic qui introduit les Comptes.",
+  "required": [
+    "id",
+    "slug",
+    "titre",
+    "provenance",
+    "categorie_id",
+    "contenu_narratif",
+    "statut",
+    "created_at",
+    "updated_at"
+  ],
+  "properties": {
+    "id": {
+      "default": "gen_random_uuid()",
+      "description": "Note:\nThis is a Primary Key.<pk/>",
+      "format": "uuid",
+      "type": "string"
+    },
+    "slug": {
+      "format": "text",
+      "type": "string"
+    },
+    "titre": {
+      "format": "text",
+      "type": "string"
+    },
+    "provenance": {
+      "default": "editorial",
+      "enum": [
+        "editorial",
+        "communautaire"
+      ],
+      "format": "public.provenance_pin",
+      "type": "string"
+    },
+    "categorie_id": {
+      "description": "Note:\nThis is a Foreign Key to `categorie.id`.<fk table='categorie' column='id'/>",
+      "format": "uuid",
+      "type": "string"
+    },
+    "contenu_narratif": {
+      "format": "jsonb"
+    },
+    "statut": {
+      "default": "brouillon",
+      "enum": [
+        "brouillon",
+        "en_revue",
+        "valide",
+        "publie",
+        "retire"
+      ],
+      "format": "public.statut_pin",
+      "type": "string"
+    },
+    "localisation": {
+      "format": "public.geography(Point,4326)",
+      "type": "string"
+    },
+    "created_at": {
+      "default": "now()",
+      "format": "timestamp with time zone",
+      "type": "string"
+    },
+    "updated_at": {
+      "default": "now()",
+      "format": "timestamp with time zone",
+      "type": "string"
+    }
+  },
+  "type": "object"
+}
