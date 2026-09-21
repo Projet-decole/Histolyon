@@ -27,7 +27,13 @@ import 'dart:io';
 //    créées par `supabase/migrations/*.sql` — jamais d'édition du fichier
 //    généré, juste une entrée filtrée.
 
-const _tablesContenu = ['pin', 'parcours', 'epoque', 'categorie'];
+const _tablesContenu = [
+  'pin',
+  'parcours',
+  'epoque',
+  'categorie',
+  'source_documentaire',
+];
 const _configStatique = 'packages/api_types/supadart.yaml';
 const _sortieApiTypes = 'packages/api_types/lib/';
 const _dossierSchema = 'content/schema';
