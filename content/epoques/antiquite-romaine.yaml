@@ -1,0 +1,9 @@
+# Bornes placeholder cohérentes (Lugdunum fondée en -43, chute de l'Empire
+# romain d'Occident en 476) — à valider par un·e historien·ne (question
+# ouverte D1.2, conception/09-cartographie/01-fond-et-epoques.yaml).
+id: d67a8516-9938-470f-bf0c-e3d682b88d25
+slug: antiquite_romaine
+libelle: Antiquité
+borne_debut: -43
+borne_fin: 476
+ordre: 1

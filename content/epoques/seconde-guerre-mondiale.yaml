@@ -1,0 +1,13 @@
+# Bornes réelles (pas un placeholder, dates historiques non ambiguës).
+#
+# Slug choisi : `seconde_guerre_mondiale`, celui de la source de vérité
+# fonctionnelle (conception/09-cartographie/01-fond-et-epoques.yaml). Le
+# composant Figma `comp-slider-epoque` porte la variante `seconde_guerre`
+# (sans « _mondiale ») — divergence constatée lors de la Story 4.1/5.1, à
+# corriger côté maquette plutôt qu'ici.
+id: 913c33d0-d7c8-4880-a9dd-84c5302af43d
+slug: seconde_guerre_mondiale
+libelle: Seconde Guerre mondiale
+borne_debut: 1939
+borne_fin: 1945
+ordre: 8
