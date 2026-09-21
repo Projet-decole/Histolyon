@@ -281,6 +281,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.1.13"
+  dotenv:
+    dependency: transitive
+    description:
+      name: dotenv
+      sha256: "379e64b6fc82d3df29461d349a1796ecd2c436c480d4653f3af6872eccbc90e1"
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.2.0"
   drift:
     dependency: transitive
     description:
@@ -605,6 +613,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.19.0"
+  mgrs_dart:
+    dependency: transitive
+    description:
+      name: mgrs_dart
+      sha256: fb89ae62f05fa0bb90f70c31fc870bcbcfd516c843fb554452ab3396f78586f7
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.0.0"
   mime:
     dependency: transitive
     description:
@@ -781,6 +797,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "5.0.6"
+  proj4dart:
+    dependency: transitive
+    description:
+      name: proj4dart
+      sha256: c8a659ac9b6864aa47c171e78d41bbe6f5e1d7bd790a5814249e6b68bc44324e
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.1.0"
   prompts:
     dependency: transitive
     description:
@@ -1098,6 +1122,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.17.2"
+  supadart:
+    dependency: "direct dev"
+    description:
+      name: supadart
+      sha256: "3bf58c7f5fa2305475c822e4cfcb7dda7cbb7695f16d15b34ca106fe540e9663"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.9.3"
   term_glyph:
     dependency: transitive
     description:
@@ -1138,6 +1170,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.4.0"
+  unicode:
+    dependency: transitive
+    description:
+      name: unicode
+      sha256: "0f69e46593d65245774d4f17125c6084d2c20b4e473a983f6e21b7d7762218f1"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.3.1"
   url_launcher:
     dependency: transitive
     description:
@@ -1283,7 +1323,7 @@ packages:
     source: hosted
     version: "7.0.1"
   yaml:
-    dependency: transitive
+    dependency: "direct dev"
     description:
       name: yaml
       sha256: f67cdd8e07d3c6329146aaef1ba043542b3134c12489f553ca9a7435d1068aea

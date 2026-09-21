@@ -1,0 +1,15 @@
+# Manifeste des médias (bucket/slug/fichier -> licence), Story 5.2/5.3.
+# Les binaires ne sont jamais commités (AGENTS.md) : `tools/media push`
+# (Story 5.3, pas encore écrit) téléversera le fichier référencé ici
+# depuis un dossier partagé vers Storage, au chemin <bucket>/<slug>/<fichier>.
+#
+# Entrée fictive (Story 5.2, démonstration structurelle) : aucun fichier
+# audio réel n'existe encore pour `demo-pin-exemple` — cette entrée sert à
+# montrer la forme du manifeste, pas un média prêt à téléverser.
+
+- media_slug: demo-pin-exemple-narration
+  bucket: audio
+  slug: demo-pin-exemple
+  fichier: narration.m4a
+  licence: "CC0 — voix de démonstration synthétique, aucun ayant droit réel"
+  credit: "Narration de démonstration (texte-à-parole), projet HistoLyon"

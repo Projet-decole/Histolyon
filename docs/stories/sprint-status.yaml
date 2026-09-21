@@ -35,6 +35,15 @@ project_key: NOKEY
 tracking_system: file-system
 story_location: docs/stories
 action_items:
+  - id: pin-cour-des-voraces-audio-et-verification-historienne
+    status: open
+    summary: "content/pins/cour-des-voraces.yaml (Story 5.2) : contenu réel sourcé
+      publiquement (Wikipédia, Musée Gadagne), pas de recherche archivistique primaire.
+      Manque encore pour clore vraiment la story : (1) un fichier audio de narration
+      (aucun n'existe, aucun outil de synthèse vocale disponible dans l'environnement
+      d'implémentation) ; (2) une relecture par une lead historienne avant de dépasser
+      le statut brouillon."
+    source: 5-2-premier-pin-réel-sourcé
   - id: verify-1-2-melos-toolchain
     status: done
     summary: "Vérifier `melos run analyze`/`test`/`format`/`gen` sur un poste avec
@@ -112,16 +121,16 @@ development_status:
   3-2-migration-socle-0001_socle-sql-schéma-rls-rpc-tests-pgtap: done
   epic-3-retrospective: optional
 
-  epic-4: backlog
-  4-1-spike-supadart-geography-et-enum-nullables: backlog
-  4-2-tools-gen-types: backlog
+  epic-4: done
+  4-1-spike-supadart-geography-et-enum-nullables: done
+  4-2-tools-gen-types: done
   epic-4-retrospective: optional
 
-  epic-5: backlog
-  5-1-époques-et-catégories-en-yaml: backlog
-  5-2-premier-pin-réel-sourcé: backlog
-  5-3-tools-media-push: backlog
-  5-4-tools-seed: backlog
+  epic-5: in-progress
+  5-1-époques-et-catégories-en-yaml: done
+  5-2-premier-pin-réel-sourcé: in-progress
+  5-3-tools-media-push: done
+  5-4-tools-seed: done
   epic-5-retrospective: optional
 
   epic-6: in-progress
@@ -157,8 +166,8 @@ development_status:
   epic-10-retrospective: optional
 
   epic-11: in-progress
-  11-1-labels-et-github-projects: backlog
-  11-2-tools-report-v0: backlog
+  11-1-labels-et-github-projects: done
+  11-2-tools-report-v0: done
   11-3-roles-md-retros-et-rétro-du-bootstrap: done
-  11-4-sprint-status-yaml: backlog
+  11-4-sprint-status-yaml: done
   epic-11-retrospective: optional

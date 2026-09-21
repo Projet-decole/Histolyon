@@ -1,0 +1,87 @@
+# ============================================================================
+# PIN DE DÉMONSTRATION — INTÉGRALEMENT FICTIF, NE PAS PUBLIER
+# ============================================================================
+# Objectif (Story 5.2) : montrer l'étendue de ce qu'un Pin peut porter
+# structurellement — teaser/narration/post-narratif (08-contenu/02-template-pin.yaml),
+# plusieurs Sources typées, un média audio avec licence, multi-époques (I8).
+#
+# Le "fait" raconté ci-dessous (un automate en forme de dragon, quai
+# Saint-Antoine, qui "chante encore" aujourd'hui) est volontairement
+# absurde et anachronique — personne ne peut le confondre avec un fait
+# réel sur Lyon. C'est délibéré : la Story 5.2 réelle (un vrai pin sourcé,
+# avec une vraie historienne) reste à faire séparément.
+#
+# Empilement de sous-types en post_narratif (quiz + saviez-vous) : le
+# template lui-même déconseille ça pour un vrai Pin ("empilement de
+# prolongements" est un anti-pattern) — fait ici exprès pour montrer les
+# deux formes dans un seul exemple.
+# ============================================================================
+
+id: 969de5f0-ae71-4869-ac48-fbff8134d677
+slug: demo-pin-exemple
+titre: "[DÉMO FICTIVE] Le dragon mécanique du quai"
+categorie: anecdote
+
+epoques:
+  - moyen_age
+  - aujourd_hui
+
+sources:
+  - demo-archive-fictive
+  - demo-photo-fictive
+  - demo-article-fictif
+
+# Coordonnées lisibles (quai Saint-Antoine, Lyon) — tools/seed convertira
+# en geography(Point,4326). Démontre le cas "Pin localisé" ; le cas
+# symétrique "Pin sans localisation" (I9) est déjà couvert par le test
+# pgTAP i9_pin_sans_localisation.sql, pas besoin de le redémontrer ici.
+localisation:
+  lat: 45.7620
+  lon: 4.8320
+
+contenu_narratif:
+  teaser: >-
+    Tu passes devant cette borne d'amarrage cent fois sans la voir.
+    Pourtant, dit-on, elle a une mémoire — et elle grince encore
+    parfois, la nuit.
+
+  narration: |
+    En te penchant sur la borne de fonte, au ras de l'eau, tu remarques
+    une gueule à demi effacée, des écailles rouillées, une queue qui
+    s'enroule sous la pierre du quai. Ce n'est pas un simple anneau
+    d'amarrage : c'est, dit la légende fictive de ce Pin de démonstration,
+    tout ce qu'il reste d'un automate-dragon installé ici en 1834 pour
+    impressionner les voyageurs qui arrivaient par le fleuve.
+
+    « On l'avait fait rugir trois fois par jour, à heure fixe, avec un
+    mécanisme d'horlogerie caché dans le socle. » — c'est ainsi qu'un
+    témoin fictif le raconte dans un registre imaginaire conservé (pour
+    les besoins de cet exemple) aux Archives municipales de Lyon. Le
+    mécanisme s'est tu au bout de quelques années, la ville a eu d'autres
+    priorités, et le dragon est resté là, silencieux, à moitié mangé par
+    la rouille.
+
+    Ce qui ne l'a jamais empêché, disent certains riverains, de grincer
+    doucement les soirs de crue — le fleuve qui monte suffirait à faire
+    tourner ce qu'il reste du mécanisme.
+
+  post_narratif:
+    - type: quiz
+      invitation: Une petite question pour voir.
+      question: "Qu'est-ce qui, selon la légende fictive, faisait \"rugir\" le dragon ?"
+      options:
+        - Un mécanisme d'horlogerie
+        - Le vent du Rhône
+        - Un employé municipal caché dedans
+      reponse_correcte: 0
+
+    - type: le_saviez_vous
+      texte: >-
+        Le saviez-vous. Ce Pin de démonstration existe justement pour
+        montrer qu'un Pin peut porter plusieurs sous-types de
+        post-narratif à la fois — un vrai Pin, lui, n'en garderait
+        généralement qu'un seul.
+
+medias:
+  - role: narration_audio
+    media_slug: demo-pin-exemple-narration
