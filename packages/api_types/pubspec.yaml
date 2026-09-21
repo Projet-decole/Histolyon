@@ -1,0 +1,16 @@
+name: api_types
+description: "Types Dart générés depuis le schéma Supabase local (AD-3) — ne jamais éditer à la main, régénérer via `dart run tools/gen_types.dart`."
+publish_to: 'none'
+
+environment:
+  sdk: ^3.13.3
+resolution: workspace
+
+dependencies:
+  flutter:
+    sdk: flutter
+  supabase_flutter: 2.17.2
+  geobase: ^1.5.0
+
+dev_dependencies:
+  test: ^1.25.0
