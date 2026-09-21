@@ -4,17 +4,46 @@
 //
 // Usage : dart run tools/validate_content.dart
 //
-// `created_at`/`updated_at` sont exemptés du `required` du schéma : ce
-// sont des colonnes gérées par la base (`default now()`), jamais saisies
-// dans le YAML d'un contenu éditorial — seul `id` (uuid généré côté
-// client, AD partagée sur tout le projet) reste exigé.
+// Champs exemptés du `required` du schéma — jamais saisis dans le YAML
+// d'un contenu éditorial, seul `id` (uuid généré côté client) reste exigé :
+// - `created_at`/`updated_at` : colonnes gérées par la base (`default now()`).
+// - `statut` : jamais touché par le seed (AD-6 — transitions par RPC
+//   uniquement, Story 5.4), reste à sa valeur par défaut ('brouillon').
+// - `provenance` : fixé par le seed lui-même ('editorial' pour tout
+//   contenu de content/, Story 5.4), pas par l'auteur du YAML.
 
 import 'dart:convert';
 import 'dart:io';
 
 import 'package:yaml/yaml.dart';
 
-const _champsExemptesDuRequired = {'created_at', 'updated_at'};
+const _champsExemptesDuRequired = {
+  'created_at',
+  'updated_at',
+  'statut',
+  'provenance',
+};
+
+/// Colonne DB (clé étrangère directe) -> nom du champ tel qu'un auteur de
+/// contenu l'écrit (slug, pas uuid) — `tools/seed` (Story 5.4) résoudra le
+/// slug en uuid au moment du seed. Le champ DB réel n'apparaît alors jamais
+/// dans le YAML, donc exempté du required lui aussi.
+const _champsReferenceParSlug = {'categorie_id': 'categorie'};
+
+/// Champs structurels de contenu qui n'existent pas comme colonnes du
+/// schéma DB (jonctions many-to-many, résolues par `tools/seed`) — une
+/// liste de slugs, jamais un uuid brut.
+const _champsJonctionParSlugs = {'epoques', 'sources'};
+
+/// `medias` : liste de références vers `content/medias.yaml` (manifeste
+/// bucket/slug/fichier -> licence, Story 5.2/5.3), pas une colonne DB.
+const _champMedias = 'medias';
+
+/// `localisation` : la colonne DB est `geography` (WKB en base), mais un
+/// auteur de contenu écrit des coordonnées lisibles — `tools/seed`
+/// convertira. Validé structurellement (objet {lat, lon} numériques),
+/// pas contre le `type: string` du schéma DB.
+const _champLocalisation = 'localisation';
 
 /// `content/<dossier>` -> `content/schema/<table>.schema.json`. Un dossier
 /// de contenu peut ne pas exister encore (ex. `parcours`, Epic 5 pas
@@ -24,6 +53,7 @@ const _dossiersDeContenu = {
   'categories': 'categorie',
   'pins': 'pin',
   'parcours': 'parcours',
+  'sources': 'source_documentaire',
 };
 
 class Violation {
@@ -105,17 +135,87 @@ List<Violation> _validerContreSchema(
   }
 
   final required = ((schema['required'] as List?) ?? []).cast<String>().where(
-    (champ) => !_champsExemptesDuRequired.contains(champ),
+    (champ) =>
+        !_champsExemptesDuRequired.contains(champ) &&
+        !_champsReferenceParSlug.containsKey(champ),
   );
   for (final champ in required) {
     if (!document.containsKey(champ) || document[champ] == null) {
       violations.add(Violation(chemin, "champ requis manquant : '$champ'."));
     }
   }
+  for (final entry in _champsReferenceParSlug.entries) {
+    if (!((schema['required'] as List?)?.contains(entry.key) ?? false)) {
+      continue;
+    }
+    final valeur = document[entry.value];
+    if (valeur is! String || valeur.isEmpty) {
+      violations.add(
+        Violation(chemin, "champ requis manquant : '${entry.value}' (slug)."),
+      );
+    }
+  }
 
   final properties = (schema['properties'] as Map?) ?? {};
   for (final cle in document.keys) {
     final nomChamp = cle.toString();
+
+    if (_champsJonctionParSlugs.contains(nomChamp)) {
+      final valeur = document[cle];
+      if (valeur is! YamlList || valeur.any((v) => v is! String || v.isEmpty)) {
+        violations.add(
+          Violation(chemin, "'$nomChamp' doit être une liste de slugs."),
+        );
+      }
+      continue;
+    }
+
+    if (nomChamp == _champMedias) {
+      final valeur = document[cle];
+      final valide =
+          valeur is YamlList &&
+          valeur.every(
+            (v) =>
+                v is YamlMap &&
+                v['role'] is String &&
+                (v['role'] as String).isNotEmpty &&
+                v['media_slug'] is String &&
+                (v['media_slug'] as String).isNotEmpty,
+          );
+      if (!valide) {
+        violations.add(
+          Violation(
+            chemin,
+            "'$_champMedias' doit être une liste de {role, media_slug}.",
+          ),
+        );
+      }
+      continue;
+    }
+
+    if (nomChamp == _champLocalisation) {
+      final valeur = document[cle];
+      if (valeur is! YamlMap ||
+          valeur['lat'] is! num ||
+          valeur['lon'] is! num) {
+        violations.add(
+          Violation(
+            chemin,
+            "'$_champLocalisation' doit être {lat: <num>, lon: <num>}.",
+          ),
+        );
+      }
+      continue;
+    }
+
+    if (_champsReferenceParSlug.values.contains(nomChamp)) {
+      final valeur = document[cle];
+      if (valeur is! String || valeur.isEmpty) {
+        violations.add(Violation(chemin, "'$nomChamp' doit être un slug."));
+      }
+      continue;
+    }
+
     final proprieteSchema = properties[nomChamp] as Map?;
     if (proprieteSchema == null) {
       violations.add(

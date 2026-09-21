@@ -1,0 +1,10 @@
+# FICTIF — démonstration structurelle uniquement (Story 5.2).
+id: d0354b38-cd14-4da5-b07f-71382c2ec7bd
+slug: demo-photo-fictive
+type: photo
+reference: "Le dragon mécanique du quai, vers 1834 (photographie fictive)"
+credit: "Collection imaginaire, projet HistoLyon (démonstration)"
+description: >-
+  Source inventée pour démontrer le type "photo" et le pattern
+  d'incrustation "archive_située" — aucune photographie réelle
+  correspondante.
