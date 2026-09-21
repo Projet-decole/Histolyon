@@ -102,8 +102,8 @@ development_status:
   2-2-tools-ctx-et-conception-index-md: backlog
   2-3-agents-md-racine-et-locaux: backlog
   2-4-tools-sync-agents: backlog
-  2-5-docs-spine-conventions-guides: done
-  2-6-templates-de-story-et-de-pr: backlog
+  2-5-docs-spine-conventions-guides: backlog
+  2-6-templates-de-story-et-de-pr: done
   2-7-prompts: backlog
   epic-2-retrospective: optional
 
