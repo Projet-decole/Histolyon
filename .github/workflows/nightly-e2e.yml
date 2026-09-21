@@ -1,0 +1,32 @@
+name: nightly-e2e
+
+on:
+  schedule:
+    # 03:00 UTC chaque nuit.
+    - cron: "0 3 * * *"
+  workflow_dispatch: {}
+
+jobs:
+  parcours-demo:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.47.4"
+          channel: "stable"
+
+      - run: flutter pub get
+
+      # integration_test/ (Story 9.5) exige un vrai appareil/émulateur,
+      # contrairement à test/ (flutter test suffit) — d'où l'émulateur
+      # Android ici plutôt qu'un simple flutter test.
+      - name: Parcours démo (vide pour l'instant) sur émulateur Android
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          target: google_apis
+          arch: x86_64
+          working-directory: apps/mobile
+          script: flutter test integration_test/app_test.dart
