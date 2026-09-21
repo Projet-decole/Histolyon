@@ -1,0 +1,46 @@
+name: ci-content
+
+on:
+  pull_request:
+    paths:
+      - "content/**"
+      - "tools/validate_content.dart"
+      - "tools/seed.dart"
+      - "supabase/migrations/**"
+      - ".github/workflows/ci-content.yml"
+
+jobs:
+  valider-et-seed-a-blanc:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.47.4"
+          channel: "stable"
+
+      - run: flutter pub get
+
+      - name: Valider content/ contre content/schema/
+        run: dart run tools/validate_content.dart
+
+      - uses: supabase/setup-cli@v1
+        with:
+          version: 2.117.0
+
+      - name: Supabase local (pour le seed à blanc)
+        run: |
+          supabase start
+          supabase db reset
+
+      - name: Récupérer les clés locales
+        run: |
+          STATUS=$(supabase status -o json)
+          echo "SUPABASE_URL=$(echo "$STATUS" | jq -r .API_URL)" >> "$GITHUB_ENV"
+          echo "SUPABASE_SERVICE_ROLE_KEY=$(echo "$STATUS" | jq -r .SERVICE_ROLE_KEY)" >> "$GITHUB_ENV"
+
+      - name: Seed à blanc (idempotence exercée deux fois)
+        run: |
+          dart run tools/seed.dart
+          dart run tools/seed.dart
