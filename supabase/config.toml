@@ -18,12 +18,21 @@ enabled = false
 enabled = true
 port = 54323
 
-[inbucket]
+[local_smtp]
 enabled = false
 
 [storage]
 enabled = true
 file_size_limit = "50MiB"
+
+# Bucket audio (Story 5.3) : narrations de Pin. Public en lecture (contenu
+# publié consommé directement par l'app, pas de session requise) ; le
+# garde-fou de taille par fichier (5 Mo) est appliqué par tools/media_push.dart
+# avant l'upload, celui-ci (limite globale du bucket) en filet de sécurité.
+[storage.buckets.audio]
+public = true
+file_size_limit = "5MiB"
+allowed_mime_types = ["audio/mp4", "audio/aac", "audio/x-m4a"]
 
 [auth]
 enabled = true
