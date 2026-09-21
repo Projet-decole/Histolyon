@@ -112,9 +112,9 @@ development_status:
   3-2-migration-socle-0001_socle-sql-schéma-rls-rpc-tests-pgtap: done
   epic-3-retrospective: optional
 
-  epic-4: in-progress
+  epic-4: done
   4-1-spike-supadart-geography-et-enum-nullables: done
-  4-2-tools-gen-types: backlog
+  4-2-tools-gen-types: done
   epic-4-retrospective: optional
 
   epic-5: backlog
