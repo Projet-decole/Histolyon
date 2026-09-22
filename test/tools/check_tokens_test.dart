@@ -10,7 +10,10 @@ void main() {
           "const Color TOK_COLOR_PRIMARY = Color(0xFFB85220);\n"
           "const Color TOK_COLOR_OVERLAY_SOMBRE = Color(0xA61C1108);\n",
         ),
-        {'TOK_COLOR_PRIMARY': 'FFB85220', 'TOK_COLOR_OVERLAY_SOMBRE': 'A61C1108'},
+        {
+          'TOK_COLOR_PRIMARY': 'FFB85220',
+          'TOK_COLOR_OVERLAY_SOMBRE': 'A61C1108',
+        },
       );
     });
   });
@@ -73,10 +76,7 @@ const BoxShadow TOK_SHADOW_SM = BoxShadow(
     });
 
     test('maps profondément différentes -> inégales', () {
-      expect(
-        valeursEgales({'a': 1, 'b': 2}, {'a': 1, 'b': 3}),
-        isFalse,
-      );
+      expect(valeursEgales({'a': 1, 'b': 2}, {'a': 1, 'b': 3}), isFalse);
     });
   });
 
@@ -95,22 +95,31 @@ const BoxShadow TOK_SHADOW_SM = BoxShadow(
     test('id absent du package -> divergence (alias ou oubli)', () {
       final divergences = comparerCategorie(
         categorie: 'colors',
-        attendu: {'TOK_COLOR_PRIMARY': 'FFB85220', 'TOK_COLOR_PIN_EDITORIAL': 'FFB85220'},
+        attendu: {
+          'TOK_COLOR_PRIMARY': 'FFB85220',
+          'TOK_COLOR_PIN_EDITORIAL': 'FFB85220',
+        },
         reel: {'TOK_COLOR_PRIMARY': 'FFB85220'},
       );
       expect(divergences, hasLength(1));
       expect(divergences.single.message, contains('TOK_COLOR_PIN_EDITORIAL'));
     });
 
-    test('id présent dans le package mais absent de l\'export -> divergence', () {
-      final divergences = comparerCategorie(
-        categorie: 'colors',
-        attendu: {'TOK_COLOR_PRIMARY': 'FFB85220'},
-        reel: {'TOK_COLOR_PRIMARY': 'FFB85220', 'TOK_COLOR_INVENTE': 'FF000000'},
-      );
-      expect(divergences, hasLength(1));
-      expect(divergences.single.message, contains('TOK_COLOR_INVENTE'));
-    });
+    test(
+      'id présent dans le package mais absent de l\'export -> divergence',
+      () {
+        final divergences = comparerCategorie(
+          categorie: 'colors',
+          attendu: {'TOK_COLOR_PRIMARY': 'FFB85220'},
+          reel: {
+            'TOK_COLOR_PRIMARY': 'FFB85220',
+            'TOK_COLOR_INVENTE': 'FF000000',
+          },
+        );
+        expect(divergences, hasLength(1));
+        expect(divergences.single.message, contains('TOK_COLOR_INVENTE'));
+      },
+    );
 
     test('valeur divergente -> signalée avec attendu et réel', () {
       final divergences = comparerCategorie(

@@ -86,14 +86,16 @@ Map<String, String> parseCouleurs(String source) {
     r'''const Color (TOK_COLOR_\w+) = Color\(0x([0-9A-Fa-f]{8})\);''',
   );
   return {
-    for (final m in motif.allMatches(source)) m.group(1)!: m.group(2)!.toUpperCase(),
+    for (final m in motif.allMatches(source))
+      m.group(1)!: m.group(2)!.toUpperCase(),
   };
 }
 
 Map<String, double> parseNombres(String source) {
   final motif = RegExp(r'''const double (TOK_\w+) = ([0-9]+(?:\.[0-9]+)?);''');
   return {
-    for (final m in motif.allMatches(source)) m.group(1)!: double.parse(m.group(2)!),
+    for (final m in motif.allMatches(source))
+      m.group(1)!: double.parse(m.group(2)!),
   };
 }
 
