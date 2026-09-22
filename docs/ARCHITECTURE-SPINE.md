@@ -206,6 +206,7 @@ graph TD
 | Licences | Attribution OSM (ODbL) et Protomaps affichée ; `licence` obligatoire sur Média, Fragment musical et Modèle 3D récupérés sur internet. |
 | Observabilité | Logs Supabase + `core/log` (niveaux, sans PII) ; rien de plus tant qu'un besoin n'est pas documenté. |
 | Commits | Conventional Commits `type(scope): sujet`, `scope` = slug de feature ou `supabase`/`content`/`docs` ; le corps cite `#<issue>`. |
+| iOS | Code multiplateforme par construction ; toute dépendance Android-only sans équivalent iOS documenté se marque `// DETTE-IOS:` et se liste dans la convention dédiée. |
 
 ## Stack
 
