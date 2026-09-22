@@ -2,6 +2,10 @@
 
 Point d'entrée L0 (AD-15) pour tout agent humain ou IA qui travaille dans ce dépôt. Moins de 150 lignes, jamais généré : c'est `tools/sync-agents` (Story 2.4) qui dérivera `CLAUDE.md`, `.cursor/rules/*` et `.github/copilot-instructions.md` de ce fichier — jamais l'inverse, ne jamais éditer ces fichiers générés à la main. Détail par domaine : [apps/mobile/AGENTS.md](apps/mobile/AGENTS.md), [supabase/AGENTS.md](supabase/AGENTS.md).
 
+## Contexte donné aux IA
+
+`CLAUDE.md`, `.cursor/rules/histolyon.mdc` et `.github/copilot-instructions.md` sont des copies verbatim de ce fichier, chargées automatiquement au démarrage par leurs outils respectifs — ce qui est écrit ici s'applique donc partout, sans action de ta part. **Rien d'autre n'est chargé automatiquement** : `conception/`, `docs/`, une story précise ne sont lus que si le prompt/l'issue les cite par ID (`tools/ctx <ID>`). Une IA qui invente un détail de design ou de règle métier n'a probablement pas reçu le bon pointeur — corrige le prompt ou l'issue, pas seulement la réponse.
+
 ## Commandes
 
 - `melos run analyze` — `dart analyze .` puis les lints maison (`tools/check_import_direction.dart` AD-5, `tools/check_tokens.dart` AD-10).
@@ -18,6 +22,7 @@ Point d'entrée L0 (AD-15) pour tout agent humain ou IA qui travaille dans ce d�
 - `packages/` — code partagé du workspace Pub (`design_tokens`, `ui_kit`, `api_types` généré, `map_styles`), peuplé au fil des Epics 4/6/7.
 - `supabase/` — schéma SQL, RPC de transition, tests pgTAP. Détail : [supabase/AGENTS.md](supabase/AGENTS.md).
 - `conception/` — L2, importée telle quelle, jamais lue en entier : adresser par ID via `tools/ctx`.
+- `conception/15-maquette.md` — référence Figma (accès au fichier, tokens, icônes, 118 composants, 41 écrans indexés) : à lire en premier pour toute tâche de design/UI/tokens, avant tout appel MCP Figma (`dart run tools/ctx.dart 15-maquette`).
 - `docs/` — L1 : spine d'architecture, conventions, guides-recettes, `docs/specs/` et `docs/stories/` (format BMAD).
 - `tools/` — scripts d'outillage. Existent aujourd'hui : `check_import_direction.dart`, `sync_agents.dart`, `ctx.dart`, `gen_types.dart`, `seed.dart`, `media_push.dart`, `report.dart`, `validate_content.dart`, `check_migration_order.dart`, `check_tokens.dart` (AD-10, compare `packages/design_tokens` à `packages/design_tokens/figma_export.json`). Le reste (`tiles`) arrive épic par épic — ne pas le traiter comme déjà là avant sa story.
 - `content/` — contenu éditorial YAML (pins, parcours, époques, catégories) et manifeste de médias, peuplé à partir des Epics 4/5.
