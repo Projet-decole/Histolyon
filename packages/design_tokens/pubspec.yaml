@@ -1,0 +1,15 @@
+name: design_tokens
+description: "Constantes de design portées depuis les variables/styles Figma de la maquette HistoLyon (AD-10) — un identifiant Figma verbatim (`-` -> `_`) = une constante Dart, jamais un alias. Vérifié contre `figma_export.json` par `dart run tools/check_tokens.dart`, ne jamais éditer les deux sans relancer la vérification."
+publish_to: 'none'
+
+environment:
+  sdk: ^3.13.3
+resolution: workspace
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter

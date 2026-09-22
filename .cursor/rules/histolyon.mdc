@@ -13,7 +13,7 @@ Point d'entrée L0 (AD-15) pour tout agent humain ou IA qui travaille dans ce d�
 
 ## Commandes
 
-- `melos run analyze` — `dart analyze .` puis le lint d'imports maison (`tools/check_import_direction.dart`, AD-5).
+- `melos run analyze` — `dart analyze .` puis les lints maison (`tools/check_import_direction.dart` AD-5, `tools/check_tokens.dart` AD-10).
 - `melos run test` — tests de chaque package du workspace qui a un dossier `test/`.
 - `melos run format` — vérifie le formatage de tout le workspace (ne corrige pas).
 - `melos run gen` — génération de code (`build_runner`) pour les packages qui en dépendent.
@@ -28,7 +28,7 @@ Point d'entrée L0 (AD-15) pour tout agent humain ou IA qui travaille dans ce d�
 - `supabase/` — schéma SQL, RPC de transition, tests pgTAP. Détail : `supabase/AGENTS.md`.
 - `conception/` — L2, importée telle quelle, jamais lue en entier : adresser par ID via `tools/ctx`.
 - `docs/` — L1 : spine d'architecture, conventions, guides-recettes, `docs/specs/` et `docs/stories/` (format BMAD).
-- `tools/` — scripts d'outillage. Existent aujourd'hui : `check_import_direction.dart`, `sync_agents.dart`. Le reste (`ctx`, `gen-types`, `seed`, `media`, `tiles`, `check-tokens`, `report`) arrive épic par épic — ne pas les traiter comme déjà là avant leur story.
+- `tools/` — scripts d'outillage. Existent aujourd'hui : `check_import_direction.dart`, `sync_agents.dart`, `ctx.dart`, `gen_types.dart`, `seed.dart`, `media_push.dart`, `report.dart`, `validate_content.dart`, `check_migration_order.dart`, `check_tokens.dart` (AD-10, compare `packages/design_tokens` à `packages/design_tokens/figma_export.json`). Le reste (`tiles`) arrive épic par épic — ne pas le traiter comme déjà là avant sa story.
 - `content/` — contenu éditorial YAML (pins, parcours, époques, catégories) et manifeste de médias, peuplé à partir des Epics 4/5.
 - `prompts/` — prompts portables d'équipe (dev-story, review, découpe) et checklist « sans IA ».
 - `env/` — fichiers pour `--dart-define-from-file` (`local.json`, `dev.json` committés ; `demo.json` jamais).

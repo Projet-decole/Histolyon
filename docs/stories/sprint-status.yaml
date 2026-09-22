@@ -45,13 +45,14 @@ action_items:
       le statut brouillon."
     source: 5-2-premier-pin-réel-sourcé
   - id: regle-branche-a-jour-avant-fusion
-    status: open
+    status: done
     summary: "Story 9.5 : activer manuellement, dans Paramètres → Branches
       → règle de protection de main, l'option « Require branches to be up
       to date before merging ». Hors de portée sans accès à l'UI GitHub
       (même famille que la protection initiale de main, Story 1.1)."
     source: 9-5-règle-de-branche-à-jour-et-nightly-e2e
     owner: "porteur"
+    resolution: "Confirmé par le porteur le 2026-09-22 : le réglage était déjà actif."
   - id: verify-1-2-melos-toolchain
     status: done
     summary: "Vérifier `melos run analyze`/`test`/`format`/`gen` sur un poste avec
@@ -73,6 +74,16 @@ action_items:
     source: 1-3-arbre-de-dossiers-de-la-spine
     resolution: "`.github/` créé par Story 2.4 (`tools/sync_agents.dart`), qui y écrit
       `copilot-instructions.md` généré depuis les AGENTS.md."
+  - id: figma-export-a-regenerer-depuis-mcp-live
+    status: open
+    summary: "packages/design_tokens/figma_export.json (Story 6.4) : instantané
+      transcrit depuis conception/15-maquette.md §4, pas un appel Figma MCP live
+      — quota Starter (20 appels/mois) épuisé pendant l'implémentation
+      (get_metadata a échoué avec `tool call limit`). À régénérer via
+      get_variable_defs sur le node 347:2 quand le quota le permet, pour
+      confirmer qu'aucune valeur n'a divergé depuis la vérification du
+      2026-09-15."
+    source: 6-4-packages-design_tokens-et-tools-check-tokens
   - id: android-cmdline-tools-missing
     status: open
     summary: "`flutter build apk` non vérifiable sur ce poste (`cmdline-tools` Android
@@ -145,7 +156,7 @@ development_status:
   6-1-composition-root: done
   6-2-core-router-core-session-core-models-core-log: done
   6-3-core-db-drift-et-core-profile: done
-  6-4-packages-design_tokens-et-tools-check-tokens: backlog
+  6-4-packages-design_tokens-et-tools-check-tokens: done
   6-5-packages-ui_kit-composants-de-la-carte: backlog
   epic-6-retrospective: optional
 
@@ -158,12 +169,12 @@ development_status:
   8-1-pins-publiés-sur-la-carte-de-lyon: backlog
   epic-8-retrospective: optional
 
-  epic-9: in-progress
+  epic-9: done
   9-1-lefthook: done
   9-2-ci-mobile-et-ci-admin: done
   9-3-ci-supabase: done
   9-4-ci-content-et-ci-docs: done
-  9-5-règle-de-branche-à-jour-et-nightly-e2e: in-progress
+  9-5-règle-de-branche-à-jour-et-nightly-e2e: done
   epic-9-retrospective: optional
 
   epic-10: backlog
