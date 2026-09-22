@@ -22,8 +22,8 @@ melos:
       description: Analyse statique de tout le workspace, plus les lints maison (AD-5, AD-10).
       run: dart analyze . && dart run tools/check_import_direction.dart && dart run tools/check_tokens.dart
     test:
-      description: Tests de chaque package du workspace qui a un dossier test/.
-      run: dart run melos exec --dir-exists=test -- "flutter test || dart test"
+      description: Tests de chaque package du workspace qui a un dossier test/, plus les tests des scripts tools/ (test/tools/, jamais couverts par melos exec qui n'itère que les membres du workspace).
+      run: dart run melos exec --dir-exists=test -- "flutter test || dart test" && dart test test/tools
     format:
       description: Vérifie le formatage de tout le workspace (sans corriger).
       run: dart format --set-exit-if-changed .

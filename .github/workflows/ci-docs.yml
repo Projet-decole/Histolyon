@@ -8,6 +8,13 @@ on:
       - "supabase/AGENTS.md"
       - "tools/sync_agents.dart"
       - "tools/gen_types.dart"
+      - "tools/ctx.dart"
+      - "tools/check_tokens.dart"
+      - "tools/check_migration_order.dart"
+      - "tools/coverage_ratchet.dart"
+      - "test/tools/**"
+      - "packages/design_tokens/**"
+      - "conception/**"
       - "supabase/migrations/**"
       - ".github/workflows/ci-docs.yml"
 
@@ -45,13 +52,18 @@ jobs:
       - name: Régénérer packages/api_types et content/schema/
         run: dart run tools/gen_types.dart
 
-      # TODO(Story 6.4) : ajouter `dart run tools/check-tokens.dart` ici
-      # une fois packages/design_tokens et tools/check-tokens écrits —
-      # bloqué par l'export Figma à ce jour (cf. docs/stories/sprint-status.yaml).
+      - name: Régénérer conception/INDEX.md
+        run: dart run tools/ctx.dart --index
+
+      - name: Vérifier packages/design_tokens contre l'export Figma (AD-10)
+        run: dart run tools/check_tokens.dart
+
+      - name: Tests des scripts tools/ (ctx, sync_agents, check_tokens, check_migration_order, coverage_ratchet, validate_content)
+        run: dart test test/tools
 
       - name: Refuser tout diff après régénération
         run: |
-          git diff --exit-code -- CLAUDE.md .cursor .github/copilot-instructions.md packages/api_types content/schema || (
-            echo "::error::La documentation ou les types générés ne sont pas à jour — relancer dart run tools/sync_agents.dart et dart run tools/gen_types.dart, committer le résultat." &&
+          git diff --exit-code -- CLAUDE.md .cursor .github/copilot-instructions.md packages/api_types content/schema conception/INDEX.md || (
+            echo "::error::La documentation ou les types générés ne sont pas à jour — relancer dart run tools/sync_agents.dart, tools/gen_types.dart et tools/ctx.dart --index, committer le résultat." &&
             exit 1
           )
