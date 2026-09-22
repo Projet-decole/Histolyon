@@ -11,7 +11,7 @@ apps/mobile/lib/features/<slug>/presentation/mon_widget.dart
 apps/mobile/test/features/<slug>/presentation/mon_widget_test.dart
 ```
 
-Point de départ concret déjà présent dans le dépôt : `apps/mobile/test/widget_test.dart`, qui teste `apps/mobile/lib/main.dart` (squelette généré par `flutter create`, non encore réorganisé en `app/`+`features/`). C'est le seul test de widget existant à ce jour — utilise-le comme gabarit de structure (imports, `testWidgets`, `WidgetTester`), pas comme exemple de contenu à reproduire (le compteur est un squelette temporaire, pas une feature du produit).
+Point de départ concret déjà présent dans le dépôt : `apps/mobile/test/widget_test.dart` (teste que l'app démarre sur un écran vide via la composition root, `app/bootstrap.dart`/`app/router.dart`) et `apps/mobile/test/core/` (tests de `core/session`, `core/log`, `core/models`, `core/profile`) — utilise-les comme gabarit de structure (imports, `testWidgets`/`test`, `ProviderScope`), pas comme exemple de couverture à reproduire (aucune feature n'existe encore sous `apps/mobile/lib/features/`).
 
 ## 2. Quoi couvrir en priorité
 

@@ -1,0 +1,80 @@
+# Journal des décisions
+
+Journal chronologique des décisions d'architecture et d'organisation du projet — jamais réécrit après coup, seulement complété. Fusion de deux journaux tenus séparément pendant la conception initiale du socle (2026-09-17, méthode BMAD) : celui de la spec du bootstrap et celui de l'architecture applicative. Pour les règles elles-mêmes : [`ARCHITECTURE-SPINE.md`](ARCHITECTURE-SPINE.md). Pour le récit destiné à l'équipe : [`ORGANISATION.md`](ORGANISATION.md).
+
+---
+
+## Phase 1 — Spec du bootstrap (`bmad-spec`, 2026-09-17)
+
+- (constraint) Cadre : projet fin d'études Epitech T-ESP-800, année 2 = développement ; jury évalue la GESTION DE PROJET (organisation, avancement quantifié, KPIs, capacité d'ajustement), pas un produit marché
+- (constraint) Équipe ~7 personnes temps partiel (~½ journée / 2 semaines / membre), composition instable, rôles flous ; 1 cheffe de projet (pilotage, 1er parcours, admin/légal), 2 spécialistes 3D, le reste dev app ; IDE/IA hétérogènes, pas d'abonnement/BMAD garanti pour tous
+- (constraint) Outil de suivi imposé (cadrage an 1) : SharePoint avec page liste de suivi de progression comme ticketing
+- (constraint) Input = `conception/` (15 paliers YAML + maquette Figma, 41 écrans mobile + 8 admin desktop, ~24 entités, invariants I1–I10) — source de vérité du QUOI ; l'architecture ne la re-documente pas, elle la cite par ID (Dx.y, Ix, écrans)
+- (constraint) [ADOPTED] Flutter pour l'app mobile (acté par la conception : « devs Flutter » partout)
+- (constraint) [ADOPTED] App sans compte : Profil local toujours présent, Compte 0..1 opt-in pour publication/sync (I2, I6) ; identité civile jamais collectée (I1) ; modération/validation scientifique (I3, I4) ; pas de dark mode ; pas de turn-by-turn
+- (direction) Orientations du porteur : BMAD comme colonne vertébrale mais consommable sans l'installer (principes + prompts + stories dans le repo) ; architecture documentaire « juste ce qu'il faut » par tâche ; CI/CD avec hooks pre-commit/pre-push ; tests d'abord, vérifiés à chaque commit ; découpe en unités élémentaires (reprise en une session courte)
+- (direction) Attentes école : état des lieux quasi automatique depuis le travail réel ; KPIs d'avancement mesurables par construction ; rétrospective/ajustement périodique de l'organisation documenté ; usage IA autorisé si maîtrisé et explicable
+- (direction) Le porteur est aujourd'hui goulet (découpe, Figma, arbitrage produit) → répartir les rôles (Pilote, Découpeur, Intégrateur, Gardien tests, Gardien design, Dev, 3D), découpe autonome
+- (question) Laissés ouverts par la conception, à trancher ici : moteur carto, étendue hors-ligne, méthode d'auth, format templates contenu + CMS, stockage médias lourds, stack back-office web, moteur 3D/AR, schéma lien universel, state management Flutter
+- (event) Activation : intent=create, mode=coaching ; livrables = spine + doc organisation + plan de bootstrap (public : équipe + jury)
+- (decision) GitHub = source de vérité du travail (issue = story = branche = PR) ; SharePoint devient une VUE alimentée (export script / jalons), plus la vérité.
+- (decision) Backend = Supabase (Postgres+PostGIS, Auth, Storage, RLS, API auto). Alternatives écartées : API custom NestJS/FastAPI (coût humain), Firebase (NoSQL mauvais fit géo/relationnel)
+- (decision) Pipeline contenu = contenu-en-fichiers (YAML conformes aux templates palier 8, validés en CI, seedés en base) DÈS le bootstrap ; back-office web « le plus tôt possible » sur le même schéma.
+- (decision) Monorepo unique (apps mobile+admin, supabase, content, docs, conception, prompts).
+- (constraint) Spécialistes 3D : pas graphistes, ne créent pas d'assets (récupération sur internet), s'adaptent à l'archi ; objectif = 1 bâtiment reconstitué dans le 1er parcours → fixer un CONTRAT d'intégration (format, stockage, déclenchement), pas un moteur
+- (constraint) Personne dans l'équipe n'a fait de Flutter ni de carto → privilégier le courant dominant et les chemins pavés ; onboarding par la doc du repo
+- (decision) Paradigme app = feature-first (features/<domaine Dx>) × couches strictes data/domain/presentation, dépendances vers le bas uniquement, jamais feature→feature sauf via core/. État Riverpod (codegen), navigation go_router, tokens palier 12 repris 1:1. Alternative écartée : Bloc (plus cérémonial, personne ne le connaît)
+- (decision) Carto = MapLibre (maplibre_gl), un style JSON par époque, tuiles vectorielles OSM (OpenFreeMap/Protomaps), hors-ligne PMTiles. Alternative écartée : Mapbox (coût, quota, Studio).
+- (decision) Ownership données : (1) schéma = `supabase/migrations` SQL, seule vérité, invariants I1–I10 en contraintes/RLS testées ; (2) types Dart/TS GÉNÉRÉS, jamais écrits à la main ; (3) serveur possède contenu éditorial+communautaire, terminal possède Profil local (Drift), sync = flux explicite opt-in ; (4) contenu-fichiers validés par schéma dérivé, seed idempotent par id stable
+- (decision) Hors-ligne = parcours préchargé seulement (pas tout Lyon) → cache contenu = paquet par parcours (pins, médias, tuiles de l'emprise) dans Drift + fichiers
+- (decision) Contrat 3D/AR : assets glTF/GLB dans Supabase Storage, référencés par l'entité Modèle 3D (C1), ouverts via `features/immersion/` qui isole le viewer ; moteur DIFFÉRÉ, revisite après le 1er spike des spécialistes 3D
+- (version) Base locale = Drift (SQLite) ; Hive/Isar écartés (Isar à l'arrêt)
+- (constraint) Capacité réelle : 1 journée école/semaine partagée entre 3 projets → par membre et par 2 semaines : ~3–4 h de dev + ~1 h de réunion d'équipe.
+- (decision) Unité de travail = story ≤ 3 h (une session), auto-suffisante ; 1 story = 1 issue GitHub = 1 branche = 1 PR ; arbre Domaine Dx → Épic → Story, IDs conception = labels GitHub.
+- (decision) Flux git : trunk-based, `main` protégé, PR obligatoire, CI verte + 1 relecture par un autre membre, squash merge, branches `story/<ID>-<slug>`
+- (decision) Cadence : itération 2 semaines ; synchro asynchrone = état des lieux généré depuis GitHub ; réunion 1 h/2 sem (CR sur SharePoint) ; rétro d'organisation à chaque rendez-vous école consignée dans `docs/team/retros/`
+- (decision) Architecture documentaire en 4 niveaux : L0 `AGENTS.md` (racine + par app, unique fichier d'instructions, `CLAUDE.md`/`.cursor`/`copilot` = copies générées) ; L1 `docs/` (spine, conventions, guides-recettes) ; L2 `conception/` jamais chargée entière, adressée par ID stable via index généré + `tools/ctx` ; L3 story = brief qui CITE les extraits à lire.
+- (decision) BMAD produit, le repo distribue : Découpeur (porteur + binôme) utilise `bmad-spec`/`bmad-create-epics-and-stories` ; sorties committées (`docs/specs`, `docs/stories`, `docs/sprint/sprint-status.yaml`) ; format story BMAD = template d'issue GitHub ; `prompts/` portables + checklist sans IA ; rôles = casquettes tournantes avec binôme, `docs/team/ROLES.md` vivant. *(Révisé le 2026-09-22, voir Phase 2 : la production de stories via BMAD est abandonnée après le bootstrap.)*
+- (constraint) Correction porteur : NE PAS compter les stories ni calibrer leur taille sur la capacité ; ce n'est pas grave si tout n'est pas développé en fin d'année. Story = LA PLUS PETITE unité de travail possible, point.
+- (decision) Tests d'abord = ORDRE strict : tests écrits (rouges) PUIS implémentation. Couverture publiée avec cliquet (jamais en baisse)
+- (decision) Politique de tests par couche : domain unitaires obligatoires ; data contre Supabase local ; presentation widget tests (pas de golden au début) ; SQL pgTAP par invariant I1–I10 et par policy RLS ; content validation de schéma ; 1 seul `integration_test` (parcours démo) en nightly
+- (decision) CI/CD : lefthook (pre-commit format+lint+schéma contenu ; pre-push tests unitaires app touchée) ; GitHub Actions filtrées par chemin ; environnements local → dev → demo ; secrets en GitHub Environments
+- (decision) Distribution : Android uniquement (APK artefact CI) ; iOS DIFFÉRÉ (pas de Mac, pas de licence Apple Developer). *(Révisé le 2026-09-22, voir Phase 2 : code partagé écrit pour les deux plateformes, publication iOS toujours différée.)*
+- (decision) Back-office = Flutter Web, hébergé statique. Alternative écartée : SPA React (2e stack, 2e génération de types)
+- (decision) Page web publique lecture seule (D11) DIFFÉRÉE
+- (decision) KPIs par construction : `tools/report` interroge GitHub → `docs/sprint/reports/<date>.md` = état des lieux collé dans le CR SharePoint.
+- (event) Coaching terminé ; passage à Finalize (vérification web des versions, distillation)
+- (version) Vérifié web 2026-09-17 : Flutter stable 3.47.4 (Dart 3.13.3) ; flutter_riverpod 3.4.3 ; go_router 18.0.1 ; drift 2.35.0 ; supabase_flutter 2.17.2 ; maplibre_gl 0.27.1 ; melos 8.7.0 ; flutter_lints 6.0.0 ; Supabase CLI v2.117.0 ; lefthook v2.1.14 ; Isar 3.1.0 figé depuis 2023 (écarté confirmé)
+- (constraint) Supabase CLI gen types ne produit pas de Dart → génération via supadart 1.9.3 ; repli : OpenAPI PostgREST
+- (version) Tuiles : OpenFreeMap et Protomaps (PMTiles) en ligne et actifs
+- (event) Spine distillée (18 AD, 12 conventions, stack vérifiée, 3 diagrammes, 10 différés) ; Reviewer Gate lancé : 2 réconciliations + rubrique + fraîcheur + adversaire
+- (constraint) Vérifié web 2026-09-17 — Supabase Free : 2 projets actifs max, 500 Mo base, 1 Go Storage, 5 Go egress, pause après 1 semaine d'inactivité → keep-alive et export hebdo obligatoires
+- (event) Reviewer Gate terminé : verdict global structure juste, mais ownership multi-écrivains, état de session, enveloppe Supabase, médias, transverses et 3 hypothèses techno à corriger
+- (decision) AD-4 amendée (I6) : ownership PAR PROVENANCE — serveur = éditorial/communautaire ; terminal = Profil sans Compte + Parcours personnel. Partage d'un Parcours personnel EXIGE un Compte.
+- (decision) AD-5 corrigée : composition root `apps/*/lib/app/` = seul endroit qui importe les features ; `core/router` = noms/chemins seulement.
+- (decision) Nouvelle AD ownership & transitions : toute transition de statut/provenance = fonction SQL exposée en RPC, avec Trace, testée pgTAP.
+- (decision) Nouvelle AD état de session : `core/session` = liste FERMÉE de providers.
+- (decision) Nouvelle AD enveloppe Supabase gratuite : dev + demo = les 2 projets ; keep-alive et export hebdo.
+- (decision) AD-7 resserrée : seed = upsert-only, `provenance=editorial` seulement ; binaires hors git, téléversés par `tools/media`.
+- (decision) AD-8/AD-9 corrigées : UNE chaîne de tuiles = `lyon.pmtiles` ; styles d'Époque = fonds Protomaps ; couches de données ajoutées par code, ré-ajoutées après `setStyle`.
+- (decision) AD-3 amendée : supadart 1.9.3 maintenant ; bascule vers `supabase_typegen` officiel quand `supabase_flutter` 3 stable.
+- (decision) AD-16 resserrée : une migration par PR, label `migration`, sérialisée par l'Intégrateur.
+- (decision) AD-10 corrigée : constante = identifiant Figma verbatim, `tools/check-tokens` compare l'export Figma au package.
+- (decision) AD-12/13/14 resserrées : niveau Épic explicite (Domaine → Épic → Story).
+- (decision) AD-17 réécrite : KPIs indépendants de la taille des stories.
+- (decision) Conventions ajoutées : IA déclarée dans la PR, i18n = fr seulement, pas de dark mode ni turn-by-turn, polymorphisme = `(type_de_cible enum, cible_id uuid)` + CHECK, `pubspec.lock` committé, attribution ODbL/Protomaps obligatoire, licence obligatoire sur Média/Modèle 3D récupérés, observabilité = logs Supabase + `core/log`.
+- (event) Triage validé par le porteur : partage de Parcours personnel exige un Compte (OK) ; rôles serveur `editeur|validateur|moderateur` OK, jamais assignés à une personne nommée dans la doc ; budgets Storage acceptés
+- (direction) Livrables humains à produire : `ORGANISATION.md` (contraintes → mécanismes → organisation) et `BOOTSTRAP.md` (premières actions sur dépôt vierge)
+- (event) `ORGANISATION.md` et `BOOTSTRAP.md` rédigés ; revue éditoriale appliquée
+- (event) Reprise 2026-09-17 : retour porteur — première version d'`ORGANISATION.md` (contraintes → mécanismes, cible jury) jugée illisible pour l'équipe : ne répond pas à « comment est organisé le repo / qu'est-ce que je fais / comment on se coordonne »
+- (decision) `ORGANISATION.md` **réécrit en guide d'équipe narratif** (même nom de fichier) : langage courant, zéro `AD-n` dans le corps, structure « Puisque … : donc … » qui mène du contrainte au mécanisme. Une page HTML de présentation (`ORGANISATION.html`) publiée en plus pour la réunion d'1h.
+- (event) Amendements depuis `bmad-spec` (Q1–Q3) : `socle-01…11` = épics ; approbation obligatoire sur `main` activée après relecture groupée de fin de socle ; sorties BMAD sous `docs/` (`specs/`, `stories/` + `sprint-status.yaml`, `architecture/` = le run d'origine). *(Révisé le 2026-09-22, voir Phase 2 : `docs/architecture/` aplati, son contenu redistribué directement sous `docs/`.)*
+- (event) Auto-vérification de cohérence de la spec : contenu « wrapper-only » identifié et exclu de la spec elle-même — paragraphe d'audience de BOOTSTRAP, frontmatter de la spine, **`ORGANISATION.html` (doublon du `.md`)**. *(Ce doublon signalé ici dès l'origine n'a été supprimé que le 2026-09-22, voir Phase 2.)*
+
+## Phase 2 — Post-bootstrap (2026-09-21 → 2026-09-22)
+
+- (event) Spike Story 4.1 (2026-09-21, table jetable supprimée après coup) : supadart 1.9.3 exécuté contre le socle local. **Geography nullable : correct.** **Enum nullable : bug confirmé** (`from_json.dart:264` retombe sur `.values.first` au lieu de `null`) — impact nul aujourd'hui (aucune colonne enum n'est nullable), mais `tools/gen-types` doit vérifier par introspection qu'aucune colonne enum n'est nullable et échouer bruyamment sinon.
+- (event) Revue de code 4 lentilles sur `review/tout-depuis-epic2` (2026-09-21) : deux écarts AD-6 confirmés et corrigés — `pin_soumettre`/`pin_publier`/`pin_retirer` n'écrivaient jamais de `trace_validation` (corrigé par la migration `20260921140832_trace_toutes_transitions.sql`) ; `verifier_membre_equipe()` n'était exercée par aucun test de rejet (corrigé). Écarts non corrigés, remontés au porteur : NFR1 — Epic 7/8 (carte/tuiles) restaient `backlog` alors qu'Epic 9/11 étaient `done`, ordre de séquencement violé ; Story 9.5 — règle « branche à jour » reste une action manuelle GitHub UI.
+- (event) Audit du dépôt (2026-09-22) : le porteur signale ne rien comprendre au dépôt livré par le bootstrap BMAD — trop de cérémonie, aucun état des lieux clair, documentation illisible. Un état des lieux complet est produit (audit, explication, critique, liste de manques).
+- (decision) Réunion d'équipe (2026-09-22) : organisation validée par l'équipe. Code partagé écrit pour Android **et** iOS dès maintenant (sans licence développeur Apple payante — donc sans publication ni test réel iOS pour l'instant, revisite si un Mac + une licence apparaissent). Casquettes non distribuées formellement sauf Découpeur (le porteur). BMAD abandonné comme moteur de production de stories : les prochaines stories deviennent des issues GitHub directes, découpées par le Découpeur.
+- (decision) Nettoyage post-bootstrap (2026-09-22) : `_bmad/` (cache local non versionné) supprimé ; `docs/architecture/architecture-HistoLyon-2026-09-17/reviews/` (revues internes du processus de rédaction, sans valeur pour un dev) supprimé ; `docs/architecture/architecture-HistoLyon-2026-09-17/` aplati — `BOOTSTRAP.md` et `ORGANISATION.md` déplacés directement sous `docs/`, la copie dupliquée d'`ARCHITECTURE-SPINE.md` supprimée, `ORGANISATION.html` supprimé (doublon déjà signalé en Phase 1), les deux `.memlog.md` fusionnés dans ce fichier. `.devcontainer/` ajouté (Flutter/Android SDK/Supabase CLI/lefthook/melos préinstallés, vérifié par un vrai build) ; `README.md` racine réécrit comme porte d'entrée unique vers structure/organisation/dev ; deux bugs de couverture CI corrigés (tests de `test/tools/` jamais exécutés ; plusieurs scripts `tools/` sans déclencheur CI).

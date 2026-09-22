@@ -14,4 +14,4 @@ Pour se répartir une casquette, éditer ce fichier dans une PR (pas de story d�
 | Spécialiste 3D | _vacant_ | _vacant_ | tu touches à la 3D ou à l'AR |
 | Éditeur de contenu | _vacant_ | _vacant_ | tu écris un pin ou un parcours |
 
-Détail de ce que fait chaque casquette : `docs/architecture/architecture-HistoLyon-2026-09-17/ORGANISATION.md`, § 9.
+Détail de ce que fait chaque casquette : [`docs/ORGANISATION.md`](../ORGANISATION.md), § 9.

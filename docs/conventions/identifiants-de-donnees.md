@@ -13,4 +13,4 @@ Générer l'`uuid` côté client (AD-4) permet à un objet créé hors-ligne (pa
 
 ## Exemple
 
-Un Parcours personnel créé hors-ligne dans `core/db` (Drift) a déjà son `id uuid` final avant toute synchronisation ; le jour où l'utilisateur le partage via `parcours_partager`, la ligne Postgres créée porte ce même `id`. Le pin de seed `content/pins/place-bellecour.yaml` porte `slug: place-bellecour`, réutilisé tel quel par `tools/seed` à chaque exécution.
+Un Parcours personnel créé hors-ligne dans `core/db` (Drift) a déjà son `id uuid` final avant toute synchronisation ; le jour où l'utilisateur le partage via `parcours_partager`, la ligne Postgres créée porte ce même `id`. Le pin de seed `content/pins/cour-des-voraces.yaml` porte `slug: cour-des-voraces`, réutilisé tel quel par `tools/seed` à chaque exécution.

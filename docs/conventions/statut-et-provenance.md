@@ -12,4 +12,4 @@ AD-6 fixe que toute transition de `statut` ou de `provenance` est une RPC dédi�
 
 ## Exemple
 
-Le Pin a `statut` (`brouillon | soumis | valide | publie | retire`) et `provenance` (`editorial | communautaire`) comme deux colonnes enum séparées. La RPC `pin_publier` est la seule à faire passer `statut` de `valide` à `publie` ; aucun code n'écrit directement `UPDATE pin SET statut = 'publie'`.
+Le Pin a `statut` (`brouillon | en_revue | valide | publie | retire`) et `provenance` (`editorial | communautaire`) comme deux colonnes enum séparées (voir `supabase/migrations/0001_socle.sql`). La RPC `pin_publier` est la seule à faire passer `statut` de `valide` à `publie` ; aucun code n'écrit directement `UPDATE pin SET statut = 'publie'`.

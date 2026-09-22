@@ -2,7 +2,7 @@
 
 **AD source :** AD-2 (le schéma SQL versionné est l'unique vérité du backend), AD-6 (un seul écrivain par entité, transitions uniquement par RPC), AD-16 (trois environnements, migrations sérialisées et poussées par la CI) — [`ARCHITECTURE-SPINE.md`](../ARCHITECTURE-SPINE.md).
 
-À la date de ce guide, aucune migration réelle n'existe encore dans `supabase/` (voir `supabase/README.md` : « premier fichier réel (`AGENTS.md`) en Story 2.3, schéma/RLS/RPC/tests à partir de l'Epic 3 »). Ce guide décrit la convention **cible**, à appliquer dès la première migration.
+Exemple réel à lire avant celui-ci : `supabase/migrations/0001_socle.sql` (schéma, RLS, RPC de transition) et `supabase/functions_sql/pin_transitions.sql`.
 
 ## 1. Nommage et emplacement
 
@@ -55,7 +55,8 @@ Si ta migration touche une colonne de cycle de vie (`statut`, `provenance` — v
 - N'autorise **jamais** de `UPDATE` direct sur ces colonnes (RLS + trigger qui bloque l'`UPDATE` hors RPC).
 - Écris une fonction SQL/plpgsql exposée en RPC pour chaque transition (ex. `pin_valider`, `pin_publier`) dans `supabase/functions_sql/`, incluse par la migration.
 - Cette RPC écrit une ligne dans la table de Trace (validation ou modération) dans la même transaction que le changement d'état.
-- Ajoute un test pgTAP qui appelle la RPC et vérifie à la fois le nouveau `statut` et la présence de la Trace créée.
+- Ajoute un test pgTAP qui appelle la RPC et vérifie à la fois le nouveau `statut` et la présence de la Trace créée, **et** un test qui vérifie le rejet quand l'appelant n'est pas dans `membre_equipe` (`throws_ok`).
+- Le pattern réel du dépôt protège la colonne par un trigger qui exige un paramètre de session (`set_config('histolyon.transition_autorisee', 'on', true)`) posé par la RPC elle-même autour de l'`UPDATE`, pas par un simple `GET DIAGNOSTICS` — voir `pin_soumettre`/`pin_valider`/`pin_publier`/`pin_retirer` dans `supabase/migrations/0001_socle.sql` pour le pattern exact à reproduire (l'exemple ci-dessous reste volontairement simplifié pour l'explication).
 
 ```sql
 -- supabase/functions_sql/pin_publier.sql

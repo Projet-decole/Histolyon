@@ -7,7 +7,7 @@ paradigm: 'Monorepo Dart schema-first : Flutter feature-first à couches stricte
 scope: 'Socle de développement HistoLyon — app mobile, back-office web, backend/contenu, structure du repo, architecture documentaire, process d''équipe, tests/CI'
 status: final
 created: '2026-09-17'
-updated: '2026-09-17'
+updated: '2026-09-22'
 binds: [D1, D2, D3, D4, D5, D6, D7, D8, D9, D10, D11, C1, C2, C3, C4, C5, C6, I1, I2, I3, I4, I5, I6, I7, I8, I9, I10]
 sources:
   - conception/01-essence.yaml
@@ -16,8 +16,8 @@ sources:
   - conception/04-donnees/06-distribution.yaml
   - conception/08-contenu/06-i18n.yaml
   - conception/15-maquette.md
-  - contexte du porteur (contraintes 3.1–3.3, attentes 2.1–2.4) — .memlog.md
-companions: [ORGANISATION.md, ORGANISATION.html, BOOTSTRAP.md]
+  - contexte du porteur (contraintes 3.1–3.3, attentes 2.1–2.4) — docs/DECISIONS.md
+companions: [ORGANISATION.md, BOOTSTRAP.md, DECISIONS.md]
 ---
 
 # Architecture Spine — HistoLyon
@@ -250,11 +250,13 @@ graph LR
 
 ```text
 histolyon/
+  README.md                 # porte d'entrée : structure / organisation / dev, en une page
   AGENTS.md                 # L0 — unique ; généré vers CLAUDE.md, .cursor/rules, copilot-instructions
   pubspec.yaml              # workspace Pub + section melos
   lefthook.yml
+  .devcontainer/            # Flutter (fvm) + Android SDK + Supabase CLI + lefthook + melos préinstallés
   .github/
-    workflows/              # ci-mobile, ci-admin, ci-supabase, ci-content, nightly-e2e, report, keep-alive, export
+    workflows/              # ci-mobile, ci-admin, ci-supabase, ci-content, ci-docs, nightly-e2e ; report/keep-alive/export = Epic 10
     ISSUE_TEMPLATE/story.md # = docs/stories/TEMPLATE.md
     PULL_REQUEST_TEMPLATE.md  # champs : issue liée, tests d'abord, assistance IA
   apps/
@@ -278,7 +280,6 @@ histolyon/
     migrations/             # vérité du schéma ; une par PR
     functions_sql/          # RPC de transition (inclus par les migrations)
     tests/                  # pgTAP — par invariant Ix, par policy, par RPC
-    seed/                   # scripts appelés par tools/seed
   content/
     schema/                 # GÉNÉRÉ (JSON Schema)
     pins/  parcours/  epoques/  categories/  modeles3d/
@@ -286,12 +287,14 @@ histolyon/
   conception/               # L2 — importé tel quel
     INDEX.md                # GÉNÉRÉ — id → fichier#ancre
   docs/
-    ARCHITECTURE-SPINE.md
-    conventions/  guides/   # un sujet par fichier
-    specs/  stories/        # produits avec BMAD, committés ; sprint-status.yaml dans stories/
-    architecture/           # run BMAD de la spine (spine, guide, bootstrap, memlog, reviews)
-    sprint/                 # reports/ (tools/report)
-    team/                   # ROLES.md, retros/
+    ARCHITECTURE-SPINE.md    # cette spine — copie unique, source de vérité des règles
+    ORGANISATION.md          # guide d'équipe narratif : pourquoi le dépôt est organisé ainsi
+    BOOTSTRAP.md             # comment le socle a été construit, étape par étape
+    DECISIONS.md             # journal chronologique des décisions (pourquoi, jamais réécrit)
+    conventions/  guides/    # un sujet par fichier
+    specs/  stories/         # docs/specs/spec-histolyon-socle/SPEC.md ; sprint-status.yaml + stories dans stories/
+    sprint/                  # reports/ (tools/report)
+    team/                    # ROLES.md, retros/
   prompts/                  # dev-story, review, decoupe + checklist sans IA
   tools/                    # ctx, gen-types, sync-agents, report, seed, media, tiles, check-tokens
   env/                      # local.json, dev.json (demo.json hors dépôt)
