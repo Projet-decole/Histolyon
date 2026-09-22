@@ -1,0 +1,65 @@
+{
+  "_source": "conception/15-maquette.md §4, vérifié par appel direct Figma MCP (get_metadata/get_screenshot) le 2026-09-15 sur la collection « HistoLyon — Tokens » (VariableCollectionId:345:2, page 01 · Fondations, node 347:2).",
+  "_regenerer": "Quand le quota Figma MCP (Starter : 20 appels/mois) le permet, revérifier avec get_variable_defs sur le node 347:2 et mettre à jour ce fichier avant de le faire à nouveau confiance.",
+  "colors": {
+    "TOK_COLOR_PRIMARY": "FFB85220",
+    "TOK_COLOR_PRIMARY_FONCE": "FF8B3A14",
+    "TOK_COLOR_PRIMARY_CLAIR": "FFD4703A",
+    "TOK_COLOR_FOND_PRINCIPAL": "FFF5E8D0",
+    "TOK_COLOR_FOND_SECONDAIRE": "FFEDD9B5",
+    "TOK_COLOR_FOND_TERTIAIRE": "FFE5CCA0",
+    "TOK_COLOR_TEXTE_PRINCIPAL": "FF1C1108",
+    "TOK_COLOR_TEXTE_SECONDAIRE": "FF5C3D1E",
+    "TOK_COLOR_TEXTE_TERTIAIRE": "FF9B7B5A",
+    "TOK_COLOR_OR_ACCENT": "FFC9901A",
+    "TOK_COLOR_BLANC_NARRATIF": "FFFAF6F0",
+    "TOK_COLOR_FONCTIONNEL_SUCCES": "FF276D45",
+    "TOK_COLOR_FONCTIONNEL_ERREUR": "FFB03427",
+    "TOK_COLOR_FONCTIONNEL_INFO": "FF2762A0",
+    "TOK_COLOR_PIN_EDITORIAL": "FFB85220",
+    "TOK_COLOR_PIN_COMMUNAUTAIRE": "FF7A6555",
+    "TOK_COLOR_CONTOUR_VERIFICATION": "FF1C1108",
+    "TOK_COLOR_OVERLAY_SOMBRE": "A61C1108"
+  },
+  "spacing": {
+    "TOK_SPACE_XS": 4,
+    "TOK_SPACE_SM": 8,
+    "TOK_SPACE_MD": 12,
+    "TOK_SPACE_LG": 16,
+    "TOK_SPACE_XL": 24,
+    "TOK_SPACE_XXL": 32,
+    "TOK_SPACE_XXXL": 48
+  },
+  "radius": {
+    "TOK_RADIUS_NONE": 0,
+    "TOK_RADIUS_SM": 4,
+    "TOK_RADIUS_MD": 8,
+    "TOK_RADIUS_LG": 12,
+    "TOK_RADIUS_PILL": 9999
+  },
+  "opacity": {
+    "TOK_OPACITY_BACKDROP_M6": 0.4,
+    "TOK_OPACITY_BACKDROP_M8": 0.65,
+    "TOK_OPACITY_DESACTIVE": 0.5,
+    "TOK_OPACITY_SEPARATEUR": 0.12
+  },
+  "typography": {
+    "TOK_TYPO_DISPLAY_XL": { "fontFamily": "Playfair Display", "fontWeight": 800, "fontSize": 32, "height": 1.2 },
+    "TOK_TYPO_DISPLAY_LG": { "fontFamily": "Playfair Display", "fontWeight": 700, "fontSize": 26, "height": 1.25 },
+    "TOK_TYPO_DISPLAY_MD": { "fontFamily": "Playfair Display", "fontWeight": 700, "fontSize": 22, "height": 1.3 },
+    "TOK_TYPO_DISPLAY_SM": { "fontFamily": "Playfair Display", "fontWeight": 700, "fontSize": 18, "height": 1.35 },
+    "TOK_TYPO_BODY_LG": { "fontFamily": "Lora", "fontWeight": 400, "fontSize": 17, "height": 1.65 },
+    "TOK_TYPO_BODY_MD": { "fontFamily": "Lora", "fontWeight": 400, "fontSize": 15, "height": 1.6 },
+    "TOK_TYPO_BODY_SM": { "fontFamily": "Lora", "fontWeight": 400, "fontSize": 14, "height": 1.55 },
+    "TOK_TYPO_BODY_EMPHASIS": { "fontFamily": "Lora", "fontWeight": 600, "fontSize": 17, "height": 1.65 },
+    "TOK_TYPO_UI_LG": { "fontFamily": "Inter", "fontWeight": 500, "fontSize": 16, "height": 1.4 },
+    "TOK_TYPO_UI_MD": { "fontFamily": "Inter", "fontWeight": 500, "fontSize": 14, "height": 1.4 },
+    "TOK_TYPO_UI_SM": { "fontFamily": "Inter", "fontWeight": 400, "fontSize": 12, "height": 1.4 },
+    "TOK_TYPO_UI_XS": { "fontFamily": "Inter", "fontWeight": 500, "fontSize": 11, "height": 1.3 }
+  },
+  "shadows": {
+    "TOK_SHADOW_SM": { "colorArgb": "1F1C1108", "offsetX": 0, "offsetY": 1, "blurRadius": 3 },
+    "TOK_SHADOW_MD": { "colorArgb": "331C1108", "offsetX": 0, "offsetY": 2, "blurRadius": 8 },
+    "TOK_SHADOW_LG": { "colorArgb": "4D1C1108", "offsetX": 0, "offsetY": 4, "blurRadius": 16 }
+  }
+}

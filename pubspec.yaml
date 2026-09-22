@@ -8,6 +8,7 @@ workspace:
   - apps/mobile
   - apps/admin
   - packages/api_types
+  - packages/design_tokens
 
 dev_dependencies:
   melos: ^8.7.0
