@@ -175,7 +175,7 @@ Chaque étape vient d'un paragraphe ci-dessus.
 
 **Pas fini à la fin de ta session ?** Pousse ta branche, écris dans l'issue où tu en es. Toi ou quelqu'un d'autre reprendra : c'est exactement pour ça que la story est petite et que le brief est complet (§ 2).
 
-**Avec une IA** (§ 5) : colle `prompts/dev-story.md` + le brief dans ton outil ; relis tout ; déclare-le dans la PR. Sans IA : `prompts/SANS-IA.md`.
+**Avec une IA** (§ 5) : colle `docs/archive/prompts/dev-story.md` + le brief dans ton outil ; relis tout ; déclare-le dans la PR. Sans IA : `docs/archive/prompts/SANS-IA.md`.
 
 ---
 
@@ -183,7 +183,7 @@ Chaque étape vient d'un paragraphe ci-dessus.
 
 ### Les casquettes
 
-Au fil des paragraphes, des responsabilités sont apparues. Ce ne sont pas des postes : ce sont des **casquettes**, tenues à deux (pour que personne ne soit indispensable — § 0), pour une itération, et qui tournent. Personne n'est chef de personne ; la casquette dit juste à qui tu t'adresses. Qui tient quoi est dans `docs/team/ROLES.md`, jamais ici.
+Au fil des paragraphes, des responsabilités sont apparues. Ce ne sont pas des postes : ce sont des **casquettes**, tenues à deux (pour que personne ne soit indispensable — § 0), pour une itération, et qui tournent. Personne n'est chef de personne ; la casquette dit juste à qui tu t'adresses. Qui tient quoi est dans `docs/archive/ROLES.md`, jamais ici.
 
 | Née au § | Casquette | Tu t'adresses à elle quand… | Elle s'occupe de… |
 | --- | --- | --- | --- |

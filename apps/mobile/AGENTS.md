@@ -1,31 +1,47 @@
 # AGENTS.md — apps/mobile
 
-App Flutter Android (terrain). Racine du dépôt : [../../AGENTS.md](../../AGENTS.md) — commandes workspace, workflow story/PR et interdits globaux valables ici aussi, non répétés ci-dessous.
+App Flutter (Android, avec du code partagé prêt pour iOS). Les règles globales sont dans le `AGENTS.md` racine.
 
-État réel aujourd'hui : squelette `flutter create` (`lib/main.dart`), aucune couche en place. Les conventions ci-dessous (couches, composition root, Riverpod) sont la convention **cible** à partir de l'Epic 6, pas l'état actuel.
+## Structure réelle
+
+```
+lib/
+  main.dart                 → app/bootstrap.dart (Supabase.initialize + ProviderScope)
+  app/router.dart           assemble les routes exportées par chaque feature (seul endroit qui importe des features)
+  app/coquille.dart         NavigationBar : Carte / Parcours / Profil
+  core/router/route_names.dart   noms et chemins de toutes les routes
+  core/session/             état transverse, liste FERMÉE : epoqueSelectionnee, parcoursActif, etapeCourante, pinCourant, modePresentation, lectureAudio
+  core/supabase/            supabaseClientProvider (lu uniquement par les couches data/)
+  core/db/                  base Drift locale (schema.drift : profil, preference, favori, historique_visite) + appDatabaseProvider
+  core/models/failure.dart  Result<T> = Ok | Err(Failure)
+  core/log/                 logger (jamais print)
+  features/<slug>/
+    presentation/<slug>_ecran.dart    écran(s)
+    presentation/<slug>_routes.dart   List<RouteBase> <slug>Routes, assemblée par app/router.dart
+    domain/                           logique + providers exposés à presentation
+    data/                             repository : Supabase / Drift → Result<T>
+```
+
+Les features en squelette sont `carte`, `parcours` et `profil` (les onglets), plus `pins` (`/pin/:slug`) et `immersion` (`/modele-3d/:slug`), qui s'ouvrent en plein écran au-dessus des onglets.
+
+## Recette : une tranche de feature
+
+1. **data/** : `<slug>_repository.dart` lit `ref.watch(supabaseClientProvider)` ou `appDatabaseProvider`. Chaque méthode publique renvoie `Future<Result<T>>` et attrape les exceptions pour les convertir en `Failure`. Pour les types serveur, utilise `package:api_types`, sans jamais redéfinir une classe `Pin` à la main.
+2. **domain/** : des providers `@riverpod` qui appellent le repository et exposent à l'écran ce dont il a besoin.
+3. **presentation/** : widgets `ConsumerWidget` qui font `ref.watch` sur les providers de `domain/`. Ils gèrent les états chargement, erreur et vide.
+4. **Nouvelle sous-route** : ajoute le nom et le chemin dans `core/router/route_names.dart`, puis la `GoRoute` dans `presentation/<slug>_routes.dart`. Ne touche pas à `app/router.dart`.
+5. **Tests** (`test/features/<slug>/…`) : test unitaire du domain avec un repository factice, test de widget de l'écran avec `ProviderScope(overrides: [...])`. Pour Drift en test : `AppDatabase.pour(NativeDatabase.memory())`.
+6. `melos run gen` après tout ajout de `@riverpod`, puis `melos run analyze` et `melos run test`.
+
+Guide détaillé : `docs/guides/ajouter-une-feature.md`. Tests de widget : `docs/guides/ecrire-un-test-de-widget.md`.
 
 ## Commandes
 
-- `flutter run` (depuis `apps/mobile/`) — lance l'app sur un device ou émulateur connecté.
-- `flutter test` (ou `melos run test` depuis la racine, qui couvre tout le workspace) — tests de ce package.
-- `flutter analyze` — analyse statique de ce seul package (`melos run analyze`, à la racine, couvre tout le workspace plus le lint d'imports).
-
-## Conventions de nommage
-
-- Couches strictes par feature : `presentation → domain → data`, jamais d'inversion (AD-5) ; `domain/` importe `data/`.
-- `app/` est l'**unique** composition root : il assemble le routeur (`app/router.dart`), le bootstrap et le `ProviderScope`.
-- État : Riverpod avec `@riverpod` (`riverpod_generator`) ; chaque couche expose ses providers, la couche du dessus les lit.
-- Navigation : `go_router`, noms et chemins de routes dans `core/router` (assemblage des `GoRoute` fait par `app/`).
-- Erreurs : `data` renvoie `Result<T, Failure>` (`Failure` scellé dans `core/models`).
-- Dossiers de feature = slugs de la table de conventions (D1…D11) : `carte`, `pins`, `parcours`, `proximite`, `onboarding`, `profil`, `audio`, `immersion`, `communaute`, `partage`.
-
-## Où chercher
-
-- `lib/main.dart` — état réel actuel : squelette `flutter create`, aucune couche encore en place.
-- `lib/{app,core,features}` — convention **cible** à partir de l'Epic 6 (`socle-06`), pas l'état actuel du dépôt.
+- `flutter run --dart-define-from-file=../../env/local.json` : app sur la base Supabase locale (`supabase start` et `dart run tools/seed.dart` doivent avoir tourné).
+- `flutter test` et `flutter analyze` pour ce seul package.
 
 ## Jamais
 
-- `setState` au-delà du widget local — passer par un provider Riverpod.
-- Attraper une exception Supabase ou Drift dans `presentation` — c'est le rôle de `data`, qui la convertit en `Failure`.
-- Voir aussi les interdits transverses du [racine](../../AGENTS.md#jamais) (import d'une feature par une autre, secrets en dur, fichiers générés édités à la main) : ils s'appliquent ici aussi et ne sont pas répétés.
+- `presentation/` qui appelle Supabase ou Drift directement, ou qui attrape une exception Supabase/Drift. C'est le rôle de `data/`.
+- Ajouter un 7e provider dans `core/session` : un besoin transverse devient un service dans `core/`.
+- Modifier `schema.drift` ou `app/router.dart` sans que l'issue le demande : ce sont des fichiers partagés, donc sources de conflits.

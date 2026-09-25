@@ -132,9 +132,9 @@ graph TD
 
 ### AD-12 — La story est la plus petite unité de travail, traçable, dans un arbre Domaine → Épic → Story
 
-- **Binds:** process, GitHub, `docs/specs/`, `docs/stories/`
+- **Binds:** process, GitHub, `docs/archive/specs/`, `docs/archive/stories/`
 - **Prevents:** des tâches trop larges pour une session ou un agent ; une découpe que seul le porteur sait faire ; un avancement non traçable.
-- **Rule:** l'arbre de découpe est Domaine (D1…D11, `socle`) → Épic (un sous-domaine `Dx.y` ou un lot) → Story ; le Découpeur produit `docs/specs/`, les épics dans `docs/` et `docs/stories/` avec BMAD (`bmad-spec`, `bmad-create-epics-and-stories`) et les committe. Une story = **1 issue GitHub = 1 branche `story/<ID>-<slug>` = 1 PR**, label de domaine obligatoire, corps = `docs/stories/TEMPLATE.md` (format dev-story BMAD, aussi template d'issue) qui **cite** les extraits de conception par ID. Une story touche **une seule** feature, ou un seul de `supabase/`, `content/`, `packages/<x>` ; une story qui a besoin d'une migration et d'une UI se découpe en deux, la migration d'abord.
+- **Rule:** l'arbre de découpe est Domaine (D1…D11, `socle`) → Épic (un sous-domaine `Dx.y` ou un lot) → Story ; le Découpeur produit `docs/archive/specs/`, les épics dans `docs/` et `docs/archive/stories/` avec BMAD (`bmad-spec`, `bmad-create-epics-and-stories`) et les committe. Une story = **1 issue GitHub = 1 branche `story/<ID>-<slug>` = 1 PR**, label de domaine obligatoire, corps = `docs/archive/stories/TEMPLATE.md` (format dev-story BMAD, aussi template d'issue) qui **cite** les extraits de conception par ID. Une story touche **une seule** feature, ou un seul de `supabase/`, `content/`, `packages/<x>` ; une story qui a besoin d'une migration et d'une UI se découpe en deux, la migration d'abord.
 
 ### AD-13 — Trunk-based : `main` toujours livrable, itération de deux semaines
 
@@ -150,7 +150,7 @@ graph TD
 
 ### AD-15 — Architecture documentaire en quatre niveaux, un seul fichier d'instructions
 
-- **Binds:** `AGENTS.md`, `docs/`, `conception/`, `docs/stories/`, `prompts/`
+- **Binds:** `AGENTS.md`, `docs/`, `conception/`, `docs/archive/stories/`, `prompts/`
 - **Prevents:** saturation de contexte ; instructions divergentes par IDE ; agents qui inventent faute de contexte ; une méthode réservée à ceux qui ont BMAD.
 - **Rule:** L0 `AGENTS.md` (racine, `apps/*/`, `supabase/`) < 150 lignes chacun, **unique** source d'instructions — `CLAUDE.md`, `.cursor/rules/*`, `.github/copilot-instructions.md` sont générés par `tools/sync-agents` et jamais édités ; L1 `docs/` = cette spine, conventions, guides-recettes (un sujet par fichier) ; L2 `conception/` importée telle quelle, **jamais lue entière**, adressée par ID via `conception/INDEX.md` généré et `tools/ctx <ID>` ; L3 la story liste précisément les fichiers L1/L2 à lire. `prompts/` contient les prompts portables (dev-story, review, découpe) collables dans toute IA et une checklist « sans IA ».
 
@@ -170,7 +170,7 @@ graph TD
 
 - **Binds:** process, `docs/team/`
 - **Prevents:** un goulet unique ; une organisation figée avant d'être connue ; rien à montrer au jury sur l'ajustement.
-- **Rule:** chaque casquette (Pilote, Découpeur, Intégrateur, Gardien des tests, Gardien du design, Spécialiste 3D) a **deux** titulaires ; `docs/team/ROLES.md` est mis à jour quand un rôle change ; une rétro d'organisation est consignée dans `docs/team/retros/<date>.md` à chaque rendez-vous école, ses actions en issues `label:organisation`.
+- **Rule:** chaque casquette (Pilote, Découpeur, Intégrateur, Gardien des tests, Gardien du design, Spécialiste 3D) a **deux** titulaires ; `docs/archive/ROLES.md` est mis à jour quand un rôle change ; une rétro d'organisation est consignée dans `docs/team/retros/<date>.md` à chaque rendez-vous école, ses actions en issues `label:organisation`.
 
 ### AD-19 — Enveloppe Supabase gratuite : keep-alive, export hebdomadaire, budget par bucket
 
@@ -258,7 +258,7 @@ histolyon/
   .devcontainer/            # Flutter (fvm) + Android SDK + Supabase CLI + lefthook + melos préinstallés
   .github/
     workflows/              # ci-mobile, ci-admin, ci-supabase, ci-content, ci-docs, nightly-e2e ; report/keep-alive/export = Epic 10
-    ISSUE_TEMPLATE/story.md # = docs/stories/TEMPLATE.md
+    ISSUE_TEMPLATE/story.md # = docs/archive/stories/TEMPLATE.md
     PULL_REQUEST_TEMPLATE.md  # champs : issue liée, tests d'abord, assistance IA
   apps/
     mobile/                 # Flutter Android
@@ -293,7 +293,7 @@ histolyon/
     BOOTSTRAP.md             # comment le socle a été construit, étape par étape
     DECISIONS.md             # journal chronologique des décisions (pourquoi, jamais réécrit)
     conventions/  guides/    # un sujet par fichier
-    specs/  stories/         # docs/specs/spec-histolyon-socle/SPEC.md ; sprint-status.yaml + stories dans stories/
+    specs/  stories/         # docs/archive/specs/spec-histolyon-socle/SPEC.md ; sprint-status.yaml + stories dans stories/
     sprint/                  # reports/ (tools/report)
     team/                    # ROLES.md, retros/
   prompts/                  # dev-story, review, decoupe + checklist sans IA

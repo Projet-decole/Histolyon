@@ -17,7 +17,7 @@
 //
 // Écrit sans dépendance pub tierce (dart:io seul), même convention que
 // tools/check_import_direction.dart -- voir
-// docs/stories/spec-2-2-tools-ctx-et-conception-index-md.md.
+// docs/archive/stories/spec-2-2-tools-ctx-et-conception-index-md.md.
 //
 // `conception/` reste strictement en lecture seule : ce script n'y écrit
 // jamais rien d'autre que conception/INDEX.md, et uniquement en mode

@@ -1,1 +1,1 @@
-Scripts d'outillage du dépôt (ctx, gen-types, sync-agents, seed, media, tiles, check-tokens, report) — peuplé au fil des Epics.
+Scripts d'outillage, lancés avec `dart run tools/<nom>.dart`. Le rôle de chacun est décrit dans `AGENTS.md` (§ Commandes) et en tête de chaque fichier.

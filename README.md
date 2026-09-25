@@ -1,51 +1,48 @@
 # HistoLyon
 
-Application Android (et, sans licence développeur Apple payante, code partagé prêt pour iOS) qui fait explorer Lyon à travers les époques : carte, slider temporel, pins historiques, parcours. Backend Supabase, contenu éditorial en YAML, monorepo Dart/Flutter.
+Application mobile qui fait explorer Lyon à travers les époques : une carte avec un slider d'époques, des pins historiques sourcés, des parcours et des reconstitutions 3D/AR. Le code est en Flutter (Android, avec du code partagé prêt pour iOS), le backend est sur Supabase et le contenu éditorial est en YAML.
 
-Ce dépôt est encore au stade **bootstrap** : l'outillage, le process et la base sont en place, mais aucune fonctionnalité produit n'est encore visible (l'app démarre sur un écran vide). Le détail de ce qui est fait et de ce qui reste : [`docs/stories/sprint-status.yaml`](docs/stories/sprint-status.yaml), lisible via `dart run tools/report.dart`.
+## Démarrer (une fois)
 
-## Trois questions, trois portes
+**Le plus simple : le devcontainer.** Ouvre le dépôt dans VS Code avec l'extension *Dev Containers*, ou dans GitHub Codespaces : tout est préinstallé.
 
-Tout le reste de la documentation répond à l'une de ces trois questions. Commence par celle qui t'intéresse — chacune se lit indépendamment des deux autres.
-
-| Question | Réponse | Temps de lecture |
-| --- | --- | --- |
-| **Comment est structuré le projet ?** — dossiers, couches, qui importe quoi | [`AGENTS.md`](AGENTS.md) (commandes, où chercher, en une page) puis [`docs/ARCHITECTURE-SPINE.md`](docs/ARCHITECTURE-SPINE.md) (les 20 règles `AD-n`, l'arbre de dossiers de référence) | 5 min + référence |
-| **Comment fonctionne l'organisation ?** — pourquoi des stories, des casquettes, ce process | [`docs/ORGANISATION.md`](docs/ORGANISATION.md) — guide d'équipe complet, se lit une fois dans l'ordre | 25 min |
-| **Comment je me mets à développer ?** — installer son poste, prendre une story, livrer | § *Démarrer à coder* ci-dessous, puis `docs/ORGANISATION.md` § 8 (« ta première story », pas à pas) | 10 min |
-
-Pour le « pourquoi » de chaque décision (pourquoi Supabase, pourquoi pas de dark mode, pourquoi BMAD puis plus BMAD…) : [`docs/DECISIONS.md`](docs/DECISIONS.md), journal chronologique jamais réécrit. Pour comment le socle lui-même a été construit, étape par étape : [`docs/BOOTSTRAP.md`](docs/BOOTSTRAP.md).
-
-## Démarrer à coder
-
-**Option la plus simple : le devcontainer.** Ouvre le dépôt dans VS Code avec l'extension *Dev Containers*, ou GitHub Codespaces — Flutter, Android SDK, Supabase CLI, melos et lefthook sont préinstallés et à la bonne version. Détail : [`.devcontainer/`](.devcontainer/).
-
-**En natif**, installer d'abord : Flutter 3.47.4 (via [fvm](https://fvm.app/), voir `.fvmrc`), Docker, Supabase CLI 2.117, lefthook 2.1, Android SDK (API 21+, JDK 21) — détail et pourquoi chaque outil : `docs/BOOTSTRAP.md` Annexe A. Puis :
+**En natif**, il faut Flutter 3.47.4 (via [fvm](https://fvm.app/), voir `.fvmrc`), Docker, [Supabase CLI](https://supabase.com/docs/guides/cli) 2.117, Android SDK et JDK 21, et [lefthook](https://lefthook.dev). Ensuite :
 
 ```bash
 git clone <url-du-depot> && cd Histolyon
-flutter pub get
-lefthook install
-supabase start
-supabase db reset
-melos run test
+flutter pub get && lefthook install
+supabase start && supabase db reset          # base locale avec le schéma complet
+eval "$(supabase status -o env | sed -n 's/^API_URL=/export SUPABASE_URL=/p; s/^SERVICE_ROLE_KEY=/export SUPABASE_SERVICE_ROLE_KEY=/p')"
+dart run tools/seed.dart                     # charge époques, catégories, pins
+melos run test                               # tout doit être vert
+cd apps/mobile && flutter run --dart-define-from-file=../../env/local.json
 ```
 
-Tout doit être vert. Sinon, ouvre une issue `socle` avec ce qui a cassé — c'est déjà une contribution utile.
+Si quelque chose casse, ouvre une issue avec le message d'erreur. C'est déjà une contribution utile.
 
-## Où trouver quoi, au-delà des trois portes
+## Travailler (à chaque session)
 
-| Besoin | Réponse |
+1. **Choisis une issue** [avec le label `prête`](../../issues?q=is%3Aopen+label%3Apr%C3%AAte+no%3Aassignee) qui n'est assignée à personne, puis **assigne-la-toi**. Chaque issue est faite pour tenir en une demi-journée.
+2. **Ouvre ton agent IA dans le dépôt** (Claude Code, Cursor, Copilot…) et dis-lui : **« Implémente l'issue #N »**. Il charge `AGENTS.md` tout seul, et ce fichier lui explique quoi lire, où coder et comment vérifier. Si ton outil n'a pas accès au dépôt, colle-lui le contenu de [`prompts/implementer-une-issue.md`](prompts/implementer-une-issue.md).
+3. **Relis ce qu'il a fait et lance l'app** pour vérifier le résultat. Tu restes responsable du code.
+4. **Ouvre la PR.** Un autre membre la relit (il peut s'aider de [`prompts/relire-une-pr.md`](prompts/relire-une-pr.md)), puis on fait un squash merge.
+
+Tu bloques ou l'issue n'est pas claire ? Écris un commentaire sur l'issue. Ne devine pas.
+
+**Pour créer une nouvelle issue**, utilise le template « Tâche » de GitHub ou le prompt [`prompts/ecrire-une-issue.md`](prompts/ecrire-une-issue.md).
+
+## Où est quoi
+
+| Besoin | Où |
 | --- | --- |
-| Prendre et livrer une story, pas à pas | `docs/ORGANISATION.md` § 8, ou `prompts/dev-story.md` (à coller dans un assistant IA) |
-| Le « quoi » du projet (fonctionnalités, données, écrans, invariants) | `conception/`, jamais lu en entier — `dart run tools/ctx.dart <ID>` (ex. `D1.2`, `I6`) |
-| La maquette Figma (accès, tokens, composants, écrans) | `conception/15-maquette.md` |
-| Une convention de code (nommage, erreurs, dates, commits…) | `docs/conventions/` — un fichier par sujet |
-| Une recette (ajouter une feature, écrire une migration, un test de widget) | `docs/guides/` |
-| L'état d'avancement, pour un compte rendu | `dart run tools/report.dart` → `docs/sprint/reports/<date>.md`, collé tel quel, jamais rédigé à la main |
-| Qui tient quelle casquette (Pilote, Découpeur, Intégrateur…) | `docs/team/ROLES.md` |
-| Le schéma de base, les RPC, les tests SQL | `supabase/` (détail : `supabase/AGENTS.md`) |
+| Règles du code, structure du dépôt, commandes | [`AGENTS.md`](AGENTS.md), plus le `AGENTS.md` de chaque zone (`apps/mobile`, `apps/admin`, `supabase`) |
+| Recettes pas à pas | [`docs/guides/`](docs/guides/) |
+| Ce que fait le produit (fonctionnalités, données, écrans) | `conception/`, lu par ID : `dart run tools/ctx.dart D1.2` |
+| La maquette Figma | [`conception/15-maquette.md`](conception/15-maquette.md) |
+| Pourquoi on a fait ces choix | [`docs/DECISIONS.md`](docs/DECISIONS.md) (journal), [`docs/ARCHITECTURE-SPINE.md`](docs/ARCHITECTURE-SPINE.md) (les règles AD-n) |
+| Pourquoi on travaille comme ça (pour le jury) | [`docs/ORGANISATION.md`](docs/ORGANISATION.md) |
+| État d'avancement pour un compte rendu | `dart run tools/report.dart` → `docs/sprint/reports/<date>.md` |
 
 ## Licences et données
 
-Contenu sous licences documentées par source (`content/medias.yaml`, `content/sources/`) ; fond de carte OpenStreetMap (ODbL) et Protomaps, attribution visible en permanence dans l'app. Aucun secret, aucune clé, aucun média n'est versionné dans ce dépôt.
+Chaque source a sa licence, documentée dans `content/sources/` et dans la colonne `licence` des médias. Le fond de carte OpenStreetMap (ODbL) et Protomaps impose une attribution visible en permanence. Aucun secret, aucune clé et aucun média n'est versionné dans ce dépôt.
