@@ -44,7 +44,7 @@ Future<void> main() async {
     final delaiJours = pr?.mergedAt != null
         ? pr!.mergedAt!.difference(issue.createdAt).inHours / 24
         : issue.closedAt.difference(issue.createdAt).inHours / 24;
-    final ciVerte = pr != null ? await gh.ciVerte(pr.mergeCommitSha) : null;
+    final ciVerte = pr != null ? await gh.ciVerte(pr.headSha) : null;
     lignes.add(
       _LigneRapport(
         issue: issue,
@@ -219,12 +219,16 @@ class _PullRequest {
   _PullRequest({
     required this.number,
     required this.mergedAt,
-    required this.mergeCommitSha,
+    required this.headSha,
   });
 
   final int number;
   final DateTime? mergedAt;
-  final String? mergeCommitSha;
+
+  /// Dernier commit de la branche de la PR : c'est lui qui porte les
+  /// check-runs (la CI ne tourne que sur `pull_request`, et le commit de
+  /// squash sur main n'en a jamais).
+  final String? headSha;
 }
 
 class _LigneRapport {
@@ -359,7 +363,7 @@ class _GitHub {
         mergedAt: data['merged_at'] != null
             ? DateTime.parse(data['merged_at'] as String)
             : null,
-        mergeCommitSha: data['merge_commit_sha'] as String?,
+        headSha: (data['head'] as Map<String, dynamic>?)?['sha'] as String?,
       );
     } catch (_) {
       return null;
@@ -385,7 +389,9 @@ class _GitHub {
         page++;
       }
       if (runs.isEmpty) return null;
-      return runs.every((r) => r['conclusion'] == 'success');
+      // Un job sauté (filtre de chemins) ou neutre n'est pas un échec.
+      const verts = {'success', 'skipped', 'neutral'};
+      return runs.every((r) => verts.contains(r['conclusion']));
     } catch (_) {
       return null;
     }

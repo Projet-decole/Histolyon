@@ -16,11 +16,22 @@ double calculerCouverturePourcent(String lcov) {
   var linesFound = 0;
   var linesHit = 0;
   for (final ligne in lcov.split('\n')) {
-    if (ligne.startsWith('LF:')) linesFound += int.parse(ligne.substring(3));
-    if (ligne.startsWith('LH:')) linesHit += int.parse(ligne.substring(3));
+    final propre = ligne.trim();
+    if (propre.startsWith('LF:')) {
+      linesFound += int.tryParse(propre.substring(3)) ?? 0;
+    }
+    if (propre.startsWith('LH:')) {
+      linesHit += int.tryParse(propre.substring(3)) ?? 0;
+    }
   }
   if (linesFound == 0) return 100;
   return linesHit / linesFound * 100;
+}
+
+/// Référence lue dans `coverage_baseline.txt` : vide -> 0, illisible -> null.
+double? lireReference(String contenu) {
+  final propre = contenu.trim();
+  return propre.isEmpty ? 0.0 : double.tryParse(propre);
 }
 
 /// Tolérance d'arrondi : deux exécutions du même code ne doivent pas
@@ -39,14 +50,25 @@ void main(List<String> args) {
     return;
   }
 
-  final actuelle = calculerCouverturePourcent(File(args[0]).readAsStringSync());
+  final lcovFile = File(args[0]);
+  if (!lcovFile.existsSync()) {
+    stderr.writeln('Rapport lcov introuvable : ${args[0]}');
+    exitCode = 2;
+    return;
+  }
+  final actuelle = calculerCouverturePourcent(lcovFile.readAsStringSync());
   final baselineFile = File(args[1]);
-  final baselineContenu = baselineFile.existsSync()
-      ? baselineFile.readAsStringSync().trim()
-      : '';
-  final reference = baselineContenu.isEmpty
-      ? 0.0
-      : double.parse(baselineContenu);
+  final reference = lireReference(
+    baselineFile.existsSync() ? baselineFile.readAsStringSync() : '',
+  );
+  if (reference == null) {
+    stderr.writeln(
+      'Référence de couverture illisible dans ${args[1]} : un seul nombre '
+      'attendu (ex. 82.50).',
+    );
+    exitCode = 2;
+    return;
+  }
 
   stdout.writeln(
     'Couverture : ${actuelle.toStringAsFixed(2)}% '

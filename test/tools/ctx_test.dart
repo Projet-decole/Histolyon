@@ -1,27 +1,15 @@
 // Tests boîte noire de `tools/ctx.dart` (AD-14/NFR6).
 //
-// `tools/ctx.dart` n'expose aucune API publique -- écrit volontairement
-// sans dépendance pub externe (dart:io seul), comme
-// `tools/check_import_direction.dart` -- donc la seule surface testable est
-// son contrat CLI (stdout/stderr/exitCode). Ce fichier suit la même
-// contrainte plutôt que d'ajouter `package:test` comme dépendance du
-// workspace racine.
-//
-// Usage : dart test/tools/ctx_test.dart (depuis la racine du workspace ;
-// c'est aussi le répertoire de travail utilisé par `dart test`).
+// Le script n'expose aucune API publique : on teste son contrat CLI
+// (stdout/stderr/exitCode/fichiers écrits) dans de vrais `test()`, pour
+// qu'un échec fasse échouer `dart test` (et donc la CI).
 
 import 'dart:io';
 
-int _failures = 0;
+import 'package:test/test.dart';
 
-void _check(String description, bool condition) {
-  if (condition) {
-    stdout.writeln('  OK   $description');
-  } else {
-    stdout.writeln('  FAIL $description');
-    _failures++;
-  }
-}
+void _check(String description, bool condition) =>
+    expect(condition, isTrue, reason: description);
 
 ProcessResult _runCtx(String scriptPath, List<String> args, String cwd) {
   return Process.runSync('dart', [scriptPath, ...args], workingDirectory: cwd);
@@ -31,18 +19,11 @@ void main() {
   final repoRoot = Directory.current.path;
   final scriptPath = '$repoRoot/tools/ctx.dart';
 
-  if (!File(scriptPath).existsSync()) {
-    stderr.writeln(
-      'test/tools/ctx_test.dart: tools/ctx.dart introuvable depuis '
-      '$repoRoot -- exécuter depuis la racine du workspace '
-      '(dart test/tools/ctx_test.dart).',
-    );
-    exitCode = 1;
-    return;
-  }
+  test('le script existe (lancer depuis la racine du workspace)', () {
+    expect(File(scriptPath).existsSync(), isTrue);
+  });
 
-  stdout.writeln('-- lookup exact d\'un id unique --');
-  {
+  test("lookup exact d'un id unique", () {
     final result = _runCtx(scriptPath, ['D1.2'], repoRoot);
     final out = result.stdout as String;
     _check('exit code 0', result.exitCode == 0);
@@ -56,10 +37,9 @@ void main() {
       'contenu du bloc présent',
       out.contains("nom: \"Slider d'époques\""),
     );
-  }
+  });
 
-  stdout.writeln('-- lookup d\'un id dupliqué --');
-  {
+  test("lookup d'un id dupliqué", () {
     final result = _runCtx(scriptPath, ['comp-icone'], repoRoot);
     final out = result.stdout as String;
     final headers = out
@@ -71,20 +51,18 @@ void main() {
       'les 5 occurrences réelles sont toutes affichées',
       headers.length == 5,
     );
-  }
+  });
 
-  stdout.writeln('-- fallback par chemin --');
-  {
+  test('fallback par chemin', () {
     final result = _runCtx(scriptPath, ['07-ecrans/carte/01'], repoRoot);
     final expected = File(
       '$repoRoot/conception/07-ecrans/carte/01-principale.yaml',
     ).readAsStringSync();
     _check('exit code 0', result.exitCode == 0);
     _check('fichier entier retourné tel quel', result.stdout == expected);
-  }
+  });
 
-  stdout.writeln('-- id introuvable --');
-  {
+  test('id introuvable', () {
     final result = _runCtx(scriptPath, ['XYZ-INEXISTANT'], repoRoot);
     _check('exit code non nul', result.exitCode != 0);
     _check('rien sur stdout', (result.stdout as String).isEmpty);
@@ -92,10 +70,9 @@ void main() {
       'message clair sur stderr',
       (result.stderr as String).contains('XYZ-INEXISTANT'),
     );
-  }
+  });
 
-  stdout.writeln('-- idempotence de --index --');
-  {
+  test('idempotence de --index', () {
     final indexFile = File('$repoRoot/conception/INDEX.md');
 
     final first = _runCtx(scriptPath, ['--index'], repoRoot);
@@ -110,12 +87,9 @@ void main() {
       'aucun diff entre les deux générations',
       firstContent == secondContent,
     );
-  }
+  });
 
-  stdout.writeln(
-    '-- id avec commentaire inline / guillemets simples (fixture) --',
-  );
-  {
+  test('id avec commentaire inline / guillemets simples (fixture)', () {
     final fixtureRoot = Directory.systemTemp.createTempSync('ctx_test_quotes_');
     try {
       final fixtureConception = Directory('${fixtureRoot.path}/conception')
@@ -157,17 +131,15 @@ void main() {
     } finally {
       fixtureRoot.deleteSync(recursive: true);
     }
-  }
+  });
 
-  stdout.writeln('-- argument vide/blanc rejeté --');
-  {
+  test('argument vide/blanc rejeté', () {
     final result = _runCtx(scriptPath, [''], repoRoot);
     _check('exit code non nul', result.exitCode != 0);
     _check('rien sur stdout', (result.stdout as String).isEmpty);
-  }
+  });
 
-  stdout.writeln('-- résolution par chemin restreinte au dernier segment --');
-  {
+  test('résolution par chemin restreinte au dernier segment', () {
     final fixtureRoot = Directory.systemTemp.createTempSync('ctx_test_seg_');
     try {
       final fixtureConception = Directory('${fixtureRoot.path}/conception')
@@ -190,19 +162,10 @@ void main() {
     } finally {
       fixtureRoot.deleteSync(recursive: true);
     }
-  }
+  });
 
-  stdout.writeln('-- argument surnuméraire rejeté (--index) --');
-  {
+  test('argument surnuméraire rejeté (--index)', () {
     final result = _runCtx(scriptPath, ['--index', 'garbage'], repoRoot);
     _check('exit code non nul', result.exitCode != 0);
-  }
-
-  stdout.writeln();
-  if (_failures == 0) {
-    stdout.writeln('Tous les tests sont passés.');
-  } else {
-    stdout.writeln('$_failures test(s) en échec.');
-    exitCode = 1;
-  }
+  });
 }

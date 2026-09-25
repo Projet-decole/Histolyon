@@ -20,6 +20,36 @@ const _formatsAutorises = {
   '.glb': (contentType: 'model/gltf-binary', tailleMaxOctets: 20 * 1024 * 1024),
 };
 
+/// Buckets déclarés dans supabase/config.toml.
+const _buckets = {'audio', 'images', 'models', 'tiles'};
+
+/// Erreur d'une entrée du manifeste, ou `null` si elle est utilisable : le
+/// bucket existe, et ni le slug ni le fichier ne sortent de leur dossier
+/// (`..`, chemin absolu, séparateur dans le slug).
+String? erreurEntreeMedia({
+  required String bucket,
+  required String slug,
+  required String fichier,
+}) {
+  if (!_buckets.contains(bucket)) {
+    return "bucket '$bucket' inconnu (attendu : ${_buckets.join(', ')}).";
+  }
+  if (slug.isEmpty ||
+      slug.contains('/') ||
+      slug.contains('\\') ||
+      slug == '..') {
+    return "slug '$slug' invalide (un seul segment, sans séparateur).";
+  }
+  final segments = fichier.replaceAll('\\', '/').split('/');
+  if (fichier.startsWith('/') ||
+      fichier.contains(':') ||
+      segments.any((s) => s == '..' || s.isEmpty)) {
+    return "fichier '$fichier' invalide : chemin relatif au dossier partagé, "
+        'sans ..';
+  }
+  return null;
+}
+
 Future<void> main() async {
   final url = Platform.environment['SUPABASE_URL'];
   final key = Platform.environment['SUPABASE_SERVICE_ROLE_KEY'];
@@ -70,6 +100,16 @@ Future<void> main() async {
         "'bucket', 'slug', 'fichier' et 'media_slug' doivent tous être "
         'renseignés en chaîne ($entree).',
       );
+      exitCode = 1;
+      continue;
+    }
+    final erreur = erreurEntreeMedia(
+      bucket: bucket,
+      slug: slug,
+      fichier: fichier,
+    );
+    if (erreur != null) {
+      stderr.writeln("tools/media_push : '$mediaSlug' — $erreur");
       exitCode = 1;
       continue;
     }

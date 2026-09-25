@@ -29,3 +29,23 @@ build/
 
 # FVM Version Cache
 .fvm/
+
+# Config d'environnement : seul env/local.json (clés de démo locales) est
+# versionné ; env/demo.json et tout autre environnement ne vont jamais dans
+# le dépôt.
+env/*
+!env/local.json
+!env/README.md
+
+# Couverture de tests locale
+coverage/
+
+# Médias : ils vont dans Supabase Storage (tools/media_push.dart), content/
+# ne référence que leurs chemins.
+*.glb
+*.gltf
+*.m4a
+*.mp3
+*.aac
+*.wav
+*.pmtiles

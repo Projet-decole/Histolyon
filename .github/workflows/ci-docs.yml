@@ -6,14 +6,10 @@ on:
       - "AGENTS.md"
       - "apps/*/AGENTS.md"
       - "supabase/AGENTS.md"
-      - "tools/sync_agents.dart"
-      - "tools/gen_types.dart"
-      - "tools/ctx.dart"
-      - "tools/check_tokens.dart"
-      - "tools/check_migration_order.dart"
-      - "tools/coverage_ratchet.dart"
+      - "tools/**"
       - "test/tools/**"
-      - "packages/design_tokens/**"
+      - "packages/**"
+      - "pubspec.yaml"
       - "conception/**"
       - "supabase/migrations/**"
       - ".github/workflows/ci-docs.yml"
@@ -46,8 +42,11 @@ jobs:
       - name: Récupérer les clés locales
         run: |
           STATUS=$(supabase status -o json)
-          echo "SUPABASE_URL=$(echo "$STATUS" | jq -r .API_URL)" >> "$GITHUB_ENV"
-          echo "SUPABASE_SERVICE_ROLE_KEY=$(echo "$STATUS" | jq -r .SERVICE_ROLE_KEY)" >> "$GITHUB_ENV"
+          # jq -e : échoue si la clé manque, au lieu d'exporter "null".
+          URL=$(echo "$STATUS" | jq -re .API_URL)
+          CLE=$(echo "$STATUS" | jq -re .SERVICE_ROLE_KEY)
+          echo "SUPABASE_URL=$URL" >> "$GITHUB_ENV"
+          echo "SUPABASE_SERVICE_ROLE_KEY=$CLE" >> "$GITHUB_ENV"
 
       - name: Régénérer packages/api_types et content/schema/
         run: dart run tools/gen_types.dart
@@ -59,7 +58,10 @@ jobs:
         run: dart run tools/check_tokens.dart
 
       - name: Tests des scripts tools/ (ctx, sync_agents, check_tokens, check_migration_order, coverage_ratchet, validate_content)
-        run: dart test test/tools
+        run: dart test --concurrency=1 test/tools
+
+      - name: Formatage des scripts et de leurs tests
+        run: dart format --output=none --set-exit-if-changed tools test
 
       - name: Refuser tout diff après régénération
         run: |
