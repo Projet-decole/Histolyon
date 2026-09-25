@@ -13,3 +13,27 @@ CREATE TABLE preference (
   valeur TEXT NOT NULL,
   PRIMARY KEY (profil_id, cle)
 );
+
+-- Favoris du Profil (C3). Local tant qu'aucun Compte n'ouvre la sync (I6).
+-- type_de_cible : 'pin' | 'parcours' ; cible_id = uuid serveur.
+CREATE TABLE favori (
+  id TEXT NOT NULL PRIMARY KEY,
+  profil_id TEXT NOT NULL REFERENCES profil(id),
+  type_de_cible TEXT NOT NULL CHECK (type_de_cible IN ('pin', 'parcours')),
+  cible_id TEXT NOT NULL,
+  ajoute_le DATETIME NOT NULL,
+  UNIQUE (profil_id, type_de_cible, cible_id)
+);
+
+-- Historique de visite (C3), local (I6). type_evenement :
+-- consultation_pin | etape_visitee | parcours_engage | parcours_termine | resultat_quiz
+CREATE TABLE historique_visite (
+  id TEXT NOT NULL PRIMARY KEY,
+  profil_id TEXT NOT NULL REFERENCES profil(id),
+  type_evenement TEXT NOT NULL,
+  type_de_cible TEXT NOT NULL CHECK (type_de_cible IN ('pin', 'parcours')),
+  cible_id TEXT NOT NULL,
+  horodatage DATETIME NOT NULL,
+  duree_secondes INTEGER,
+  score_quiz INTEGER
+);

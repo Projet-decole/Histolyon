@@ -30,16 +30,13 @@ void main() {
     expect(await db.select(db.profil).get(), hasLength(1));
   });
 
-  test(
-    "deux appels concurrents (ex. deux widgets au démarrage) ne créent qu'un seul Profil",
-    () async {
-      final resultats = await Future.wait([
-        repository.assurerProfilLocal(),
-        repository.assurerProfilLocal(),
-      ]);
+  test("deux appels concurrents (ex. deux widgets au démarrage) ne créent qu'un seul Profil", () async {
+    final resultats = await Future.wait([
+      repository.assurerProfilLocal(),
+      repository.assurerProfilLocal(),
+    ]);
 
-      expect(resultats[0].id, resultats[1].id);
-      expect(await db.select(db.profil).get(), hasLength(1));
-    },
-  );
+    expect(resultats[0].id, resultats[1].id);
+    expect(await db.select(db.profil).get(), hasLength(1));
+  });
 }

@@ -12,13 +12,10 @@ import 'package:mobile/app/bootstrap.dart';
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
-  testWidgets(
-    "l'app démarre sur un écran vide (parcours démo, vide pour l'instant)",
-    (tester) async {
-      await tester.pumpWidget(const ProviderScope(child: HistoLyonApp()));
-      await tester.pumpAndSettle();
+  testWidgets("l'app démarre sur la coquille à trois onglets", (tester) async {
+    await tester.pumpWidget(const ProviderScope(child: HistoLyonApp()));
+    await tester.pumpAndSettle();
 
-      expect(find.byType(Scaffold), findsOneWidget);
-    },
-  );
+    expect(find.byType(NavigationBar), findsOneWidget);
+  });
 }

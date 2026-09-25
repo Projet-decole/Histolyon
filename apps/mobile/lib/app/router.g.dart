@@ -8,26 +8,26 @@ part of 'router.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
-/// Unique point d'assemblage des routes (AD-5) : `app/` importe les features
-/// pour composer les `GoRoute` qu'elles exportent. Aucune feature n'existe
-/// encore (squelette de l'Epic 6) — seul un écran vide est câblé ici, pas une
-/// feature, pour que l'app démarre sur quelque chose de visible.
+/// Unique point d'assemblage des routes (AD-5) : `app/` importe les routes
+/// exportées par chaque feature. Une feature n'a jamais besoin de modifier ce
+/// fichier pour ajouter une sous-route : elle l'ajoute dans son propre
+/// `<slug>_routes.dart`.
 
 @ProviderFor(appRouter)
 final appRouterProvider = AppRouterProvider._();
 
-/// Unique point d'assemblage des routes (AD-5) : `app/` importe les features
-/// pour composer les `GoRoute` qu'elles exportent. Aucune feature n'existe
-/// encore (squelette de l'Epic 6) — seul un écran vide est câblé ici, pas une
-/// feature, pour que l'app démarre sur quelque chose de visible.
+/// Unique point d'assemblage des routes (AD-5) : `app/` importe les routes
+/// exportées par chaque feature. Une feature n'a jamais besoin de modifier ce
+/// fichier pour ajouter une sous-route : elle l'ajoute dans son propre
+/// `<slug>_routes.dart`.
 
 final class AppRouterProvider
     extends $FunctionalProvider<GoRouter, GoRouter, GoRouter>
     with $Provider<GoRouter> {
-  /// Unique point d'assemblage des routes (AD-5) : `app/` importe les features
-  /// pour composer les `GoRoute` qu'elles exportent. Aucune feature n'existe
-  /// encore (squelette de l'Epic 6) — seul un écran vide est câblé ici, pas une
-  /// feature, pour que l'app démarre sur quelque chose de visible.
+  /// Unique point d'assemblage des routes (AD-5) : `app/` importe les routes
+  /// exportées par chaque feature. Une feature n'a jamais besoin de modifier ce
+  /// fichier pour ajouter une sous-route : elle l'ajoute dans son propre
+  /// `<slug>_routes.dart`.
   AppRouterProvider._()
     : super(
         from: null,
@@ -61,4 +61,4 @@ final class AppRouterProvider
   }
 }
 
-String _$appRouterHash() => r'dacb8446bbe4bd7ffd3300cb6e55f43af65f7063';
+String _$appRouterHash() => r'bb4ad1455d9da034d70343dab042356d226b7e1f';
