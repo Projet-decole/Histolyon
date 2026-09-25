@@ -53,7 +53,7 @@ Des `ConsumerWidget` qui font `ref.watch` sur les providers de `domain/`, sans i
 ## 4. Routes
 
 - Une nouvelle sous-route se déclare dans `core/router/route_names.dart` (nom + chemin), puis la `GoRoute` va dans `presentation/<slug>_routes.dart`.
-- Pour aller vers une autre feature, on utilise `context.goNamed(RouteNames.pin, pathParameters: {'slug': s})`, jamais un import de l'autre feature.
+- Pour aller vers une autre feature, on utilise son nom de route, jamais un import de l'autre feature : `context.goNamed(RouteNames.parcours)` vers un onglet, `context.pushNamed(RouteNames.pin, pathParameters: {'slug': s})` vers un écran plein écran (le retour ramène aux onglets).
 
 ## 5. Tests puis vérification
 

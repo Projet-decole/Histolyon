@@ -53,7 +53,7 @@ On te donne un numéro d'issue, par exemple « implémente l'issue #12 ». Voici
 
 ## Règles (la CI en vérifie une partie)
 
-- **Architecture (AD-5, vérifiée par la CI)** : une feature n'importe jamais une autre feature, et `core/` ou `packages/` n'importent jamais une feature. Dans une feature, les imports vont de `presentation` vers `domain`, puis de `domain` vers `data`. Pour passer d'une feature à l'autre : `context.goNamed(RouteNames.x)`.
+- **Architecture (AD-5, vérifiée par la CI)** : une feature n'importe jamais une autre feature, et `core/` ou `packages/` n'importent jamais une feature. Dans une feature, les imports vont de `presentation` vers `domain`, puis de `domain` vers `data`. Pour passer d'une feature à l'autre : `context.goNamed(RouteNames.x)` (onglet) ou `context.pushNamed(RouteNames.x)` (écran plein écran).
 - **Données** : `data/` est la seule couche qui parle à Supabase ou Drift. Elle renvoie un `Result<T>` (`Ok`/`Err(Failure)`, dans `core/models/failure.dart`) et n'expose jamais d'exception brute.
 - **État** : Riverpod `@riverpod`. `setState` est réservé à l'UI locale éphémère. L'état transverse (époque sélectionnée, parcours actif…) est dans `core/session`, une liste fermée de providers.
 - **Cycles de vie** : une colonne `statut` ne se modifie jamais par un `UPDATE` (un trigger le bloque). Chaque transition est une RPC SQL qui écrit sa trace (voir `docs/guides/ecrire-une-migration.md`).
@@ -154,6 +154,7 @@ lib/
   core/session/             état transverse, liste FERMÉE : epoqueSelectionnee, parcoursActif, etapeCourante, pinCourant, modePresentation, lectureAudio
   core/supabase/            supabaseClientProvider (lu uniquement par les couches data/)
   core/db/                  base Drift locale (schema.drift : profil, preference, favori, historique_visite) + appDatabaseProvider
+  core/profile/             Profil local sans Compte (I6) : profilLocalIdProvider
   core/models/failure.dart  Result<T> = Ok | Err(Failure)
   core/log/                 logger (jamais print)
   features/<slug>/
@@ -163,7 +164,9 @@ lib/
     data/                             repository : Supabase / Drift → Result<T>
 ```
 
-Les features en squelette sont `carte`, `parcours` et `profil` (les onglets), plus `pins` (`/pin/:slug`) et `immersion` (`/modele-3d/:slug`), qui s'ouvrent en plein écran au-dessus des onglets.
+Les features en squelette sont `carte`, `parcours` et `profil` (les onglets), plus `pins` (`/pin/:slug`) et `immersion` (`/modele-3d/:slug`), qui s'ouvrent en plein écran au-dessus des onglets avec `context.pushNamed(...)` (le retour ramène aux onglets ; `goNamed` sert à changer d'onglet).
+
+Le thème (`app/theme.dart`, construit depuis `design_tokens`) et la locale `fr` sont posés à la composition root : une feature utilise `Theme.of(context)` ou les tokens, jamais une valeur en dur.
 
 ## Recette : une tranche de feature
 

@@ -14,6 +14,7 @@ on:
       - "tools/coverage_ratchet.dart"
       - "test/tools/**"
       - "packages/design_tokens/**"
+      - "packages/api_types/**"
       - "conception/**"
       - "supabase/migrations/**"
       - ".github/workflows/ci-docs.yml"
@@ -51,6 +52,10 @@ jobs:
 
       - name: Régénérer packages/api_types et content/schema/
         run: dart run tools/gen_types.dart
+
+      - name: Tester packages/api_types contre la base locale (select typé sur pin)
+        working-directory: packages/api_types
+        run: flutter test
 
       - name: Régénérer conception/INDEX.md
         run: dart run tools/ctx.dart --index
