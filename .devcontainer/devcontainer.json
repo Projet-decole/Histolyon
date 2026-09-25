@@ -3,17 +3,20 @@
   "build": {
     "dockerfile": "Dockerfile"
   },
-  // Permet à `supabase start` (dans le conteneur) de piloter des conteneurs
-  // Postgres/Auth/Storage sur le Docker de l'hôte, sans Docker-in-Docker.
+  // Docker-in-Docker : `supabase start` lance Postgres/Auth/Storage DANS ce
+  // conteneur, donc 127.0.0.1:54321 fonctionne ici comme sur un poste natif,
+  // quel que soit l'hôte (Linux/Mac/Windows). Docker-outside-of-docker a été
+  // essayé et abandonné : les conteneurs Supabase tournaient sur l'hôte,
+  // injoignables depuis ici (vérifié le 2026-09-25).
   "features": {
-    "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {}
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {}
   },
-  "forwardPorts": [54321, 54322, 54323, 54324],
+  "forwardPorts": [8080, 54321, 54322, 54323],
   "portsAttributes": {
+    "8080": { "label": "App HistoLyon (navigateur)", "onAutoForward": "openBrowser" },
     "54321": { "label": "Supabase API" },
     "54322": { "label": "Supabase DB (Postgres)" },
-    "54323": { "label": "Supabase Studio" },
-    "54324": { "label": "Supabase Inbucket (emails locaux)" }
+    "54323": { "label": "Supabase Studio" }
   },
   "postCreateCommand": "flutter pub get && (lefthook install || true)",
   "customizations": {

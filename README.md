@@ -2,24 +2,30 @@
 
 Application mobile qui fait explorer Lyon à travers les époques : une carte avec un slider d'époques, des pins historiques sourcés, des parcours et des reconstitutions 3D/AR. Le code est en Flutter (Android, avec du code partagé prêt pour iOS), le backend est sur Supabase et le contenu éditorial est en YAML.
 
-## Démarrer (une fois)
+## Démarrer
 
-**Le plus simple : le devcontainer.** Ouvre le dépôt dans VS Code avec l'extension *Dev Containers*, ou dans GitHub Codespaces : tout est préinstallé.
+**Seuls Docker et VS Code sont à installer**, quel que soit ton système (Windows, Mac ou Linux). Tout le reste (Flutter, Supabase, Android SDK, aux bonnes versions) est dans le devcontainer.
 
-**En natif**, il faut Flutter 3.47.4 (via [fvm](https://fvm.app/), voir `.fvmrc`), Docker, [Supabase CLI](https://supabase.com/docs/guides/cli) 2.117, Android SDK et JDK 21, et [lefthook](https://lefthook.dev). Ensuite :
+1. Installe [Docker Desktop](https://www.docker.com/products/docker-desktop/) (sous Linux, Docker Engine suffit), [VS Code](https://code.visualstudio.com/) et son extension **Dev Containers**.
+   Dans Docker Desktop → *Settings → Resources*, donne **au moins 8 Go de mémoire** à Docker (Supabase + Flutter en ont besoin ; avec 4 Go, les tests se bloquent). Sous Windows (WSL 2), c'est la moitié de la RAM par défaut, ce qui suffit à partir de 16 Go.
+2. Clone le dépôt et ouvre-le dans VS Code. Clique sur **« Reopen in Container »** : la première fois, le conteneur se construit en 10 à 15 minutes.
+3. Dans le terminal de VS Code (qui est dans le conteneur) :
 
 ```bash
-git clone <url-du-depot> && cd Histolyon
-flutter pub get && lefthook install
-supabase start && supabase db reset          # base locale avec le schéma complet
-eval "$(supabase status -o env | sed -n 's/^API_URL=/export SUPABASE_URL=/p; s/^SERVICE_ROLE_KEY=/export SUPABASE_SERVICE_ROLE_KEY=/p')"
-dart run tools/seed.dart                     # charge époques, catégories, pins
-dart run tools/publier_local.dart            # publie tout en local pour que l'app le voie
-melos run test                               # tout doit être vert
-cd apps/mobile && flutter run --dart-define-from-file=../../env/local.json
+melos run local     # base Supabase locale : schéma, contenu, pins publiés (5-10 min la 1re fois)
+melos run app       # l'app s'ouvre dans ton navigateur sur http://localhost:8080
 ```
 
-Si quelque chose casse, ouvre une issue avec le message d'erreur. C'est déjà une contribution utile.
+C'est tout. À chaque séance suivante, `melos run local` puis `melos run app`. Dans le terminal de `melos run app`, `r` recharge l'app après une modification.
+
+**Tester sur ton téléphone Android** (utile pour la 3D, l'AR, le GPS) : active le *débogage sans fil* du téléphone (Options pour les développeurs), puis, depuis le terminal du conteneur, `adb pair <ip:port>` et `adb connect <ip:port>` (les deux adresses sont affichées par le téléphone). Lance ensuite `cd apps/mobile && flutter run --dart-define-from-file=../../env/local.json`. Le téléphone et l'ordinateur doivent être sur le même Wi-Fi.
+
+<details><summary>Sans devcontainer (installation native, déconseillée)</summary>
+
+Il faut installer toi-même Flutter 3.47.4 (via [fvm](https://fvm.app/), voir `.fvmrc`), Docker, [Supabase CLI](https://supabase.com/docs/guides/cli) 2.117, JDK 21, l'Android SDK (ou Android Studio pour l'émulateur) et [lefthook](https://lefthook.dev), puis faire `flutter pub get && lefthook install` et les deux commandes ci-dessus.
+</details>
+
+Si quelque chose casse, écris un commentaire dans #86 avec le message d'erreur. C'est déjà une contribution utile.
 
 ## Travailler (à chaque session)
 

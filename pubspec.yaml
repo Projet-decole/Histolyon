@@ -23,10 +23,16 @@ melos:
       run: dart analyze . && dart run tools/check_import_direction.dart && dart run tools/check_tokens.dart
     test:
       description: Tests de chaque package du workspace qui a un dossier test/, plus les tests des scripts tools/ (test/tools/, jamais couverts par melos exec qui n'itère que les membres du workspace).
-      run: dart run melos exec --dir-exists=test -- "flutter test || dart test" && dart test test/tools
+      run: dart run melos exec --concurrency=1 --dir-exists=test -- "flutter test || dart test" && dart test test/tools
     format:
       description: Vérifie le formatage de tout le workspace (sans corriger).
       run: dart format --set-exit-if-changed .
+    local:
+      description: Base locale prête en une commande — démarre Supabase, rejoue les migrations, charge le contenu et le publie (voir la sortie pour l'URL du Studio).
+      run: supabase start -x edge-runtime,logflare,vector,imgproxy && supabase db reset && dart run tools/seed.dart && dart run tools/publier_local.dart
+    app:
+      description: Lance l'app mobile dans le navigateur sur http://localhost:8080, branchée à la base locale (hot reload avec r dans le terminal).
+      run: cd apps/mobile && flutter run -d web-server --web-hostname 0.0.0.0 --web-port 8080 --dart-define-from-file=../../env/local.json
     gen:
       description: Génération de code (build_runner) pour chaque package qui en dépend.
       run: dart run melos exec --depends-on=build_runner -- "dart run build_runner build --delete-conflicting-outputs"

@@ -15,6 +15,15 @@ class AppDatabase extends _$AppDatabase {
   int get schemaVersion => 1;
 
   static QueryExecutor _ouvrirConnexion() {
-    return driftDatabase(name: 'histolyon');
+    return driftDatabase(
+      name: 'histolyon',
+      // Cible web (développement dans le navigateur depuis le devcontainer) :
+      // fichiers servis depuis web/, versions alignées sur pubspec.lock
+      // (sqlite3 3.6.0, drift 2.35.0).
+      web: DriftWebOptions(
+        sqlite3Wasm: Uri.parse('sqlite3.wasm'),
+        driftWorker: Uri.parse('drift_worker.js'),
+      ),
+    );
   }
 }
