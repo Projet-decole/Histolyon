@@ -6,9 +6,9 @@
 # Ce que ce conteneur NE fait PAS : lancer un émulateur Android (accès
 # GPU/KVM non fiable en conteneur) — `flutter build apk` fonctionne en tâche
 # de fond, mais teste sur un appareil réel (adb, USB) ou Android Studio hors
-# conteneur. Docker (pour `supabase start`) n'est pas installé ici : il
-# tourne sur l'hôte, ce conteneur s'y connecte via la feature
-# docker-outside-of-docker (voir devcontainer.json).
+# conteneur : l'app se voit dans le navigateur (`melos run app`, voir
+# README) ou sur un téléphone en ADB sans fil. Docker (pour `supabase start`)
+# est fourni par la feature docker-in-docker (voir devcontainer.json).
 FROM mcr.microsoft.com/devcontainers/base:ubuntu-24.04
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -44,13 +44,10 @@ RUN mkdir -p "$ANDROID_SDK_ROOT/cmdline-tools" \
     && yes | sdkmanager --sdk_root="$ANDROID_SDK_ROOT" --licenses > /dev/null \
     && sdkmanager --sdk_root="$ANDROID_SDK_ROOT" "platform-tools" "platforms;android-34" "build-tools;34.0.0"
 
-# --- Supabase CLI (pilote les conteneurs Postgres/Auth/Storage locaux via
-# docker-outside-of-docker). Le nom de l'asset .deb inclut le numéro de
-# version (pas de nom fixe "latest") -- on le résout via l'API GitHub ---
-RUN SUPABASE_DEB_URL=$(curl -fsSL https://api.github.com/repos/supabase/cli/releases/latest \
-        | grep -o '"browser_download_url": *"[^"]*linux_amd64\.deb"' \
-        | grep -o 'https://[^"]*') \
-    && curl -fsSL -o /tmp/supabase.deb "$SUPABASE_DEB_URL" \
+# --- Supabase CLI, épinglé (même version que la CI, ci-supabase.yml) ---
+ARG SUPABASE_CLI_VERSION=2.117.0
+RUN curl -fsSL -o /tmp/supabase.deb \
+        "https://github.com/supabase/cli/releases/download/v${SUPABASE_CLI_VERSION}/supabase_${SUPABASE_CLI_VERSION}_linux_amd64.deb" \
     && sudo dpkg -i /tmp/supabase.deb \
     && rm /tmp/supabase.deb \
     && supabase --version

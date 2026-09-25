@@ -37,7 +37,7 @@ Guide détaillé : `docs/guides/ajouter-une-feature.md`. Tests de widget : `docs
 
 ## Commandes
 
-- `flutter run --dart-define-from-file=../../env/local.json` : app sur la base Supabase locale (`supabase start` et `dart run tools/seed.dart` doivent avoir tourné).
+- `melos run app` (depuis la racine) : app dans le navigateur, sur http://localhost:8080 (lancer `melos run local` avant). Sur un téléphone Android en ADB : `flutter run --dart-define-from-file=../../env/local.json`.
 - `flutter test` et `flutter analyze` pour ce seul package.
 
 ## Jamais

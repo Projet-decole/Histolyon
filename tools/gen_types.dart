@@ -1,13 +1,15 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'src/connexion_supabase.dart';
+
 // Story 4.2 (AD-3) : régénère packages/api_types (Dart, via supadart) et
 // content/schema/ (JSON Schema) depuis le schéma Supabase local — jamais
 // de modèle écrit à la main.
 //
 // Usage : dart run tools/gen_types.dart
-// Lit SUPABASE_URL et SUPABASE_SERVICE_ROLE_KEY dans l'environnement
-// (jamais commitées — voir `supabase status` en local).
+// Base visée : SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY si présentes, sinon
+// la base locale de `supabase start` (tools/src/connexion_supabase.dart).
 //
 // Deux limites de supadart 1.9.3 contournées ici plutôt que dans le
 // fichier généré (cf. spike Story 4.1, .memlog.md de la spine) :
@@ -40,17 +42,13 @@ const _dossierSchema = 'content/schema';
 const _dossierMigrations = 'supabase/migrations';
 
 Future<void> main() async {
-  final url = Platform.environment['SUPABASE_URL'];
-  final key = Platform.environment['SUPABASE_SERVICE_ROLE_KEY'];
-  if (url == null || key == null) {
-    stderr.writeln(
-      'tools/gen-types : SUPABASE_URL et SUPABASE_SERVICE_ROLE_KEY doivent '
-      "être renseignées dans l'environnement (jamais commitées) — "
-      'voir `supabase status` en local pour les récupérer.',
-    );
+  final connexion = await connexionSupabase('gen-types');
+  if (connexion == null) {
     exitCode = 1;
     return;
   }
+  final url = connexion.url;
+  final key = connexion.cle;
 
   final Map<String, dynamic> swaggerComplet;
   try {
