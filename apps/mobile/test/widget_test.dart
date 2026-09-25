@@ -33,18 +33,44 @@ void main() {
     expect(find.text('Parcours — à venir'), findsOneWidget);
   });
 
-  testWidgets('la route nommée pin ouvre la fiche au-dessus des onglets', (
-    tester,
-  ) async {
-    await tester.pumpWidget(const ProviderScope(child: HistoLyonApp()));
-    await tester.pumpAndSettle();
+  // Écrans plein écran : ouverts par pushNamed pour garder les onglets
+  // dessous (bouton retour, geste retour Android).
+  testWidgets(
+    'la route nommée pin ouvre la fiche au-dessus des onglets, puis retour',
+    (tester) async {
+      await tester.pumpWidget(const ProviderScope(child: HistoLyonApp()));
+      await tester.pumpAndSettle();
 
-    final context = tester.element(find.byType(NavigationBar));
-    GoRouter.of(context)
-        .goNamed(RouteNames.pin, pathParameters: {'slug': 'cour-des-voraces'});
-    await tester.pumpAndSettle();
+      final context = tester.element(find.byType(NavigationBar));
+      GoRouter.of(
+        context,
+      ).pushNamed(RouteNames.pin, pathParameters: {'slug': 'cour-des-voraces'});
+      await tester.pumpAndSettle();
 
-    expect(find.text('cour-des-voraces'), findsOneWidget);
-    expect(find.byType(NavigationBar), findsNothing);
-  });
+      expect(find.text('cour-des-voraces'), findsOneWidget);
+      expect(find.byType(NavigationBar), findsNothing);
+
+      await tester.tap(find.byType(BackButton));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(NavigationBar), findsOneWidget);
+    },
+  );
+
+  testWidgets(
+    'la route nommée modele3d ouvre la vue 3D au-dessus des onglets',
+    (tester) async {
+      await tester.pumpWidget(const ProviderScope(child: HistoLyonApp()));
+      await tester.pumpAndSettle();
+
+      final context = tester.element(find.byType(NavigationBar));
+      GoRouter.of(
+        context,
+      ).pushNamed(RouteNames.modele3d, pathParameters: {'slug': 'basilique'});
+      await tester.pumpAndSettle();
+
+      expect(find.text('basilique'), findsOneWidget);
+      expect(find.byType(NavigationBar), findsNothing);
+    },
+  );
 }
