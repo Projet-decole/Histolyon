@@ -2,7 +2,6 @@
 // suppression d'un Profil nettoie ses données, les valeurs fermées sont
 // contrôlées.
 
-import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 

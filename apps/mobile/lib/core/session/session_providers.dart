@@ -22,7 +22,13 @@ class ParcoursActif extends _$ParcoursActif {
   @override
   String? build() => null;
 
-  void definir(String? parcoursId) => state = parcoursId;
+  /// Changer de parcours (ou en sortir) invalide l'étape courante.
+  void definir(String? parcoursId) {
+    if (parcoursId != state) {
+      ref.read(etapeCouranteProvider.notifier).definir(null);
+    }
+    state = parcoursId;
+  }
 }
 
 /// Index de l'étape courante dans le parcours actif.

@@ -62,20 +62,22 @@ void main() {
   test(
     "une erreur de base devient un Err, jamais une exception brute",
     () async {
-      await db.close();
+      await db.customStatement('DROP TABLE profil');
 
       expect(await repository.assurerProfilLocal(), isA<Err<ProfilData>>());
     },
   );
 
-  test('profilLocalProvider expose le Profil local', () async {
+  test("profilLocalIdProvider expose l'identifiant du Profil local", () async {
     final container = ProviderContainer(
       overrides: [appDatabaseProvider.overrideWithValue(db)],
     );
     addTearDown(container.dispose);
 
-    final resultat = await container.read(profilLocalProvider.future);
+    final resultat = await container.read(profilLocalIdProvider.future);
+    final profil = await db.select(db.profil).getSingle();
 
-    expect(_profil(resultat).id, isNotEmpty);
+    expect(resultat, isA<Ok<String>>());
+    expect((resultat as Ok<String>).value, profil.id);
   });
 }
