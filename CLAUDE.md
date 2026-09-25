@@ -92,7 +92,7 @@ Pour voir les colonnes exactes, lis la migration concernée, ou `packages/api_ty
 
 **RPC de transition existantes** : `pin_soumettre`, `pin_valider`, `pin_publier`, `pin_retirer`. Toutes les autres transitions (parcours, commentaire, retour, signalement, compte, et pour les pins : demande de complément, réouverture, promotion I10) **n'existent pas encore**. Leurs colonnes `statut` sont déjà protégées par trigger, donc chaque transition manquante doit passer par une nouvelle RPC.
 
-**Buckets Storage** : `audio`, `images`, `modeles-3d` (voir `config.toml`).
+**Buckets Storage** : `audio`, `images`, `models` (3D), `tiles` (fond de carte) (voir `config.toml`).
 
 ## Commandes
 

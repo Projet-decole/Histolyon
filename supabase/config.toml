@@ -40,11 +40,16 @@ public = true
 file_size_limit = "2MiB"
 allowed_mime_types = ["image/jpeg", "image/png", "image/webp"]
 
-# Modèles 3D (table modele_3d, D8). glTF binaire uniquement.
-[storage.buckets.modeles-3d]
+# Modèles 3D (table modele_3d, D8, AD-11). glTF binaire uniquement.
+[storage.buckets.models]
 public = true
 file_size_limit = "30MiB"
 allowed_mime_types = ["model/gltf-binary", "application/octet-stream"]
+
+# Fond de carte lyon.pmtiles (AD-8), produit par tools/tiles.
+[storage.buckets.tiles]
+public = true
+file_size_limit = "200MiB"
 
 [auth]
 enabled = true
