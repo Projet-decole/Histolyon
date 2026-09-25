@@ -144,7 +144,7 @@ Maintenant, chaque dossier a une raison d'être que tu viens de lire.
 | `apps/mobile/` | § 1, § 4b | L'app Android. `lib/features/<domaine>/` = ta zone, en trois couches ; `lib/core/` = le partagé ; `lib/app/` = l'assemblage. | Presque toutes les stories D1–D9, D11. |
 | `apps/admin/` | § 1 | Le back-office, en Flutter Web, même structure. | Les stories D10, après le premier pin. |
 | `packages/` | § 1, § 4b | Partagé par les deux apps : `design_tokens` (couleurs, typos de la maquette, mêmes noms que Figma), `ui_kit` (les composants de la maquette), `api_types` (**généré** depuis la base), `map_styles` (un fond de carte par époque). | Rarement ; avec le Gardien du design. `api_types` se régénère, ne s'édite pas. |
-| `supabase/` | § 1, § 4c | La base : `migrations/` (le schéma), `functions_sql/` (les changements d'état : soumettre, valider, publier), `tests/` (un test SQL par règle métier). | Stories qui touchent les données ; une migration par PR, via l'Intégrateur. |
+| `supabase/` | § 1, § 4c | La base : `migrations/` (le schéma et les changements d'état : soumettre, valider, publier), `tests/` (un test SQL par règle métier). | Stories qui touchent les données ; une migration par PR, via l'Intégrateur. |
 | `content/` | § 1 | Pins, parcours, époques, catégories en YAML, relus en PR comme du code. Les images et sons ne sont pas là (ils vont dans le stockage Supabase via `tools/media`). | Tu écris ou corriges du contenu. |
 | `prompts/` | § 5 | Les prompts à coller dans une IA, et la checklist sans IA. | À chaque story. |
 | `tools/` | § 3, § 4c, § 6 | Les scripts : `ctx`, `gen-types`, `seed`, `media`, `report`, `check-tokens`… | Quand la story le dit. |
