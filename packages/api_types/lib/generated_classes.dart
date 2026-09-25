@@ -989,7 +989,7 @@ class Compte implements SupadartClass<Compte> {
 
 class Signalement implements SupadartClass<Signalement> {
   final String id;
-  final String signaleurId;
+  final String? signaleurId;
   final TYPE_DE_CIBLE typeDeCible;
   final String cibleId;
   final MOTIF_SIGNALEMENT motif;
@@ -999,7 +999,7 @@ class Signalement implements SupadartClass<Signalement> {
 
   const Signalement({
     required this.id,
-    required this.signaleurId,
+    this.signaleurId,
     required this.typeDeCible,
     required this.cibleId,
     required this.motif,
@@ -1051,7 +1051,7 @@ class Signalement implements SupadartClass<Signalement> {
 
   static Map<String, dynamic> insert({
     String? id,
-    required String signaleurId,
+    String? signaleurId,
     required TYPE_DE_CIBLE typeDeCible,
     required String cibleId,
     required MOTIF_SIGNALEMENT motif,
@@ -1098,7 +1098,7 @@ class Signalement implements SupadartClass<Signalement> {
       id: jsonn['id'] != null ? jsonn['id'].toString() : '',
       signaleurId: jsonn['signaleur_id'] != null
           ? jsonn['signaleur_id'].toString()
-          : '',
+          : null,
       typeDeCible: jsonn['type_de_cible'] != null
           ? TYPE_DE_CIBLE.values.byName(jsonn['type_de_cible'].toString())
           : TYPE_DE_CIBLE.values.first,
@@ -1565,7 +1565,7 @@ class MembreEquipe implements SupadartClass<MembreEquipe> {
 class TraceValidation implements SupadartClass<TraceValidation> {
   final String id;
   final String pinId;
-  final String validateur;
+  final String? validateur;
   final String decision;
   final String? typeDeValidation;
   final String? motif;
@@ -1574,7 +1574,7 @@ class TraceValidation implements SupadartClass<TraceValidation> {
   const TraceValidation({
     required this.id,
     required this.pinId,
-    required this.validateur,
+    this.validateur,
     required this.decision,
     this.typeDeValidation,
     this.motif,
@@ -1622,7 +1622,7 @@ class TraceValidation implements SupadartClass<TraceValidation> {
   static Map<String, dynamic> insert({
     String? id,
     required String pinId,
-    required String validateur,
+    String? validateur,
     required String decision,
     String? typeDeValidation,
     String? motif,
@@ -1665,7 +1665,7 @@ class TraceValidation implements SupadartClass<TraceValidation> {
       pinId: jsonn['pin_id'] != null ? jsonn['pin_id'].toString() : '',
       validateur: jsonn['validateur'] != null
           ? jsonn['validateur'].toString()
-          : '',
+          : null,
       decision: jsonn['decision'] != null ? jsonn['decision'].toString() : '',
       typeDeValidation: jsonn['type_de_validation'] != null
           ? jsonn['type_de_validation'].toString()
@@ -2576,7 +2576,7 @@ class TraceModeration implements SupadartClass<TraceModeration> {
   final String id;
   final String typeDeCible;
   final String cibleId;
-  final String moderateur;
+  final String? moderateur;
   final DECISION_MODERATION decision;
   final String? motif;
   final ACTION_MODERATION actionPrise;
@@ -2586,7 +2586,7 @@ class TraceModeration implements SupadartClass<TraceModeration> {
     required this.id,
     required this.typeDeCible,
     required this.cibleId,
-    required this.moderateur,
+    this.moderateur,
     required this.decision,
     this.motif,
     required this.actionPrise,
@@ -2639,7 +2639,7 @@ class TraceModeration implements SupadartClass<TraceModeration> {
     String? id,
     required String typeDeCible,
     required String cibleId,
-    required String moderateur,
+    String? moderateur,
     required DECISION_MODERATION decision,
     String? motif,
     ACTION_MODERATION? actionPrise,
@@ -2688,7 +2688,7 @@ class TraceModeration implements SupadartClass<TraceModeration> {
       cibleId: jsonn['cible_id'] != null ? jsonn['cible_id'].toString() : '',
       moderateur: jsonn['moderateur'] != null
           ? jsonn['moderateur'].toString()
-          : '',
+          : null,
       decision: jsonn['decision'] != null
           ? DECISION_MODERATION.values.byName(jsonn['decision'].toString())
           : DECISION_MODERATION.values.first,

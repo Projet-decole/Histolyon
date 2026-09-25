@@ -279,7 +279,6 @@ histolyon/
   supabase/
     AGENTS.md
     migrations/             # vérité du schéma ; une par PR
-    functions_sql/          # RPC de transition (inclus par les migrations)
     tests/                  # pgTAP — par invariant Ix, par policy, par RPC
   content/
     schema/                 # GÉNÉRÉ (JSON Schema)
