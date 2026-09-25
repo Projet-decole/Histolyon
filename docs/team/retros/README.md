@@ -25,5 +25,5 @@ Un fichier par rétro, `docs/team/retros/AAAA-MM-JJ.md` :
 ## Règles
 
 - Chaque changement décidé devient une issue étiquetée `organisation`, traitée comme une story (une issue = un changement, pas un fourre-tout).
-- Pas de nom de personne dans le fichier de rétro — une casquette (`docs/team/ROLES.md`) ou un fait, jamais un reproche individuel.
+- Pas de nom de personne dans le fichier de rétro — une casquette (`docs/archive/ROLES.md`) ou un fait, jamais un reproche individuel.
 - La rétro se lit en réunion, elle ne s'y rédige pas à zéro : un brouillon en continu (dans ce dossier ou ailleurs) vaut mieux qu'une page blanche le jour J.

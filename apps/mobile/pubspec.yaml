@@ -36,6 +36,12 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
 
+  # Packages du workspace (types générés depuis le schéma, tokens Figma).
+  api_types:
+    path: ../../packages/api_types
+  design_tokens:
+    path: ../../packages/design_tokens
+
   flutter_riverpod: 3.4.3
   riverpod_annotation: 4.0.7
   go_router: 18.0.1

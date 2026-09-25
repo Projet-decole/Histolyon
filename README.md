@@ -1,45 +1,49 @@
 # HistoLyon
 
-Application Android (et, sans licence développeur payante, code partagé prêt pour iOS) qui fait explorer Lyon à travers les époques : carte, slider temporel, pins historiques, parcours. Backend Supabase, contenu éditorial en YAML, monorepo Dart/Flutter.
+Application mobile qui fait explorer Lyon à travers les époques : une carte avec un slider d'époques, des pins historiques sourcés, des parcours et des reconstitutions 3D/AR. Le code est en Flutter (Android, avec du code partagé prêt pour iOS), le backend est sur Supabase et le contenu éditorial est en YAML.
 
-**Nouveau sur ce dépôt ? Commence ici, dans l'ordre :**
+## Démarrer (une fois)
 
-1. [`AGENTS.md`](AGENTS.md) — commandes, conventions, où chercher. Une page, à lire en entier.
-2. [`docs/architecture/architecture-HistoLyon-2026-09-17/ORGANISATION.md`](docs/architecture/architecture-HistoLyon-2026-09-17/ORGANISATION.md) — pourquoi le dépôt est organisé ainsi (25 min de lecture, explique tout le reste).
-3. [`docs/architecture/architecture-HistoLyon-2026-09-17/BOOTSTRAP.md`](docs/architecture/architecture-HistoLyon-2026-09-17/BOOTSTRAP.md) — comment le socle a été construit, étape par étape.
+**Le plus simple : le devcontainer.** Ouvre le dépôt dans VS Code avec l'extension *Dev Containers*, ou dans GitHub Codespaces : tout est préinstallé.
 
-## Démarrer à coder
-
-**Option la plus simple : le devcontainer.** Ouvre le dépôt dans VS Code avec l'extension *Dev Containers*, ou GitHub Codespaces — Flutter, Android SDK, Supabase CLI, melos et lefthook sont préinstallés et à la bonne version. Détail : [`.devcontainer/`](.devcontainer/).
-
-**En natif**, installer d'abord : Flutter 3.47.4 (via [fvm](https://fvm.app/), voir `.fvmrc`), Docker, Supabase CLI 2.117, lefthook 2.1, Android SDK (API 21+, JDK 21). Puis :
+**En natif**, il faut Flutter 3.47.4 (via [fvm](https://fvm.app/), voir `.fvmrc`), Docker, [Supabase CLI](https://supabase.com/docs/guides/cli) 2.117, Android SDK et JDK 21, et [lefthook](https://lefthook.dev). Ensuite :
 
 ```bash
 git clone <url-du-depot> && cd Histolyon
-flutter pub get
-lefthook install
-supabase start
-supabase db reset
-melos run test
+flutter pub get && lefthook install
+supabase start && supabase db reset          # base locale avec le schéma complet
+eval "$(supabase status -o env | sed -n 's/^API_URL=/export SUPABASE_URL=/p; s/^SERVICE_ROLE_KEY=/export SUPABASE_SERVICE_ROLE_KEY=/p')"
+dart run tools/seed.dart                     # charge époques, catégories, pins
+dart run tools/publier_local.dart            # publie tout en local pour que l'app le voie
+melos run test                               # tout doit être vert
+cd apps/mobile && flutter run --dart-define-from-file=../../env/local.json
 ```
 
-Tout doit être vert. Sinon, ouvre une issue `socle` avec ce qui a cassé.
+Si quelque chose casse, ouvre une issue avec le message d'erreur. C'est déjà une contribution utile.
 
-## Où trouver quoi
+## Travailler (à chaque session)
 
-| Question | Réponse |
+1. **Choisis une issue** [avec le label `prête`](../../issues?q=is%3Aopen+label%3Apr%C3%AAte+no%3Aassignee) qui n'est assignée à personne, puis **assigne-la-toi**. Chaque issue est faite pour tenir en une demi-journée.
+2. **Ouvre ton agent IA dans le dépôt** (Claude Code, Cursor, Copilot…) et dis-lui : **« Implémente l'issue #N »**. Il charge `AGENTS.md` tout seul, et ce fichier lui explique quoi lire, où coder et comment vérifier. Si ton outil n'a pas accès au dépôt, colle-lui le contenu de [`prompts/implementer-une-issue.md`](prompts/implementer-une-issue.md).
+3. **Relis ce qu'il a fait et lance l'app** pour vérifier le résultat. Tu restes responsable du code.
+4. **Ouvre la PR.** Un autre membre la relit (il peut s'aider de [`prompts/relire-une-pr.md`](prompts/relire-une-pr.md)), puis on fait un squash merge.
+
+Tu bloques ou l'issue n'est pas claire ? Écris un commentaire sur l'issue. Ne devine pas.
+
+**Pour créer une nouvelle issue**, utilise le template « Tâche » de GitHub ou le prompt [`prompts/ecrire-une-issue.md`](prompts/ecrire-une-issue.md).
+
+## Où est quoi
+
+| Besoin | Où |
 | --- | --- |
-| Comment prendre et livrer une story ? | `ORGANISATION.md` § 8, ou `prompts/dev-story.md` |
-| Le « quoi » du projet (fonctionnalités, données, écrans) ? | `conception/`, jamais lu en entier — `dart run tools/ctx.dart <ID>` |
-| La maquette Figma ? | `conception/15-maquette.md` |
-| Une règle d'architecture ? | `docs/ARCHITECTURE-SPINE.md` (règles `AD-n`) et `docs/conventions/` |
-| L'état d'avancement, pour un compte rendu ? | `dart run tools/report.dart` → `docs/sprint/reports/<date>.md` (voir la question suivante) |
-| Qui tient quelle casquette ? | `docs/team/ROLES.md` |
-
-## Le rapport d'avancement automatique
-
-`dart run tools/report.dart` interroge l'API GitHub (issues et PR fermées, étiquetées par domaine) et écrit un fichier dans `docs/sprint/reports/<date>.md` : délai médian entre la prise d'une story et sa fusion, taux de CI verte, liste des stories fermées par domaine. Ce fichier généré se colle tel quel dans le compte rendu de réunion — il ne se rédige jamais à la main. Le dernier en date : [`docs/sprint/reports/`](docs/sprint/reports/).
+| Règles du code, structure du dépôt, commandes | [`AGENTS.md`](AGENTS.md), plus le `AGENTS.md` de chaque zone (`apps/mobile`, `apps/admin`, `supabase`) |
+| Recettes pas à pas | [`docs/guides/`](docs/guides/) |
+| Ce que fait le produit (fonctionnalités, données, écrans) | `conception/`, lu par ID : `dart run tools/ctx.dart D1.2` |
+| La maquette Figma | [`conception/15-maquette.md`](conception/15-maquette.md) |
+| Pourquoi on a fait ces choix | [`docs/DECISIONS.md`](docs/DECISIONS.md) (journal), [`docs/ARCHITECTURE-SPINE.md`](docs/ARCHITECTURE-SPINE.md) (les règles AD-n) |
+| Pourquoi on travaille comme ça (pour le jury) | [`docs/ORGANISATION.md`](docs/ORGANISATION.md) |
+| État d'avancement pour un compte rendu | `dart run tools/report.dart` → `docs/sprint/reports/<date>.md` |
 
 ## Licences et données
 
-Contenu sous licences documentées par source (`content/medias.yaml`, `content/sources/`) ; fond de carte OpenStreetMap (ODbL) et Protomaps, attribution visible en permanence dans l'app. Aucun secret, aucune clé, aucun média n'est versionné dans ce dépôt.
+Chaque source a sa licence, documentée dans `content/sources/` et dans la colonne `licence` des médias. Le fond de carte OpenStreetMap (ODbL) et Protomaps impose une attribution visible en permanence. Aucun secret, aucune clé et aucun média n'est versionné dans ce dépôt.

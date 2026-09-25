@@ -3,7 +3,7 @@
 //
 // Écrit sans dépendance pub tierce (dart:io seul) pour éviter le conflit de
 // versions cli_util entre `custom_lint` et `melos` dans un workspace Pub
-// unifié — voir docs/stories/spec-1-5-lint-d-imports-et-lints-de-base.md.
+// unifié — voir docs/archive/stories/spec-1-5-lint-d-imports-et-lints-de-base.md.
 //
 // Usage : dart run tools/check_import_direction.dart
 // Sortie non vide + exit 1 si une violation est trouvée.

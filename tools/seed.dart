@@ -84,8 +84,7 @@ Future<void> main() async {
         'reference': source['reference'],
         'credit': source['credit'],
         if (source['lien'] != null) 'lien': source['lien'],
-        if (source['description'] != null)
-          'description': source['description'],
+        if (source['description'] != null) 'description': source['description'],
       }, onConflict: 'slug'),
     );
   }
@@ -182,7 +181,10 @@ Future<void> main() async {
 /// RLS) comme une ligne stderr + `exitCode = 1`, sans interrompre le reste du
 /// seed — même politique de tolérance que les lookups de clé étrangère
 /// ci-dessus plutôt qu'un crash qui abandonnerait tout le contenu restant.
-Future<bool> _essayer(String description, Future<void> Function() action) async {
+Future<bool> _essayer(
+  String description,
+  Future<void> Function() action,
+) async {
   try {
     await action();
     return true;

@@ -4,119 +4,184 @@
 
 # AGENTS.md — HistoLyon
 
-Point d'entrée L0 (AD-15) pour tout agent humain ou IA qui travaille dans ce dépôt. Moins de 150 lignes, jamais généré : c'est `tools/sync-agents` (Story 2.4) qui dérivera `CLAUDE.md`, `.cursor/rules/*` et `.github/copilot-instructions.md` de ce fichier — jamais l'inverse, ne jamais éditer ces fichiers générés à la main. Détail par domaine : `apps/mobile/AGENTS.md`, `supabase/AGENTS.md`.
+App Flutter qui fait explorer Lyon à travers les époques : carte avec un slider d'époques, pins historiques, parcours et un peu de 3D/AR. Le backend est sur Supabase et le contenu éditorial est en YAML.
 
-## Contexte donné aux IA
+Ce fichier est **le point d'entrée de tout agent IA**. Il est chargé automatiquement : `CLAUDE.md`, `.cursor/rules/` et `.github/copilot-instructions.md` en sont générés. Pour en savoir plus sur une zone, lis le `AGENTS.md` local : `apps/mobile/AGENTS.md`, `apps/admin/AGENTS.md` ou `supabase/AGENTS.md`.
 
-`CLAUDE.md`, `.cursor/rules/histolyon.mdc` et `.github/copilot-instructions.md` sont des copies verbatim de ce fichier, chargées automatiquement au démarrage par leurs outils respectifs — ce qui est écrit ici s'applique donc partout, sans action de ta part. **Rien d'autre n'est chargé automatiquement** : `conception/`, `docs/`, une story précise ne sont lus que si le prompt/l'issue les cite par ID (`tools/ctx <ID>`). Une IA qui invente un détail de design ou de règle métier n'a probablement pas reçu le bon pointeur — corrige le prompt ou l'issue, pas seulement la réponse.
+## Ta mission type : implémenter une issue GitHub
+
+On te donne un numéro d'issue, par exemple « implémente l'issue #12 ». Voici ce qu'il faut faire, dans l'ordre :
+
+1. **Lis l'issue** en entier, commentaires compris (`gh issue view 12 --comments` ou l'outil GitHub disponible). Elle contient tout : l'objectif, ce qu'il faut lire, la zone à modifier, les tests attendus et la condition « terminé quand ».
+2. **Lis ce qu'elle cite, et seulement ça.** La doc de conception est dans `conception/`. Ne la lis jamais en entier : passe par l'ID que donne l'issue, par exemple `dart run tools/ctx.dart D1.2` ou `dart run tools/ctx.dart I3`. Lis ensuite le `AGENTS.md` de la zone que tu modifies.
+3. **Crée la branche** `<n°issue>-<slug-court>` depuis `main` à jour, par exemple `12-slider-epoques`.
+4. **Tests d'abord.** Ton premier commit ne contient que les tests décrits par l'issue, et ils doivent être rouges. Le code vient ensuite, jusqu'à ce qu'ils passent.
+5. **Reste dans la zone indiquée par l'issue.** Si tu dois modifier un fichier hors zone (le schéma SQL, une autre feature, `app/router.dart`…), **arrête-toi et signale-le** au lieu de le faire.
+6. **Vérifie** : `melos run analyze`, `melos run test` et `melos run format` doivent être verts. Si tu as touché `supabase/`, lance aussi `supabase db reset && supabase test db`.
+7. **Ouvre la PR** avec le template (`Closes #12`, déclaration de l'assistance IA). Un autre membre la relit avant la fusion (squash merge).
+
+**Si l'issue est floue, contradictoire ou trop grosse pour une demi-journée**, n'invente pas. Écris un commentaire sur l'issue avec ta question précise, puis arrête-toi. Un détail de design ou une règle métier inventés sont des bugs.
+
+## Où est quoi (état réel)
+
+| Chemin | Contenu |
+| --- | --- |
+| `apps/mobile/lib/app/` | Composition root : bootstrap, routeur, coquille à 3 onglets (Carte, Parcours, Profil). |
+| `apps/mobile/lib/features/<slug>/` | Une feature = `presentation/ → domain/ → data/`. Squelettes existants : `carte`, `parcours`, `profil`, `pins`, `immersion`. |
+| `apps/mobile/lib/core/` | Partagé entre features : `router/route_names.dart`, `session/` (état transverse), `db/` (Drift local), `supabase/` (client), `models/failure.dart`, `log/`. |
+| `apps/admin/` | Back-office Flutter Web, encore un squelette. |
+| `packages/api_types` | Types Dart **générés** depuis le schéma SQL. Ne jamais les éditer à la main. |
+| `packages/design_tokens` | Couleurs, typos, espacements, rayons, ombres de la maquette Figma. |
+| `supabase/migrations/` | **Schéma complet** : pins, parcours, étapes, médias, modèles 3D, comptes, commentaires, signalements, avec la RLS. |
+| `content/` | Contenu éditorial YAML (époques, catégories, sources, pins), chargé par `dart run tools/seed.dart`. |
+| `conception/` | Le « quoi » du produit : fonctionnalités D1–D11, données, écrans, invariants I1–I10. Lecture par ID via `tools/ctx.dart`. Maquette Figma : `conception/15-maquette.md`. |
+| `docs/guides/` | Recettes : ajouter une feature, écrire une migration ou une RPC, écrire un test de widget. |
+| `docs/` (reste) | Pour les humains et le jury : `ARCHITECTURE-SPINE.md` (règles AD-n), `DECISIONS.md` (journal des décisions), `ORGANISATION.md`. `docs/archive/` contient l'historique du bootstrap : ne pas s'en servir comme référence. |
 
 ## Commandes
 
-- `melos run analyze` — `dart analyze .` puis les lints maison (`tools/check_import_direction.dart` AD-5, `tools/check_tokens.dart` AD-10).
-- `melos run test` — tests de chaque package du workspace qui a un dossier `test/`.
-- `melos run format` — vérifie le formatage de tout le workspace (ne corrige pas).
-- `melos run gen` — génération de code (`build_runner`) pour les packages qui en dépendent.
-- Livré par la Story 2.2, indisponible tant qu'elle n'est pas fusionnée : `dart run tools/ctx.dart <ID>` — imprime l'extrait `conception/` correspondant à un ID (ex. `D1.2`, `I6`) ; `dart run tools/ctx.dart --index` régénère `conception/INDEX.md` (AD-15).
-- `dart run tools/sync_agents.dart` — régénère `CLAUDE.md`, `.cursor/rules/histolyon.mdc` et `.github/copilot-instructions.md` depuis tous les `AGENTS.md` du dépôt (racine + locaux, découverts par glob) ; à rejouer après toute modification d'un `AGENTS.md`.
+- `melos run analyze` : `dart analyze`, plus le lint de direction des imports et la vérification des tokens.
+- `melos run test` : tests de tous les packages. `melos run format` vérifie le formatage (`dart format .` le corrige).
+- `melos run gen` : `build_runner` (Riverpod, Drift) après avoir modifié un `@riverpod` ou `schema.drift`.
+- `supabase start`, puis `supabase db reset` (rejoue les migrations) et `supabase test db` (pgTAP).
+- `dart run tools/seed.dart` : charge `content/` en base locale. `dart run tools/gen_types.dart` : régénère `packages/api_types` après une migration. Les deux demandent `SUPABASE_URL` et `SUPABASE_SERVICE_ROLE_KEY`, à lire dans `supabase status`.
+- `dart run tools/publier_local.dart` : en local uniquement, publie tous les pins et parcours seedés (sinon la RLS les masque dans l'app).
+- `dart run tools/ctx.dart <ID>` : extrait de conception (`D1.2`, `I6`, `15-maquette`…).
+- `flutter run --dart-define-from-file=env/local.json` (depuis `apps/mobile/`) : lance l'app sur la base locale.
+- `dart run tools/sync_agents.dart` : régénère `CLAUDE.md` et les autres fichiers dérivés. À lancer après toute modification d'un `AGENTS.md`.
 
-## Où chercher
+## Règles (la CI en vérifie une partie)
 
-- `apps/mobile/` — app Flutter Android (terrain). Détail : `apps/mobile/AGENTS.md`.
-- `apps/admin/` — app Flutter Web (back-office), squelette `flutter create` pour l'instant.
-- `packages/` — code partagé du workspace Pub (`design_tokens`, `ui_kit`, `api_types` généré, `map_styles`), peuplé au fil des Epics 4/6/7.
-- `supabase/` — schéma SQL, RPC de transition, tests pgTAP. Détail : `supabase/AGENTS.md`.
-- `conception/` — L2, importée telle quelle, jamais lue en entier : adresser par ID via `tools/ctx`.
-- `conception/15-maquette.md` — référence Figma (accès au fichier, tokens, icônes, 118 composants, 41 écrans indexés) : à lire en premier pour toute tâche de design/UI/tokens, avant tout appel MCP Figma (`dart run tools/ctx.dart 15-maquette`).
-- `docs/` — L1 : spine d'architecture, conventions, guides-recettes, `docs/specs/` et `docs/stories/` (format BMAD).
-- `tools/` — scripts d'outillage. Existent aujourd'hui : `check_import_direction.dart`, `sync_agents.dart`, `ctx.dart`, `gen_types.dart`, `seed.dart`, `media_push.dart`, `report.dart`, `validate_content.dart`, `check_migration_order.dart`, `check_tokens.dart` (AD-10, compare `packages/design_tokens` à `packages/design_tokens/figma_export.json`). Le reste (`tiles`) arrive épic par épic — ne pas le traiter comme déjà là avant sa story.
-- `content/` — contenu éditorial YAML (pins, parcours, époques, catégories) et manifeste de médias, peuplé à partir des Epics 4/5.
-- `prompts/` — prompts portables d'équipe (dev-story, review, découpe) et checklist « sans IA ».
-- `env/` — fichiers pour `--dart-define-from-file` (`local.json`, `dev.json` committés ; `demo.json` jamais).
-
-## Conventions de nommage
-
-- Un seul langage applicatif : Dart/Flutter pour mobile et back-office (AD-1) — aucune stack non-Dart sans amendement de cette AD.
-- Langue des identifiants : français du glossaire, sans accent — `snake_case` en SQL/fichiers, `lowerCamelCase` en Dart (`pin`, `epoque`, `parcours`, `etape`, `profil`, `compte`).
-- Identifiants : PK `id uuid` partout, généré côté client ; les entités éditoriales ajoutent un `slug text unique` (clé de seed et d'URL).
-- Commits : Conventional Commits `type(scope): sujet`, `scope` = slug de feature ou `supabase`/`content`/`docs` ; le corps cite `#<issue>`.
-- Workflow : une story = une issue GitHub = une branche `story/<ID>-<slug>` = une PR (AD-12) ; `main` protégé, trunk-based, PR à jour avec `main` + CI verte + relecture par un autre membre avant fusion, squash merge (AD-13).
+- **Architecture (AD-5, vérifiée par la CI)** : une feature n'importe jamais une autre feature, et `core/` ou `packages/` n'importent jamais une feature. Dans une feature, les imports vont de `presentation` vers `domain`, puis de `domain` vers `data`. Pour passer d'une feature à l'autre : `context.goNamed(RouteNames.x)`.
+- **Données** : `data/` est la seule couche qui parle à Supabase ou Drift. Elle renvoie un `Result<T>` (`Ok`/`Err(Failure)`, dans `core/models/failure.dart`) et n'expose jamais d'exception brute.
+- **État** : Riverpod `@riverpod`. `setState` est réservé à l'UI locale éphémère. L'état transverse (époque sélectionnée, parcours actif…) est dans `core/session`, une liste fermée de providers.
+- **Cycles de vie** : une colonne `statut` ne se modifie jamais par un `UPDATE` (un trigger le bloque). Chaque transition est une RPC SQL qui écrit sa trace (voir `docs/guides/ecrire-une-migration.md`).
+- **Visuel** : aucune couleur ni taille en dur dans une feature. Tout vient de `packages/design_tokens` (identifiants Figma). Pas de thème sombre.
+- **Données personnelles** : jamais d'identité civile (I1), seulement un pseudonyme. Le Profil anonyme reste local, dans Drift (I6). Pas de SDK d'analytics. Pas d'identifiant utilisateur dans les logs.
+- **Nommage** : identifiants en français du glossaire, sans accent (`pin`, `epoque`, `parcours`, `etape`). `snake_case` en SQL et pour les fichiers, `lowerCamelCase` en Dart. Les slugs de feature sont fixes : `carte`, `pins`, `parcours`, `proximite`, `onboarding`, `profil`, `audio`, `immersion`, `communaute`, `partage`.
+- **Géo et dates** : positions en `geography(Point, 4326)`, dates en `timestamptz` UTC. Attribution OpenStreetMap/Protomaps toujours visible sur la carte.
+- **Langue** : app en français uniquement.
+- **Commits** : `type(scope): sujet`, avec pour `scope` le slug de la feature, `supabase`, `content`, `admin` ou `docs`. Le corps cite `#<issue>`.
+- **Code multiplateforme** : pas d'API réservée à Android sans équivalent iOS. Sinon, ajouter un commentaire `// DETTE-IOS: <raison>`.
 
 ## Jamais
 
-- Aucun secret ni URL en dur dans le code — `--dart-define-from-file=env/<env>.json` ; `env/demo.json` n'entre jamais dans le dépôt.
-- Éditer à la main un fichier généré (`packages/api_types`, `content/schema/`, `CLAUDE.md`, `.cursor/rules/*`, `.github/copilot-instructions.md`, `conception/INDEX.md`) — un conflit Git dessus se résout en régénérant.
-- Éditer `conception/` (L2, importée telle quelle) ou `docs/architecture/` (copie de référence de la spine) pour documenter quoi que ce soit — la prose neuve vit dans les `AGENTS.md` et `docs/conventions|guides/`.
-- Committer un média (`content/` ne référence que des chemins Storage) ou `env/demo.json`.
-- Pousser directement sur `main` — toujours par PR liée à une issue.
-- Une feature qui importe une autre feature, ou un `core/` qui importe une feature (AD-5) — détail par app dans les `AGENTS.md` locaux.
+- Pousser sur `main` : toujours passer par une PR liée à une issue.
+- Un secret ou une URL en dur : la config passe par `--dart-define-from-file=env/<env>.json`, et `env/demo.json` ne va jamais dans le dépôt. Aucune clé `sb_secret_*` dans une app.
+- Éditer à la main un fichier généré : `packages/api_types`, `content/schema/`, `*.g.dart`, `CLAUDE.md`, `.cursor/rules/*`, `.github/copilot-instructions.md`, `conception/INDEX.md`. En cas de conflit Git sur l'un d'eux, on le régénère.
+- Éditer `conception/`, qui est importée telle quelle. `docs/DECISIONS.md` se complète, il ne se réécrit jamais.
+- Committer un média (image, audio, `.glb`) : ils vont dans Supabase Storage, et `content/` ne référence que leurs chemins.
 
 ## supabase/AGENTS.md
 
 # AGENTS.md — supabase
 
-Backend Supabase : migrations, RPC de transition, tests pgTAP. Racine du dépôt : `AGENTS.md` — commandes workspace, workflow story/PR et interdits globaux valables ici aussi, non répétés ci-dessous.
+Backend : schéma Postgres, RLS, RPC de transition et tests pgTAP. Les règles globales sont dans le `AGENTS.md` racine.
 
-État réel aujourd'hui : seul `README.md` existe dans `supabase/` ; migrations, RLS, RPC et tests arrivent à partir de l'Epic 3. Les rubriques ci-dessous décrivent la convention **cible**, pas l'état actuel.
+## État réel
+
+Le **schéma est complet** pour toutes les données serveur (`migrations/`) :
+
+- **Contenu (C1)** : `pin`, `categorie`, `epoque`, `source_documentaire`, `pin_epoque`, `pin_source`, `pin_lie`, `media`, `badge`, `modele_3d` (+ `modele_3d_source`), `fragment_musical` (+ `pin_fragment_musical`).
+- **Parcours (C2)** : `parcours`, `parcours_epoque`, `etape` (éditoriaux et communautaires ; les parcours personnels restent en local dans Drift).
+- **Utilisateur (C3)** : `compte` (pseudonyme, `id` = `auth.users.id`). Profil, favoris et historique restent en local (I6).
+- **Communauté (C4)** : `commentaire`, `retour_parcours`, `signalement`, `trace_moderation`.
+- **Équipe et audit** : `membre_equipe` (rôles `editeur | validateur | moderateur`), `trace_validation`.
+
+Pour voir les colonnes exactes, lis la migration concernée, ou `packages/api_types/lib/generated_classes.dart`.
+
+**RPC de transition existantes** : `pin_soumettre`, `pin_valider`, `pin_publier`, `pin_retirer`. Toutes les autres transitions (parcours, commentaire, retour, signalement, compte, et pour les pins : demande de complément, réouverture, promotion I10) **n'existent pas encore**. Leurs colonnes `statut` sont déjà protégées par trigger, donc chaque transition manquante doit passer par une nouvelle RPC.
+
+**Buckets Storage** : `audio`, `images`, `models` (3D), `tiles` (fond de carte) (voir `config.toml`).
 
 ## Commandes
 
-- `supabase start` — démarre Supabase en local (Docker).
-- `supabase db reset` — rejoue toutes les migrations puis le seed depuis `content/` sur une base vide.
-- `supabase test db` — exécute les tests pgTAP de `tests/`.
+- `supabase start`, puis `supabase db reset` (migrations depuis zéro) et `supabase test db` (pgTAP de `tests/database/`).
+- Après une migration : `dart run tools/gen_types.dart` pour régénérer `packages/api_types` et `content/schema/` dans la même PR.
 
-## Conventions de nommage
+## Conventions
 
-- Migrations dans `migrations/`, une par PR, horodatage postérieur au dernier de `main` (AD-16, vérifié en CI).
-- Statut & provenance : deux colonnes enum Postgres distinctes, jamais un booléen `publie`.
-- Polymorphisme (Signalement, Favori, Lien universel) : `(type_de_cible enum, cible_id uuid)` + contrainte `CHECK`, jamais de table de jointure par type.
-- Chaque invariant I1-I10 est une contrainte SQL et/ou une policy RLS, avec son test pgTAP dans `tests/`.
-- Toute transition de `statut`/`provenance` est une fonction SQL exposée en RPC, qui écrit sa Trace (AD-6) — jamais un `UPDATE` direct sur une colonne de cycle de vie (RLS + trigger).
-- Rôles d'équipe via la table `membre_equipe(compte_id, role)`, `role` enum `editeur | validateur | moderateur`, portée par les policies.
-
-## Où chercher
-
-- `migrations/` — vérité du schéma (pas encore peuplé).
-- `functions_sql/` — RPC de transition, incluses par les migrations (pas encore peuplé).
-- `tests/` — pgTAP par invariant, par policy et par RPC (pas encore peuplé).
-- `seed/` — scripts appelés par `tools/seed` (pas encore peuplé).
+- **Une migration par PR** : `supabase migration new <slug>`, avec un horodatage postérieur au dernier de `main` (vérifié en CI).
+- **RPC de transition** : même patron que `pin_publier`. On y trouve `security definer`, la vérification du rôle, la vérification du statut de départ, `set_config('histolyon.transition_autorisee','on',true)` autour de l'`UPDATE`, puis l'insertion de la trace (`trace_validation` pour le processus éditorial, `trace_moderation` pour la communauté). Recette : `docs/guides/ecrire-une-migration.md`.
+- **Tests** : chaque invariant, policy ou RPC a son fichier pgTAP dans `tests/database/`. Il couvre le cas nominal, le rejet d'un appelant non autorisé et le rejet d'un mauvais statut.
+- **Polymorphisme** (signalement, trace_moderation) : colonnes `(type_de_cible, cible_id uuid)`, jamais une table par type.
+- **Helpers pour les policies** : `est_membre_equipe()`, `est_moderateur()`, `pin_est_visible(id)`, `parcours_est_visible(id)`.
 
 ## Jamais
 
-- Modifier un projet Supabase à la main — toute modification de base passe par `migrations/`.
-- `UPDATE` direct sur une colonne de cycle de vie (`statut`, `provenance`) — toujours via la RPC de transition dédiée.
-- Committer une clé secrète (`sb_secret_*`) — seule la clé publiable (`sb_publishable_*`) vit dans les apps, la clé secrète ne vit qu'en CI et dans `tools/`.
-- Voir aussi les interdits transverses du `AGENTS.md#jamais` (secrets/URLs en dur, fichiers générés édités à la main) : ils s'appliquent ici aussi et ne sont pas répétés.
+- Modifier un projet Supabase hébergé à la main : tout passe par `migrations/`.
+- Modifier une migration déjà fusionnée dans `main` : on en écrit une nouvelle.
+- Faire un `UPDATE` direct sur une colonne `statut` : toujours passer par une RPC.
+- Committer une clé `sb_secret_*`.
+
+## apps/admin/AGENTS.md
+
+# AGENTS.md — apps/admin
+
+Back-office Flutter Web, utilisé par l'équipe éditoriale pour saisir, valider et publier les pins et parcours, et pour modérer la communauté. Les règles globales sont dans le `AGENTS.md` racine.
+
+## État réel
+
+Pour l'instant, c'est le squelette `flutter create` (`lib/main.dart`). La première issue admin pose la structure, calquée sur `apps/mobile` : `lib/app/` (bootstrap, routeur, coquille), `lib/core/`, `lib/features/<slug>/{presentation,domain,data}`.
+
+Slugs de feature admin : `catalogue`, `saisie`, `validation`, `moderation`. Les écrans de référence sont dans `conception/07-ecrans/admin/`, par exemple `dart run tools/ctx.dart` avec l'ID que donne l'issue.
+
+## Règles propres à l'admin
+
+- **Connexion requise** : seuls les comptes présents dans `membre_equipe` voient quelque chose. La RLS serveur l'impose de toute façon, l'UI ne fait que le refléter.
+- **Changements de statut** (soumettre, valider, publier, retirer) : toujours via les RPC (`supabase.rpc('pin_publier', params: {...})`), jamais par un `update` sur `statut`.
+- Mêmes couches, mêmes `Result<T>`, même Riverpod que l'app mobile. Les types serveur viennent de `package:api_types`, et les valeurs visuelles de `package:design_tokens`.
+
+## Commandes
+
+- `flutter run -d chrome --dart-define-from-file=../../env/local.json` (depuis `apps/admin/`).
 
 ## apps/mobile/AGENTS.md
 
 # AGENTS.md — apps/mobile
 
-App Flutter Android (terrain). Racine du dépôt : `AGENTS.md` — commandes workspace, workflow story/PR et interdits globaux valables ici aussi, non répétés ci-dessous.
+App Flutter (Android, avec du code partagé prêt pour iOS). Les règles globales sont dans le `AGENTS.md` racine.
 
-État réel aujourd'hui : squelette `flutter create` (`lib/main.dart`), aucune couche en place. Les conventions ci-dessous (couches, composition root, Riverpod) sont la convention **cible** à partir de l'Epic 6, pas l'état actuel.
+## Structure réelle
+
+```
+lib/
+  main.dart                 → app/bootstrap.dart (Supabase.initialize + ProviderScope)
+  app/router.dart           assemble les routes exportées par chaque feature (seul endroit qui importe des features)
+  app/coquille.dart         NavigationBar : Carte / Parcours / Profil
+  core/router/route_names.dart   noms et chemins de toutes les routes
+  core/session/             état transverse, liste FERMÉE : epoqueSelectionnee, parcoursActif, etapeCourante, pinCourant, modePresentation, lectureAudio
+  core/supabase/            supabaseClientProvider (lu uniquement par les couches data/)
+  core/db/                  base Drift locale (schema.drift : profil, preference, favori, historique_visite) + appDatabaseProvider
+  core/models/failure.dart  Result<T> = Ok | Err(Failure)
+  core/log/                 logger (jamais print)
+  features/<slug>/
+    presentation/<slug>_ecran.dart    écran(s)
+    presentation/<slug>_routes.dart   List<RouteBase> <slug>Routes, assemblée par app/router.dart
+    domain/                           logique + providers exposés à presentation
+    data/                             repository : Supabase / Drift → Result<T>
+```
+
+Les features en squelette sont `carte`, `parcours` et `profil` (les onglets), plus `pins` (`/pin/:slug`) et `immersion` (`/modele-3d/:slug`), qui s'ouvrent en plein écran au-dessus des onglets.
+
+## Recette : une tranche de feature
+
+1. **data/** : `<slug>_repository.dart` lit `ref.watch(supabaseClientProvider)` ou `appDatabaseProvider`. Chaque méthode publique renvoie `Future<Result<T>>` et attrape les exceptions pour les convertir en `Failure`. Pour les types serveur, utilise `package:api_types`, sans jamais redéfinir une classe `Pin` à la main.
+2. **domain/** : des providers `@riverpod` qui appellent le repository et exposent à l'écran ce dont il a besoin.
+3. **presentation/** : widgets `ConsumerWidget` qui font `ref.watch` sur les providers de `domain/`. Ils gèrent les états chargement, erreur et vide.
+4. **Nouvelle sous-route** : ajoute le nom et le chemin dans `core/router/route_names.dart`, puis la `GoRoute` dans `presentation/<slug>_routes.dart`. Ne touche pas à `app/router.dart`.
+5. **Tests** (`test/features/<slug>/…`) : test unitaire du domain avec un repository factice, test de widget de l'écran avec `ProviderScope(overrides: [...])`. Pour Drift en test : `AppDatabase.pour(NativeDatabase.memory())`.
+6. `melos run gen` après tout ajout de `@riverpod`, puis `melos run analyze` et `melos run test`.
+
+Guide détaillé : `docs/guides/ajouter-une-feature.md`. Tests de widget : `docs/guides/ecrire-un-test-de-widget.md`.
 
 ## Commandes
 
-- `flutter run` (depuis `apps/mobile/`) — lance l'app sur un device ou émulateur connecté.
-- `flutter test` (ou `melos run test` depuis la racine, qui couvre tout le workspace) — tests de ce package.
-- `flutter analyze` — analyse statique de ce seul package (`melos run analyze`, à la racine, couvre tout le workspace plus le lint d'imports).
-
-## Conventions de nommage
-
-- Couches strictes par feature : `presentation → domain → data`, jamais d'inversion (AD-5) ; `domain/` importe `data/`.
-- `app/` est l'**unique** composition root : il assemble le routeur (`app/router.dart`), le bootstrap et le `ProviderScope`.
-- État : Riverpod avec `@riverpod` (`riverpod_generator`) ; chaque couche expose ses providers, la couche du dessus les lit.
-- Navigation : `go_router`, noms et chemins de routes dans `core/router` (assemblage des `GoRoute` fait par `app/`).
-- Erreurs : `data` renvoie `Result<T, Failure>` (`Failure` scellé dans `core/models`).
-- Dossiers de feature = slugs de la table de conventions (D1…D11) : `carte`, `pins`, `parcours`, `proximite`, `onboarding`, `profil`, `audio`, `immersion`, `communaute`, `partage`.
-
-## Où chercher
-
-- `lib/main.dart` — état réel actuel : squelette `flutter create`, aucune couche encore en place.
-- `lib/{app,core,features}` — convention **cible** à partir de l'Epic 6 (`socle-06`), pas l'état actuel du dépôt.
+- `flutter run --dart-define-from-file=../../env/local.json` : app sur la base Supabase locale (`supabase start` et `dart run tools/seed.dart` doivent avoir tourné).
+- `flutter test` et `flutter analyze` pour ce seul package.
 
 ## Jamais
 
-- `setState` au-delà du widget local — passer par un provider Riverpod.
-- Attraper une exception Supabase ou Drift dans `presentation` — c'est le rôle de `data`, qui la convertit en `Failure`.
-- Voir aussi les interdits transverses du `AGENTS.md#jamais` (import d'une feature par une autre, secrets en dur, fichiers générés édités à la main) : ils s'appliquent ici aussi et ne sont pas répétés.
+- `presentation/` qui appelle Supabase ou Drift directement, ou qui attrape une exception Supabase/Drift. C'est le rôle de `data/`.
+- Ajouter un 7e provider dans `core/session` : un besoin transverse devient un service dans `core/`.
+- Modifier `schema.drift` ou `app/router.dart` sans que l'issue le demande : ce sont des fichiers partagés, donc sources de conflits.

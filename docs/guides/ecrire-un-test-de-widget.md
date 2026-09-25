@@ -1,6 +1,6 @@
 # Guide — Écrire un test de widget
 
-**AD source :** AD-14 (« Tests d'abord, dans cet ordre, par couche » — pour `presentation` : « widget tests des composants `ui_kit` touchés » ; « le premier commit d'une branche de story contient ses tests (rouges) », [`ARCHITECTURE-SPINE.md`](../ARCHITECTURE-SPINE.md)).
+**AD source :** AD-14 (« Tests d'abord, dans cet ordre, par couche » — pour `presentation` : « le premier commit d'une branche de story contient ses tests (rouges) », [`ARCHITECTURE-SPINE.md`](../ARCHITECTURE-SPINE.md)).
 
 ## 1. Où placer le test
 
@@ -11,17 +11,15 @@ apps/mobile/lib/features/<slug>/presentation/mon_widget.dart
 apps/mobile/test/features/<slug>/presentation/mon_widget_test.dart
 ```
 
-Point de départ concret déjà présent dans le dépôt : `apps/mobile/test/widget_test.dart`, qui teste `apps/mobile/lib/main.dart` (squelette généré par `flutter create`, non encore réorganisé en `app/`+`features/`). C'est le seul test de widget existant à ce jour — utilise-le comme gabarit de structure (imports, `testWidgets`, `WidgetTester`), pas comme exemple de contenu à reproduire (le compteur est un squelette temporaire, pas une feature du produit).
+Point de départ concret : `apps/mobile/test/widget_test.dart` (démarrage de l'app, navigation entre onglets, ouverture d'un pin par route nommée) et `apps/mobile/test/core/` (tests de `core/session`, `core/log`, `core/models`, `core/profile`).
 
 ## 2. Quoi couvrir en priorité
 
-AD-14 fixe la priorité pour la couche `presentation` : les **composants `ui_kit` touchés** par ta story. Concrètement, avant de tester un écran entier :
+1. Les états de l'écran : chargement, erreur (`Failure`), vide, nominal.
+2. L'interaction principale décrite par l'issue (tap, glissement du slider…) et son effet observable.
+3. Si un composant visuel est réutilisable par d'autres features, il descend dans `packages/` (ou `core/`) avec son propre test — pas copié d'une feature à l'autre.
 
-1. Identifie quels composants `comp-*` de `packages/ui_kit` ta feature utilise ou modifie.
-2. Écris (ou complète) le widget test de ce composant dans `packages/ui_kit/test/` s'il n'existe pas déjà.
-3. Ensuite seulement, teste l'assemblage dans `presentation/` de ta feature (l'écran qui utilise ces composants).
-
-Un `integration_test` de bout en bout n'est **pas** ta responsabilité par story : un seul existe pour tout le produit (le parcours démo), exécuté en nightly.
+Un `integration_test` de bout en bout n'est **pas** ta responsabilité par issue : un seul existe pour tout le produit, exécuté en nightly.
 
 ## 3. Structure Arrange / Act / Assert
 
@@ -56,8 +54,8 @@ void main() {
 Points spécifiques à ce projet :
 
 - Si le widget lit un provider `@riverpod` de `domain/`, enveloppe-le dans un `ProviderScope` avec des `overrides` pour isoler le test du vrai `data/` (pas d'appel réseau réel dans un test `presentation`).
-- Un widget qui dépend de `go_router` (navigation nommée, voir [`docs/conventions/etat.md`](../conventions/etat.md)) se teste avec un `GoRouter` de test minimal plutôt qu'en lançant l'app entière.
-- Le test ne doit jamais attendre une exception Supabase/Drift : si le widget affiche un état d'erreur, on l'obtient en fournissant un `override` de provider qui renvoie un `Failure` (voir [`docs/conventions/erreurs.md`](../conventions/erreurs.md)), pas en simulant une vraie panne réseau.
+- Un widget qui dépend de `go_router` (navigation nommée via `core/router/route_names.dart`) se teste avec un `GoRouter` de test minimal plutôt qu'en lançant l'app entière.
+- Le test ne doit jamais attendre une exception Supabase/Drift : si le widget affiche un état d'erreur, on l'obtient en fournissant un `override` de provider qui renvoie un `Err(Failure)` (`core/models/failure.dart`), pas en simulant une vraie panne réseau.
 
 ## 4. Premier commit rouge
 
@@ -67,4 +65,4 @@ Avant d'écrire l'implémentation : écris le test avec le comportement final at
 
 - `flutter test` sur le package touché passe (les tests ajoutés sont maintenant verts).
 - `melos run analyze` ne remonte aucune régression.
-- La couverture du package ne baisse pas (cliquet CI, AD-14).
+- La couverture du package ne baisse pas (cliquet CI, `coverage_baseline.txt`).
