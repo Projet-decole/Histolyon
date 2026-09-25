@@ -70,6 +70,16 @@
       "default": "now()",
       "format": "timestamp with time zone",
       "type": "string"
+    },
+    "badge_id": {
+      "description": "Note:\nThis is a Foreign Key to `badge.id`.<fk table='badge' column='id'/>",
+      "format": "uuid",
+      "type": "string"
+    },
+    "auteur_communautaire_id": {
+      "description": "Note:\nThis is a Foreign Key to `compte.id`.<fk table='compte' column='id'/>",
+      "format": "uuid",
+      "type": "string"
     }
   },
   "type": "object"

@@ -1,0 +1,114 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "parcours",
+  "description": "Parcours éditorial ou communautaire (C2). Minimum 2 étapes et ≥ 1 époque : vérifiés par la RPC de soumission/publication, pas par contrainte (un brouillon se construit progressivement).",
+  "required": [
+    "id",
+    "slug",
+    "titre",
+    "provenance",
+    "statut",
+    "densite",
+    "retours_actifs",
+    "created_at",
+    "updated_at"
+  ],
+  "properties": {
+    "id": {
+      "default": "gen_random_uuid()",
+      "description": "Note:\nThis is a Primary Key.<pk/>",
+      "format": "uuid",
+      "type": "string"
+    },
+    "slug": {
+      "format": "text",
+      "type": "string"
+    },
+    "titre": {
+      "format": "text",
+      "type": "string"
+    },
+    "provenance": {
+      "default": "editorial",
+      "enum": [
+        "editorial",
+        "communautaire"
+      ],
+      "format": "public.provenance_parcours",
+      "type": "string"
+    },
+    "statut": {
+      "default": "brouillon",
+      "enum": [
+        "brouillon",
+        "en_revue",
+        "valide",
+        "publie",
+        "retire"
+      ],
+      "format": "public.statut_parcours",
+      "type": "string"
+    },
+    "teaser_narratif": {
+      "format": "text",
+      "type": "string"
+    },
+    "conclusion_narrative": {
+      "format": "text",
+      "type": "string"
+    },
+    "signature_editoriale": {
+      "format": "text",
+      "type": "string"
+    },
+    "auteur_communautaire_id": {
+      "description": "Note:\nThis is a Foreign Key to `compte.id`.<fk table='compte' column='id'/>",
+      "format": "uuid",
+      "type": "string"
+    },
+    "badge_id": {
+      "description": "Note:\nThis is a Foreign Key to `badge.id`.<fk table='badge' column='id'/>",
+      "format": "uuid",
+      "type": "string"
+    },
+    "image_ouverture_media_id": {
+      "description": "Note:\nThis is a Foreign Key to `media.id`.<fk table='media' column='id'/>",
+      "format": "uuid",
+      "type": "string"
+    },
+    "duree_estimee_minutes": {
+      "format": "int32",
+      "type": "integer"
+    },
+    "distance_estimee_metres": {
+      "format": "int32",
+      "type": "integer"
+    },
+    "densite": {
+      "default": "intermediaire",
+      "enum": [
+        "legere",
+        "intermediaire",
+        "dense"
+      ],
+      "format": "public.densite_contenu",
+      "type": "string"
+    },
+    "retours_actifs": {
+      "default": true,
+      "format": "boolean",
+      "type": "boolean"
+    },
+    "created_at": {
+      "default": "now()",
+      "format": "timestamp with time zone",
+      "type": "string"
+    },
+    "updated_at": {
+      "default": "now()",
+      "format": "timestamp with time zone",
+      "type": "string"
+    }
+  },
+  "type": "object"
+}

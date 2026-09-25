@@ -37,13 +37,28 @@ abstract class SupadartClass<T> {
 // Supabase Client Extension
 extension SupadartClient on SupabaseClient {
   SupabaseQueryBuilder get pin => from('pin');
+  SupabaseQueryBuilder get pin_lie => from('pin_lie');
+  SupabaseQueryBuilder get pin_fragment_musical => from('pin_fragment_musical');
   SupabaseQueryBuilder get pin_source => from('pin_source');
+  SupabaseQueryBuilder get badge => from('badge');
+  SupabaseQueryBuilder get etape => from('etape');
   SupabaseQueryBuilder get source_documentaire => from('source_documentaire');
+  SupabaseQueryBuilder get parcours_epoque => from('parcours_epoque');
+  SupabaseQueryBuilder get compte => from('compte');
+  SupabaseQueryBuilder get signalement => from('signalement');
+  SupabaseQueryBuilder get media => from('media');
+  SupabaseQueryBuilder get fragment_musical => from('fragment_musical');
+  SupabaseQueryBuilder get modele_3d_source => from('modele_3d_source');
   SupabaseQueryBuilder get membre_equipe => from('membre_equipe');
   SupabaseQueryBuilder get trace_validation => from('trace_validation');
+  SupabaseQueryBuilder get commentaire => from('commentaire');
   SupabaseQueryBuilder get epoque => from('epoque');
+  SupabaseQueryBuilder get parcours => from('parcours');
   SupabaseQueryBuilder get categorie => from('categorie');
   SupabaseQueryBuilder get pin_epoque => from('pin_epoque');
+  SupabaseQueryBuilder get modele_3d => from('modele_3d');
+  SupabaseQueryBuilder get trace_moderation => from('trace_moderation');
+  SupabaseQueryBuilder get retour_parcours => from('retour_parcours');
 }
 
 // Supabase Storage Client Extension
@@ -54,7 +69,57 @@ enum PROVENANCE_PIN { editorial, communautaire }
 
 enum STATUT_PIN { brouillon, en_revue, valide, publie, retire }
 
+enum STATUT_COMPTE { actif, suspendu, supprime }
+
+enum TYPE_DE_CIBLE { pin, parcours, commentaire, retour_parcours }
+
+enum MOTIF_SIGNALEMENT {
+  inapproprie,
+  historiquement_faux,
+  hors_sujet,
+  atteinte_vie_privee,
+  autre,
+}
+
+enum STATUT_SIGNALEMENT { nouveau, en_examen, rejete, remedie }
+
+enum TYPE_MEDIA {
+  image,
+  archive_colorisee,
+  archive_brute,
+  audio_narration,
+  audio_ambiance,
+  element_interactif,
+}
+
 enum ROLE_EQUIPE { editeur, validateur, moderateur }
+
+enum STATUT_CONTRIBUTION {
+  en_attente,
+  publie,
+  refuse,
+  masque,
+  supprime_par_auteur,
+}
+
+enum PROVENANCE_PARCOURS { editorial, communautaire }
+
+enum STATUT_PARCOURS { brouillon, en_revue, valide, publie, retire }
+
+enum DENSITE_CONTENU { legere, intermediaire, dense }
+
+enum DECISION_MODERATION {
+  publie,
+  refuse,
+  masque,
+  demasque,
+  rejete,
+  remedie,
+  valide_sources_verifiees,
+  retire_sources_insuffisantes,
+}
+
+enum ACTION_MODERATION { aucune, cible_masquee, cible_retiree, cible_corrigee }
 
 // Utils
 class Pin implements SupadartClass<Pin> {
@@ -68,6 +133,8 @@ class Pin implements SupadartClass<Pin> {
   final Geometry? localisation;
   final DateTime createdAt;
   final DateTime updatedAt;
+  final String? badgeId;
+  final String? auteurCommunautaireId;
 
   const Pin({
     required this.id,
@@ -80,6 +147,8 @@ class Pin implements SupadartClass<Pin> {
     this.localisation,
     required this.createdAt,
     required this.updatedAt,
+    this.badgeId,
+    this.auteurCommunautaireId,
   });
 
   static String get table_name => 'pin';
@@ -93,6 +162,8 @@ class Pin implements SupadartClass<Pin> {
   static String get c_localisation => 'localisation';
   static String get c_createdAt => 'created_at';
   static String get c_updatedAt => 'updated_at';
+  static String get c_badgeId => 'badge_id';
+  static String get c_auteurCommunautaireId => 'auteur_communautaire_id';
 
   static List<Pin> converter(List<Map<String, dynamic>> data) {
     return data.map(Pin.fromJson).toList();
@@ -113,6 +184,8 @@ class Pin implements SupadartClass<Pin> {
     Geometry? localisation,
     DateTime? createdAt,
     DateTime? updatedAt,
+    String? badgeId,
+    String? auteurCommunautaireId,
   }) {
     return {
       if (id != null) 'id': id,
@@ -127,6 +200,9 @@ class Pin implements SupadartClass<Pin> {
         'localisation': localisation.toBytesHex(format: WKB.geometryExtended),
       if (createdAt != null) 'created_at': createdAt.toUtc().toIso8601String(),
       if (updatedAt != null) 'updated_at': updatedAt.toUtc().toIso8601String(),
+      if (badgeId != null) 'badge_id': badgeId,
+      if (auteurCommunautaireId != null)
+        'auteur_communautaire_id': auteurCommunautaireId,
     };
   }
 
@@ -141,6 +217,8 @@ class Pin implements SupadartClass<Pin> {
     Geometry? localisation,
     DateTime? createdAt,
     DateTime? updatedAt,
+    String? badgeId,
+    String? auteurCommunautaireId,
   }) {
     return _generateMap(
       id: id,
@@ -153,6 +231,8 @@ class Pin implements SupadartClass<Pin> {
       localisation: localisation,
       createdAt: createdAt,
       updatedAt: updatedAt,
+      badgeId: badgeId,
+      auteurCommunautaireId: auteurCommunautaireId,
     );
   }
 
@@ -167,6 +247,8 @@ class Pin implements SupadartClass<Pin> {
     Geometry? localisation,
     DateTime? createdAt,
     DateTime? updatedAt,
+    String? badgeId,
+    String? auteurCommunautaireId,
   }) {
     return _generateMap(
       id: id,
@@ -179,6 +261,8 @@ class Pin implements SupadartClass<Pin> {
       localisation: localisation,
       createdAt: createdAt,
       updatedAt: updatedAt,
+      badgeId: badgeId,
+      auteurCommunautaireId: auteurCommunautaireId,
     );
   }
 
@@ -211,6 +295,10 @@ class Pin implements SupadartClass<Pin> {
       updatedAt: jsonn['updated_at'] != null
           ? DateTime.parse(jsonn['updated_at'].toString())
           : DateTime.fromMillisecondsSinceEpoch(0),
+      badgeId: jsonn['badge_id'] != null ? jsonn['badge_id'].toString() : null,
+      auteurCommunautaireId: jsonn['auteur_communautaire_id'] != null
+          ? jsonn['auteur_communautaire_id'].toString()
+          : null,
     );
   }
 
@@ -226,7 +314,115 @@ class Pin implements SupadartClass<Pin> {
       localisation: localisation,
       createdAt: createdAt,
       updatedAt: updatedAt,
+      badgeId: badgeId,
+      auteurCommunautaireId: auteurCommunautaireId,
     );
+  }
+}
+
+class PinLie implements SupadartClass<PinLie> {
+  final String pinId;
+  final String pinLieId;
+
+  const PinLie({required this.pinId, required this.pinLieId});
+
+  static String get table_name => 'pin_lie';
+  static String get c_pinId => 'pin_id';
+  static String get c_pinLieId => 'pin_lie_id';
+
+  static List<PinLie> converter(List<Map<String, dynamic>> data) {
+    return data.map(PinLie.fromJson).toList();
+  }
+
+  static PinLie converterSingle(Map<String, dynamic> data) {
+    return PinLie.fromJson(data);
+  }
+
+  static Map<String, dynamic> _generateMap({String? pinId, String? pinLieId}) {
+    return {
+      if (pinId != null) 'pin_id': pinId,
+      if (pinLieId != null) 'pin_lie_id': pinLieId,
+    };
+  }
+
+  static Map<String, dynamic> insert({String? pinId, String? pinLieId}) {
+    return _generateMap(pinId: pinId, pinLieId: pinLieId);
+  }
+
+  static Map<String, dynamic> update({String? pinId, String? pinLieId}) {
+    return _generateMap(pinId: pinId, pinLieId: pinLieId);
+  }
+
+  factory PinLie.fromJson(Map<String, dynamic> jsonn) {
+    return PinLie(
+      pinId: jsonn['pin_id'] != null ? jsonn['pin_id'].toString() : '',
+      pinLieId: jsonn['pin_lie_id'] != null
+          ? jsonn['pin_lie_id'].toString()
+          : '',
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return _generateMap(pinId: pinId, pinLieId: pinLieId);
+  }
+}
+
+class PinFragmentMusical implements SupadartClass<PinFragmentMusical> {
+  final String pinId;
+  final String fragmentMusicalId;
+
+  const PinFragmentMusical({
+    required this.pinId,
+    required this.fragmentMusicalId,
+  });
+
+  static String get table_name => 'pin_fragment_musical';
+  static String get c_pinId => 'pin_id';
+  static String get c_fragmentMusicalId => 'fragment_musical_id';
+
+  static List<PinFragmentMusical> converter(List<Map<String, dynamic>> data) {
+    return data.map(PinFragmentMusical.fromJson).toList();
+  }
+
+  static PinFragmentMusical converterSingle(Map<String, dynamic> data) {
+    return PinFragmentMusical.fromJson(data);
+  }
+
+  static Map<String, dynamic> _generateMap({
+    String? pinId,
+    String? fragmentMusicalId,
+  }) {
+    return {
+      if (pinId != null) 'pin_id': pinId,
+      if (fragmentMusicalId != null) 'fragment_musical_id': fragmentMusicalId,
+    };
+  }
+
+  static Map<String, dynamic> insert({
+    String? pinId,
+    String? fragmentMusicalId,
+  }) {
+    return _generateMap(pinId: pinId, fragmentMusicalId: fragmentMusicalId);
+  }
+
+  static Map<String, dynamic> update({
+    String? pinId,
+    String? fragmentMusicalId,
+  }) {
+    return _generateMap(pinId: pinId, fragmentMusicalId: fragmentMusicalId);
+  }
+
+  factory PinFragmentMusical.fromJson(Map<String, dynamic> jsonn) {
+    return PinFragmentMusical(
+      pinId: jsonn['pin_id'] != null ? jsonn['pin_id'].toString() : '',
+      fragmentMusicalId: jsonn['fragment_musical_id'] != null
+          ? jsonn['fragment_musical_id'].toString()
+          : '',
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return _generateMap(pinId: pinId, fragmentMusicalId: fragmentMusicalId);
   }
 }
 
@@ -272,6 +468,229 @@ class PinSource implements SupadartClass<PinSource> {
 
   Map<String, dynamic> toJson() {
     return _generateMap(pinId: pinId, sourceId: sourceId);
+  }
+}
+
+class Badge implements SupadartClass<Badge> {
+  final String id;
+  final String slug;
+  final String libelle;
+  final String description;
+  final DateTime createdAt;
+
+  const Badge({
+    required this.id,
+    required this.slug,
+    required this.libelle,
+    required this.description,
+    required this.createdAt,
+  });
+
+  static String get table_name => 'badge';
+  static String get c_id => 'id';
+  static String get c_slug => 'slug';
+  static String get c_libelle => 'libelle';
+  static String get c_description => 'description';
+  static String get c_createdAt => 'created_at';
+
+  static List<Badge> converter(List<Map<String, dynamic>> data) {
+    return data.map(Badge.fromJson).toList();
+  }
+
+  static Badge converterSingle(Map<String, dynamic> data) {
+    return Badge.fromJson(data);
+  }
+
+  static Map<String, dynamic> _generateMap({
+    String? id,
+    String? slug,
+    String? libelle,
+    String? description,
+    DateTime? createdAt,
+  }) {
+    return {
+      if (id != null) 'id': id,
+      if (slug != null) 'slug': slug,
+      if (libelle != null) 'libelle': libelle,
+      if (description != null) 'description': description,
+      if (createdAt != null) 'created_at': createdAt.toUtc().toIso8601String(),
+    };
+  }
+
+  static Map<String, dynamic> insert({
+    String? id,
+    required String slug,
+    required String libelle,
+    required String description,
+    DateTime? createdAt,
+  }) {
+    return _generateMap(
+      id: id,
+      slug: slug,
+      libelle: libelle,
+      description: description,
+      createdAt: createdAt,
+    );
+  }
+
+  static Map<String, dynamic> update({
+    String? id,
+    String? slug,
+    String? libelle,
+    String? description,
+    DateTime? createdAt,
+  }) {
+    return _generateMap(
+      id: id,
+      slug: slug,
+      libelle: libelle,
+      description: description,
+      createdAt: createdAt,
+    );
+  }
+
+  factory Badge.fromJson(Map<String, dynamic> jsonn) {
+    return Badge(
+      id: jsonn['id'] != null ? jsonn['id'].toString() : '',
+      slug: jsonn['slug'] != null ? jsonn['slug'].toString() : '',
+      libelle: jsonn['libelle'] != null ? jsonn['libelle'].toString() : '',
+      description: jsonn['description'] != null
+          ? jsonn['description'].toString()
+          : '',
+      createdAt: jsonn['created_at'] != null
+          ? DateTime.parse(jsonn['created_at'].toString())
+          : DateTime.fromMillisecondsSinceEpoch(0),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return _generateMap(
+      id: id,
+      slug: slug,
+      libelle: libelle,
+      description: description,
+      createdAt: createdAt,
+    );
+  }
+}
+
+class Etape implements SupadartClass<Etape> {
+  final String id;
+  final String parcoursId;
+  final int position;
+  final String pinId;
+  final String? introduction;
+  final String? transitionDepuisPrecedente;
+
+  const Etape({
+    required this.id,
+    required this.parcoursId,
+    required this.position,
+    required this.pinId,
+    this.introduction,
+    this.transitionDepuisPrecedente,
+  });
+
+  static String get table_name => 'etape';
+  static String get c_id => 'id';
+  static String get c_parcoursId => 'parcours_id';
+  static String get c_position => 'position';
+  static String get c_pinId => 'pin_id';
+  static String get c_introduction => 'introduction';
+  static String get c_transitionDepuisPrecedente =>
+      'transition_depuis_precedente';
+
+  static List<Etape> converter(List<Map<String, dynamic>> data) {
+    return data.map(Etape.fromJson).toList();
+  }
+
+  static Etape converterSingle(Map<String, dynamic> data) {
+    return Etape.fromJson(data);
+  }
+
+  static Map<String, dynamic> _generateMap({
+    String? id,
+    String? parcoursId,
+    int? position,
+    String? pinId,
+    String? introduction,
+    String? transitionDepuisPrecedente,
+  }) {
+    return {
+      if (id != null) 'id': id,
+      if (parcoursId != null) 'parcours_id': parcoursId,
+      if (position != null) 'position': position,
+      if (pinId != null) 'pin_id': pinId,
+      if (introduction != null) 'introduction': introduction,
+      if (transitionDepuisPrecedente != null)
+        'transition_depuis_precedente': transitionDepuisPrecedente,
+    };
+  }
+
+  static Map<String, dynamic> insert({
+    String? id,
+    required String parcoursId,
+    required int position,
+    required String pinId,
+    String? introduction,
+    String? transitionDepuisPrecedente,
+  }) {
+    return _generateMap(
+      id: id,
+      parcoursId: parcoursId,
+      position: position,
+      pinId: pinId,
+      introduction: introduction,
+      transitionDepuisPrecedente: transitionDepuisPrecedente,
+    );
+  }
+
+  static Map<String, dynamic> update({
+    String? id,
+    String? parcoursId,
+    int? position,
+    String? pinId,
+    String? introduction,
+    String? transitionDepuisPrecedente,
+  }) {
+    return _generateMap(
+      id: id,
+      parcoursId: parcoursId,
+      position: position,
+      pinId: pinId,
+      introduction: introduction,
+      transitionDepuisPrecedente: transitionDepuisPrecedente,
+    );
+  }
+
+  factory Etape.fromJson(Map<String, dynamic> jsonn) {
+    return Etape(
+      id: jsonn['id'] != null ? jsonn['id'].toString() : '',
+      parcoursId: jsonn['parcours_id'] != null
+          ? jsonn['parcours_id'].toString()
+          : '',
+      position: jsonn['position'] != null
+          ? int.parse(jsonn['position'].toString())
+          : 0,
+      pinId: jsonn['pin_id'] != null ? jsonn['pin_id'].toString() : '',
+      introduction: jsonn['introduction'] != null
+          ? jsonn['introduction'].toString()
+          : null,
+      transitionDepuisPrecedente: jsonn['transition_depuis_precedente'] != null
+          ? jsonn['transition_depuis_precedente'].toString()
+          : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return _generateMap(
+      id: id,
+      parcoursId: parcoursId,
+      position: position,
+      pinId: pinId,
+      introduction: introduction,
+      transitionDepuisPrecedente: transitionDepuisPrecedente,
+    );
   }
 }
 
@@ -410,6 +829,645 @@ class SourceDocumentaire implements SupadartClass<SourceDocumentaire> {
       description: description,
       createdAt: createdAt,
     );
+  }
+}
+
+class ParcoursEpoque implements SupadartClass<ParcoursEpoque> {
+  final String parcoursId;
+  final String epoqueId;
+
+  const ParcoursEpoque({required this.parcoursId, required this.epoqueId});
+
+  static String get table_name => 'parcours_epoque';
+  static String get c_parcoursId => 'parcours_id';
+  static String get c_epoqueId => 'epoque_id';
+
+  static List<ParcoursEpoque> converter(List<Map<String, dynamic>> data) {
+    return data.map(ParcoursEpoque.fromJson).toList();
+  }
+
+  static ParcoursEpoque converterSingle(Map<String, dynamic> data) {
+    return ParcoursEpoque.fromJson(data);
+  }
+
+  static Map<String, dynamic> _generateMap({
+    String? parcoursId,
+    String? epoqueId,
+  }) {
+    return {
+      if (parcoursId != null) 'parcours_id': parcoursId,
+      if (epoqueId != null) 'epoque_id': epoqueId,
+    };
+  }
+
+  static Map<String, dynamic> insert({String? parcoursId, String? epoqueId}) {
+    return _generateMap(parcoursId: parcoursId, epoqueId: epoqueId);
+  }
+
+  static Map<String, dynamic> update({String? parcoursId, String? epoqueId}) {
+    return _generateMap(parcoursId: parcoursId, epoqueId: epoqueId);
+  }
+
+  factory ParcoursEpoque.fromJson(Map<String, dynamic> jsonn) {
+    return ParcoursEpoque(
+      parcoursId: jsonn['parcours_id'] != null
+          ? jsonn['parcours_id'].toString()
+          : '',
+      epoqueId: jsonn['epoque_id'] != null ? jsonn['epoque_id'].toString() : '',
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return _generateMap(parcoursId: parcoursId, epoqueId: epoqueId);
+  }
+}
+
+class Compte implements SupadartClass<Compte> {
+  final String id;
+  final String pseudonyme;
+  final String? avatar;
+  final STATUT_COMPTE statut;
+  final DateTime createdAt;
+
+  const Compte({
+    required this.id,
+    required this.pseudonyme,
+    this.avatar,
+    required this.statut,
+    required this.createdAt,
+  });
+
+  static String get table_name => 'compte';
+  static String get c_id => 'id';
+  static String get c_pseudonyme => 'pseudonyme';
+  static String get c_avatar => 'avatar';
+  static String get c_statut => 'statut';
+  static String get c_createdAt => 'created_at';
+
+  static List<Compte> converter(List<Map<String, dynamic>> data) {
+    return data.map(Compte.fromJson).toList();
+  }
+
+  static Compte converterSingle(Map<String, dynamic> data) {
+    return Compte.fromJson(data);
+  }
+
+  static Map<String, dynamic> _generateMap({
+    String? id,
+    String? pseudonyme,
+    String? avatar,
+    STATUT_COMPTE? statut,
+    DateTime? createdAt,
+  }) {
+    return {
+      if (id != null) 'id': id,
+      if (pseudonyme != null) 'pseudonyme': pseudonyme,
+      if (avatar != null) 'avatar': avatar,
+      if (statut != null) 'statut': statut.toString().split('.').last,
+      if (createdAt != null) 'created_at': createdAt.toUtc().toIso8601String(),
+    };
+  }
+
+  static Map<String, dynamic> insert({
+    String? id,
+    required String pseudonyme,
+    String? avatar,
+    STATUT_COMPTE? statut,
+    DateTime? createdAt,
+  }) {
+    return _generateMap(
+      id: id,
+      pseudonyme: pseudonyme,
+      avatar: avatar,
+      statut: statut,
+      createdAt: createdAt,
+    );
+  }
+
+  static Map<String, dynamic> update({
+    String? id,
+    String? pseudonyme,
+    String? avatar,
+    STATUT_COMPTE? statut,
+    DateTime? createdAt,
+  }) {
+    return _generateMap(
+      id: id,
+      pseudonyme: pseudonyme,
+      avatar: avatar,
+      statut: statut,
+      createdAt: createdAt,
+    );
+  }
+
+  factory Compte.fromJson(Map<String, dynamic> jsonn) {
+    return Compte(
+      id: jsonn['id'] != null ? jsonn['id'].toString() : '',
+      pseudonyme: jsonn['pseudonyme'] != null
+          ? jsonn['pseudonyme'].toString()
+          : '',
+      avatar: jsonn['avatar'] != null ? jsonn['avatar'].toString() : null,
+      statut: jsonn['statut'] != null
+          ? STATUT_COMPTE.values.byName(jsonn['statut'].toString())
+          : STATUT_COMPTE.values.first,
+      createdAt: jsonn['created_at'] != null
+          ? DateTime.parse(jsonn['created_at'].toString())
+          : DateTime.fromMillisecondsSinceEpoch(0),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return _generateMap(
+      id: id,
+      pseudonyme: pseudonyme,
+      avatar: avatar,
+      statut: statut,
+      createdAt: createdAt,
+    );
+  }
+}
+
+class Signalement implements SupadartClass<Signalement> {
+  final String id;
+  final String signaleurId;
+  final TYPE_DE_CIBLE typeDeCible;
+  final String cibleId;
+  final MOTIF_SIGNALEMENT motif;
+  final String? precisionLibre;
+  final STATUT_SIGNALEMENT statut;
+  final DateTime createdAt;
+
+  const Signalement({
+    required this.id,
+    required this.signaleurId,
+    required this.typeDeCible,
+    required this.cibleId,
+    required this.motif,
+    this.precisionLibre,
+    required this.statut,
+    required this.createdAt,
+  });
+
+  static String get table_name => 'signalement';
+  static String get c_id => 'id';
+  static String get c_signaleurId => 'signaleur_id';
+  static String get c_typeDeCible => 'type_de_cible';
+  static String get c_cibleId => 'cible_id';
+  static String get c_motif => 'motif';
+  static String get c_precisionLibre => 'precision_libre';
+  static String get c_statut => 'statut';
+  static String get c_createdAt => 'created_at';
+
+  static List<Signalement> converter(List<Map<String, dynamic>> data) {
+    return data.map(Signalement.fromJson).toList();
+  }
+
+  static Signalement converterSingle(Map<String, dynamic> data) {
+    return Signalement.fromJson(data);
+  }
+
+  static Map<String, dynamic> _generateMap({
+    String? id,
+    String? signaleurId,
+    TYPE_DE_CIBLE? typeDeCible,
+    String? cibleId,
+    MOTIF_SIGNALEMENT? motif,
+    String? precisionLibre,
+    STATUT_SIGNALEMENT? statut,
+    DateTime? createdAt,
+  }) {
+    return {
+      if (id != null) 'id': id,
+      if (signaleurId != null) 'signaleur_id': signaleurId,
+      if (typeDeCible != null)
+        'type_de_cible': typeDeCible.toString().split('.').last,
+      if (cibleId != null) 'cible_id': cibleId,
+      if (motif != null) 'motif': motif.toString().split('.').last,
+      if (precisionLibre != null) 'precision_libre': precisionLibre,
+      if (statut != null) 'statut': statut.toString().split('.').last,
+      if (createdAt != null) 'created_at': createdAt.toUtc().toIso8601String(),
+    };
+  }
+
+  static Map<String, dynamic> insert({
+    String? id,
+    required String signaleurId,
+    required TYPE_DE_CIBLE typeDeCible,
+    required String cibleId,
+    required MOTIF_SIGNALEMENT motif,
+    String? precisionLibre,
+    STATUT_SIGNALEMENT? statut,
+    DateTime? createdAt,
+  }) {
+    return _generateMap(
+      id: id,
+      signaleurId: signaleurId,
+      typeDeCible: typeDeCible,
+      cibleId: cibleId,
+      motif: motif,
+      precisionLibre: precisionLibre,
+      statut: statut,
+      createdAt: createdAt,
+    );
+  }
+
+  static Map<String, dynamic> update({
+    String? id,
+    String? signaleurId,
+    TYPE_DE_CIBLE? typeDeCible,
+    String? cibleId,
+    MOTIF_SIGNALEMENT? motif,
+    String? precisionLibre,
+    STATUT_SIGNALEMENT? statut,
+    DateTime? createdAt,
+  }) {
+    return _generateMap(
+      id: id,
+      signaleurId: signaleurId,
+      typeDeCible: typeDeCible,
+      cibleId: cibleId,
+      motif: motif,
+      precisionLibre: precisionLibre,
+      statut: statut,
+      createdAt: createdAt,
+    );
+  }
+
+  factory Signalement.fromJson(Map<String, dynamic> jsonn) {
+    return Signalement(
+      id: jsonn['id'] != null ? jsonn['id'].toString() : '',
+      signaleurId: jsonn['signaleur_id'] != null
+          ? jsonn['signaleur_id'].toString()
+          : '',
+      typeDeCible: jsonn['type_de_cible'] != null
+          ? TYPE_DE_CIBLE.values.byName(jsonn['type_de_cible'].toString())
+          : TYPE_DE_CIBLE.values.first,
+      cibleId: jsonn['cible_id'] != null ? jsonn['cible_id'].toString() : '',
+      motif: jsonn['motif'] != null
+          ? MOTIF_SIGNALEMENT.values.byName(jsonn['motif'].toString())
+          : MOTIF_SIGNALEMENT.values.first,
+      precisionLibre: jsonn['precision_libre'] != null
+          ? jsonn['precision_libre'].toString()
+          : null,
+      statut: jsonn['statut'] != null
+          ? STATUT_SIGNALEMENT.values.byName(jsonn['statut'].toString())
+          : STATUT_SIGNALEMENT.values.first,
+      createdAt: jsonn['created_at'] != null
+          ? DateTime.parse(jsonn['created_at'].toString())
+          : DateTime.fromMillisecondsSinceEpoch(0),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return _generateMap(
+      id: id,
+      signaleurId: signaleurId,
+      typeDeCible: typeDeCible,
+      cibleId: cibleId,
+      motif: motif,
+      precisionLibre: precisionLibre,
+      statut: statut,
+      createdAt: createdAt,
+    );
+  }
+}
+
+class Media implements SupadartClass<Media> {
+  final String id;
+  final String pinId;
+  final TYPE_MEDIA type;
+  final String cheminStorage;
+  final String credit;
+  final String? legende;
+  final String? description;
+  final int ordre;
+  final DateTime createdAt;
+
+  const Media({
+    required this.id,
+    required this.pinId,
+    required this.type,
+    required this.cheminStorage,
+    required this.credit,
+    this.legende,
+    this.description,
+    required this.ordre,
+    required this.createdAt,
+  });
+
+  static String get table_name => 'media';
+  static String get c_id => 'id';
+  static String get c_pinId => 'pin_id';
+  static String get c_type => 'type';
+  static String get c_cheminStorage => 'chemin_storage';
+  static String get c_credit => 'credit';
+  static String get c_legende => 'legende';
+  static String get c_description => 'description';
+  static String get c_ordre => 'ordre';
+  static String get c_createdAt => 'created_at';
+
+  static List<Media> converter(List<Map<String, dynamic>> data) {
+    return data.map(Media.fromJson).toList();
+  }
+
+  static Media converterSingle(Map<String, dynamic> data) {
+    return Media.fromJson(data);
+  }
+
+  static Map<String, dynamic> _generateMap({
+    String? id,
+    String? pinId,
+    TYPE_MEDIA? type,
+    String? cheminStorage,
+    String? credit,
+    String? legende,
+    String? description,
+    int? ordre,
+    DateTime? createdAt,
+  }) {
+    return {
+      if (id != null) 'id': id,
+      if (pinId != null) 'pin_id': pinId,
+      if (type != null) 'type': type.toString().split('.').last,
+      if (cheminStorage != null) 'chemin_storage': cheminStorage,
+      if (credit != null) 'credit': credit,
+      if (legende != null) 'legende': legende,
+      if (description != null) 'description': description,
+      if (ordre != null) 'ordre': ordre,
+      if (createdAt != null) 'created_at': createdAt.toUtc().toIso8601String(),
+    };
+  }
+
+  static Map<String, dynamic> insert({
+    String? id,
+    required String pinId,
+    required TYPE_MEDIA type,
+    required String cheminStorage,
+    required String credit,
+    String? legende,
+    String? description,
+    int? ordre,
+    DateTime? createdAt,
+  }) {
+    return _generateMap(
+      id: id,
+      pinId: pinId,
+      type: type,
+      cheminStorage: cheminStorage,
+      credit: credit,
+      legende: legende,
+      description: description,
+      ordre: ordre,
+      createdAt: createdAt,
+    );
+  }
+
+  static Map<String, dynamic> update({
+    String? id,
+    String? pinId,
+    TYPE_MEDIA? type,
+    String? cheminStorage,
+    String? credit,
+    String? legende,
+    String? description,
+    int? ordre,
+    DateTime? createdAt,
+  }) {
+    return _generateMap(
+      id: id,
+      pinId: pinId,
+      type: type,
+      cheminStorage: cheminStorage,
+      credit: credit,
+      legende: legende,
+      description: description,
+      ordre: ordre,
+      createdAt: createdAt,
+    );
+  }
+
+  factory Media.fromJson(Map<String, dynamic> jsonn) {
+    return Media(
+      id: jsonn['id'] != null ? jsonn['id'].toString() : '',
+      pinId: jsonn['pin_id'] != null ? jsonn['pin_id'].toString() : '',
+      type: jsonn['type'] != null
+          ? TYPE_MEDIA.values.byName(jsonn['type'].toString())
+          : TYPE_MEDIA.values.first,
+      cheminStorage: jsonn['chemin_storage'] != null
+          ? jsonn['chemin_storage'].toString()
+          : '',
+      credit: jsonn['credit'] != null ? jsonn['credit'].toString() : '',
+      legende: jsonn['legende'] != null ? jsonn['legende'].toString() : null,
+      description: jsonn['description'] != null
+          ? jsonn['description'].toString()
+          : null,
+      ordre: jsonn['ordre'] != null ? int.parse(jsonn['ordre'].toString()) : 0,
+      createdAt: jsonn['created_at'] != null
+          ? DateTime.parse(jsonn['created_at'].toString())
+          : DateTime.fromMillisecondsSinceEpoch(0),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return _generateMap(
+      id: id,
+      pinId: pinId,
+      type: type,
+      cheminStorage: cheminStorage,
+      credit: credit,
+      legende: legende,
+      description: description,
+      ordre: ordre,
+      createdAt: createdAt,
+    );
+  }
+}
+
+class FragmentMusical implements SupadartClass<FragmentMusical> {
+  final String id;
+  final String slug;
+  final String titre;
+  final String epoqueId;
+  final String cheminStorage;
+  final String credit;
+  final String? description;
+  final DateTime createdAt;
+
+  const FragmentMusical({
+    required this.id,
+    required this.slug,
+    required this.titre,
+    required this.epoqueId,
+    required this.cheminStorage,
+    required this.credit,
+    this.description,
+    required this.createdAt,
+  });
+
+  static String get table_name => 'fragment_musical';
+  static String get c_id => 'id';
+  static String get c_slug => 'slug';
+  static String get c_titre => 'titre';
+  static String get c_epoqueId => 'epoque_id';
+  static String get c_cheminStorage => 'chemin_storage';
+  static String get c_credit => 'credit';
+  static String get c_description => 'description';
+  static String get c_createdAt => 'created_at';
+
+  static List<FragmentMusical> converter(List<Map<String, dynamic>> data) {
+    return data.map(FragmentMusical.fromJson).toList();
+  }
+
+  static FragmentMusical converterSingle(Map<String, dynamic> data) {
+    return FragmentMusical.fromJson(data);
+  }
+
+  static Map<String, dynamic> _generateMap({
+    String? id,
+    String? slug,
+    String? titre,
+    String? epoqueId,
+    String? cheminStorage,
+    String? credit,
+    String? description,
+    DateTime? createdAt,
+  }) {
+    return {
+      if (id != null) 'id': id,
+      if (slug != null) 'slug': slug,
+      if (titre != null) 'titre': titre,
+      if (epoqueId != null) 'epoque_id': epoqueId,
+      if (cheminStorage != null) 'chemin_storage': cheminStorage,
+      if (credit != null) 'credit': credit,
+      if (description != null) 'description': description,
+      if (createdAt != null) 'created_at': createdAt.toUtc().toIso8601String(),
+    };
+  }
+
+  static Map<String, dynamic> insert({
+    String? id,
+    required String slug,
+    required String titre,
+    required String epoqueId,
+    required String cheminStorage,
+    required String credit,
+    String? description,
+    DateTime? createdAt,
+  }) {
+    return _generateMap(
+      id: id,
+      slug: slug,
+      titre: titre,
+      epoqueId: epoqueId,
+      cheminStorage: cheminStorage,
+      credit: credit,
+      description: description,
+      createdAt: createdAt,
+    );
+  }
+
+  static Map<String, dynamic> update({
+    String? id,
+    String? slug,
+    String? titre,
+    String? epoqueId,
+    String? cheminStorage,
+    String? credit,
+    String? description,
+    DateTime? createdAt,
+  }) {
+    return _generateMap(
+      id: id,
+      slug: slug,
+      titre: titre,
+      epoqueId: epoqueId,
+      cheminStorage: cheminStorage,
+      credit: credit,
+      description: description,
+      createdAt: createdAt,
+    );
+  }
+
+  factory FragmentMusical.fromJson(Map<String, dynamic> jsonn) {
+    return FragmentMusical(
+      id: jsonn['id'] != null ? jsonn['id'].toString() : '',
+      slug: jsonn['slug'] != null ? jsonn['slug'].toString() : '',
+      titre: jsonn['titre'] != null ? jsonn['titre'].toString() : '',
+      epoqueId: jsonn['epoque_id'] != null ? jsonn['epoque_id'].toString() : '',
+      cheminStorage: jsonn['chemin_storage'] != null
+          ? jsonn['chemin_storage'].toString()
+          : '',
+      credit: jsonn['credit'] != null ? jsonn['credit'].toString() : '',
+      description: jsonn['description'] != null
+          ? jsonn['description'].toString()
+          : null,
+      createdAt: jsonn['created_at'] != null
+          ? DateTime.parse(jsonn['created_at'].toString())
+          : DateTime.fromMillisecondsSinceEpoch(0),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return _generateMap(
+      id: id,
+      slug: slug,
+      titre: titre,
+      epoqueId: epoqueId,
+      cheminStorage: cheminStorage,
+      credit: credit,
+      description: description,
+      createdAt: createdAt,
+    );
+  }
+}
+
+class Modele3dSource implements SupadartClass<Modele3dSource> {
+  final String modele3dId;
+  final String sourceId;
+
+  const Modele3dSource({required this.modele3dId, required this.sourceId});
+
+  static String get table_name => 'modele_3d_source';
+  static String get c_modele3dId => 'modele_3d_id';
+  static String get c_sourceId => 'source_id';
+
+  static List<Modele3dSource> converter(List<Map<String, dynamic>> data) {
+    return data.map(Modele3dSource.fromJson).toList();
+  }
+
+  static Modele3dSource converterSingle(Map<String, dynamic> data) {
+    return Modele3dSource.fromJson(data);
+  }
+
+  static Map<String, dynamic> _generateMap({
+    String? modele3dId,
+    String? sourceId,
+  }) {
+    return {
+      if (modele3dId != null) 'modele_3d_id': modele3dId,
+      if (sourceId != null) 'source_id': sourceId,
+    };
+  }
+
+  static Map<String, dynamic> insert({String? modele3dId, String? sourceId}) {
+    return _generateMap(modele3dId: modele3dId, sourceId: sourceId);
+  }
+
+  static Map<String, dynamic> update({String? modele3dId, String? sourceId}) {
+    return _generateMap(modele3dId: modele3dId, sourceId: sourceId);
+  }
+
+  factory Modele3dSource.fromJson(Map<String, dynamic> jsonn) {
+    return Modele3dSource(
+      modele3dId: jsonn['modele_3d_id'] != null
+          ? jsonn['modele_3d_id'].toString()
+          : '',
+      sourceId: jsonn['source_id'] != null ? jsonn['source_id'].toString() : '',
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return _generateMap(modele3dId: modele3dId, sourceId: sourceId);
   }
 }
 
@@ -610,6 +1668,146 @@ class TraceValidation implements SupadartClass<TraceValidation> {
   }
 }
 
+class Commentaire implements SupadartClass<Commentaire> {
+  final String id;
+  final String pinId;
+  final String auteurId;
+  final String contenu;
+  final STATUT_CONTRIBUTION statut;
+  final String? motifDeRefus;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+
+  const Commentaire({
+    required this.id,
+    required this.pinId,
+    required this.auteurId,
+    required this.contenu,
+    required this.statut,
+    this.motifDeRefus,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+
+  static String get table_name => 'commentaire';
+  static String get c_id => 'id';
+  static String get c_pinId => 'pin_id';
+  static String get c_auteurId => 'auteur_id';
+  static String get c_contenu => 'contenu';
+  static String get c_statut => 'statut';
+  static String get c_motifDeRefus => 'motif_de_refus';
+  static String get c_createdAt => 'created_at';
+  static String get c_updatedAt => 'updated_at';
+
+  static List<Commentaire> converter(List<Map<String, dynamic>> data) {
+    return data.map(Commentaire.fromJson).toList();
+  }
+
+  static Commentaire converterSingle(Map<String, dynamic> data) {
+    return Commentaire.fromJson(data);
+  }
+
+  static Map<String, dynamic> _generateMap({
+    String? id,
+    String? pinId,
+    String? auteurId,
+    String? contenu,
+    STATUT_CONTRIBUTION? statut,
+    String? motifDeRefus,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+  }) {
+    return {
+      if (id != null) 'id': id,
+      if (pinId != null) 'pin_id': pinId,
+      if (auteurId != null) 'auteur_id': auteurId,
+      if (contenu != null) 'contenu': contenu,
+      if (statut != null) 'statut': statut.toString().split('.').last,
+      if (motifDeRefus != null) 'motif_de_refus': motifDeRefus,
+      if (createdAt != null) 'created_at': createdAt.toUtc().toIso8601String(),
+      if (updatedAt != null) 'updated_at': updatedAt.toUtc().toIso8601String(),
+    };
+  }
+
+  static Map<String, dynamic> insert({
+    String? id,
+    required String pinId,
+    required String auteurId,
+    required String contenu,
+    STATUT_CONTRIBUTION? statut,
+    String? motifDeRefus,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+  }) {
+    return _generateMap(
+      id: id,
+      pinId: pinId,
+      auteurId: auteurId,
+      contenu: contenu,
+      statut: statut,
+      motifDeRefus: motifDeRefus,
+      createdAt: createdAt,
+      updatedAt: updatedAt,
+    );
+  }
+
+  static Map<String, dynamic> update({
+    String? id,
+    String? pinId,
+    String? auteurId,
+    String? contenu,
+    STATUT_CONTRIBUTION? statut,
+    String? motifDeRefus,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+  }) {
+    return _generateMap(
+      id: id,
+      pinId: pinId,
+      auteurId: auteurId,
+      contenu: contenu,
+      statut: statut,
+      motifDeRefus: motifDeRefus,
+      createdAt: createdAt,
+      updatedAt: updatedAt,
+    );
+  }
+
+  factory Commentaire.fromJson(Map<String, dynamic> jsonn) {
+    return Commentaire(
+      id: jsonn['id'] != null ? jsonn['id'].toString() : '',
+      pinId: jsonn['pin_id'] != null ? jsonn['pin_id'].toString() : '',
+      auteurId: jsonn['auteur_id'] != null ? jsonn['auteur_id'].toString() : '',
+      contenu: jsonn['contenu'] != null ? jsonn['contenu'].toString() : '',
+      statut: jsonn['statut'] != null
+          ? STATUT_CONTRIBUTION.values.byName(jsonn['statut'].toString())
+          : STATUT_CONTRIBUTION.values.first,
+      motifDeRefus: jsonn['motif_de_refus'] != null
+          ? jsonn['motif_de_refus'].toString()
+          : null,
+      createdAt: jsonn['created_at'] != null
+          ? DateTime.parse(jsonn['created_at'].toString())
+          : DateTime.fromMillisecondsSinceEpoch(0),
+      updatedAt: jsonn['updated_at'] != null
+          ? DateTime.parse(jsonn['updated_at'].toString())
+          : DateTime.fromMillisecondsSinceEpoch(0),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return _generateMap(
+      id: id,
+      pinId: pinId,
+      auteurId: auteurId,
+      contenu: contenu,
+      statut: statut,
+      motifDeRefus: motifDeRefus,
+      createdAt: createdAt,
+      updatedAt: updatedAt,
+    );
+  }
+}
+
 class Epoque implements SupadartClass<Epoque> {
   final String id;
   final String slug;
@@ -733,6 +1931,270 @@ class Epoque implements SupadartClass<Epoque> {
       borneFin: borneFin,
       ordre: ordre,
       createdAt: createdAt,
+    );
+  }
+}
+
+class Parcours implements SupadartClass<Parcours> {
+  final String id;
+  final String slug;
+  final String titre;
+  final PROVENANCE_PARCOURS provenance;
+  final STATUT_PARCOURS statut;
+  final String? teaserNarratif;
+  final String? conclusionNarrative;
+  final String? signatureEditoriale;
+  final String? auteurCommunautaireId;
+  final String? badgeId;
+  final String? imageOuvertureMediaId;
+  final int? dureeEstimeeMinutes;
+  final int? distanceEstimeeMetres;
+  final DENSITE_CONTENU densite;
+  final bool retoursActifs;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+
+  const Parcours({
+    required this.id,
+    required this.slug,
+    required this.titre,
+    required this.provenance,
+    required this.statut,
+    this.teaserNarratif,
+    this.conclusionNarrative,
+    this.signatureEditoriale,
+    this.auteurCommunautaireId,
+    this.badgeId,
+    this.imageOuvertureMediaId,
+    this.dureeEstimeeMinutes,
+    this.distanceEstimeeMetres,
+    required this.densite,
+    required this.retoursActifs,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+
+  static String get table_name => 'parcours';
+  static String get c_id => 'id';
+  static String get c_slug => 'slug';
+  static String get c_titre => 'titre';
+  static String get c_provenance => 'provenance';
+  static String get c_statut => 'statut';
+  static String get c_teaserNarratif => 'teaser_narratif';
+  static String get c_conclusionNarrative => 'conclusion_narrative';
+  static String get c_signatureEditoriale => 'signature_editoriale';
+  static String get c_auteurCommunautaireId => 'auteur_communautaire_id';
+  static String get c_badgeId => 'badge_id';
+  static String get c_imageOuvertureMediaId => 'image_ouverture_media_id';
+  static String get c_dureeEstimeeMinutes => 'duree_estimee_minutes';
+  static String get c_distanceEstimeeMetres => 'distance_estimee_metres';
+  static String get c_densite => 'densite';
+  static String get c_retoursActifs => 'retours_actifs';
+  static String get c_createdAt => 'created_at';
+  static String get c_updatedAt => 'updated_at';
+
+  static List<Parcours> converter(List<Map<String, dynamic>> data) {
+    return data.map(Parcours.fromJson).toList();
+  }
+
+  static Parcours converterSingle(Map<String, dynamic> data) {
+    return Parcours.fromJson(data);
+  }
+
+  static Map<String, dynamic> _generateMap({
+    String? id,
+    String? slug,
+    String? titre,
+    PROVENANCE_PARCOURS? provenance,
+    STATUT_PARCOURS? statut,
+    String? teaserNarratif,
+    String? conclusionNarrative,
+    String? signatureEditoriale,
+    String? auteurCommunautaireId,
+    String? badgeId,
+    String? imageOuvertureMediaId,
+    int? dureeEstimeeMinutes,
+    int? distanceEstimeeMetres,
+    DENSITE_CONTENU? densite,
+    bool? retoursActifs,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+  }) {
+    return {
+      if (id != null) 'id': id,
+      if (slug != null) 'slug': slug,
+      if (titre != null) 'titre': titre,
+      if (provenance != null)
+        'provenance': provenance.toString().split('.').last,
+      if (statut != null) 'statut': statut.toString().split('.').last,
+      if (teaserNarratif != null) 'teaser_narratif': teaserNarratif,
+      if (conclusionNarrative != null)
+        'conclusion_narrative': conclusionNarrative,
+      if (signatureEditoriale != null)
+        'signature_editoriale': signatureEditoriale,
+      if (auteurCommunautaireId != null)
+        'auteur_communautaire_id': auteurCommunautaireId,
+      if (badgeId != null) 'badge_id': badgeId,
+      if (imageOuvertureMediaId != null)
+        'image_ouverture_media_id': imageOuvertureMediaId,
+      if (dureeEstimeeMinutes != null)
+        'duree_estimee_minutes': dureeEstimeeMinutes,
+      if (distanceEstimeeMetres != null)
+        'distance_estimee_metres': distanceEstimeeMetres,
+      if (densite != null) 'densite': densite.toString().split('.').last,
+      if (retoursActifs != null) 'retours_actifs': retoursActifs,
+      if (createdAt != null) 'created_at': createdAt.toUtc().toIso8601String(),
+      if (updatedAt != null) 'updated_at': updatedAt.toUtc().toIso8601String(),
+    };
+  }
+
+  static Map<String, dynamic> insert({
+    String? id,
+    required String slug,
+    required String titre,
+    PROVENANCE_PARCOURS? provenance,
+    STATUT_PARCOURS? statut,
+    String? teaserNarratif,
+    String? conclusionNarrative,
+    String? signatureEditoriale,
+    String? auteurCommunautaireId,
+    String? badgeId,
+    String? imageOuvertureMediaId,
+    int? dureeEstimeeMinutes,
+    int? distanceEstimeeMetres,
+    DENSITE_CONTENU? densite,
+    bool? retoursActifs,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+  }) {
+    return _generateMap(
+      id: id,
+      slug: slug,
+      titre: titre,
+      provenance: provenance,
+      statut: statut,
+      teaserNarratif: teaserNarratif,
+      conclusionNarrative: conclusionNarrative,
+      signatureEditoriale: signatureEditoriale,
+      auteurCommunautaireId: auteurCommunautaireId,
+      badgeId: badgeId,
+      imageOuvertureMediaId: imageOuvertureMediaId,
+      dureeEstimeeMinutes: dureeEstimeeMinutes,
+      distanceEstimeeMetres: distanceEstimeeMetres,
+      densite: densite,
+      retoursActifs: retoursActifs,
+      createdAt: createdAt,
+      updatedAt: updatedAt,
+    );
+  }
+
+  static Map<String, dynamic> update({
+    String? id,
+    String? slug,
+    String? titre,
+    PROVENANCE_PARCOURS? provenance,
+    STATUT_PARCOURS? statut,
+    String? teaserNarratif,
+    String? conclusionNarrative,
+    String? signatureEditoriale,
+    String? auteurCommunautaireId,
+    String? badgeId,
+    String? imageOuvertureMediaId,
+    int? dureeEstimeeMinutes,
+    int? distanceEstimeeMetres,
+    DENSITE_CONTENU? densite,
+    bool? retoursActifs,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+  }) {
+    return _generateMap(
+      id: id,
+      slug: slug,
+      titre: titre,
+      provenance: provenance,
+      statut: statut,
+      teaserNarratif: teaserNarratif,
+      conclusionNarrative: conclusionNarrative,
+      signatureEditoriale: signatureEditoriale,
+      auteurCommunautaireId: auteurCommunautaireId,
+      badgeId: badgeId,
+      imageOuvertureMediaId: imageOuvertureMediaId,
+      dureeEstimeeMinutes: dureeEstimeeMinutes,
+      distanceEstimeeMetres: distanceEstimeeMetres,
+      densite: densite,
+      retoursActifs: retoursActifs,
+      createdAt: createdAt,
+      updatedAt: updatedAt,
+    );
+  }
+
+  factory Parcours.fromJson(Map<String, dynamic> jsonn) {
+    return Parcours(
+      id: jsonn['id'] != null ? jsonn['id'].toString() : '',
+      slug: jsonn['slug'] != null ? jsonn['slug'].toString() : '',
+      titre: jsonn['titre'] != null ? jsonn['titre'].toString() : '',
+      provenance: jsonn['provenance'] != null
+          ? PROVENANCE_PARCOURS.values.byName(jsonn['provenance'].toString())
+          : PROVENANCE_PARCOURS.values.first,
+      statut: jsonn['statut'] != null
+          ? STATUT_PARCOURS.values.byName(jsonn['statut'].toString())
+          : STATUT_PARCOURS.values.first,
+      teaserNarratif: jsonn['teaser_narratif'] != null
+          ? jsonn['teaser_narratif'].toString()
+          : null,
+      conclusionNarrative: jsonn['conclusion_narrative'] != null
+          ? jsonn['conclusion_narrative'].toString()
+          : null,
+      signatureEditoriale: jsonn['signature_editoriale'] != null
+          ? jsonn['signature_editoriale'].toString()
+          : null,
+      auteurCommunautaireId: jsonn['auteur_communautaire_id'] != null
+          ? jsonn['auteur_communautaire_id'].toString()
+          : null,
+      badgeId: jsonn['badge_id'] != null ? jsonn['badge_id'].toString() : null,
+      imageOuvertureMediaId: jsonn['image_ouverture_media_id'] != null
+          ? jsonn['image_ouverture_media_id'].toString()
+          : null,
+      dureeEstimeeMinutes: jsonn['duree_estimee_minutes'] != null
+          ? int.parse(jsonn['duree_estimee_minutes'].toString())
+          : null,
+      distanceEstimeeMetres: jsonn['distance_estimee_metres'] != null
+          ? int.parse(jsonn['distance_estimee_metres'].toString())
+          : null,
+      densite: jsonn['densite'] != null
+          ? DENSITE_CONTENU.values.byName(jsonn['densite'].toString())
+          : DENSITE_CONTENU.values.first,
+      retoursActifs: jsonn['retours_actifs'] != null
+          ? jsonn['retours_actifs'] as bool
+          : false,
+      createdAt: jsonn['created_at'] != null
+          ? DateTime.parse(jsonn['created_at'].toString())
+          : DateTime.fromMillisecondsSinceEpoch(0),
+      updatedAt: jsonn['updated_at'] != null
+          ? DateTime.parse(jsonn['updated_at'].toString())
+          : DateTime.fromMillisecondsSinceEpoch(0),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return _generateMap(
+      id: id,
+      slug: slug,
+      titre: titre,
+      provenance: provenance,
+      statut: statut,
+      teaserNarratif: teaserNarratif,
+      conclusionNarrative: conclusionNarrative,
+      signatureEditoriale: signatureEditoriale,
+      auteurCommunautaireId: auteurCommunautaireId,
+      badgeId: badgeId,
+      imageOuvertureMediaId: imageOuvertureMediaId,
+      dureeEstimeeMinutes: dureeEstimeeMinutes,
+      distanceEstimeeMetres: distanceEstimeeMetres,
+      densite: densite,
+      retoursActifs: retoursActifs,
+      createdAt: createdAt,
+      updatedAt: updatedAt,
     );
   }
 }
@@ -893,5 +2355,487 @@ class PinEpoque implements SupadartClass<PinEpoque> {
 
   Map<String, dynamic> toJson() {
     return _generateMap(pinId: pinId, epoqueId: epoqueId);
+  }
+}
+
+class Modele3d implements SupadartClass<Modele3d> {
+  final String id;
+  final String slug;
+  final String titre;
+  final String epoqueId;
+  final String? pinId;
+  final String cheminStorage;
+  final Geometry? ancrage;
+  final double? capDegres;
+  final double echelle;
+  final String? description;
+  final DateTime createdAt;
+
+  const Modele3d({
+    required this.id,
+    required this.slug,
+    required this.titre,
+    required this.epoqueId,
+    this.pinId,
+    required this.cheminStorage,
+    this.ancrage,
+    this.capDegres,
+    required this.echelle,
+    this.description,
+    required this.createdAt,
+  });
+
+  static String get table_name => 'modele_3d';
+  static String get c_id => 'id';
+  static String get c_slug => 'slug';
+  static String get c_titre => 'titre';
+  static String get c_epoqueId => 'epoque_id';
+  static String get c_pinId => 'pin_id';
+  static String get c_cheminStorage => 'chemin_storage';
+  static String get c_ancrage => 'ancrage';
+  static String get c_capDegres => 'cap_degres';
+  static String get c_echelle => 'echelle';
+  static String get c_description => 'description';
+  static String get c_createdAt => 'created_at';
+
+  static List<Modele3d> converter(List<Map<String, dynamic>> data) {
+    return data.map(Modele3d.fromJson).toList();
+  }
+
+  static Modele3d converterSingle(Map<String, dynamic> data) {
+    return Modele3d.fromJson(data);
+  }
+
+  static Map<String, dynamic> _generateMap({
+    String? id,
+    String? slug,
+    String? titre,
+    String? epoqueId,
+    String? pinId,
+    String? cheminStorage,
+    Geometry? ancrage,
+    double? capDegres,
+    double? echelle,
+    String? description,
+    DateTime? createdAt,
+  }) {
+    return {
+      if (id != null) 'id': id,
+      if (slug != null) 'slug': slug,
+      if (titre != null) 'titre': titre,
+      if (epoqueId != null) 'epoque_id': epoqueId,
+      if (pinId != null) 'pin_id': pinId,
+      if (cheminStorage != null) 'chemin_storage': cheminStorage,
+      if (ancrage != null)
+        'ancrage': ancrage.toBytesHex(format: WKB.geometryExtended),
+      if (capDegres != null) 'cap_degres': capDegres,
+      if (echelle != null) 'echelle': echelle,
+      if (description != null) 'description': description,
+      if (createdAt != null) 'created_at': createdAt.toUtc().toIso8601String(),
+    };
+  }
+
+  static Map<String, dynamic> insert({
+    String? id,
+    required String slug,
+    required String titre,
+    required String epoqueId,
+    String? pinId,
+    required String cheminStorage,
+    Geometry? ancrage,
+    double? capDegres,
+    double? echelle,
+    String? description,
+    DateTime? createdAt,
+  }) {
+    return _generateMap(
+      id: id,
+      slug: slug,
+      titre: titre,
+      epoqueId: epoqueId,
+      pinId: pinId,
+      cheminStorage: cheminStorage,
+      ancrage: ancrage,
+      capDegres: capDegres,
+      echelle: echelle,
+      description: description,
+      createdAt: createdAt,
+    );
+  }
+
+  static Map<String, dynamic> update({
+    String? id,
+    String? slug,
+    String? titre,
+    String? epoqueId,
+    String? pinId,
+    String? cheminStorage,
+    Geometry? ancrage,
+    double? capDegres,
+    double? echelle,
+    String? description,
+    DateTime? createdAt,
+  }) {
+    return _generateMap(
+      id: id,
+      slug: slug,
+      titre: titre,
+      epoqueId: epoqueId,
+      pinId: pinId,
+      cheminStorage: cheminStorage,
+      ancrage: ancrage,
+      capDegres: capDegres,
+      echelle: echelle,
+      description: description,
+      createdAt: createdAt,
+    );
+  }
+
+  factory Modele3d.fromJson(Map<String, dynamic> jsonn) {
+    return Modele3d(
+      id: jsonn['id'] != null ? jsonn['id'].toString() : '',
+      slug: jsonn['slug'] != null ? jsonn['slug'].toString() : '',
+      titre: jsonn['titre'] != null ? jsonn['titre'].toString() : '',
+      epoqueId: jsonn['epoque_id'] != null ? jsonn['epoque_id'].toString() : '',
+      pinId: jsonn['pin_id'] != null ? jsonn['pin_id'].toString() : null,
+      cheminStorage: jsonn['chemin_storage'] != null
+          ? jsonn['chemin_storage'].toString()
+          : '',
+      ancrage: jsonn['ancrage'] != null
+          ? GeometryBuilder.decodeHex(
+              jsonn['ancrage'].toString(),
+              format: WKB.geometryExtended,
+            )
+          : null,
+      capDegres: jsonn['cap_degres'] != null
+          ? double.parse(jsonn['cap_degres'].toString())
+          : null,
+      echelle: jsonn['echelle'] != null
+          ? double.parse(jsonn['echelle'].toString())
+          : 0.0,
+      description: jsonn['description'] != null
+          ? jsonn['description'].toString()
+          : null,
+      createdAt: jsonn['created_at'] != null
+          ? DateTime.parse(jsonn['created_at'].toString())
+          : DateTime.fromMillisecondsSinceEpoch(0),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return _generateMap(
+      id: id,
+      slug: slug,
+      titre: titre,
+      epoqueId: epoqueId,
+      pinId: pinId,
+      cheminStorage: cheminStorage,
+      ancrage: ancrage,
+      capDegres: capDegres,
+      echelle: echelle,
+      description: description,
+      createdAt: createdAt,
+    );
+  }
+}
+
+class TraceModeration implements SupadartClass<TraceModeration> {
+  final String id;
+  final String typeDeCible;
+  final String cibleId;
+  final String moderateur;
+  final DECISION_MODERATION decision;
+  final String? motif;
+  final ACTION_MODERATION actionPrise;
+  final DateTime horodatage;
+
+  const TraceModeration({
+    required this.id,
+    required this.typeDeCible,
+    required this.cibleId,
+    required this.moderateur,
+    required this.decision,
+    this.motif,
+    required this.actionPrise,
+    required this.horodatage,
+  });
+
+  static String get table_name => 'trace_moderation';
+  static String get c_id => 'id';
+  static String get c_typeDeCible => 'type_de_cible';
+  static String get c_cibleId => 'cible_id';
+  static String get c_moderateur => 'moderateur';
+  static String get c_decision => 'decision';
+  static String get c_motif => 'motif';
+  static String get c_actionPrise => 'action_prise';
+  static String get c_horodatage => 'horodatage';
+
+  static List<TraceModeration> converter(List<Map<String, dynamic>> data) {
+    return data.map(TraceModeration.fromJson).toList();
+  }
+
+  static TraceModeration converterSingle(Map<String, dynamic> data) {
+    return TraceModeration.fromJson(data);
+  }
+
+  static Map<String, dynamic> _generateMap({
+    String? id,
+    String? typeDeCible,
+    String? cibleId,
+    String? moderateur,
+    DECISION_MODERATION? decision,
+    String? motif,
+    ACTION_MODERATION? actionPrise,
+    DateTime? horodatage,
+  }) {
+    return {
+      if (id != null) 'id': id,
+      if (typeDeCible != null) 'type_de_cible': typeDeCible,
+      if (cibleId != null) 'cible_id': cibleId,
+      if (moderateur != null) 'moderateur': moderateur,
+      if (decision != null) 'decision': decision.toString().split('.').last,
+      if (motif != null) 'motif': motif,
+      if (actionPrise != null)
+        'action_prise': actionPrise.toString().split('.').last,
+      if (horodatage != null)
+        'horodatage': horodatage.toUtc().toIso8601String(),
+    };
+  }
+
+  static Map<String, dynamic> insert({
+    String? id,
+    required String typeDeCible,
+    required String cibleId,
+    required String moderateur,
+    required DECISION_MODERATION decision,
+    String? motif,
+    ACTION_MODERATION? actionPrise,
+    DateTime? horodatage,
+  }) {
+    return _generateMap(
+      id: id,
+      typeDeCible: typeDeCible,
+      cibleId: cibleId,
+      moderateur: moderateur,
+      decision: decision,
+      motif: motif,
+      actionPrise: actionPrise,
+      horodatage: horodatage,
+    );
+  }
+
+  static Map<String, dynamic> update({
+    String? id,
+    String? typeDeCible,
+    String? cibleId,
+    String? moderateur,
+    DECISION_MODERATION? decision,
+    String? motif,
+    ACTION_MODERATION? actionPrise,
+    DateTime? horodatage,
+  }) {
+    return _generateMap(
+      id: id,
+      typeDeCible: typeDeCible,
+      cibleId: cibleId,
+      moderateur: moderateur,
+      decision: decision,
+      motif: motif,
+      actionPrise: actionPrise,
+      horodatage: horodatage,
+    );
+  }
+
+  factory TraceModeration.fromJson(Map<String, dynamic> jsonn) {
+    return TraceModeration(
+      id: jsonn['id'] != null ? jsonn['id'].toString() : '',
+      typeDeCible: jsonn['type_de_cible'] != null
+          ? jsonn['type_de_cible'].toString()
+          : '',
+      cibleId: jsonn['cible_id'] != null ? jsonn['cible_id'].toString() : '',
+      moderateur: jsonn['moderateur'] != null
+          ? jsonn['moderateur'].toString()
+          : '',
+      decision: jsonn['decision'] != null
+          ? DECISION_MODERATION.values.byName(jsonn['decision'].toString())
+          : DECISION_MODERATION.values.first,
+      motif: jsonn['motif'] != null ? jsonn['motif'].toString() : null,
+      actionPrise: jsonn['action_prise'] != null
+          ? ACTION_MODERATION.values.byName(jsonn['action_prise'].toString())
+          : ACTION_MODERATION.values.first,
+      horodatage: jsonn['horodatage'] != null
+          ? DateTime.parse(jsonn['horodatage'].toString())
+          : DateTime.fromMillisecondsSinceEpoch(0),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return _generateMap(
+      id: id,
+      typeDeCible: typeDeCible,
+      cibleId: cibleId,
+      moderateur: moderateur,
+      decision: decision,
+      motif: motif,
+      actionPrise: actionPrise,
+      horodatage: horodatage,
+    );
+  }
+}
+
+class RetourParcours implements SupadartClass<RetourParcours> {
+  final String id;
+  final String parcoursId;
+  final String auteurId;
+  final int evaluation;
+  final String? commentaireLibre;
+  final STATUT_CONTRIBUTION statut;
+  final String? motifDeRefus;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+
+  const RetourParcours({
+    required this.id,
+    required this.parcoursId,
+    required this.auteurId,
+    required this.evaluation,
+    this.commentaireLibre,
+    required this.statut,
+    this.motifDeRefus,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+
+  static String get table_name => 'retour_parcours';
+  static String get c_id => 'id';
+  static String get c_parcoursId => 'parcours_id';
+  static String get c_auteurId => 'auteur_id';
+  static String get c_evaluation => 'evaluation';
+  static String get c_commentaireLibre => 'commentaire_libre';
+  static String get c_statut => 'statut';
+  static String get c_motifDeRefus => 'motif_de_refus';
+  static String get c_createdAt => 'created_at';
+  static String get c_updatedAt => 'updated_at';
+
+  static List<RetourParcours> converter(List<Map<String, dynamic>> data) {
+    return data.map(RetourParcours.fromJson).toList();
+  }
+
+  static RetourParcours converterSingle(Map<String, dynamic> data) {
+    return RetourParcours.fromJson(data);
+  }
+
+  static Map<String, dynamic> _generateMap({
+    String? id,
+    String? parcoursId,
+    String? auteurId,
+    int? evaluation,
+    String? commentaireLibre,
+    STATUT_CONTRIBUTION? statut,
+    String? motifDeRefus,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+  }) {
+    return {
+      if (id != null) 'id': id,
+      if (parcoursId != null) 'parcours_id': parcoursId,
+      if (auteurId != null) 'auteur_id': auteurId,
+      if (evaluation != null) 'evaluation': evaluation,
+      if (commentaireLibre != null) 'commentaire_libre': commentaireLibre,
+      if (statut != null) 'statut': statut.toString().split('.').last,
+      if (motifDeRefus != null) 'motif_de_refus': motifDeRefus,
+      if (createdAt != null) 'created_at': createdAt.toUtc().toIso8601String(),
+      if (updatedAt != null) 'updated_at': updatedAt.toUtc().toIso8601String(),
+    };
+  }
+
+  static Map<String, dynamic> insert({
+    String? id,
+    required String parcoursId,
+    required String auteurId,
+    required int evaluation,
+    String? commentaireLibre,
+    STATUT_CONTRIBUTION? statut,
+    String? motifDeRefus,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+  }) {
+    return _generateMap(
+      id: id,
+      parcoursId: parcoursId,
+      auteurId: auteurId,
+      evaluation: evaluation,
+      commentaireLibre: commentaireLibre,
+      statut: statut,
+      motifDeRefus: motifDeRefus,
+      createdAt: createdAt,
+      updatedAt: updatedAt,
+    );
+  }
+
+  static Map<String, dynamic> update({
+    String? id,
+    String? parcoursId,
+    String? auteurId,
+    int? evaluation,
+    String? commentaireLibre,
+    STATUT_CONTRIBUTION? statut,
+    String? motifDeRefus,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+  }) {
+    return _generateMap(
+      id: id,
+      parcoursId: parcoursId,
+      auteurId: auteurId,
+      evaluation: evaluation,
+      commentaireLibre: commentaireLibre,
+      statut: statut,
+      motifDeRefus: motifDeRefus,
+      createdAt: createdAt,
+      updatedAt: updatedAt,
+    );
+  }
+
+  factory RetourParcours.fromJson(Map<String, dynamic> jsonn) {
+    return RetourParcours(
+      id: jsonn['id'] != null ? jsonn['id'].toString() : '',
+      parcoursId: jsonn['parcours_id'] != null
+          ? jsonn['parcours_id'].toString()
+          : '',
+      auteurId: jsonn['auteur_id'] != null ? jsonn['auteur_id'].toString() : '',
+      evaluation: jsonn['evaluation'] != null
+          ? int.parse(jsonn['evaluation'].toString())
+          : 0,
+      commentaireLibre: jsonn['commentaire_libre'] != null
+          ? jsonn['commentaire_libre'].toString()
+          : null,
+      statut: jsonn['statut'] != null
+          ? STATUT_CONTRIBUTION.values.byName(jsonn['statut'].toString())
+          : STATUT_CONTRIBUTION.values.first,
+      motifDeRefus: jsonn['motif_de_refus'] != null
+          ? jsonn['motif_de_refus'].toString()
+          : null,
+      createdAt: jsonn['created_at'] != null
+          ? DateTime.parse(jsonn['created_at'].toString())
+          : DateTime.fromMillisecondsSinceEpoch(0),
+      updatedAt: jsonn['updated_at'] != null
+          ? DateTime.parse(jsonn['updated_at'].toString())
+          : DateTime.fromMillisecondsSinceEpoch(0),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return _generateMap(
+      id: id,
+      parcoursId: parcoursId,
+      auteurId: auteurId,
+      evaluation: evaluation,
+      commentaireLibre: commentaireLibre,
+      statut: statut,
+      motifDeRefus: motifDeRefus,
+      createdAt: createdAt,
+      updatedAt: updatedAt,
+    );
   }
 }
