@@ -96,3 +96,12 @@ Journal chronologique des décisions d'architecture et d'organisation du projet 
 - (decision) `melos run local` = base locale prête en une commande ; `tools/seed.dart` et `tools/gen_types.dart` lisent la base locale via `supabase status` quand les variables d'environnement sont absentes.
 - (decision) `melos run test` exécute les packages un par un (`--concurrency=1`).
 - (event) Prérequis constaté : **≥ 8 Go de mémoire alloués à Docker**. Avec 3,7 Go (poste du porteur, partagé avec un autre projet), les tests Flutter se bloquent puis le conteneur est tué.
+
+## Phase 5 (suite) — Revue complète du dépôt, lot docs et contenu (2026-09-25)
+
+- (event) Revue de code 4 lentilles de tout le dépôt, en quatre lots (supabase #113, socle mobile #115, outillage et CI #117, docs et contenu #119), un correctif par lot. Constat principal du lot docs : `ORGANISATION.md` et le spine décrivaient encore le processus BMAD (branches `story/<ID>`, template de story archivé, prompts archivés, casquettes en binôme), en contradiction avec `AGENTS.md`.
+- (decision) **Spine amendé** plutôt que réécrit : AD-12 (issue courte `tache.md`, branche `<n°issue>-<slug>`, labels de zone **et** de domaine), AD-15 (prompts réels), AD-17 (indicateur par domaine d'après le label de domaine des issues), AD-18 (seul le Découpeur est attribué), noms réels des outils. `ORGANISATION.md` garde son récit pour le jury, avec un bandeau de mise à jour et des étapes pratiques à jour (devcontainer, `melos run local`).
+- (decision) **Catégories alignées sur l'inventaire de conception** (`13-icones/02-icones-categories.yaml`) : `patrimoine_vivant` devient `patrimoine_vivant_traditions` (nouvel `id`, le seed upserte par slug), libellé « Personne » au lieu de « Personnage historique ». Une base locale déjà seedée garde l'ancienne catégorie jusqu'au prochain `melos run local`.
+- (decision) **Contenu fictif isolé** : le pin fictif était déjà dans `content/demo/` (jamais chargé) ; l'entrée média fictive y rejoint `content/demo/medias.yaml`, et `content/medias.yaml` ne liste que des médias réels (aucun pour l'instant).
+- (decision) **Premier pin réel accepté non vérifié** : `cour-des-voraces` est sourcé publiquement (Wikipédia, Musée Gadagne), sans recherche d'archive. Il reste en `brouillon` jusqu'à vérification par l'Éditeur de contenu (dates de l'escalier et de la société des Voraces, coordonnées, source académique). Les bornes d'époques partagées entre époques voisines attendent la question ouverte D1.2.
+

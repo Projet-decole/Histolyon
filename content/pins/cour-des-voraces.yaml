@@ -1,24 +1,20 @@
 # ============================================================================
-# PREMIER PIN RÉEL — Story 5.2
+# PREMIER PIN RÉEL — à vérifier avant publication (DECISIONS, phase 5)
 # ============================================================================
-# Contenu basé sur des faits d'histoire lyonnaise largement établis et
-# documentés publiquement (les canuts, les traboules, les révoltes de
-# 1831/1834). Ce n'est PAS le résultat d'une recherche archivistique
-# primaire — je n'ai accès ni aux Archives municipales de Lyon, ni à une
-# historienne pour vérifier les détails fins. Les sources citées sont
-# publiques et générales (Wikipédia, Musée Gadagne), pas des pièces
-# d'archive avec cote précise.
+# Rédigé à partir de faits d'histoire lyonnaise documentés publiquement (les
+# canuts, les traboules, les révoltes de 1831/1834), sans recherche
+# archivistique primaire. Sources publiques et générales (Wikipédia, Musée
+# Gadagne), sans cote d'archive.
 #
-# Ce que je NE fournis PAS ici, honnêtement :
-# - un fichier audio (aucune narration enregistrée n'existe — production
-#   à faire séparément, cf. content/medias.yaml non touché par ce fichier)
-# - une vérification par une lead historienne (recommandé avant que ce
-#   pin dépasse le statut brouillon)
-#
-# Le porteur a explicitement accepté ce compromis (contenu réel mais
-# sourcé publiquement plutôt que fictif, révisable/supprimable ensuite)
-# plutôt que de rester sur le pin de démonstration fictif de la Story 5.2
-# (voir content/demo/pins/demo-pin-exemple.yaml).
+# Reste à faire par l'Éditeur de contenu avant de soumettre ce pin :
+# - vérifier les dates : l'escalier emblématique date d'environ 1840 et la
+#   société des Voraces des années 1846-1848, le texte les rapproche des
+#   révoltes de 1831/1834 ;
+# - vérifier les coordonnées (place Colbert) ;
+# - ajouter une source archivistique ou académique ;
+# - produire la narration audio (aucune n'existe, rien dans medias.yaml).
+# Choix assumé par l'équipe : un pin réel sourcé publiquement plutôt que le
+# pin fictif de content/demo/, révisable ou supprimable ensuite.
 # ============================================================================
 
 id: c4d158e5-f125-4f3d-ad5e-57a9456379e1

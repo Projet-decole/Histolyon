@@ -17,7 +17,7 @@ labels: ''
 ## Zone
 
 `<un seul dossier : apps/mobile/lib/features/<slug>/ | supabase/ | content/ | apps/admin/… | packages/<nom>/>`
-Rien d'autre n'est modifié, sauf : <exception explicite, ou « aucune »>.
+Rien d'autre n'est modifié, sauf : <exception explicite, ou « aucune » — ex. `core/router/route_names.dart` pour une route, `app/router.dart` pour une nouvelle feature, `schema.drift`>.
 
 ## À faire
 
@@ -30,11 +30,11 @@ Rien d'autre n'est modifié, sauf : <exception explicite, ou « aucune »>.
 ## Terminé quand
 
 - [ ] …
-- [ ] `melos run analyze` et `melos run test` verts
+- [ ] `melos run analyze`, `melos run test` et `melos run format` verts (+ `supabase db reset && supabase test db` si `supabase/`)
 
 ## Hors périmètre
 
 - …
 
 ---
-Dépend de : <#n ou « rien »> · Taille : ½ journée avec une IA
+Domaine : <D1…D11 ou socle> · Dépend de : <#n ou « rien »> · Taille : ½ journée avec une IA
