@@ -17,7 +17,7 @@ sources:
   - conception/08-contenu/06-i18n.yaml
   - conception/15-maquette.md
   - contexte du porteur (contraintes 3.1–3.3, attentes 2.1–2.4) — docs/DECISIONS.md
-companions: [ORGANISATION.md, BOOTSTRAP.md, DECISIONS.md]
+companions: [ORGANISATION.md, DECISIONS.md, archive/BOOTSTRAP.md]
 ---
 
 # Architecture Spine — HistoLyon
@@ -50,7 +50,7 @@ companions: [ORGANISATION.md, BOOTSTRAP.md, DECISIONS.md]
 
 - **Binds:** `apps/*`, `packages/api_types`, `content/schema`
 - **Prevents:** des modèles Dart rédigés à la main qui dérivent du schéma ; deux PR qui « résolvent » un conflit sur du généré à la main.
-- **Rule:** `packages/api_types` (Dart) et `content/schema/*.json` (JSON Schema) sont produits par `tools/gen-types` à partir du schéma local ; régénérés et committés dans la PR de toute migration ; la CI échoue si la génération diffère du commit ; un conflit Git sur un fichier généré se résout en régénérant, jamais à la main. Outil courant : supadart (enums déclarés dans `supadart.yaml`, PostGIS via `geobase`) ; bascule vers `supabase_typegen` officiel quand `supabase_flutter` 3 est stable.
+- **Rule:** `packages/api_types` (Dart) et `content/schema/*.json` (JSON Schema) sont produits par `tools/gen_types` à partir du schéma local ; régénérés et committés dans la PR de toute migration ; la CI échoue si la génération diffère du commit ; un conflit Git sur un fichier généré se résout en régénérant, jamais à la main. Outil courant : supadart (enums déclarés dans `supadart.yaml`, PostGIS via `geobase`) ; bascule vers `supabase_typegen` officiel quand `supabase_flutter` 3 est stable.
 
 ### AD-4 — Ownership des données par provenance : serveur / terminal
 
@@ -102,9 +102,9 @@ graph TD
 
 ### AD-7 — Le contenu éditorial vit en fichiers ; les binaires vivent dans Storage
 
-- **Binds:** D10, C1, C2, C5, `content/`, `tools/seed`, `tools/media`
+- **Binds:** D10, C1, C2, C5, `content/`, `tools/seed`, `tools/media_push`
 - **Prevents:** un premier pin bloqué derrière l'admin ; un seed qui écrase l'état posé par l'admin ou efface les pins communautaires ; des binaires sans emplacement ni format ; un dépôt Git gonflé de médias.
-- **Rule:** phase 1 : `content/` (YAML conformes aux templates du palier 8, validés contre `content/schema/`) est **la** source des entités `editorial` ; `tools/seed` est **upsert-only par `slug`**, ne touche que `provenance = editorial`, jamais `statut`, jamais une Trace, jamais une ligne communautaire ; la base est la vérité pour tout le reste. Les binaires ne sont **jamais** dans Git : `tools/media push` les téléverse depuis un dossier partagé hors dépôt vers Storage (`<bucket>/<slug>/<fichier>`), le YAML les référence par ce chemin, la CI vérifie l'existence et les formats (`webp` ≤ 500 Ko, `m4a`/AAC ≤ 5 Mo, `glb` ≤ 20 Mo). Phase 2 : dès que `apps/admin` couvre la saisie d'un Pin **et** que l'export automatique d'AD-19 tourne, la base devient la source, `content/` devient fixtures et export — bascule par amendement de cette AD.
+- **Rule:** phase 1 : `content/` (YAML conformes aux templates du palier 8, validés contre `content/schema/`) est **la** source des entités `editorial` ; `tools/seed` est **upsert-only par `slug`**, ne touche que `provenance = editorial`, jamais `statut`, jamais une Trace, jamais une ligne communautaire ; la base est la vérité pour tout le reste. Les binaires ne sont **jamais** dans Git : `tools/media_push` les téléverse depuis un dossier partagé hors dépôt vers Storage (`<bucket>/<slug>/<fichier>`), le YAML les référence par ce chemin, la CI vérifie l'existence et les formats (`webp` ≤ 500 Ko, `m4a`/AAC ≤ 5 Mo, `glb` ≤ 20 Mo). Phase 2 : dès que `apps/admin` couvre la saisie d'un Pin **et** que l'export automatique d'AD-19 tourne, la base devient la source, `content/` devient fixtures et export — bascule par amendement de cette AD.
 
 ### AD-8 — Cartographie : MapLibre, une seule chaîne de tuiles, un style de fond par Époque
 
@@ -122,7 +122,7 @@ graph TD
 
 - **Binds:** palier 10, palier 12, `packages/design_tokens`, `packages/ui_kit`
 - **Prevents:** valeurs visuelles inventées ; renommage qui casse la traçabilité Figma ↔ code ; composants `comp-*` réimplémentés dans une feature.
-- **Rule:** chaque variable et style Figma est une constante de `packages/design_tokens` nommée par **l'identifiant Figma verbatim**, `-` → `_` (`TOK_COLOR_PRIMARY`), lint de nommage désactivé dans ce seul package ; un identifiant = une constante, jamais un alias qui fusionne deux tokens ; `tools/check-tokens` compare l'export Figma au package en CI. Les composants `comp-*` de la maquette vivent dans `packages/ui_kit`, mapping tenu à la main dans `packages/ui_kit/FIGMA-MAP.md` (Code Connect indisponible) ; une feature ne crée un widget local que s'il n'existe pas comme `comp-*`. Aucune valeur visuelle littérale dans une feature ; pas de thème sombre.
+- **Rule:** chaque variable et style Figma est une constante de `packages/design_tokens` nommée par **l'identifiant Figma verbatim**, `-` → `_` (`TOK_COLOR_PRIMARY`), lint de nommage désactivé dans ce seul package ; un identifiant = une constante, jamais un alias qui fusionne deux tokens ; `tools/check_tokens` compare l'export Figma au package en CI. Les composants `comp-*` de la maquette vivent dans `packages/ui_kit`, mapping tenu à la main dans `packages/ui_kit/FIGMA-MAP.md` (Code Connect indisponible) ; une feature ne crée un widget local que s'il n'existe pas comme `comp-*`. Aucune valeur visuelle littérale dans une feature ; pas de thème sombre.
 
 ### AD-11 — Contrat 3D/AR : le viewer est isolé derrière une interface
 
@@ -130,11 +130,11 @@ graph TD
 - **Prevents:** un moteur 3D qui contamine l'app ; des spécialistes 3D bloqués par l'archi ou l'inverse.
 - **Rule:** assets glTF/GLB dans le bucket `models`, référencés par l'entité Modèle 3D avec sa licence ; l'app ouvre l'immersion via `features/immersion` qui expose `ImmersionViewer(modelRef)` ; le moteur est interne à cette feature et à ses spécialistes.
 
-### AD-12 — La story est la plus petite unité de travail, traçable, dans un arbre Domaine → Épic → Story
+### AD-12 — L'issue est la plus petite unité de travail, traçable jusqu'au domaine
 
-- **Binds:** process, GitHub, `docs/archive/specs/`, `docs/archive/stories/`
+- **Binds:** process, GitHub, `.github/ISSUE_TEMPLATE/tache.md`, `prompts/`
 - **Prevents:** des tâches trop larges pour une session ou un agent ; une découpe que seul le porteur sait faire ; un avancement non traçable.
-- **Rule:** l'arbre de découpe est Domaine (D1…D11, `socle`) → Épic (un sous-domaine `Dx.y` ou un lot) → Story ; le Découpeur produit `docs/archive/specs/`, les épics dans `docs/` et `docs/archive/stories/` avec BMAD (`bmad-spec`, `bmad-create-epics-and-stories`) et les committe. Une story = **1 issue GitHub = 1 branche `story/<ID>-<slug>` = 1 PR**, label de domaine obligatoire, corps = `docs/archive/stories/TEMPLATE.md` (format dev-story BMAD, aussi template d'issue) qui **cite** les extraits de conception par ID. Une story touche **une seule** feature, ou un seul de `supabase/`, `content/`, `packages/<x>` ; une story qui a besoin d'une migration et d'une UI se découpe en deux, la migration d'abord.
+- **Rule:** l'arbre de découpe est Domaine (D1…D11, `socle`) → sous-domaine `Dx.y` → issue. Le Découpeur écrit les issues au format `.github/ISSUE_TEMPLATE/tache.md` (`prompts/ecrire-une-issue.md`), qui **cite** les extraits de conception par ID. Une issue = **1 branche `<n°issue>-<slug>` = 1 PR**, labels de zone et de domaine. Une issue touche **une seule** zone : une feature, ou un seul de `supabase/`, `content/`, `packages/<x>` ; une tâche qui a besoin d'une migration et d'une UI se découpe en deux, la migration d'abord. *(Amendé le 2026-09-25 : la production de stories par BMAD est abandonnée, DECISIONS phases 2 et 3.)*
 
 ### AD-13 — Trunk-based : `main` toujours livrable, itération de deux semaines
 
@@ -150,9 +150,9 @@ graph TD
 
 ### AD-15 — Architecture documentaire en quatre niveaux, un seul fichier d'instructions
 
-- **Binds:** `AGENTS.md`, `docs/`, `conception/`, `docs/archive/stories/`, `prompts/`
+- **Binds:** `AGENTS.md`, `docs/`, `conception/`, `prompts/`
 - **Prevents:** saturation de contexte ; instructions divergentes par IDE ; agents qui inventent faute de contexte ; une méthode réservée à ceux qui ont BMAD.
-- **Rule:** L0 `AGENTS.md` (racine, `apps/*/`, `supabase/`) < 150 lignes chacun, **unique** source d'instructions — `CLAUDE.md`, `.cursor/rules/*`, `.github/copilot-instructions.md` sont générés par `tools/sync-agents` et jamais édités ; L1 `docs/` = cette spine, conventions, guides-recettes (un sujet par fichier) ; L2 `conception/` importée telle quelle, **jamais lue entière**, adressée par ID via `conception/INDEX.md` généré et `tools/ctx <ID>` ; L3 la story liste précisément les fichiers L1/L2 à lire. `prompts/` contient les prompts portables (dev-story, review, découpe) collables dans toute IA et une checklist « sans IA ».
+- **Rule:** L0 `AGENTS.md` (racine, `apps/*/`, `supabase/`) < 150 lignes chacun, **unique** source d'instructions — `CLAUDE.md`, `.cursor/rules/*`, `.github/copilot-instructions.md` sont générés par `tools/sync_agents` et jamais édités ; L1 `docs/` = cette spine, `DECISIONS.md`, guides-recettes (`docs/guides/`, un sujet par fichier) ; L2 `conception/` importée telle quelle, **jamais lue entière**, adressée par ID via `conception/INDEX.md` généré et `tools/ctx <ID>` ; L3 l'issue liste précisément les fichiers L1/L2 à lire. `prompts/` contient les prompts portables collables dans toute IA : écrire une issue, implémenter une issue, relire une PR.
 
 ### AD-16 — Trois environnements, migrations sérialisées et poussées par la CI
 
@@ -164,19 +164,19 @@ graph TD
 
 - **Binds:** process, `tools/report`, `docs/sprint/`
 - **Prevents:** un reporting manuel à chaque rendez-vous école ; des KPIs non mesurables ; un comptage de stories qui pousserait à les grossir ou à courir après un périmètre.
-- **Rule:** `tools/report` produit `docs/sprint/reports/<date>.md` uniquement à partir des issues, PR, labels et artefacts CI : **état des lieux** (fait / en cours / reste, listé par domaine, jamais compté comme cible), **indicateurs** = sous-domaines `Dx.y` dont la DoD est atteinte sur le total du domaine, délai médian story → fusion, taux de CI verte, couverture par package, actions de rétro closes. Ce fichier est collé dans le compte-rendu de réunion sur SharePoint ; GitHub Projects remplace la liste de suivi.
+- **Rule:** `tools/report` produit `docs/sprint/reports/<date>.md` uniquement à partir des issues, PR, labels et artefacts CI : **état des lieux** (fait / en cours / reste, listé par domaine, jamais compté comme cible), **indicateurs** = sous-domaines `Dx.y` dont la DoD est atteinte sur le total du domaine (d'après le label de domaine de chaque issue), délai médian issue → fusion, taux de CI verte, couverture par package, actions de rétro closes. Ce fichier est collé dans le compte-rendu de réunion sur SharePoint ; GitHub Projects remplace la liste de suivi.
 
 ### AD-18 — Rôles = casquettes tournantes en binôme, documentées a posteriori
 
 - **Binds:** process, `docs/team/`
 - **Prevents:** un goulet unique ; une organisation figée avant d'être connue ; rien à montrer au jury sur l'ajustement.
-- **Rule:** chaque casquette (Pilote, Découpeur, Intégrateur, Gardien des tests, Gardien du design, Spécialiste 3D) a **deux** titulaires ; `docs/archive/ROLES.md` est mis à jour quand un rôle change ; une rétro d'organisation est consignée dans `docs/team/retros/<date>.md` à chaque rendez-vous école, ses actions en issues `label:organisation`.
+- **Rule:** les casquettes (Pilote, Découpeur, Intégrateur, Gardien des tests, Gardien du design, Spécialiste 3D) sont prises selon les besoins ; seul le Découpeur est attribué formellement (DECISIONS, phase 2), et tout changement d'attribution se note dans `docs/DECISIONS.md` ou la rétro, jamais un nom de personne dans la doc. Une rétro d'organisation est consignée dans `docs/team/retros/<date>.md` à chaque rendez-vous école, ses actions en issues `label:organisation`. *(Amendé le 2026-09-25.)*
 
 ### AD-19 — Enveloppe Supabase gratuite : keep-alive, export hebdomadaire, budget par bucket
 
 - **Binds:** ops, `.github/workflows/`, `supabase/`, Storage
 - **Prevents:** le projet `demo` en pause le jour du jury (pause après 7 jours d'inactivité) ; la base comme seule copie du contenu sans sauvegarde ; le Storage (1 Go) saturé par un seul type de média.
-- **Rule:** `dev` et `demo` sont les deux projets actifs autorisés ; une Action hebdomadaire interroge les deux (keep-alive) ; une Action hebdomadaire exporte `supabase db dump` + les buckets en artefact conservé ; budgets Storage : `tiles` 150 Mo, `audio` 400 Mo, `images` 200 Mo, `models` 200 Mo, vérifiés par `tools/media` ; base ≤ 500 Mo. Toute évolution (plan payant, autre hébergeur) passe par amendement.
+- **Rule:** `dev` et `demo` sont les deux projets actifs autorisés ; une Action hebdomadaire interroge les deux (keep-alive) ; une Action hebdomadaire exporte `supabase db dump` + les buckets en artefact conservé ; budgets Storage : `tiles` 150 Mo, `audio` 400 Mo, `images` 200 Mo, `models` 200 Mo, vérifiés par `tools/media_push` ; base ≤ 500 Mo. Toute évolution (plan payant, autre hébergeur) passe par amendement.
 
 ### AD-20 — L'état de session est une liste fermée dans `core/session` ; les comportements transverses sont des services de `core/`
 
@@ -244,7 +244,7 @@ graph LR
   M --> PG & AU & ST
   A --> PG & AU & ST
   C[content/ YAML] -- seed upsert --> PG
-  MD[dossier médias partagé] -- tools/media --> ST
+  MD[dossier médias partagé] -- tools/media_push --> ST
   GH[GitHub Actions] -- migrations · seed · keep-alive · export --> PG
   GH -- report --> SP[SharePoint · CR de réunion]
 ```
@@ -258,7 +258,7 @@ histolyon/
   .devcontainer/            # Flutter (fvm) + Android SDK + Supabase CLI + lefthook + melos préinstallés
   .github/
     workflows/              # ci-mobile, ci-admin, ci-supabase, ci-content, ci-docs, nightly-e2e ; report/keep-alive/export = Epic 10
-    ISSUE_TEMPLATE/story.md # = docs/archive/stories/TEMPLATE.md
+    ISSUE_TEMPLATE/tache.md # format court d'une issue (AD-12)
     PULL_REQUEST_TEMPLATE.md  # champs : issue liée, tests d'abord, assistance IA
   apps/
     mobile/                 # Flutter Android
@@ -290,14 +290,13 @@ histolyon/
   docs/
     ARCHITECTURE-SPINE.md    # cette spine — copie unique, source de vérité des règles
     ORGANISATION.md          # guide d'équipe narratif : pourquoi le dépôt est organisé ainsi
-    BOOTSTRAP.md             # comment le socle a été construit, étape par étape
     DECISIONS.md             # journal chronologique des décisions (pourquoi, jamais réécrit)
-    conventions/  guides/    # un sujet par fichier
-    specs/  stories/         # docs/archive/specs/spec-histolyon-socle/SPEC.md ; sprint-status.yaml + stories dans stories/
+    guides/                  # recettes, un sujet par fichier
+    archive/                 # historique du bootstrap (BOOTSTRAP, specs, stories BMAD) — pas une référence
     sprint/                  # reports/ (tools/report)
-    team/                    # ROLES.md, retros/
-  prompts/                  # dev-story, review, decoupe + checklist sans IA
-  tools/                    # ctx, gen-types, sync-agents, report, seed, media, tiles, check-tokens
+    team/                    # retros/
+  prompts/                  # écrire une issue, implémenter une issue, relire une PR
+  tools/                    # ctx, gen_types, sync_agents, report, seed, media_push, check_tokens, validate_content…
   env/                      # local.json, dev.json (demo.json hors dépôt)
 ```
 
@@ -314,7 +313,7 @@ histolyon/
 | D7 Audio et narration | `mobile/features/audio`, `core/audio_player`, bucket `audio` | AD-9, AD-20 |
 | D8 3D et AR | `mobile/features/immersion`, bucket `models` | AD-11 |
 | D9 Communauté | `mobile/features/communaute`, RLS I2/I3/I5, RPC de modération | AD-2, AD-6 |
-| D10 Production de contenu | `content/`, `tools/seed`, `tools/media`, puis `apps/admin` | AD-7, AD-6, AD-1, AD-3 |
+| D10 Production de contenu | `content/`, `tools/seed`, `tools/media_push`, puis `apps/admin` | AD-7, AD-6, AD-1, AD-3 |
 | D11 Surfaces hors-app | `mobile/features/partage`, `core/share`, table `lien_universel` ; page publique différée | AD-4, AD-6, Deferred |
 | Comportements transverses | `mobile/core/*` | AD-20 |
 | Organisation & suivi | GitHub, `docs/`, `prompts/`, `tools/report` | AD-12 → AD-18 |

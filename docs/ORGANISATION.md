@@ -1,5 +1,7 @@
 # HistoLyon — Comment on en est arrivés à cette organisation
 
+> **Mis à jour le 2026-09-25.** Ce guide raconte comment l'organisation est née. Depuis, deux ajustements (voir `docs/DECISIONS.md`, phases 2 et 3) : BMAD n'est plus utilisé pour produire des stories, remplacées par des **issues courtes** (`.github/ISSUE_TEMPLATE/tache.md`) ; le code est écrit pour Android **et** iOS. Les étapes pratiques (§ 8, Annexe A) sont à jour ; pour le détail des règles, `AGENTS.md` fait foi.
+
 *Guide de l'équipe. Il se lit dans l'ordre, une fois, en 25 minutes : chaque partie découle de la précédente, et à la fin le dépôt, la façon de travailler et les rôles n'ont plus besoin d'être expliqués — ils sont la conséquence de ce qui précède. Les règles techniques détaillées sont dans `docs/ARCHITECTURE-SPINE.md` ; ce guide raconte pourquoi elles existent.*
 
 ---
@@ -28,7 +30,7 @@ Tout ce qui suit répond à cette question, une contrainte à la fois.
 - **Pas de backend à écrire : Supabase.** C'est une base Postgres hébergée, avec l'authentification, le stockage de fichiers et les règles d'accès fournis. Notre « backend », c'est le schéma de la base et quelques fonctions SQL. Gratuit, dans des limites qu'on gère (deux projets maximum, on y revient).
 - **Une carte sans clé d'API : MapLibre**, avec un fond de carte de Lyon dans un seul fichier (`lyon.pmtiles`) qu'on héberge nous-mêmes. Un style de carte par époque : le slider ne fait que changer de style.
 - **Le contenu commence en fichiers.** Les premiers pins, parcours et époques sont des fichiers YAML dans le dépôt, chargés en base par un script. Ça évite de devoir finir huit écrans de back-office avant de voir le premier pin sur la carte. Le back-office prendra le relais plus tard.
-- **Android seulement** : pas de Mac, pas de licence Apple. iOS attendra.
+- **Android d'abord** : pas de Mac ni de licence Apple, donc ni build ni test iOS pour l'instant. Le code est quand même écrit pour les deux (toute API Android-only se marque `// DETTE-IOS:`).
 
 *Ce que ça implique pour toi : il y a une chose à apprendre, Flutter, et le dépôt contient des guides-recettes pour ça. Tu n'auras jamais à écrire un serveur.*
 
@@ -44,7 +46,7 @@ Une story, c'est : « afficher le pin sur la carte », « ajouter la colonne `ep
 
 **Comment on découpe.** On suit la conception, qui est déjà organisée en onze domaines (D1 Carte, D2 Pins, D3 Parcours… D11 Surfaces hors-app) et en sous-domaines (D1.2 Slider d'époques). Un domaine = un domaine de travail. Un sous-domaine = un **épic**. Un épic = quelques stories. Le jury peut suivre une ligne continue de la conception au code.
 
-**Qui découpe.** Découper bien, c'est un vrai travail : c'est une **casquette** — le Découpeur — tenue par deux personnes, avec une méthode outillée (BMAD) qui produit les briefs à partir de la conception. Les autres n'ont pas besoin de cette méthode : pour eux, une story est juste une tâche bien écrite.
+**Qui découpe.** Découper bien, c'est un vrai travail : c'est une **casquette** — le Découpeur — tenue par le porteur, qui écrit les briefs (issues courtes, `prompts/ecrire-une-issue.md`) à partir de la conception. Les autres n'ont pas besoin de cette méthode : pour eux, une story est juste une tâche bien écrite.
 
 *Ce que ça implique pour toi : tu ne prends jamais « une fonctionnalité », tu prends une story. Tu n'as jamais à deviner : si le brief ne suffit pas, tu le dis au Découpeur.*
 
@@ -140,7 +142,7 @@ Maintenant, chaque dossier a une raison d'être que tu viens de lire.
 | --- | --- | --- | --- |
 | `AGENTS.md` | § 6 | Les règles en une page, pour humains et IA. | Toujours en premier. Ses copies (`CLAUDE.md`, `.cursor/`, `.github/copilot-instructions.md`) ne s'éditent jamais. |
 | `conception/` | § 0, § 6 | Le quoi. | Par extrait, via `tools/ctx`, quand ta story le cite. |
-| `docs/` | § 6 | Règles d'architecture (`ARCHITECTURE-SPINE.md`), conventions, guides, stories, suivi de sprint, équipe (`team/ROLES.md`, `team/retros/`). | Quand ta story cite un guide ; le Découpeur et le Pilote y écrivent. |
+| `docs/` | § 6 | Règles d'architecture (`ARCHITECTURE-SPINE.md`), journal des décisions, guides, suivi de sprint, rétros (`team/retros/`) ; l'historique du bootstrap dans `archive/`. | Quand ta story cite un guide ; le Découpeur et le Pilote y écrivent. |
 | `apps/mobile/` | § 1, § 4b | L'app Android. `lib/features/<domaine>/` = ta zone, en trois couches ; `lib/core/` = le partagé ; `lib/app/` = l'assemblage. | Presque toutes les stories D1–D9, D11. |
 | `apps/admin/` | § 1 | Le back-office, en Flutter Web, même structure. | Les stories D10, après le premier pin. |
 | `packages/` | § 1, § 4b | Partagé par les deux apps : `design_tokens` (couleurs, typos de la maquette, mêmes noms que Figma), `ui_kit` (les composants de la maquette), `api_types` (**généré** depuis la base), `map_styles` (un fond de carte par époque). | Rarement ; avec le Gardien du design. `api_types` se régénère, ne s'édite pas. |
@@ -157,12 +159,12 @@ Maintenant, chaque dossier a une raison d'être que tu viens de lire.
 
 Chaque étape vient d'un paragraphe ci-dessus.
 
-1. **Prendre** (§ 2, § 3). Dans le GitHub Project « HistoLyon », vue *par domaine*, choisis une issue ouverte et non assignée, dans un domaine que tu veux apprendre. Assigne-toi. Pas besoin de demander.
-2. **Lire** (§ 2, § 6). L'issue est le brief. Lis ce qu'elle cite — `tools/ctx D2.4` pour la conception — rien de plus. Si quelque chose manque : commente l'issue, mentionne le Découpeur, ne devine pas.
+1. **Prendre** (§ 2, § 3). Dans les issues GitHub, choisis une issue ouverte, non assignée et marquée `prête`, dans une zone ou un domaine que tu veux apprendre. Assigne-toi. Pas besoin de demander.
+2. **Lire** (§ 2, § 6). L'issue est le brief. Lis ce qu'elle cite — `dart run tools/ctx.dart D2.4` pour la conception — rien de plus. Si quelque chose manque : commente l'issue, mentionne le Découpeur, ne devine pas.
 3. **Brancher** (§ 3, § 4a) :
    ```bash
    git switch main && git pull
-   git switch -c story/D2.4-02-apercu-rapide     # story/<ID>-<slug>
+   git switch -c 42-apercu-rapide                # <n°issue>-<slug>
    ```
 4. **Tests d'abord** (§ 5). Écris les tests listés dans le brief. Ils sont rouges. C'est ton premier commit :
    ```bash
@@ -175,7 +177,7 @@ Chaque étape vient d'un paragraphe ci-dessus.
 
 **Pas fini à la fin de ta session ?** Pousse ta branche, écris dans l'issue où tu en es. Toi ou quelqu'un d'autre reprendra : c'est exactement pour ça que la story est petite et que le brief est complet (§ 2).
 
-**Avec une IA** (§ 5) : colle `docs/archive/prompts/dev-story.md` + le brief dans ton outil ; relis tout ; déclare-le dans la PR. Sans IA : `docs/archive/prompts/SANS-IA.md`.
+**Avec une IA** (§ 5) : donne-lui le numéro de l'issue et `prompts/implementer-une-issue.md` (les agents lisent `AGENTS.md` d'eux-mêmes) ; relis tout ; déclare-le dans la PR. Sans IA : suis `AGENTS.md`, « Ta mission type ».
 
 ---
 
@@ -183,7 +185,7 @@ Chaque étape vient d'un paragraphe ci-dessus.
 
 ### Les casquettes
 
-Au fil des paragraphes, des responsabilités sont apparues. Ce ne sont pas des postes : ce sont des **casquettes**, tenues à deux (pour que personne ne soit indispensable — § 0), pour une itération, et qui tournent. Personne n'est chef de personne ; la casquette dit juste à qui tu t'adresses. Qui tient quoi est dans `docs/archive/ROLES.md`, jamais ici.
+Au fil des paragraphes, des responsabilités sont apparues. Ce ne sont pas des postes : ce sont des **casquettes**, qui tournent, idéalement à deux pour que personne ne soit indispensable (§ 0). Personne n'est chef de personne ; la casquette dit juste à qui tu t'adresses. Seul le Découpeur est attribué formellement pour l'instant ; les autres se prennent selon les besoins, et un changement se note dans `docs/DECISIONS.md` ou la rétro, jamais un nom ici.
 
 | Née au § | Casquette | Tu t'adresses à elle quand… | Elle s'occupe de… |
 | --- | --- | --- | --- |
@@ -230,15 +232,15 @@ Rien de tout ça n'est figé. Une règle qui gêne se change — mais par écrit
 | melos | 8.7 | lancer les scripts sur tout le dépôt |
 | gh (GitHub CLI) | — | créer des PR depuis le terminal (optionnel) |
 
-Puis, une fois le socle en place :
+Le plus simple : ouvrir le dépôt dans le **devcontainer** (`.devcontainer/`), qui a déjà tous ces outils — voir `README.md`. Sinon, en natif :
 
 ```bash
 git clone git@github.com:Projet-decole/Histolyon.git && cd Histolyon
 flutter pub get            # les dépendances de tout le workspace
 lefthook install           # active les hooks git
-supabase start             # la base locale (Docker)
-supabase db reset          # rejoue les migrations et charge content/
+melos run local            # Supabase local : migrations, content/ chargé et publié
 melos run test             # tout doit être vert
+melos run app              # l'app dans le navigateur, http://localhost:8080
 ```
 
 Si tout est vert, tu es prêt. Sinon, ouvre une issue `socle` avec ce qui a cassé : c'est déjà une contribution.
@@ -272,5 +274,5 @@ Si tout est vert, tu es prêt. Sinon, ouvre une issue `socle` avec ce qui a cass
 | **Spine** | `docs/ARCHITECTURE-SPINE.md` : les règles d'architecture, chacune avec un identifiant `AD-n` stable (§ 9). |
 | **AGENTS.md** | Le fichier d'instructions unique, humains et IA (§ 6). |
 | **Casquette** | Une responsabilité tenue à deux pour une itération (§ 9). |
-| **BMAD** | La méthode outillée du Découpeur pour produire les stories. Personne d'autre n'a besoin de l'installer (§ 2). |
+| **BMAD** | La méthode outillée qui a servi à construire le socle (`docs/archive/`). Abandonnée ensuite pour les issues courtes ; personne n'a besoin de l'installer. |
 | **Rétro** | La rétrospective d'organisation, à chaque rendez-vous école (§ 9). |

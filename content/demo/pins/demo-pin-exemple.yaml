@@ -7,15 +7,15 @@
 # jamais atterrir en base aux côtés du contenu éditorial réel, y compris en
 # environnement dev via un futur `deploy-dev`.
 #
-# Objectif (Story 5.2) : montrer l'étendue de ce qu'un Pin peut porter
+# Objectif : montrer l'étendue de ce qu'un Pin peut porter
 # structurellement — teaser/narration/post-narratif (08-contenu/02-template-pin.yaml),
 # plusieurs Sources typées, un média audio avec licence, multi-époques (I8).
 #
 # Le "fait" raconté ci-dessous (un automate en forme de dragon, quai
 # Saint-Antoine, qui "chante encore" aujourd'hui) est volontairement
 # absurde et anachronique — personne ne peut le confondre avec un fait
-# réel sur Lyon. C'est délibéré : la Story 5.2 réelle (un vrai pin sourcé,
-# avec une vraie historienne) reste à faire séparément.
+# réel sur Lyon. C'est délibéré : le premier pin réel est
+# content/pins/cour-des-voraces.yaml.
 #
 # Empilement de sous-types en post_narratif (quiz + saviez-vous) : le
 # template lui-même déconseille ça pour un vrai Pin ("empilement de

@@ -52,4 +52,4 @@ Tu bloques ou l'issue n'est pas claire ? Écris un commentaire sur l'issue. Ne d
 
 ## Licences et données
 
-Chaque source a sa licence, documentée dans `content/sources/` et dans la colonne `licence` des médias. Le fond de carte OpenStreetMap (ODbL) et Protomaps impose une attribution visible en permanence. Aucun secret, aucune clé et aucun média n'est versionné dans ce dépôt.
+Chaque média a sa licence et son crédit (`content/medias.yaml`, colonne `licence` en base) ; chaque source cite son auteur et, pour un texte réutilisé, sa licence (`content/sources/`). Le fond de carte OpenStreetMap (ODbL) et Protomaps impose une attribution visible en permanence. Aucun secret, aucune clé et aucun média n'est versionné dans ce dépôt.
