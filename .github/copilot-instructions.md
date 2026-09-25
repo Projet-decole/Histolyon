@@ -45,6 +45,7 @@ On te donne un numéro d'issue, par exemple « implémente l'issue #12 ». Voici
 - `melos run gen` : `build_runner` (Riverpod, Drift) après avoir modifié un `@riverpod` ou `schema.drift`.
 - `supabase start`, puis `supabase db reset` (rejoue les migrations) et `supabase test db` (pgTAP).
 - `dart run tools/seed.dart` : charge `content/` en base locale. `dart run tools/gen_types.dart` : régénère `packages/api_types` après une migration. Les deux demandent `SUPABASE_URL` et `SUPABASE_SERVICE_ROLE_KEY`, à lire dans `supabase status`.
+- `dart run tools/publier_local.dart` : en local uniquement, publie tous les pins et parcours seedés (sinon la RLS les masque dans l'app).
 - `dart run tools/ctx.dart <ID>` : extrait de conception (`D1.2`, `I6`, `15-maquette`…).
 - `flutter run --dart-define-from-file=env/local.json` (depuis `apps/mobile/`) : lance l'app sur la base locale.
 - `dart run tools/sync_agents.dart` : régénère `CLAUDE.md` et les autres fichiers dérivés. À lancer après toute modification d'un `AGENTS.md`.

@@ -14,6 +14,7 @@ flutter pub get && lefthook install
 supabase start && supabase db reset          # base locale avec le schéma complet
 eval "$(supabase status -o env | sed -n 's/^API_URL=/export SUPABASE_URL=/p; s/^SERVICE_ROLE_KEY=/export SUPABASE_SERVICE_ROLE_KEY=/p')"
 dart run tools/seed.dart                     # charge époques, catégories, pins
+dart run tools/publier_local.dart            # publie tout en local pour que l'app le voie
 melos run test                               # tout doit être vert
 cd apps/mobile && flutter run --dart-define-from-file=../../env/local.json
 ```
