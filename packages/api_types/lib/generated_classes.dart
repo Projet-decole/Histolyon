@@ -1138,6 +1138,7 @@ class Media implements SupadartClass<Media> {
   final TYPE_MEDIA type;
   final String cheminStorage;
   final String credit;
+  final String licence;
   final String? legende;
   final String? description;
   final int ordre;
@@ -1149,6 +1150,7 @@ class Media implements SupadartClass<Media> {
     required this.type,
     required this.cheminStorage,
     required this.credit,
+    required this.licence,
     this.legende,
     this.description,
     required this.ordre,
@@ -1161,6 +1163,7 @@ class Media implements SupadartClass<Media> {
   static String get c_type => 'type';
   static String get c_cheminStorage => 'chemin_storage';
   static String get c_credit => 'credit';
+  static String get c_licence => 'licence';
   static String get c_legende => 'legende';
   static String get c_description => 'description';
   static String get c_ordre => 'ordre';
@@ -1180,6 +1183,7 @@ class Media implements SupadartClass<Media> {
     TYPE_MEDIA? type,
     String? cheminStorage,
     String? credit,
+    String? licence,
     String? legende,
     String? description,
     int? ordre,
@@ -1191,6 +1195,7 @@ class Media implements SupadartClass<Media> {
       if (type != null) 'type': type.toString().split('.').last,
       if (cheminStorage != null) 'chemin_storage': cheminStorage,
       if (credit != null) 'credit': credit,
+      if (licence != null) 'licence': licence,
       if (legende != null) 'legende': legende,
       if (description != null) 'description': description,
       if (ordre != null) 'ordre': ordre,
@@ -1204,6 +1209,7 @@ class Media implements SupadartClass<Media> {
     required TYPE_MEDIA type,
     required String cheminStorage,
     required String credit,
+    required String licence,
     String? legende,
     String? description,
     int? ordre,
@@ -1215,6 +1221,7 @@ class Media implements SupadartClass<Media> {
       type: type,
       cheminStorage: cheminStorage,
       credit: credit,
+      licence: licence,
       legende: legende,
       description: description,
       ordre: ordre,
@@ -1228,6 +1235,7 @@ class Media implements SupadartClass<Media> {
     TYPE_MEDIA? type,
     String? cheminStorage,
     String? credit,
+    String? licence,
     String? legende,
     String? description,
     int? ordre,
@@ -1239,6 +1247,7 @@ class Media implements SupadartClass<Media> {
       type: type,
       cheminStorage: cheminStorage,
       credit: credit,
+      licence: licence,
       legende: legende,
       description: description,
       ordre: ordre,
@@ -1257,6 +1266,7 @@ class Media implements SupadartClass<Media> {
           ? jsonn['chemin_storage'].toString()
           : '',
       credit: jsonn['credit'] != null ? jsonn['credit'].toString() : '',
+      licence: jsonn['licence'] != null ? jsonn['licence'].toString() : '',
       legende: jsonn['legende'] != null ? jsonn['legende'].toString() : null,
       description: jsonn['description'] != null
           ? jsonn['description'].toString()
@@ -1275,6 +1285,7 @@ class Media implements SupadartClass<Media> {
       type: type,
       cheminStorage: cheminStorage,
       credit: credit,
+      licence: licence,
       legende: legende,
       description: description,
       ordre: ordre,
@@ -1290,6 +1301,7 @@ class FragmentMusical implements SupadartClass<FragmentMusical> {
   final String epoqueId;
   final String cheminStorage;
   final String credit;
+  final String licence;
   final String? description;
   final DateTime createdAt;
 
@@ -1300,6 +1312,7 @@ class FragmentMusical implements SupadartClass<FragmentMusical> {
     required this.epoqueId,
     required this.cheminStorage,
     required this.credit,
+    required this.licence,
     this.description,
     required this.createdAt,
   });
@@ -1311,6 +1324,7 @@ class FragmentMusical implements SupadartClass<FragmentMusical> {
   static String get c_epoqueId => 'epoque_id';
   static String get c_cheminStorage => 'chemin_storage';
   static String get c_credit => 'credit';
+  static String get c_licence => 'licence';
   static String get c_description => 'description';
   static String get c_createdAt => 'created_at';
 
@@ -1329,6 +1343,7 @@ class FragmentMusical implements SupadartClass<FragmentMusical> {
     String? epoqueId,
     String? cheminStorage,
     String? credit,
+    String? licence,
     String? description,
     DateTime? createdAt,
   }) {
@@ -1339,6 +1354,7 @@ class FragmentMusical implements SupadartClass<FragmentMusical> {
       if (epoqueId != null) 'epoque_id': epoqueId,
       if (cheminStorage != null) 'chemin_storage': cheminStorage,
       if (credit != null) 'credit': credit,
+      if (licence != null) 'licence': licence,
       if (description != null) 'description': description,
       if (createdAt != null) 'created_at': createdAt.toUtc().toIso8601String(),
     };
@@ -1351,6 +1367,7 @@ class FragmentMusical implements SupadartClass<FragmentMusical> {
     required String epoqueId,
     required String cheminStorage,
     required String credit,
+    required String licence,
     String? description,
     DateTime? createdAt,
   }) {
@@ -1361,6 +1378,7 @@ class FragmentMusical implements SupadartClass<FragmentMusical> {
       epoqueId: epoqueId,
       cheminStorage: cheminStorage,
       credit: credit,
+      licence: licence,
       description: description,
       createdAt: createdAt,
     );
@@ -1373,6 +1391,7 @@ class FragmentMusical implements SupadartClass<FragmentMusical> {
     String? epoqueId,
     String? cheminStorage,
     String? credit,
+    String? licence,
     String? description,
     DateTime? createdAt,
   }) {
@@ -1383,6 +1402,7 @@ class FragmentMusical implements SupadartClass<FragmentMusical> {
       epoqueId: epoqueId,
       cheminStorage: cheminStorage,
       credit: credit,
+      licence: licence,
       description: description,
       createdAt: createdAt,
     );
@@ -1398,6 +1418,7 @@ class FragmentMusical implements SupadartClass<FragmentMusical> {
           ? jsonn['chemin_storage'].toString()
           : '',
       credit: jsonn['credit'] != null ? jsonn['credit'].toString() : '',
+      licence: jsonn['licence'] != null ? jsonn['licence'].toString() : '',
       description: jsonn['description'] != null
           ? jsonn['description'].toString()
           : null,
@@ -1415,6 +1436,7 @@ class FragmentMusical implements SupadartClass<FragmentMusical> {
       epoqueId: epoqueId,
       cheminStorage: cheminStorage,
       credit: credit,
+      licence: licence,
       description: description,
       createdAt: createdAt,
     );
@@ -2365,6 +2387,7 @@ class Modele3d implements SupadartClass<Modele3d> {
   final String epoqueId;
   final String? pinId;
   final String cheminStorage;
+  final String licence;
   final Geometry? ancrage;
   final double? capDegres;
   final double echelle;
@@ -2378,6 +2401,7 @@ class Modele3d implements SupadartClass<Modele3d> {
     required this.epoqueId,
     this.pinId,
     required this.cheminStorage,
+    required this.licence,
     this.ancrage,
     this.capDegres,
     required this.echelle,
@@ -2392,6 +2416,7 @@ class Modele3d implements SupadartClass<Modele3d> {
   static String get c_epoqueId => 'epoque_id';
   static String get c_pinId => 'pin_id';
   static String get c_cheminStorage => 'chemin_storage';
+  static String get c_licence => 'licence';
   static String get c_ancrage => 'ancrage';
   static String get c_capDegres => 'cap_degres';
   static String get c_echelle => 'echelle';
@@ -2413,6 +2438,7 @@ class Modele3d implements SupadartClass<Modele3d> {
     String? epoqueId,
     String? pinId,
     String? cheminStorage,
+    String? licence,
     Geometry? ancrage,
     double? capDegres,
     double? echelle,
@@ -2426,6 +2452,7 @@ class Modele3d implements SupadartClass<Modele3d> {
       if (epoqueId != null) 'epoque_id': epoqueId,
       if (pinId != null) 'pin_id': pinId,
       if (cheminStorage != null) 'chemin_storage': cheminStorage,
+      if (licence != null) 'licence': licence,
       if (ancrage != null)
         'ancrage': ancrage.toBytesHex(format: WKB.geometryExtended),
       if (capDegres != null) 'cap_degres': capDegres,
@@ -2442,6 +2469,7 @@ class Modele3d implements SupadartClass<Modele3d> {
     required String epoqueId,
     String? pinId,
     required String cheminStorage,
+    required String licence,
     Geometry? ancrage,
     double? capDegres,
     double? echelle,
@@ -2455,6 +2483,7 @@ class Modele3d implements SupadartClass<Modele3d> {
       epoqueId: epoqueId,
       pinId: pinId,
       cheminStorage: cheminStorage,
+      licence: licence,
       ancrage: ancrage,
       capDegres: capDegres,
       echelle: echelle,
@@ -2470,6 +2499,7 @@ class Modele3d implements SupadartClass<Modele3d> {
     String? epoqueId,
     String? pinId,
     String? cheminStorage,
+    String? licence,
     Geometry? ancrage,
     double? capDegres,
     double? echelle,
@@ -2483,6 +2513,7 @@ class Modele3d implements SupadartClass<Modele3d> {
       epoqueId: epoqueId,
       pinId: pinId,
       cheminStorage: cheminStorage,
+      licence: licence,
       ancrage: ancrage,
       capDegres: capDegres,
       echelle: echelle,
@@ -2501,6 +2532,7 @@ class Modele3d implements SupadartClass<Modele3d> {
       cheminStorage: jsonn['chemin_storage'] != null
           ? jsonn['chemin_storage'].toString()
           : '',
+      licence: jsonn['licence'] != null ? jsonn['licence'].toString() : '',
       ancrage: jsonn['ancrage'] != null
           ? GeometryBuilder.decodeHex(
               jsonn['ancrage'].toString(),
@@ -2530,6 +2562,7 @@ class Modele3d implements SupadartClass<Modele3d> {
       epoqueId: epoqueId,
       pinId: pinId,
       cheminStorage: cheminStorage,
+      licence: licence,
       ancrage: ancrage,
       capDegres: capDegres,
       echelle: echelle,

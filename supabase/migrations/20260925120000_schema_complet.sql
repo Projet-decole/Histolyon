@@ -139,6 +139,8 @@ create table media (
     type type_media not null,
     chemin_storage text not null check (chemin_storage <> ''),
     credit text not null check (credit <> ''),
+    -- Licence obligatoire (docs : conventions, licences), ex. 'CC-BY-SA 4.0'.
+    licence text not null check (licence <> ''),
     legende text,
     description text,
     ordre integer not null default 0,
@@ -159,6 +161,7 @@ create table modele_3d (
     epoque_id uuid not null references epoque (id),
     pin_id uuid references pin (id) on delete set null,
     chemin_storage text not null check (chemin_storage <> ''),
+    licence text not null check (licence <> ''),
     -- Ancrage AR (latitude, longitude, altitude) ; absent = consultation 3D seule.
     ancrage geography (pointz, 4326),
     -- Orientation du modèle en degrés par rapport au nord, pour l'AR.
@@ -186,6 +189,7 @@ create table fragment_musical (
     epoque_id uuid not null references epoque (id),
     chemin_storage text not null check (chemin_storage <> ''),
     credit text not null check (credit <> ''),
+    licence text not null check (licence <> ''),
     description text,
     created_at timestamptz not null default now()
 );
