@@ -1,7 +1,6 @@
-# Hooks Git (Story 9.1, AD-14) : une erreur doit être visible avant qu'un
-# autre membre la voie. Nécessite le binaire lefthook (https://lefthook.dev)
-# puis `lefthook install` — non vérifié en exécution réelle dans cet
-# environnement (binaire absent).
+# Hooks Git (AD-14) : une erreur doit être visible avant qu'un autre membre
+# la voie. lefthook est installé dans le devcontainer ; ailleurs,
+# https://lefthook.dev puis `lefthook install`.
 #
 # Simplifications assumées faute d'outillage existant à ce stade du
 # bootstrap (à réviser quand les stories citées existent) :
@@ -13,7 +12,9 @@
 #   modifié n'existe encore dans `tools/`.
 
 pre-commit:
-  parallel: true
+  # Séquentiel : `format` réécrit les fichiers stagés, `analyze` doit lire
+  # leur version finale.
+  parallel: false
   commands:
     format:
       glob: "*.dart"

@@ -217,6 +217,15 @@ List<Violation> _validerContreSchema(
             "'$_champLocalisation' doit être {lat: <num>, lon: <num>}.",
           ),
         );
+      } else if ((valeur['lat'] as num).abs() > 90 ||
+          (valeur['lon'] as num).abs() > 180) {
+        violations.add(
+          Violation(
+            chemin,
+            "'$_champLocalisation' hors bornes : lat dans [-90, 90], lon dans "
+            '[-180, 180] (lat et lon inversées ?).',
+          ),
+        );
       }
       continue;
     }

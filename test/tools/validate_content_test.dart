@@ -213,6 +213,25 @@ localisation: "45.76,4.83"
       );
     });
 
+    test('localisation hors bornes (lat/lon inversées) -> refus (1)', () {
+      File('${tempDir.path}/content/pins/hors-bornes.yaml')
+          .writeAsStringSync('''
+id: 969de5f0-ae71-4869-ac48-fbff8134d677
+slug: demo
+titre: Demo
+categorie: anecdote
+contenu_narratif:
+  teaser: t
+localisation:
+  lat: 4.83
+  lon: 245.76
+''');
+      expect(
+        evaluerValidationContent(contentExiste: true, schemaExiste: true),
+        1,
+      );
+    });
+
     test('epoques qui ne sont pas une liste de slugs -> refus (1)', () {
       File('${tempDir.path}/content/pins/mauvaises-epoques.yaml')
           .writeAsStringSync('''

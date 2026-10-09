@@ -1,27 +1,15 @@
 // Tests boîte noire de `tools/sync_agents.dart` (AD-14/NFR6).
 //
-// Même contrainte et même approche que `test/tools/ctx_test.dart` (Story
-// 2.2) : le script n'expose aucune API publique -- écrit volontairement sans
-// dépendance pub externe (dart:io seul) -- donc la seule surface testable
-// est son contrat CLI (stdout/stderr/exitCode/fichiers écrits). Ce fichier
-// suit la même contrainte plutôt que d'ajouter `package:test` comme
-// dépendance du workspace racine.
-//
-// Usage : dart test/tools/sync_agents_test.dart (depuis la racine du
-// workspace ; c'est aussi le répertoire de travail utilisé par `dart test`).
+// Le script n'expose aucune API publique : on teste son contrat CLI
+// (stdout/stderr/exitCode/fichiers écrits) dans de vrais `test()`, pour
+// qu'un échec fasse échouer `dart test` (et donc la CI).
 
 import 'dart:io';
 
-int _failures = 0;
+import 'package:test/test.dart';
 
-void _check(String description, bool condition) {
-  if (condition) {
-    stdout.writeln('  OK   $description');
-  } else {
-    stdout.writeln('  FAIL $description');
-    _failures++;
-  }
-}
+void _check(String description, bool condition) =>
+    expect(condition, isTrue, reason: description);
 
 ProcessResult _run(String scriptPath, String cwd) {
   return Process.runSync('dart', [scriptPath], workingDirectory: cwd);
@@ -31,22 +19,15 @@ void main() {
   final repoRoot = Directory.current.path;
   final scriptPath = '$repoRoot/tools/sync_agents.dart';
 
-  if (!File(scriptPath).existsSync()) {
-    stderr.writeln(
-      'test/tools/sync_agents_test.dart: tools/sync_agents.dart introuvable '
-      'depuis $repoRoot -- exécuter depuis la racine du workspace '
-      '(dart test/tools/sync_agents_test.dart).',
-    );
-    exitCode = 1;
-    return;
-  }
+  test('le script existe (lancer depuis la racine du workspace)', () {
+    expect(File(scriptPath).existsSync(), isTrue);
+  });
 
   final claudeFile = File('$repoRoot/CLAUDE.md');
   final cursorFile = File('$repoRoot/.cursor/rules/histolyon.mdc');
   final copilotFile = File('$repoRoot/.github/copilot-instructions.md');
 
-  stdout.writeln('-- découverte des AGENTS.md réels --');
-  {
+  test('découverte des AGENTS.md réels', () {
     final result = _run(scriptPath, repoRoot);
     final out = result.stdout as String;
     _check('exit code 0', result.exitCode == 0);
@@ -83,10 +64,9 @@ void main() {
       claudeContent.contains('`AGENTS.md#jamais`') ||
           claudeContent.contains('`AGENTS.md`'),
     );
-  }
+  });
 
-  stdout.writeln('-- idempotence --');
-  {
+  test('idempotence', () {
     final first = _run(scriptPath, repoRoot);
     final firstClaude = claudeFile.readAsStringSync();
     final firstCursor = cursorFile.readAsStringSync();
@@ -105,10 +85,9 @@ void main() {
       '.github/copilot-instructions.md inchangé',
       firstCopilot == secondCopilot,
     );
-  }
+  });
 
-  stdout.writeln('-- propagation d\'un changement source (fixture isolée) --');
-  {
+  test("propagation d'un changement source (fixture isolée)", () {
     final fixtureRoot = Directory.systemTemp.createTempSync(
       'sync_agents_test_propagation_',
     );
@@ -159,10 +138,9 @@ void main() {
     } finally {
       fixtureRoot.deleteSync(recursive: true);
     }
-  }
+  });
 
-  stdout.writeln('-- garde-fou de répertoire (pubspec.yaml absent) --');
-  {
+  test('garde-fou de répertoire (pubspec.yaml absent)', () {
     final fixtureRoot = Directory.systemTemp.createTempSync(
       'sync_agents_test_guard_',
     );
@@ -193,18 +171,10 @@ void main() {
     } finally {
       fixtureRoot.deleteSync(recursive: true);
     }
-  }
+  });
 
   // Remet les 3 fichiers générés réels dans leur état stable (dernière
   // exécution sur repoRoot, sans la fixture) pour ne pas laisser de diff
   // parasite après ce test.
   _run(scriptPath, repoRoot);
-
-  stdout.writeln();
-  if (_failures == 0) {
-    stdout.writeln('Tous les tests sont passés.');
-  } else {
-    stdout.writeln('$_failures test(s) en échec.');
-    exitCode = 1;
-  }
 }

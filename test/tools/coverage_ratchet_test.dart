@@ -40,4 +40,14 @@ end_of_record
       expect(comparerAuCliquet(actuelle: 79.999, reference: 80), 0);
     });
   });
+
+  test('lcov aux fins de ligne Windows (CRLF) lu sans exception', () {
+    expect(calculerCouverturePourcent('LF:10\r\nLH:5\r\n'), 50);
+  });
+
+  test('référence : vide -> 0, nombre -> valeur, illisible -> null', () {
+    expect(lireReference(''), 0.0);
+    expect(lireReference('82.5\n'), 82.5);
+    expect(lireReference('quatre-vingts'), isNull);
+  });
 }

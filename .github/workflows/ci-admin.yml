@@ -7,6 +7,9 @@ on:
       - "pubspec.yaml"
       - "pubspec.lock"
       - "tools/coverage_ratchet.dart"
+      - "tools/check_import_direction.dart"
+      - "tools/check_tokens.dart"
+      - "packages/**"
       - ".github/workflows/ci-admin.yml"
 
 jobs:
@@ -28,6 +31,9 @@ jobs:
 
       - name: Analyse statique (workspace, cf. Story 1.5/AD-5)
         run: dart run melos run analyze
+
+      - name: Formatage (dart format)
+        run: dart format --output=none --set-exit-if-changed apps/admin packages
 
       - name: Tests + couverture
         working-directory: apps/admin
