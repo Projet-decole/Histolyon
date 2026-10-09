@@ -1,0 +1,10 @@
+# FICTIF — démonstration de la forme d'une entrée du manifeste
+# content/medias.yaml, pour le pin de content/demo/. Aucun fichier audio
+# n'existe : ce manifeste n'est lu par aucun outil.
+
+- media_slug: demo-pin-exemple-narration
+  bucket: audio
+  slug: demo-pin-exemple
+  fichier: narration.m4a
+  licence: "CC0 — voix de démonstration synthétique, aucun ayant droit réel"
+  credit: "Narration de démonstration (texte-à-parole), projet HistoLyon"

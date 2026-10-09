@@ -63,7 +63,7 @@ Des `ConsumerWidget` qui font `ref.watch` sur les providers de `domain/`, sans i
 
 ## 6. Créer une feature qui n'existe pas encore
 
-1. Copie `features/carte/` sous le nouveau slug (fixé dans `AGENTS.md`, jamais inventé).
+1. Copie `features/carte/` sous le nouveau slug (fixé dans `AGENTS.md`, jamais inventé), puis renomme fichiers et symboles : `<slug>_ecran.dart`, `<slug>_routes.dart`, `<Slug>Ecran`, `<slug>Routes` (sinon `app/router.dart` voit deux `carteRoutes`). `carte` ne montre que `presentation/` : pour `data/` et `domain/`, suis les sections 1 et 2 ci-dessus.
 2. Ajoute le nom et le chemin de route dans `core/router/route_names.dart`.
 3. Branche `<slug>Routes` dans `app/router.dart`, soit dans une branche d'onglet, soit en plein écran. C'est la **seule** modification autorisée dans `app/`, et l'issue doit la mentionner.
 

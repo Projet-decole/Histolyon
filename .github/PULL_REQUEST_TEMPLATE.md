@@ -7,7 +7,8 @@ Closes #<numéro>
 ## Vérifié
 
 - [ ] Le premier commit contient les tests (rouges), le code vient après
-- [ ] `melos run analyze` et `melos run test` verts (+ `supabase test db` si `supabase/` touché)
+- [ ] `melos run analyze`, `melos run test` et `melos run format` verts (+ `supabase db reset && supabase test db` si `supabase/` touché)
+- [ ] Rien hors de la zone de l'issue (sinon signalé ci-dessus) ; fichiers générés régénérés, jamais édités à la main
 - [ ] Testé dans l'app (émulateur / Chrome) si c'est visible
 
 ## Assistance IA

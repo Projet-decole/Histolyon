@@ -23,7 +23,17 @@ insert into auth.users (id, email) values
     ('11111111-0000-0000-0000-000000000001', 'modo@histolyon.local'),
     ('11111111-0000-0000-0000-000000000002', 'quidam@histolyon.local');
 insert into membre_equipe (compte_id, role) values ('11111111-0000-0000-0000-000000000001', 'moderateur');
--- ... compte, categorie, pin, commentaire ...
+-- Chaîne de clés étrangères : compte (auteur) -> categorie -> pin -> commentaire.
+insert into compte (id, pseudonyme) values ('11111111-0000-0000-0000-000000000002', 'quidam');
+insert into categorie (id, slug, libelle, ordre) values ('22222222-0000-0000-0000-000000000001', 'test-cat', 'Cat', 1);
+insert into pin (id, slug, titre, categorie_id, statut) values ('33333333-0000-0000-0000-000000000001', 'test-pin', 'Pin', '22222222-0000-0000-0000-000000000001', 'publie');
+insert into commentaire (id, pin_id, auteur_id, contenu) values
+    ('<id>', '33333333-0000-0000-0000-000000000001', '11111111-0000-0000-0000-000000000002', 'En attente'),
+    ('<id-publie>', '33333333-0000-0000-0000-000000000001', '11111111-0000-0000-0000-000000000002', 'Déjà publié');
+-- Statut de départ d'une fixture : même drapeau que les RPC (test uniquement).
+select set_config('histolyon.transition_autorisee', 'on', true);
+update commentaire set statut = 'publie' where id = '<id-publie>';
+select set_config('histolyon.transition_autorisee', 'off', true);
 
 -- 1. Rejet d'un appelant non autorisé
 select set_config('request.jwt.claim.sub', '11111111-0000-0000-0000-000000000002', true);
@@ -35,7 +45,8 @@ select lives_ok($$ select commentaire_publier('<id>'::uuid) $$, 'le modérateur 
 select is((select statut::text from commentaire where id = '<id>'), 'publie', 'statut publie');
 select is((select count(*)::int from trace_moderation where cible_id = '<id>'), 1, 'trace écrite');
 
--- 4. (dans un autre test) rejet si le statut de départ est mauvais
+-- 4. Rejet si le statut de départ est mauvais
+select throws_ok($$ select commentaire_publier('<id-publie>'::uuid) $$, 'P0001', null, 'refusé hors en_attente');
 
 select * from finish();
 rollback;
@@ -78,6 +89,9 @@ begin
 end;
 $$;
 
+-- Par défaut PostgreSQL accorde EXECUTE à PUBLIC : sans ce revoke, le grant
+-- ne restreint rien.
+revoke execute on function commentaire_publier(uuid) from public, anon;
 grant execute on function commentaire_publier(uuid) to authenticated;
 ```
 
@@ -91,6 +105,8 @@ grant execute on function commentaire_publier(uuid) to authenticated;
 supabase db reset && supabase test db                 # tout vert
 dart run tools/gen_types.dart                         # si une table ou une colonne a changé
 ```
+
+Nomme le fichier de test d'après ce qu'il vérifie (`rpc_<nom>.sql`, `i<n>_<invariant>.sql`). Un choix métier que la conception ne tranche pas s'ajoute à `docs/DECISIONS.md`.
 
 Une RPC seule ne change pas les types, donc pas besoin de `gen_types`. Un changement de table ou de colonne demande de committer le `packages/api_types` et le `content/schema/` régénérés dans la même PR.
 
