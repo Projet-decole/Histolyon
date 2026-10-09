@@ -119,7 +119,7 @@ final class ParcoursActifProvider
   }
 }
 
-String _$parcoursActifHash() => r'4d4fbcf940273cb75a8713151bb6f55fd94a762c';
+String _$parcoursActifHash() => r'1d4796c7374336fa0f4c16059e36e743fa6bd27f';
 
 /// Parcours en cours (identifiant), ou `null` hors parcours.
 

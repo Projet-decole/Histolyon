@@ -1,8 +1,11 @@
 /// Noms et chemins de routes (AD-5) : `core/router` ne fait que nommer, seul
 /// `app/router.dart` assemble les `GoRoute` exportées par les features.
 ///
-/// Naviguer d'une feature à une autre = `context.goNamed(RouteNames.x)`,
-/// jamais un import de l'autre feature.
+/// Naviguer d'une feature à une autre passe par ces noms, jamais par un import
+/// de l'autre feature :
+/// - vers un onglet : `context.goNamed(RouteNames.carte)` ;
+/// - vers un écran plein écran (`pin`, `modele3d`) : `context.pushNamed(...)`,
+///   pour garder les onglets dessous (bouton et geste retour).
 abstract final class RouteNames {
   // Onglets (surfaces principales S1-S3, conception/05-architecture-info.yaml).
   static const String carte = 'carte';

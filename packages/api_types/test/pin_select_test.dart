@@ -30,20 +30,23 @@ void main() {
           .select()
           .single();
 
-      final pinInsere = await client
-          .from(Pin.table_name)
-          .insert(
-            Pin.insert(
-              slug: 'test-gen-types-pin-$suffixe',
-              titre: 'Pin de test (tools/gen-types)',
-              categorieId: categorie['id'] as String,
-              contenuNarratif: {'texte': 'contenu de test'},
-            ),
-          )
-          .select()
-          .single();
-
+      // Nettoyage même si une insertion ou une assertion échoue — sinon un
+      // échec laisse le pin/catégorie de test orphelins en base locale.
+      Map<String, dynamic>? pinInsere;
       try {
+        pinInsere = await client
+            .from(Pin.table_name)
+            .insert(
+              Pin.insert(
+                slug: 'test-gen-types-pin-$suffixe',
+                titre: 'Pin de test (tools/gen-types)',
+                categorieId: categorie['id'] as String,
+                contenuNarratif: {'texte': 'contenu de test'},
+              ),
+            )
+            .select()
+            .single();
+
         final ligne = await client
             .from(Pin.table_name)
             .select()
@@ -56,9 +59,9 @@ void main() {
         expect(pin.provenance, PROVENANCE_PIN.editorial);
         expect(pin.localisation, isNull);
       } finally {
-        // Nettoyage même si une assertion échoue — sinon un échec laisse le
-        // pin/catégorie de test orphelins en base locale.
-        await client.from(Pin.table_name).delete().eq('id', pinInsere['id']);
+        if (pinInsere != null) {
+          await client.from(Pin.table_name).delete().eq('id', pinInsere['id']);
+        }
         await client
             .from(Categorie.table_name)
             .delete()

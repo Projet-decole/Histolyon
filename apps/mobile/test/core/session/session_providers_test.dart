@@ -47,4 +47,16 @@ void main() {
     container.read(lectureAudioProvider.notifier).definir(true);
     expect(container.read(lectureAudioProvider), isTrue);
   });
+
+  test("changer de parcours actif remet l'étape courante à null", () {
+    container.read(parcoursActifProvider.notifier).definir('parcours-1');
+    container.read(etapeCouranteProvider.notifier).definir(2);
+
+    container.read(parcoursActifProvider.notifier).definir('parcours-2');
+    expect(container.read(etapeCouranteProvider), isNull);
+
+    container.read(etapeCouranteProvider.notifier).definir(1);
+    container.read(parcoursActifProvider.notifier).definir(null);
+    expect(container.read(etapeCouranteProvider), isNull);
+  });
 }

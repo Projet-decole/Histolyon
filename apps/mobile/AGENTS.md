@@ -13,6 +13,7 @@ lib/
   core/session/             état transverse, liste FERMÉE : epoqueSelectionnee, parcoursActif, etapeCourante, pinCourant, modePresentation, lectureAudio
   core/supabase/            supabaseClientProvider (lu uniquement par les couches data/)
   core/db/                  base Drift locale (schema.drift : profil, preference, favori, historique_visite) + appDatabaseProvider
+  core/profile/             Profil local sans Compte (I6) : profilLocalIdProvider
   core/models/failure.dart  Result<T> = Ok | Err(Failure)
   core/log/                 logger (jamais print)
   features/<slug>/
@@ -22,7 +23,9 @@ lib/
     data/                             repository : Supabase / Drift → Result<T>
 ```
 
-Les features en squelette sont `carte`, `parcours` et `profil` (les onglets), plus `pins` (`/pin/:slug`) et `immersion` (`/modele-3d/:slug`), qui s'ouvrent en plein écran au-dessus des onglets.
+Les features en squelette sont `carte`, `parcours` et `profil` (les onglets), plus `pins` (`/pin/:slug`) et `immersion` (`/modele-3d/:slug`), qui s'ouvrent en plein écran au-dessus des onglets avec `context.pushNamed(...)` (le retour ramène aux onglets ; `goNamed` sert à changer d'onglet).
+
+Le thème (`app/theme.dart`, construit depuis `design_tokens`) et la locale `fr` sont posés à la composition root : une feature utilise `Theme.of(context)` ou les tokens, jamais une valeur en dur.
 
 ## Recette : une tranche de feature
 

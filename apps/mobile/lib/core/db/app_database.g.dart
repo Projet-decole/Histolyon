@@ -224,7 +224,7 @@ class Preference extends Table with TableInfo<Preference, PreferenceData> {
     false,
     type: DriftSqlType.string,
     requiredDuringInsert: true,
-    $customConstraints: 'NOT NULL REFERENCES profil(id)',
+    $customConstraints: 'NOT NULL REFERENCES profil(id)ON DELETE CASCADE',
   );
   static const VerificationMeta _cleMeta = const VerificationMeta('cle');
   late final GeneratedColumn<String> cle = GeneratedColumn<String>(
@@ -499,7 +499,7 @@ class Favori extends Table with TableInfo<Favori, FavoriData> {
     false,
     type: DriftSqlType.string,
     requiredDuringInsert: true,
-    $customConstraints: 'NOT NULL REFERENCES profil(id)',
+    $customConstraints: 'NOT NULL REFERENCES profil(id)ON DELETE CASCADE',
   );
   static const VerificationMeta _typeDeCibleMeta = const VerificationMeta(
     'typeDeCible',
@@ -878,7 +878,7 @@ class HistoriqueVisite extends Table
     false,
     type: DriftSqlType.string,
     requiredDuringInsert: true,
-    $customConstraints: 'NOT NULL REFERENCES profil(id)',
+    $customConstraints: 'NOT NULL REFERENCES profil(id)ON DELETE CASCADE',
   );
   static const VerificationMeta _typeEvenementMeta = const VerificationMeta(
     'typeEvenement',
@@ -889,7 +889,7 @@ class HistoriqueVisite extends Table
     false,
     type: DriftSqlType.string,
     requiredDuringInsert: true,
-    $customConstraints: 'NOT NULL',
+    $customConstraints: 'NOT NULL CHECK (type_evenement IN (\'consultation_pin\', \'etape_visitee\', \'parcours_engage\', \'parcours_termine\', \'resultat_quiz\'))',
   );
   static const VerificationMeta _typeDeCibleMeta = const VerificationMeta(
     'typeDeCible',
@@ -1399,6 +1399,10 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final Preference preference = Preference(this);
   late final Favori favori = Favori(this);
   late final HistoriqueVisite historiqueVisite = HistoriqueVisite(this);
+  late final Index historiqueVisiteProfilHorodatage = Index(
+    'historique_visite_profil_horodatage',
+    'CREATE INDEX historique_visite_profil_horodatage ON historique_visite (profil_id, horodatage)',
+  );
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -1408,7 +1412,32 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     preference,
     favori,
     historiqueVisite,
+    historiqueVisiteProfilHorodatage,
   ];
+  @override
+  StreamQueryUpdateRules get streamUpdateRules => const StreamQueryUpdateRules([
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'profil',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('preference', kind: UpdateKind.delete)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'profil',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('favori', kind: UpdateKind.delete)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'profil',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('historique_visite', kind: UpdateKind.delete)],
+    ),
+  ]);
 }
 
 typedef $ProfilCreateCompanionBuilder = ProfilCompanion Function({

@@ -14,6 +14,15 @@ class AppDatabase extends _$AppDatabase {
   @override
   int get schemaVersion => 1;
 
+  /// SQLite n'applique les clés étrangères (et donc les `ON DELETE CASCADE`
+  /// de schema.drift) que si on le lui demande, à chaque ouverture.
+  @override
+  MigrationStrategy get migration => MigrationStrategy(
+    beforeOpen: (details) async {
+      await customStatement('PRAGMA foreign_keys = ON');
+    },
+  );
+
   static QueryExecutor _ouvrirConnexion() {
     return driftDatabase(
       name: 'histolyon',
