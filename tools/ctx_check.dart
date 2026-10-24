@@ -203,7 +203,7 @@ Rapport verifie(Corpus c, {required CoutPack coutPack}) {
 void _verifieSource(Corpus c, Unit u, String s, void Function(Unit?, String) err) {
   final t = s.trim();
   if (t.startsWith('brief:') || t.startsWith('DEC-')) return;
-  final m = RegExp(r'^((?:conception|content|packages|produit|supabase)/[^:\s]+)(?::(\d+)(?:-(\d+))?)?(?:\s.*)?$').firstMatch(t);
+  final m = RegExp(r'^((?:(?:conception|content|packages|produit|supabase|apps|docs)/[^:\s]+|AGENTS\.md))(?::(\d+)(?:-(\d+))?)?(?:\s.*)?$').firstMatch(t);
   if (m == null) {
     err(u, 'source illisible "$t" (attendu chemin:ligne)');
     return;
