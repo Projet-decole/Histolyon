@@ -17,7 +17,8 @@ sources:
   - conception/07-ecrans/carte/02-apercu-pin.yaml:14
   - conception/08-contenu/04-microcopy-grand-public.yaml:321
   - conception/10-composants/04-shell.yaml:132
-images: []
+images:
+  - {etat: nominal, fichier: img/ECR-CARTE-APERCU-PIN--nominal@2x.png, node_figma: ""}
 budget_tokens: 2000
 derniere_verif: 2026-10-24
 ---

@@ -14,7 +14,8 @@ liens:
 anciens_ids: [E-TRANSVERSES-PARCOURS-PERSISTANT]
 sources:
   - conception/07-ecrans/transverses/02-parcours-persistant.yaml:15
-images: []
+images:
+  - {etat: audio_et_parcours, fichier: img/ECR-TRANSVERSES-PARCOURS-PERSISTANT--audio_et_parcours@2x.png, node_figma: ""}
 budget_tokens: 2000
 derniere_verif: 2026-10-24
 ---

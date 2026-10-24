@@ -15,7 +15,8 @@ anciens_ids: [E-PIN-CONSULTATION-APPROFONDIE]
 sources:
   - conception/07-ecrans/pin/01-consultation-approfondie.yaml:14
   - conception/08-contenu/04-microcopy-grand-public.yaml:360
-images: []
+images:
+  - {etat: nominal, fichier: img/ECR-PIN-CONSULTATION-APPROFONDIE--nominal@2x.png, node_figma: ""}
 budget_tokens: 2000
 derniere_verif: 2026-10-24
 ---

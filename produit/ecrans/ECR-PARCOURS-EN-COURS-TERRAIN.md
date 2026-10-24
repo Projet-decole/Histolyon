@@ -16,7 +16,8 @@ sources:
   - conception/07-ecrans/parcours/05-en-cours-terrain.yaml:16
   - conception/07-ecrans/parcours/07-saut-etape.yaml:16
   - conception/08-contenu/04-microcopy-grand-public.yaml:476
-images: []
+images:
+  - {etat: nominal, fichier: img/ECR-PARCOURS-EN-COURS-TERRAIN--nominal@2x.png, node_figma: ""}
 budget_tokens: 2000
 derniere_verif: 2026-10-24
 ---

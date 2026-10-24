@@ -17,7 +17,8 @@ sources:
   - conception/07-ecrans/transverses/04-dialogue-confirmation.yaml:17
   - conception/08-contenu/04-microcopy-grand-public.yaml:252
   - conception/11-reponse-parametrique/03-chorégraphies.yaml:206
-images: []
+images:
+  - {etat: abandon_parcours, fichier: img/ECR-TRANSVERSES-DIALOGUE-CONFIRMATION--abandon_parcours@2x.png, node_figma: ""}
 budget_tokens: 2000
 derniere_verif: 2026-10-24
 ---

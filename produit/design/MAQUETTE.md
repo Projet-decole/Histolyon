@@ -72,7 +72,14 @@ R9. **Nommage des états d’écran.** Cible : `ECR-<NOM>--<etat>` (double tiret
 Captures versionnées dans `produit/ecrans/img/`, nommées `ECR-<NOM>--<etat>@2x.png` (DEC-10). Chaque fiche d’écran les liste dans son champ `images` avec l’état, le fichier et le nœud Figma.
 
 ## Frames manquantes
-À compléter lors de l’import des images.
+Images importées le 24/10/2026 depuis l’export Figma (PNG 780 × 1688, soit 2× 390 × 844) : 13 frames dans `ecrans/img/`, liées dans le champ `images` de chaque fiche d’écran. Les node ids ne sont pas dans l’export : champ `node_figma` à renseigner.
+
+Frames absentes de l’export pour les écrans du MVP :
+- ECR-TRANSVERSES-BANDEAU-OFFLINE : pas de frame propre ; le bandeau se voit dans la frame `offline_avec_cache` de ECR-CARTE-PRINCIPALE.
+- ECR-PARCOURS-EN-COURS-TERRAIN : une seule frame (état nominal) ; l’état « étape sautée » et la fin partielle n’ont pas de frame.
+- ECR-PIN-CONSULTATION-APPROFONDIE, ECR-PIN-CONSULTATION-3D, ECR-PARCOURS-FICHE-DETAIL, ECR-PARCOURS-FIN-CELEBRATION, ECR-CARTE-APERCU-PIN : état nominal seulement (pas de frame chargement ni erreur).
+- ECR-TRANSVERSES-DIALOGUE-CONFIRMATION : instance « abandon de parcours » ; ECR-TRANSVERSES-MESSAGE-EPHEMERE : seule frame « lien copié » (instance de partage, hors MVP ; le message « Parcours abandonné » du MVP n’a pas de frame) ; ECR-TRANSVERSES-PARCOURS-PERSISTANT : frame audio + parcours (l’audio est hors MVP).
+- Écrans hors MVP exportés mais non copiés : recherche, filtres, alerte de proximité, communauté, profil, partage, éditeur, canapé, lancement, saut d’étape, AR, mode présentation.
 
 ## Ce qui n’est pas confirmé
 Les interactions câblées dans le prototype n’ont pas d’inventaire exhaustif : à tester dans Figma avant de supposer un enchaînement. La liste nominative des dix ancres de la page 07 n’est confirmée que pour la première.

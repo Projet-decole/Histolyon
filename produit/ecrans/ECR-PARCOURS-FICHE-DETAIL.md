@@ -15,7 +15,8 @@ anciens_ids: [E-PARCOURS-FICHE-DETAIL]
 sources:
   - conception/07-ecrans/parcours/03-fiche-detail.yaml:15
   - conception/08-contenu/04-microcopy-grand-public.yaml:440
-images: []
+images:
+  - {etat: nominal, fichier: img/ECR-PARCOURS-FICHE-DETAIL--nominal@2x.png, node_figma: ""}
 budget_tokens: 2000
 derniere_verif: 2026-10-24
 ---

@@ -16,7 +16,11 @@ anciens_ids: [E-CARTE-PRINCIPALE]
 sources:
   - conception/07-ecrans/carte/01-principale.yaml:14
   - conception/08-contenu/04-microcopy-grand-public.yaml:306
-images: []
+images:
+  - {etat: nominal_charge, fichier: img/ECR-CARTE-PRINCIPALE--nominal_charge@2x.png, node_figma: ""}
+  - {etat: chargement_initial, fichier: img/ECR-CARTE-PRINCIPALE--chargement_initial@2x.png, node_figma: ""}
+  - {etat: offline_avec_cache, fichier: img/ECR-CARTE-PRINCIPALE--offline_avec_cache@2x.png, node_figma: ""}
+  - {etat: parcours_en_cours, fichier: img/ECR-CARTE-PRINCIPALE--parcours_en_cours@2x.png, node_figma: ""}
 budget_tokens: 2000
 derniere_verif: 2026-10-24
 ---

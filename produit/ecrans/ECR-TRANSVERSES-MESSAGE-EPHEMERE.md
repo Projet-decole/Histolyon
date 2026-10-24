@@ -18,7 +18,8 @@ sources:
   - conception/08-contenu/04-microcopy-grand-public.yaml:278
   - conception/11-reponse-parametrique/03-chorégraphies.yaml:228
   - conception/11-reponse-parametrique/05-comportements-temporels-purs.yaml:37
-images: []
+images:
+  - {etat: lien_copie, fichier: img/ECR-TRANSVERSES-MESSAGE-EPHEMERE--lien_copie@2x.png, node_figma: ""}
 budget_tokens: 2000
 derniere_verif: 2026-10-24
 ---

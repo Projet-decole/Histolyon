@@ -16,7 +16,8 @@ anciens_ids: [E-PIN-CONSULTATION-3D]
 sources:
   - conception/07-ecrans/pin/03-consultation-3d.yaml:16
   - conception/08-contenu/04-microcopy-grand-public.yaml:387
-images: []
+images:
+  - {etat: nominal, fichier: img/ECR-PIN-CONSULTATION-3D--nominal@2x.png, node_figma: ""}
 budget_tokens: 2000
 derniere_verif: 2026-10-24
 ---
