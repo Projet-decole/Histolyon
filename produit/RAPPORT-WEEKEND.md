@@ -57,7 +57,7 @@ Les rédacteurs ont consigné leurs contradictions en `DEC-20…DEC-99` (statut 
 ## Blocages et réserves
 - Aucun blocage de plus de 3 itérations.
 - Les node ids Figma ne sont pas dans l’export d’images : `node_figma` est vide dans les fiches d’écran.
-- Contre-vérification : restent notamment (voir `decisions/_verif.md`) CAP-D1.2 R11 (indication du slider reprise alors que `QO-CONTENU` la dit écartée), CAP-D2.4 R9 (« Ce pin n’est plus disponible ») contre son écran qui le déclare sans objet, et l’image exigée par CAP-D2.4 R3 que l’écran rend optionnelle (QO-104). À arbitrer.
+- Contre-vérification : restent notamment (voir `decisions/_verif.md`) CAP-D1.2 R11 (indication du slider reprise alors que les questions du groupe contenu la dit écartée), CAP-D2.4 R9 (« Ce pin n’est plus disponible ») contre son écran qui le déclare sans objet, et l’image exigée par CAP-D2.4 R3 que l’écran rend optionnelle (QO-104). À arbitrer.
 - Quatre fiches de données ont été écrites par heredoc shell, 33 fiches S2 par script (déroge à la consigne « outil dédié d’abord » du CLAUDE.md global ; contenu inchangé).
 
 ## À regarder en priorité
