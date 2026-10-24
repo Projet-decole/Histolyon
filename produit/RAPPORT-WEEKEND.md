@@ -36,7 +36,7 @@ Outils : `tools/ctx.dart` v2 (`lire`, `pack`, `chercher`, `refs`, `liste`, `chem
 - Diff contre `origin/main` : uniquement `produit/**`, `tools/ctx.dart`, `tools/ctx_*.dart`, `test/tools/ctx_v2_*` (nouveaux). `dart analyze tools test/tools` propre ; `ctx_test`, `ctx_v2_test`, `ctx_v2_recherche_test` verts.
 
 ## Contradictions et décisions proposées (à valider)
-Les rédacteurs ont consigné leurs contradictions en `DEC-20…DEC-99` (statut `mvp`, « décision proposée »). Les plus importantes :
+Les rédacteurs ont consigné leurs contradictions en DEC-20 et suivants (plages par groupe) (statut `mvp`, « décision proposée »). Les plus importantes :
 - DEC-20 : « un seul style de carte » (DEC-06) contre « une apparence par époque » (D1.3) → un style, paramètres qui varient. DEC-82 : contredit `docs/ARCHITECTURE-SPINE.md:113`, à aligner hors `produit/`.
 - DEC-40 : l’écran « saut d’étape » n’est pas gardé ; un bouton « Sauter cette étape » sur l’écran du parcours (étape non complétée, DEC-09).
 - DEC-50 : un modèle 3D par pin, pas d’AR ; DEC-51 : la visionneuse masque son chrome (le mode présentation est hors MVP).
