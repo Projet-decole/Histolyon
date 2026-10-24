@@ -13,6 +13,7 @@
 // Option globale : `--produit <dossier>` (défaut `produit/`).
 
 import 'dart:io';
+import 'dart:math';
 
 import 'ctx_check.dart';
 import 'ctx_corpus.dart';
@@ -24,7 +25,7 @@ const _stop = {
   'quoi', 'ce', 'se', 'sur', 'si', 'on', 'est', 'a', 'en', 'pour', 'par',
   'dans', 'd', 'l', 'quel', 'quelle', 'quels', 'quelles', 'quand', 'comment',
   'au', 'aux', 'il', 'elle', 'qu', 'y', 'ne', 'pas', 'son', 'sa', 'ses',
-  'tape', 'passe',
+  'tape', 'passe', 'combien', 'faut', 'peut', 'fait', 'sont', 'ont', 'etre',
 };
 
 int runV2(List<String> argsBrut) {
@@ -266,13 +267,35 @@ List<Resultat> cherche(Corpus c, String requete, {int max = 10}) {
     vus.addAll(l);
   }
   // Unités sans id (aucune ne devrait exister) ignorées.
+  // Règles numérotées (`- **R15. Titre.** texte`) des documents : indexées à
+  // part pour qu'une règle précise ressorte avant son document entier.
+  final regle = RegExp(r'^[-*]\s+\*\*(R\d+)\.\s*(.+?)\*\*');
+  for (final u in c.units.where((u) => u.type == 'document')) {
+    final lignes = u.raw.split('\n');
+    for (var i = 0; i < lignes.length; i++) {
+      final m = regle.firstMatch(lignes[i]);
+      if (m == null) continue;
+      final id = '${u.id}#${m.group(1)}';
+      vus.add(Entree(id, u, Section(id, m.group(2)!, i + 1, 0, lignes[i])));
+    }
+  }
+  // Poids inverse de la fréquence : un terme présent partout (« pin ») compte
+  // moins qu'un terme rare (« source »).
+  final textes = <Entree, String>{
+    for (final e in vus)
+      e: normalise(
+        e.section != null ? e.section!.texte : '${e.unit.titre}\n${e.unit.body}',
+      ),
+  };
+  final poids = <String, double>{
+    for (final t in termes)
+      t: log(1 + vus.length / (1 + textes.values.where((x) => x.contains(t)).length)),
+  };
   for (final e in vus) {
     final titre = normalise(e.titre);
     final id = normalise(e.id);
     final anciens = normalise(e.unit.listOf('anciens_ids').join(' '));
-    final corps = normalise(
-      e.section != null ? e.section!.texte : '${e.unit.titre}\n${e.unit.body}',
-    );
+    final corps = textes[e]!;
     var score = 0.0;
     var trouves = 0;
     for (final t in termes) {
@@ -283,13 +306,18 @@ List<Resultat> cherche(Corpus c, String requete, {int max = 10}) {
       final n = t.allMatches(corps).length;
       if (n > 0) s += 1 + (n > 4 ? 4 : n - 1) * 0.5;
       if (s > 0) trouves++;
-      score += s;
+      score += s * poids[t]! * poids[t]!;
     }
     if (trouves == 0) continue;
     score *= 0.5 + 0.5 * trouves / termes.length;
     if (trouves == termes.length && termes.length > 1) score += 5;
     if (phrase.length > 4 && titre.contains(phrase)) score += 8;
     if (phrase.length > 4 && corps.contains(phrase)) score += 4;
+    // Les annexes de tri, de questions ouvertes et de collisions complètent
+    // les unités : elles passent après à pertinence égale.
+    if (e.unit.rel.startsWith('decisions/_') || e.unit.rel.startsWith('decisions/QO-')) {
+      score *= 0.6;
+    }
     // Une section précise l'emporte sur son fichier entier à score égal.
     if (e.section != null) score += 0.5;
     res.add(Resultat(e, score, _extrait(e, termes)));

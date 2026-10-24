@@ -8,10 +8,10 @@ jalon: JAL-FU3
 liens:
   ecrans: [ECR-PIN-CONSULTATION-APPROFONDIE]
   flux: [FLX-B2]
-  entites: [ENT-PIN, ENT-CATEGORIE, ENT-EPOQUE, ENT-SOURCE, ENT-MEDIA]
+  entites: [ENT-PIN, ENT-CATEGORIE, ENT-EPOQUE, ENT-SOURCE]
   invariants: [INV-03, INV-04]
   composants: [COMP-ZONE-NARRATION, COMP-ZONE-SOURCES, COMP-BLOC-SOURCES]
-  decisions: [DEC-03, DEC-04, DEC-05, DEC-14, DEC-32, DEC-34]
+  decisions: [DEC-03, DEC-04, DEC-32, DEC-34]
   questions: []
   capacites: [CAP-D2.4, CAP-D2.6, CAP-D8.1, CAP-D3.5]
 anciens_ids: [D2.5]

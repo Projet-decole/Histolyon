@@ -51,7 +51,7 @@ Pour qui écrit un texte de l’app : récit d’un pin, parcours, libellé. Cha
 ## 3. Le récit d’un pin
 
 - **R14. Teaser : une phrase qui donne envie sans tout dire.** Un fait plus un pourquoi, environ 10 à 25 mots. Promesse d’un récit, pas son résumé. Le chiffre ou la date sont tissés dans la phrase, jamais posés en début. (02-template-pin.yaml:107-128 ; 01-strategie-narrative.yaml:129-135). Le teaser réel de la Cour des Voraces compte deux phrases courtes : voir QO-901.
-- **R15. Récit : environ 200 à 800 mots.** Plusieurs paragraphes, une seule voix de bout en bout, des « respirations » : pas de pavé sans transition. Pas de plafond strict, mais un pin long doit respirer. (01-strategie-narrative.yaml:150-153 ; 02-template-pin.yaml:155-160)
+- **R15. Récit : longueur d’environ 200 à 800 mots.** Plusieurs paragraphes, une seule voix de bout en bout, des « respirations » : pas de pavé sans transition. Pas de plafond strict, mais un pin long doit respirer. (01-strategie-narrative.yaml:150-153 ; 02-template-pin.yaml:155-160)
 - **R16. Ouverture sensorielle ou spatiale.** Installer le lieu et le moment : « en levant les yeux », « tu pousses la porte ». (02-template-pin.yaml:163-166)
 - **R17. Transitions sobres.** Connecteurs simples (« et puis », « ce qui change tout »), pas de marqueurs scolaires. (:172-174)
 - **R18. Clôture sans morale.** Une phrase qui referme sans verrouiller. Ni « En conclusion », ni « Voilà l’histoire fascinante ». (:176-179)

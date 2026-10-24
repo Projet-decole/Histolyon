@@ -23,7 +23,7 @@ Marqueur d’un pin sur la carte. Sa couleur dit la provenance, sa forme dit l�
 
 ## Variantes et états
 Cinq dimensions orthogonales :
-- Provenance : éditorial, communautaire. Au MVP : éditorial seul (DEC-04).
+- Provenance : éditorial, communautaire. La communauté est hors MVP (CAP-D9.2).
 - Multi-époques : simple, empilé. Au MVP : simple seul (DEC-02).
 - Vérification : absente, en cours. Règle R1 : un pin éditorial n’est jamais « en cours ». Au MVP : absente.
 - Contexte de parcours : normal, étape courante, étape complétée, étape à venir, hors parcours.

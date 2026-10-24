@@ -7,7 +7,7 @@ priorite: secondaire
 jalon: JAL-GEL
 liens:
   capacites: [CAP-D8.2]
-  flux: [FLX-C7]
+  flux: []
   composants: [COMP-MESSAGE-EPHEMERE]
   entites: []
   decisions: [DEC-14]
@@ -27,7 +27,7 @@ derniere_verif: 2026-10-24
 Retour bref, lisible et non bloquant : confirmer une action ou signaler un événement. Une idée par message, aucune action obligatoire, jamais promotionnel.
 
 ## Instances au MVP
-- « Parcours abandonné » après FLX-C7 (confirmé par le dialogue).
+- « Parcours abandonné » après l’abandon d’un parcours (flux d’origine C7, non repris ; confirmé par le dialogue).
 - « Connexion retrouvée. » à la reconnexion (ECR-TRANSVERSES-BANDEAU-OFFLINE).
 - Vue 3D : erreur ou indisponibilité signalée sur place (ECR-PIN-CONSULTATION-3D), pas par ce message.
 

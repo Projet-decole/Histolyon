@@ -8,7 +8,7 @@ jalon: JAL-GEL
 liens:
   capacites: [CAP-D3.9]
   flux: [FLX-C9]
-  composants: [COMP-LAYOUT-PARCOURS, COMP-ITEM-LISTE-ETAPE, COMP-BUTTON-PRIMARY]
+  composants: [COMP-ITEM-LISTE-ETAPE, COMP-BUTTON-PRIMARY]
   entites: [ENT-PARCOURS, ENT-ETAPE, ENT-HISTORIQUE-DE-VISITE]
   decisions: [DEC-05, DEC-09, DEC-14]
 anciens_ids: [E-PARCOURS-FIN-CELEBRATION]
@@ -24,7 +24,7 @@ derniere_verif: 2026-10-24
 Marque la fin du parcours par un moment dédié : phrase de clôture et récapitulatif honnête de ce qui a été vu (CAP-D3.9). L’expérience reste pleine si des étapes ont été sautées (DEC-09).
 
 ## Composition
-De haut en bas dans COMP-LAYOUT-PARCOURS :
+De haut en bas :
 1. **Ouverture** : image atmosphérique, titre du parcours, mention de fin.
 2. **Conclusion narrative** : phrase de clôture, présente seulement si le parcours en porte une.
 3. **Récapitulatif « En chemin »** : « X étapes vues sur Y », durée totale, époques traversées.

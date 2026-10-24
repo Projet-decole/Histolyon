@@ -34,7 +34,7 @@ Kenji découvre la 3D par hasard sur un pin qui s’y prête, sans tutoriel, et 
 - Reporté : choix entre plusieurs modèles et accès à l’AR (DEC-50, CAP-D8.3).
 
 ## Règle d’apparition (à retenir)
-Le bouton « Voir en 3D » existe si et seulement si les trois conditions sont vraies : (1) le pin est affiché en consultation approfondie ; (2) il a un modèle 3D rattaché ; (3) ce modèle est publié, a au moins une source (INV-04) et son fichier est disponible dans l’app. Sinon, aucun élément, aucun espace réservé.
+Le bouton « Voir en 3D » existe si et seulement si les trois conditions sont vraies : (1) le pin est affiché en consultation approfondie ; (2) il a un modèle 3D rattaché ; (3) ce modèle est publié, a au moins une source (INV-04) (DEC-50). Sinon, aucun élément, aucun espace réservé.
 
 ## Règles
 R1. Le point d’accès n’apparaît que si les conditions de la règle d’apparition sont réunies.

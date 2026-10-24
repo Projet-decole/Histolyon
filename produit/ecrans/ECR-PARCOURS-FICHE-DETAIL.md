@@ -8,7 +8,7 @@ jalon: JAL-FU3
 liens:
   capacites: [CAP-D3.3, CAP-D3.4]
   flux: [FLX-C3, FLX-C4]
-  composants: [COMP-LAYOUT-PARCOURS, COMP-BUTTON-PRIMARY, COMP-BUTTON-BACK, COMP-ITEM-LISTE-ETAPE, COMP-APERCU-RAPIDE-PIN]
+  composants: [COMP-BUTTON-PRIMARY, COMP-BUTTON-BACK, COMP-ITEM-LISTE-ETAPE, COMP-APERCU-RAPIDE-PIN]
   entites: [ENT-PARCOURS, ENT-ETAPE]
   decisions: [DEC-04, DEC-05, DEC-09, DEC-13, DEC-14]
 anciens_ids: [E-PARCOURS-FICHE-DETAIL]
@@ -24,7 +24,7 @@ derniere_verif: 2026-10-24
 Permet de décider de démarrer l’unique parcours du MVP. Présente le teaser, les métadonnées et les étapes, puis lance le parcours (CAP-D3.3). Point d’entrée de la surface Parcours, sans catalogue (QO-302).
 
 ## Composition
-De haut en bas, dans COMP-LAYOUT-PARCOURS :
+De haut en bas, :
 1. **En-tête narratif** : image d’ouverture, titre, teaser narratif, marque « Officiel » ; bouton retour (COMP-BUTTON-BACK).
 2. **Métadonnées** : durée estimée, distance, nombre d’étapes, époques traversées, densité (légère, moyenne, dense).
 3. **Liste des étapes** : une rangée par étape (COMP-ITEM-LISTE-ETAPE) avec position, titre du pin, catégorie, époque.

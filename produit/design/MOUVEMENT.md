@@ -22,7 +22,7 @@ derniere_verif: 2026-10-24
 
 # Mouvement
 
-Tout ce qui bouge ou réagit à un état. Les tokens statiques sont dans TOKENS.md. Les sections `TOK-DUR-*`, `TOK-CRV-*` fixent des valeurs : une chorégraphie choisit dans cet inventaire, elle n’invente pas de durée. Ces valeurs sont indépendantes de la plateforme.
+Tout ce qui bouge ou réagit à un état. Les tokens statiques sont dans TOKENS.md. Les sections de durée et de courbe ci-dessous fixent des valeurs : une chorégraphie choisit dans cet inventaire, elle n’invente pas de durée. Ces valeurs sont indépendantes de la plateforme.
 
 ## Règles générales
 R1. Les opacités des voiles de surface ne sont pas ici mais dans TOKENS.md (`TOK-OPACITY-BACKDROP-M6`, `TOK-OPACITY-BACKDROP-M8`).

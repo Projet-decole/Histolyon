@@ -7,14 +7,14 @@ appui_sur_la_grille,,conception/02-personas.yaml:103,non-repris: persona ou règ
 cas_hors_personas,,conception/02-personas.yaml:109,non-repris: persona ou règle de lecture
 conflit_entre_personas,,conception/02-personas.yaml:116,non-repris: persona ou règle de lecture
 pas_de_modification_des_personas_a_la_legere,,conception/02-personas.yaml:124,non-repris: persona ou règle de lecture
-kenji,,conception/02-personas.yaml:142,non-repris: persona ou règle de lecture
-mme_dupont,,conception/02-personas.yaml:215,non-repris: persona ou règle de lecture
-mme_martin,,conception/02-personas.yaml:288,non-repris: persona ou règle de lecture
-pere_lyonnais,,conception/02-personas.yaml:364,non-repris: persona ou règle de lecture
-editeur_de_contenu,,conception/02-personas.yaml:453,non-repris: persona ou règle de lecture
-valideur_scientifique,,conception/02-personas.yaml:540,non-repris: persona ou règle de lecture
-moderateur_communaute,,conception/02-personas.yaml:553,non-repris: persona ou règle de lecture
-institution,,conception/02-personas.yaml:579,non-repris: persona ou règle de lecture
+kenji,DOC-VISION,conception/02-personas.yaml:142,repris
+mme_dupont,DOC-VISION,conception/02-personas.yaml:215,repris
+mme_martin,DOC-VISION,conception/02-personas.yaml:288,repris
+pere_lyonnais,DOC-VISION,conception/02-personas.yaml:364,repris
+editeur_de_contenu,DOC-VISION,conception/02-personas.yaml:453,repris
+valideur_scientifique,DOC-VISION,conception/02-personas.yaml:540,repris
+moderateur_communaute,DOC-VISION,conception/02-personas.yaml:553,repris
+institution,DOC-VISION,conception/02-personas.yaml:579,repris
 par_domaine_pas_par_ecran,,conception/03-fonctionnalites/00-index.yaml:197,non-repris: domaine fonctionnel
 domaines_de_taille_inegale_assumee,,conception/03-fonctionnalites/00-index.yaml:203,non-repris: domaine fonctionnel
 comportements_transverses_definis_une_fois,,conception/03-fonctionnalites/00-index.yaml:209,non-repris: domaine fonctionnel
@@ -32,126 +32,126 @@ D8,,conception/03-fonctionnalites/00-index.yaml:305,non-repris: domaine fonction
 D9,,conception/03-fonctionnalites/00-index.yaml:314,non-repris: domaine fonctionnel
 D10,,conception/03-fonctionnalites/00-index.yaml:324,non-repris: domaine fonctionnel
 D11,,conception/03-fonctionnalites/00-index.yaml:335,non-repris: domaine fonctionnel
-D1.2,CAP-D1.2,conception/03-fonctionnalites/00-index.yaml:356,a-ecrire
-D1.1,CAP-D1.1,conception/03-fonctionnalites/00-index.yaml:519,a-ecrire
-D1.2,CAP-D1.2,conception/03-fonctionnalites/00-index.yaml:521,a-ecrire
-D1.1,CAP-D1.1,conception/03-fonctionnalites/01-carte-exploration-temporelle.yaml:55,a-ecrire
-D1.2,CAP-D1.2,conception/03-fonctionnalites/01-carte-exploration-temporelle.yaml:153,a-ecrire
-D1.3,CAP-D1.3,conception/03-fonctionnalites/01-carte-exploration-temporelle.yaml:238,a-ecrire
-D1.4,CAP-D1.4,conception/03-fonctionnalites/01-carte-exploration-temporelle.yaml:313,a-ecrire
-D1.5,CAP-D1.5,conception/03-fonctionnalites/01-carte-exploration-temporelle.yaml:400,a-ecrire
-D2.1,CAP-D2.1,conception/03-fonctionnalites/02-pins-et-contenu.yaml:64,a-ecrire
-D2.2,CAP-D2.2,conception/03-fonctionnalites/02-pins-et-contenu.yaml:156,a-ecrire
-D2.3,CAP-D2.3,conception/03-fonctionnalites/02-pins-et-contenu.yaml:240,a-ecrire
-D2.4,CAP-D2.4,conception/03-fonctionnalites/02-pins-et-contenu.yaml:321,a-ecrire
-D2.5,CAP-D2.5,conception/03-fonctionnalites/02-pins-et-contenu.yaml:416,a-ecrire
-D2.6,CAP-D2.6,conception/03-fonctionnalites/02-pins-et-contenu.yaml:540,a-ecrire
-D2.7,CAP-D2.7,conception/03-fonctionnalites/02-pins-et-contenu.yaml:638,a-ecrire
-D3.1,CAP-D3.1,conception/03-fonctionnalites/03-parcours.yaml:57,a-ecrire
-D3.2,CAP-D3.2,conception/03-fonctionnalites/03-parcours.yaml:138,a-ecrire
-D3.3,CAP-D3.3,conception/03-fonctionnalites/03-parcours.yaml:226,a-ecrire
-D3.4,CAP-D3.4,conception/03-fonctionnalites/03-parcours.yaml:325,a-ecrire
-D3.5,CAP-D3.5,conception/03-fonctionnalites/03-parcours.yaml:426,a-ecrire
-D3.6,CAP-D3.6,conception/03-fonctionnalites/03-parcours.yaml:536,a-ecrire
-D3.7,CAP-D3.7,conception/03-fonctionnalites/03-parcours.yaml:636,a-ecrire
-D3.8,CAP-D3.8,conception/03-fonctionnalites/03-parcours.yaml:750,a-ecrire
-D3.9,CAP-D3.9,conception/03-fonctionnalites/03-parcours.yaml:838,a-ecrire
-D3.10,CAP-D3.10,conception/03-fonctionnalites/03-parcours.yaml:937,a-ecrire
-D4.1,CAP-D4.1,conception/03-fonctionnalites/04-notifications-proximite.yaml:83,a-ecrire
-D4.2,CAP-D4.2,conception/03-fonctionnalites/04-notifications-proximite.yaml:184,a-ecrire
-D4.3,CAP-D4.3,conception/03-fonctionnalites/04-notifications-proximite.yaml:317,a-ecrire
-D5.1,CAP-D5.1,conception/03-fonctionnalites/05-onboarding.yaml:66,a-ecrire
-D5.2,CAP-D5.2,conception/03-fonctionnalites/05-onboarding.yaml:158,a-ecrire
-D5.3,CAP-D5.3,conception/03-fonctionnalites/05-onboarding.yaml:245,a-ecrire
-D5.4,CAP-D5.4,conception/03-fonctionnalites/05-onboarding.yaml:342,a-ecrire
-D5.5,CAP-D5.5,conception/03-fonctionnalites/05-onboarding.yaml:431,a-ecrire
-D6.1,CAP-D6.1,conception/03-fonctionnalites/06-profil.yaml:72,a-ecrire
-D6.2,CAP-D6.2,conception/03-fonctionnalites/06-profil.yaml:165,a-ecrire
-D6.3,CAP-D6.3,conception/03-fonctionnalites/06-profil.yaml:259,a-ecrire
-D6.4,CAP-D6.4,conception/03-fonctionnalites/06-profil.yaml:367,a-ecrire
-D6.5,CAP-D6.5,conception/03-fonctionnalites/06-profil.yaml:476,a-ecrire
-D6.6,CAP-D6.6,conception/03-fonctionnalites/06-profil.yaml:604,a-ecrire
-D7.1,CAP-D7.1,conception/03-fonctionnalites/07-audio-narration.yaml:76,a-ecrire
-D7.2,CAP-D7.2,conception/03-fonctionnalites/07-audio-narration.yaml:172,a-ecrire
-D7.3,CAP-D7.3,conception/03-fonctionnalites/07-audio-narration.yaml:257,a-ecrire
-D7.4,CAP-D7.4,conception/03-fonctionnalites/07-audio-narration.yaml:335,a-ecrire
-D7.5,CAP-D7.5,conception/03-fonctionnalites/07-audio-narration.yaml:443,a-ecrire
-D8.1,CAP-D8.1,conception/03-fonctionnalites/08-3d-ar.yaml:74,a-ecrire
-D8.2,CAP-D8.2,conception/03-fonctionnalites/08-3d-ar.yaml:160,a-ecrire
-D8.3,CAP-D8.3,conception/03-fonctionnalites/08-3d-ar.yaml:266,a-ecrire
-D8.4,CAP-D8.4,conception/03-fonctionnalites/08-3d-ar.yaml:387,a-ecrire
-D9.1,CAP-D9.1,conception/03-fonctionnalites/09-communaute.yaml:72,a-ecrire
-D9.2,CAP-D9.2,conception/03-fonctionnalites/09-communaute.yaml:187,a-ecrire
-D9.3,CAP-D9.3,conception/03-fonctionnalites/09-communaute.yaml:318,a-ecrire
-D9.4,CAP-D9.4,conception/03-fonctionnalites/09-communaute.yaml:441,a-ecrire
-D10.1,CAP-D10.1,conception/03-fonctionnalites/10-production-contenu.yaml:78,a-ecrire
-D10.2,CAP-D10.2,conception/03-fonctionnalites/10-production-contenu.yaml:194,a-ecrire
-D10.3,CAP-D10.3,conception/03-fonctionnalites/10-production-contenu.yaml:292,a-ecrire
-D10.4,CAP-D10.4,conception/03-fonctionnalites/10-production-contenu.yaml:401,a-ecrire
-D10.5,CAP-D10.5,conception/03-fonctionnalites/10-production-contenu.yaml:507,a-ecrire
-D11.1,CAP-D11.1,conception/03-fonctionnalites/11-surfaces-hors-app.yaml:77,a-ecrire
-D11.2,CAP-D11.2,conception/03-fonctionnalites/11-surfaces-hors-app.yaml:167,a-ecrire
-D11.3,CAP-D11.3,conception/03-fonctionnalites/11-surfaces-hors-app.yaml:264,a-ecrire
-D11.4,CAP-D11.4,conception/03-fonctionnalites/11-surfaces-hors-app.yaml:344,a-ecrire
-D11.5,CAP-D11.5,conception/03-fonctionnalites/11-surfaces-hors-app.yaml:448,a-ecrire
+D1.2,CAP-D1.2,conception/03-fonctionnalites/00-index.yaml:356,repris
+D1.1,CAP-D1.1,conception/03-fonctionnalites/00-index.yaml:519,repris
+D1.2,CAP-D1.2,conception/03-fonctionnalites/00-index.yaml:521,repris
+D1.1,CAP-D1.1,conception/03-fonctionnalites/01-carte-exploration-temporelle.yaml:55,repris
+D1.2,CAP-D1.2,conception/03-fonctionnalites/01-carte-exploration-temporelle.yaml:153,repris
+D1.3,CAP-D1.3,conception/03-fonctionnalites/01-carte-exploration-temporelle.yaml:238,repris
+D1.4,CAP-D1.4,conception/03-fonctionnalites/01-carte-exploration-temporelle.yaml:313,repris
+D1.5,CAP-D1.5,conception/03-fonctionnalites/01-carte-exploration-temporelle.yaml:400,repris
+D2.1,CAP-D2.1,conception/03-fonctionnalites/02-pins-et-contenu.yaml:64,repris
+D2.2,CAP-D2.2,conception/03-fonctionnalites/02-pins-et-contenu.yaml:156,repris
+D2.3,CAP-D2.3,conception/03-fonctionnalites/02-pins-et-contenu.yaml:240,repris
+D2.4,CAP-D2.4,conception/03-fonctionnalites/02-pins-et-contenu.yaml:321,repris
+D2.5,CAP-D2.5,conception/03-fonctionnalites/02-pins-et-contenu.yaml:416,repris
+D2.6,CAP-D2.6,conception/03-fonctionnalites/02-pins-et-contenu.yaml:540,repris
+D2.7,CAP-D2.7,conception/03-fonctionnalites/02-pins-et-contenu.yaml:638,repris
+D3.1,CAP-D3.1,conception/03-fonctionnalites/03-parcours.yaml:57,repris
+D3.2,CAP-D3.2,conception/03-fonctionnalites/03-parcours.yaml:138,repris
+D3.3,CAP-D3.3,conception/03-fonctionnalites/03-parcours.yaml:226,repris
+D3.4,CAP-D3.4,conception/03-fonctionnalites/03-parcours.yaml:325,repris
+D3.5,CAP-D3.5,conception/03-fonctionnalites/03-parcours.yaml:426,repris
+D3.6,CAP-D3.6,conception/03-fonctionnalites/03-parcours.yaml:536,repris
+D3.7,CAP-D3.7,conception/03-fonctionnalites/03-parcours.yaml:636,repris
+D3.8,CAP-D3.8,conception/03-fonctionnalites/03-parcours.yaml:750,repris
+D3.9,CAP-D3.9,conception/03-fonctionnalites/03-parcours.yaml:838,repris
+D3.10,CAP-D3.10,conception/03-fonctionnalites/03-parcours.yaml:937,repris
+D4.1,CAP-D4.1,conception/03-fonctionnalites/04-notifications-proximite.yaml:83,repris
+D4.2,CAP-D4.2,conception/03-fonctionnalites/04-notifications-proximite.yaml:184,repris
+D4.3,CAP-D4.3,conception/03-fonctionnalites/04-notifications-proximite.yaml:317,repris
+D5.1,CAP-D5.1,conception/03-fonctionnalites/05-onboarding.yaml:66,repris
+D5.2,CAP-D5.2,conception/03-fonctionnalites/05-onboarding.yaml:158,repris
+D5.3,CAP-D5.3,conception/03-fonctionnalites/05-onboarding.yaml:245,repris
+D5.4,CAP-D5.4,conception/03-fonctionnalites/05-onboarding.yaml:342,repris
+D5.5,CAP-D5.5,conception/03-fonctionnalites/05-onboarding.yaml:431,repris
+D6.1,CAP-D6.1,conception/03-fonctionnalites/06-profil.yaml:72,repris
+D6.2,CAP-D6.2,conception/03-fonctionnalites/06-profil.yaml:165,repris
+D6.3,CAP-D6.3,conception/03-fonctionnalites/06-profil.yaml:259,repris
+D6.4,CAP-D6.4,conception/03-fonctionnalites/06-profil.yaml:367,repris
+D6.5,CAP-D6.5,conception/03-fonctionnalites/06-profil.yaml:476,repris
+D6.6,CAP-D6.6,conception/03-fonctionnalites/06-profil.yaml:604,repris
+D7.1,CAP-D7.1,conception/03-fonctionnalites/07-audio-narration.yaml:76,repris
+D7.2,CAP-D7.2,conception/03-fonctionnalites/07-audio-narration.yaml:172,repris
+D7.3,CAP-D7.3,conception/03-fonctionnalites/07-audio-narration.yaml:257,repris
+D7.4,CAP-D7.4,conception/03-fonctionnalites/07-audio-narration.yaml:335,repris
+D7.5,CAP-D7.5,conception/03-fonctionnalites/07-audio-narration.yaml:443,repris
+D8.1,CAP-D8.1,conception/03-fonctionnalites/08-3d-ar.yaml:74,repris
+D8.2,CAP-D8.2,conception/03-fonctionnalites/08-3d-ar.yaml:160,repris
+D8.3,CAP-D8.3,conception/03-fonctionnalites/08-3d-ar.yaml:266,repris
+D8.4,CAP-D8.4,conception/03-fonctionnalites/08-3d-ar.yaml:387,repris
+D9.1,CAP-D9.1,conception/03-fonctionnalites/09-communaute.yaml:72,repris
+D9.2,CAP-D9.2,conception/03-fonctionnalites/09-communaute.yaml:187,repris
+D9.3,CAP-D9.3,conception/03-fonctionnalites/09-communaute.yaml:318,repris
+D9.4,CAP-D9.4,conception/03-fonctionnalites/09-communaute.yaml:441,repris
+D10.1,CAP-D10.1,conception/03-fonctionnalites/10-production-contenu.yaml:78,repris
+D10.2,CAP-D10.2,conception/03-fonctionnalites/10-production-contenu.yaml:194,repris
+D10.3,CAP-D10.3,conception/03-fonctionnalites/10-production-contenu.yaml:292,repris
+D10.4,CAP-D10.4,conception/03-fonctionnalites/10-production-contenu.yaml:401,repris
+D10.5,CAP-D10.5,conception/03-fonctionnalites/10-production-contenu.yaml:507,repris
+D11.1,CAP-D11.1,conception/03-fonctionnalites/11-surfaces-hors-app.yaml:77,repris
+D11.2,CAP-D11.2,conception/03-fonctionnalites/11-surfaces-hors-app.yaml:167,repris
+D11.3,CAP-D11.3,conception/03-fonctionnalites/11-surfaces-hors-app.yaml:264,repris
+D11.4,CAP-D11.4,conception/03-fonctionnalites/11-surfaces-hors-app.yaml:344,repris
+D11.5,CAP-D11.5,conception/03-fonctionnalites/11-surfaces-hors-app.yaml:448,repris
 C1,,conception/04-donnees/00-index.yaml:77,non-repris: cluster de données
 C2,,conception/04-donnees/00-index.yaml:84,non-repris: cluster de données
 C3,,conception/04-donnees/00-index.yaml:89,non-repris: cluster de données
 C4,,conception/04-donnees/00-index.yaml:94,non-repris: cluster de données
 C5,,conception/04-donnees/00-index.yaml:99,non-repris: cluster de données
 C6,,conception/04-donnees/00-index.yaml:104,non-repris: cluster de données
-I1,INV-01,conception/04-donnees/00-index.yaml:117,a-ecrire
-I2,INV-02,conception/04-donnees/00-index.yaml:140,a-ecrire
-I3,INV-03,conception/04-donnees/00-index.yaml:155,a-ecrire
-I4,INV-04,conception/04-donnees/00-index.yaml:177,a-ecrire
-I5,INV-05,conception/04-donnees/00-index.yaml:185,a-ecrire
-I6,INV-06,conception/04-donnees/00-index.yaml:194,a-ecrire
-I7,INV-07,conception/04-donnees/00-index.yaml:213,a-ecrire
-I8,INV-08,conception/04-donnees/00-index.yaml:223,a-ecrire
-I9,INV-09,conception/04-donnees/00-index.yaml:232,a-ecrire
-I10,INV-10,conception/04-donnees/00-index.yaml:241,a-ecrire
-pin,ENT-PIN,conception/04-donnees/01-contenu.yaml:32,a-ecrire
-categorie,ENT-CATEGORIE,conception/04-donnees/01-contenu.yaml:149,a-ecrire
-epoque,ENT-EPOQUE,conception/04-donnees/01-contenu.yaml:189,a-ecrire
-source,ENT-SOURCE,conception/04-donnees/01-contenu.yaml:235,a-ecrire
-media,ENT-MEDIA,conception/04-donnees/01-contenu.yaml:285,a-ecrire
-badge,ENT-BADGE,conception/04-donnees/01-contenu.yaml:334,a-ecrire
-modele_3d,ENT-MODELE-3D,conception/04-donnees/01-contenu.yaml:369,a-ecrire
-fragment_musical,ENT-FRAGMENT-MUSICAL,conception/04-donnees/01-contenu.yaml:422,a-ecrire
-couche_cartographique,ENT-COUCHE-CARTOGRAPHIQUE,conception/04-donnees/01-contenu.yaml:463,a-ecrire
-parcours,ENT-PARCOURS,conception/04-donnees/02-parcours.yaml:37,a-ecrire
-etape,ENT-ETAPE,conception/04-donnees/02-parcours.yaml:296,a-ecrire
-profil,ENT-PROFIL,conception/04-donnees/03-utilisateur.yaml:44,a-ecrire
-compte,ENT-COMPTE,conception/04-donnees/03-utilisateur.yaml:169,a-ecrire
-favori,ENT-FAVORI,conception/04-donnees/03-utilisateur.yaml:281,a-ecrire
-historique_de_visite,ENT-HISTORIQUE-DE-VISITE,conception/04-donnees/03-utilisateur.yaml:352,a-ecrire
-commentaire,ENT-COMMENTAIRE,conception/04-donnees/04-communaute.yaml:43,a-ecrire
-retour_de_parcours,ENT-RETOUR-DE-PARCOURS,conception/04-donnees/04-communaute.yaml:129,a-ecrire
-signalement,ENT-SIGNALEMENT,conception/04-donnees/04-communaute.yaml:219,a-ecrire
-trace_de_moderation,ENT-TRACE-DE-MODERATION,conception/04-donnees/04-communaute.yaml:318,a-ecrire
-template,ENT-TEMPLATE,conception/04-donnees/05-production.yaml:58,a-ecrire
-trace_de_validation,ENT-TRACE-DE-VALIDATION,conception/04-donnees/05-production.yaml:162,a-ecrire
+I1,INV-01,conception/04-donnees/00-index.yaml:117,repris
+I2,,conception/04-donnees/00-index.yaml:140,non-repris: invariant
+I3,INV-03,conception/04-donnees/00-index.yaml:155,repris
+I4,INV-04,conception/04-donnees/00-index.yaml:177,repris
+I5,,conception/04-donnees/00-index.yaml:185,non-repris: invariant
+I6,INV-06,conception/04-donnees/00-index.yaml:194,repris
+I7,INV-07,conception/04-donnees/00-index.yaml:213,repris
+I8,INV-08,conception/04-donnees/00-index.yaml:223,repris
+I9,INV-09,conception/04-donnees/00-index.yaml:232,repris
+I10,,conception/04-donnees/00-index.yaml:241,non-repris: invariant
+pin,ENT-PIN,conception/04-donnees/01-contenu.yaml:32,repris
+categorie,ENT-CATEGORIE,conception/04-donnees/01-contenu.yaml:149,repris
+epoque,ENT-EPOQUE,conception/04-donnees/01-contenu.yaml:189,repris
+source,ENT-SOURCE,conception/04-donnees/01-contenu.yaml:235,repris
+media,ENT-MEDIA,conception/04-donnees/01-contenu.yaml:285,repris
+badge,ENT-BADGE,conception/04-donnees/01-contenu.yaml:334,repris
+modele_3d,ENT-MODELE-3D,conception/04-donnees/01-contenu.yaml:369,repris
+fragment_musical,,conception/04-donnees/01-contenu.yaml:422,non-repris: entité
+couche_cartographique,,conception/04-donnees/01-contenu.yaml:463,non-repris: entité
+parcours,ENT-PARCOURS,conception/04-donnees/02-parcours.yaml:37,repris
+etape,ENT-ETAPE,conception/04-donnees/02-parcours.yaml:296,repris
+profil,ENT-PROFIL,conception/04-donnees/03-utilisateur.yaml:44,repris
+compte,,conception/04-donnees/03-utilisateur.yaml:169,non-repris: entité
+favori,,conception/04-donnees/03-utilisateur.yaml:281,non-repris: entité
+historique_de_visite,ENT-HISTORIQUE-DE-VISITE,conception/04-donnees/03-utilisateur.yaml:352,repris
+commentaire,,conception/04-donnees/04-communaute.yaml:43,non-repris: entité
+retour_de_parcours,,conception/04-donnees/04-communaute.yaml:129,non-repris: entité
+signalement,,conception/04-donnees/04-communaute.yaml:219,non-repris: entité
+trace_de_moderation,,conception/04-donnees/04-communaute.yaml:318,non-repris: entité
+template,,conception/04-donnees/05-production.yaml:58,non-repris: entité
+trace_de_validation,,conception/04-donnees/05-production.yaml:162,non-repris: entité
 D1,,conception/04-donnees/06-distribution.yaml:44,non-repris: décision locale
 D2,,conception/04-donnees/06-distribution.yaml:53,non-repris: décision locale
 D3,,conception/04-donnees/06-distribution.yaml:61,non-repris: décision locale
-lien_universel,ENT-LIEN-UNIVERSEL,conception/04-donnees/06-distribution.yaml:74,a-ecrire
-image_partageable,ENT-IMAGE-PARTAGEABLE,conception/04-donnees/06-distribution.yaml:149,a-ecrire
-code_visuel,ENT-CODE-VISUEL,conception/04-donnees/06-distribution.yaml:253,a-ecrire
-M1,MOD-M1,conception/05-architecture-info.yaml:93,a-ecrire
-M2,MOD-M2,conception/05-architecture-info.yaml:109,a-ecrire
-M3,MOD-M3,conception/05-architecture-info.yaml:125,a-ecrire
-M4,MOD-M4,conception/05-architecture-info.yaml:142,a-ecrire
-M5,MOD-M5,conception/05-architecture-info.yaml:160,a-ecrire
-M6,MOD-M6,conception/05-architecture-info.yaml:178,a-ecrire
-M7,MOD-M7,conception/05-architecture-info.yaml:195,a-ecrire
-M8,MOD-M8,conception/05-architecture-info.yaml:214,a-ecrire
-M9,MOD-M9,conception/05-architecture-info.yaml:231,a-ecrire
-S1,SRF-S1,conception/05-architecture-info.yaml:259,a-ecrire
-S2,SRF-S2,conception/05-architecture-info.yaml:291,a-ecrire
-S3,SRF-S3,conception/05-architecture-info.yaml:335,a-ecrire
-P1,SRF-P1,conception/05-architecture-info.yaml:370,a-ecrire
-P2,SRF-P2,conception/05-architecture-info.yaml:387,a-ecrire
-P3,SRF-P3,conception/05-architecture-info.yaml:403,a-ecrire
+lien_universel,,conception/04-donnees/06-distribution.yaml:74,non-repris: entité
+image_partageable,,conception/04-donnees/06-distribution.yaml:149,non-repris: entité
+code_visuel,,conception/04-donnees/06-distribution.yaml:253,non-repris: entité
+M1,MOD-M1,conception/05-architecture-info.yaml:93,repris
+M2,MOD-M2,conception/05-architecture-info.yaml:109,repris
+M3,MOD-M3,conception/05-architecture-info.yaml:125,repris
+M4,MOD-M4,conception/05-architecture-info.yaml:142,repris
+M5,MOD-M5,conception/05-architecture-info.yaml:160,repris
+M6,MOD-M6,conception/05-architecture-info.yaml:178,repris
+M7,MOD-M7,conception/05-architecture-info.yaml:195,repris
+M8,MOD-M8,conception/05-architecture-info.yaml:214,repris
+M9,MOD-M9,conception/05-architecture-info.yaml:231,repris
+S1,SRF-S1,conception/05-architecture-info.yaml:259,repris
+S2,SRF-S2,conception/05-architecture-info.yaml:291,repris
+S3,SRF-S3,conception/05-architecture-info.yaml:335,repris
+P1,SRF-P1,conception/05-architecture-info.yaml:370,repris
+P2,SRF-P2,conception/05-architecture-info.yaml:387,repris
+P3,SRF-P3,conception/05-architecture-info.yaml:403,repris
 N1,,conception/05-architecture-info.yaml:453,non-repris: élément d’architecture
 N2,,conception/05-architecture-info.yaml:458,non-repris: élément d’architecture
 N3,,conception/05-architecture-info.yaml:463,non-repris: élément d’architecture
@@ -176,116 +176,116 @@ E3,,conception/05-architecture-info.yaml:579,non-repris: élément d’architect
 06,,conception/06-flows/00-index.yaml:94,non-repris: numéro de section
 07,,conception/06-flows/00-index.yaml:100,non-repris: numéro de section
 08,,conception/06-flows/00-index.yaml:106,non-repris: numéro de section
-A1,FLX-A1,conception/06-flows/00-index.yaml:119,a-ecrire
-A2,FLX-A2,conception/06-flows/00-index.yaml:122,a-ecrire
-A3,FLX-A3,conception/06-flows/00-index.yaml:125,a-ecrire
-A4,FLX-A4,conception/06-flows/00-index.yaml:128,a-ecrire
-A5,FLX-A5,conception/06-flows/00-index.yaml:131,a-ecrire
-A6,FLX-A6,conception/06-flows/00-index.yaml:134,a-ecrire
-B1,FLX-B1,conception/06-flows/00-index.yaml:139,a-ecrire
-B2,FLX-B2,conception/06-flows/00-index.yaml:142,a-ecrire
-B3,FLX-B3,conception/06-flows/00-index.yaml:145,a-ecrire
-B4,FLX-B4,conception/06-flows/00-index.yaml:148,a-ecrire
-B5,FLX-B5,conception/06-flows/00-index.yaml:151,a-ecrire
-B6,FLX-B6,conception/06-flows/00-index.yaml:154,a-ecrire
-B7,FLX-B7,conception/06-flows/00-index.yaml:157,a-ecrire
-C1,FLX-C1,conception/06-flows/00-index.yaml:161,a-ecrire
-C2,FLX-C2,conception/06-flows/00-index.yaml:164,a-ecrire
-C3,FLX-C3,conception/06-flows/00-index.yaml:167,a-ecrire
-C4,FLX-C4,conception/06-flows/00-index.yaml:170,a-ecrire
-C5,FLX-C5,conception/06-flows/00-index.yaml:173,a-ecrire
-C6,FLX-C6,conception/06-flows/00-index.yaml:176,a-ecrire
-C7,FLX-C7,conception/06-flows/00-index.yaml:179,a-ecrire
-C8,FLX-C8,conception/06-flows/00-index.yaml:182,a-ecrire
-C9,FLX-C9,conception/06-flows/00-index.yaml:185,a-ecrire
-C10,FLX-C10,conception/06-flows/00-index.yaml:188,a-ecrire
-C11,FLX-C11,conception/06-flows/00-index.yaml:191,a-ecrire
-C12,FLX-C12,conception/06-flows/00-index.yaml:194,a-ecrire
-C13,FLX-C13,conception/06-flows/00-index.yaml:197,a-ecrire
-D1,FLX-D1,conception/06-flows/00-index.yaml:201,a-ecrire
-D2,FLX-D2,conception/06-flows/00-index.yaml:204,a-ecrire
-D3,FLX-D3,conception/06-flows/00-index.yaml:207,a-ecrire
-D4,FLX-D4,conception/06-flows/00-index.yaml:210,a-ecrire
-D5,FLX-D5,conception/06-flows/00-index.yaml:213,a-ecrire
-D6,FLX-D6,conception/06-flows/00-index.yaml:216,a-ecrire
-D7,FLX-D7,conception/06-flows/00-index.yaml:219,a-ecrire
-D8,FLX-D8,conception/06-flows/00-index.yaml:222,a-ecrire
-D9,FLX-D9,conception/06-flows/00-index.yaml:225,a-ecrire
-E1,FLX-E1,conception/06-flows/00-index.yaml:229,a-ecrire
-E2,FLX-E2,conception/06-flows/00-index.yaml:232,a-ecrire
-E3,FLX-E3,conception/06-flows/00-index.yaml:235,a-ecrire
-F1,FLX-F1,conception/06-flows/00-index.yaml:239,a-ecrire
-F2,FLX-F2,conception/06-flows/00-index.yaml:242,a-ecrire
-F3,FLX-F3,conception/06-flows/00-index.yaml:245,a-ecrire
-F4,FLX-F4,conception/06-flows/00-index.yaml:248,a-ecrire
-F5,FLX-F5,conception/06-flows/00-index.yaml:251,a-ecrire
-G1,FLX-G1,conception/06-flows/00-index.yaml:255,a-ecrire
-G2,FLX-G2,conception/06-flows/00-index.yaml:258,a-ecrire
-G3,FLX-G3,conception/06-flows/00-index.yaml:261,a-ecrire
-G4,FLX-G4,conception/06-flows/00-index.yaml:264,a-ecrire
-G5,FLX-G5,conception/06-flows/00-index.yaml:267,a-ecrire
-G6,FLX-G6,conception/06-flows/00-index.yaml:270,a-ecrire
-H1,FLX-H1,conception/06-flows/00-index.yaml:274,a-ecrire
-H2,FLX-H2,conception/06-flows/00-index.yaml:277,a-ecrire
-H3,FLX-H3,conception/06-flows/00-index.yaml:280,a-ecrire
-H4,FLX-H4,conception/06-flows/00-index.yaml:283,a-ecrire
-H5,FLX-H5,conception/06-flows/00-index.yaml:286,a-ecrire
-H6,FLX-H6,conception/06-flows/00-index.yaml:289,a-ecrire
-A1,FLX-A1,conception/06-flows/01-decouverte.yaml:39,a-ecrire
-A2,FLX-A2,conception/06-flows/01-decouverte.yaml:95,a-ecrire
-A3,FLX-A3,conception/06-flows/01-decouverte.yaml:141,a-ecrire
-A4,FLX-A4,conception/06-flows/01-decouverte.yaml:207,a-ecrire
-A5,FLX-A5,conception/06-flows/01-decouverte.yaml:252,a-ecrire
-A6,FLX-A6,conception/06-flows/01-decouverte.yaml:309,a-ecrire
-B1,FLX-B1,conception/06-flows/02-consultation-pin.yaml:40,a-ecrire
-B2,FLX-B2,conception/06-flows/02-consultation-pin.yaml:104,a-ecrire
-B3,FLX-B3,conception/06-flows/02-consultation-pin.yaml:200,a-ecrire
-B4,FLX-B4,conception/06-flows/02-consultation-pin.yaml:262,a-ecrire
-B5,FLX-B5,conception/06-flows/02-consultation-pin.yaml:324,a-ecrire
-B6,FLX-B6,conception/06-flows/02-consultation-pin.yaml:395,a-ecrire
-B7,FLX-B7,conception/06-flows/02-consultation-pin.yaml:459,a-ecrire
-C1,FLX-C1,conception/06-flows/03-parcours.yaml:39,a-ecrire
-C2,FLX-C2,conception/06-flows/03-parcours.yaml:80,a-ecrire
-C3,FLX-C3,conception/06-flows/03-parcours.yaml:110,a-ecrire
-C4,FLX-C4,conception/06-flows/03-parcours.yaml:159,a-ecrire
-C5,FLX-C5,conception/06-flows/03-parcours.yaml:204,a-ecrire
-C6,FLX-C6,conception/06-flows/03-parcours.yaml:265,a-ecrire
-C7,FLX-C7,conception/06-flows/03-parcours.yaml:312,a-ecrire
-C8,FLX-C8,conception/06-flows/03-parcours.yaml:361,a-ecrire
-C9,FLX-C9,conception/06-flows/03-parcours.yaml:395,a-ecrire
-C10,FLX-C10,conception/06-flows/03-parcours.yaml:433,a-ecrire
-C11,FLX-C11,conception/06-flows/03-parcours.yaml:471,a-ecrire
-C12,FLX-C12,conception/06-flows/03-parcours.yaml:514,a-ecrire
-C13,FLX-C13,conception/06-flows/03-parcours.yaml:567,a-ecrire
-D1,FLX-D1,conception/06-flows/04-profil-compte.yaml:45,a-ecrire
-D2,FLX-D2,conception/06-flows/04-profil-compte.yaml:90,a-ecrire
-D3,FLX-D3,conception/06-flows/04-profil-compte.yaml:141,a-ecrire
-D4,FLX-D4,conception/06-flows/04-profil-compte.yaml:206,a-ecrire
-D5,FLX-D5,conception/06-flows/04-profil-compte.yaml:266,a-ecrire
-D6,FLX-D6,conception/06-flows/04-profil-compte.yaml:331,a-ecrire
-D7,FLX-D7,conception/06-flows/04-profil-compte.yaml:432,a-ecrire
-D8,FLX-D8,conception/06-flows/04-profil-compte.yaml:505,a-ecrire
-D9,FLX-D9,conception/06-flows/04-profil-compte.yaml:580,a-ecrire
-E1,FLX-E1,conception/06-flows/05-notifications.yaml:39,a-ecrire
-E2,FLX-E2,conception/06-flows/05-notifications.yaml:105,a-ecrire
-E3,FLX-E3,conception/06-flows/05-notifications.yaml:173,a-ecrire
-F1,FLX-F1,conception/06-flows/06-partage.yaml:41,a-ecrire
-F2,FLX-F2,conception/06-flows/06-partage.yaml:89,a-ecrire
-F3,FLX-F3,conception/06-flows/06-partage.yaml:139,a-ecrire
-F4,FLX-F4,conception/06-flows/06-partage.yaml:210,a-ecrire
-F5,FLX-F5,conception/06-flows/06-partage.yaml:273,a-ecrire
-G1,FLX-G1,conception/06-flows/07-communaute.yaml:42,a-ecrire
-G2,FLX-G2,conception/06-flows/07-communaute.yaml:93,a-ecrire
-G3,FLX-G3,conception/06-flows/07-communaute.yaml:149,a-ecrire
-G4,FLX-G4,conception/06-flows/07-communaute.yaml:227,a-ecrire
-G5,FLX-G5,conception/06-flows/07-communaute.yaml:317,a-ecrire
-G6,FLX-G6,conception/06-flows/07-communaute.yaml:380,a-ecrire
-H1,FLX-H1,conception/06-flows/08-back-office.yaml:45,a-ecrire
-H2,FLX-H2,conception/06-flows/08-back-office.yaml:100,a-ecrire
-H3,FLX-H3,conception/06-flows/08-back-office.yaml:154,a-ecrire
-H4,FLX-H4,conception/06-flows/08-back-office.yaml:206,a-ecrire
-H5,FLX-H5,conception/06-flows/08-back-office.yaml:268,a-ecrire
-H6,FLX-H6,conception/06-flows/08-back-office.yaml:317,a-ecrire
+A1,FLX-A1,conception/06-flows/00-index.yaml:119,repris
+A2,,conception/06-flows/00-index.yaml:122,non-repris: flux
+A3,FLX-A3,conception/06-flows/00-index.yaml:125,repris
+A4,,conception/06-flows/00-index.yaml:128,non-repris: flux
+A5,,conception/06-flows/00-index.yaml:131,non-repris: flux
+A6,,conception/06-flows/00-index.yaml:134,non-repris: flux
+B1,FLX-B1,conception/06-flows/00-index.yaml:139,repris
+B2,FLX-B2,conception/06-flows/00-index.yaml:142,repris
+B3,,conception/06-flows/00-index.yaml:145,non-repris: flux
+B4,FLX-B4,conception/06-flows/00-index.yaml:148,repris
+B5,FLX-B5,conception/06-flows/00-index.yaml:151,repris
+B6,,conception/06-flows/00-index.yaml:154,non-repris: flux
+B7,,conception/06-flows/00-index.yaml:157,non-repris: flux
+C1,,conception/06-flows/00-index.yaml:161,non-repris: flux
+C2,,conception/06-flows/00-index.yaml:164,non-repris: flux
+C3,FLX-C3,conception/06-flows/00-index.yaml:167,repris
+C4,FLX-C4,conception/06-flows/00-index.yaml:170,repris
+C5,FLX-C5,conception/06-flows/00-index.yaml:173,repris
+C6,,conception/06-flows/00-index.yaml:176,non-repris: flux
+C7,,conception/06-flows/00-index.yaml:179,non-repris: flux
+C8,FLX-C8,conception/06-flows/00-index.yaml:182,repris
+C9,FLX-C9,conception/06-flows/00-index.yaml:185,repris
+C10,,conception/06-flows/00-index.yaml:188,non-repris: flux
+C11,,conception/06-flows/00-index.yaml:191,non-repris: flux
+C12,,conception/06-flows/00-index.yaml:194,non-repris: flux
+C13,,conception/06-flows/00-index.yaml:197,non-repris: flux
+D1,,conception/06-flows/00-index.yaml:201,non-repris: flux
+D2,,conception/06-flows/00-index.yaml:204,non-repris: flux
+D3,,conception/06-flows/00-index.yaml:207,non-repris: flux
+D4,,conception/06-flows/00-index.yaml:210,non-repris: flux
+D5,,conception/06-flows/00-index.yaml:213,non-repris: flux
+D6,,conception/06-flows/00-index.yaml:216,non-repris: flux
+D7,,conception/06-flows/00-index.yaml:219,non-repris: flux
+D8,,conception/06-flows/00-index.yaml:222,non-repris: flux
+D9,,conception/06-flows/00-index.yaml:225,non-repris: flux
+E1,,conception/06-flows/00-index.yaml:229,non-repris: flux
+E2,,conception/06-flows/00-index.yaml:232,non-repris: flux
+E3,FLX-E3,conception/06-flows/00-index.yaml:235,repris
+F1,,conception/06-flows/00-index.yaml:239,non-repris: flux
+F2,,conception/06-flows/00-index.yaml:242,non-repris: flux
+F3,,conception/06-flows/00-index.yaml:245,non-repris: flux
+F4,,conception/06-flows/00-index.yaml:248,non-repris: flux
+F5,,conception/06-flows/00-index.yaml:251,non-repris: flux
+G1,,conception/06-flows/00-index.yaml:255,non-repris: flux
+G2,,conception/06-flows/00-index.yaml:258,non-repris: flux
+G3,,conception/06-flows/00-index.yaml:261,non-repris: flux
+G4,,conception/06-flows/00-index.yaml:264,non-repris: flux
+G5,,conception/06-flows/00-index.yaml:267,non-repris: flux
+G6,,conception/06-flows/00-index.yaml:270,non-repris: flux
+H1,,conception/06-flows/00-index.yaml:274,non-repris: flux
+H2,,conception/06-flows/00-index.yaml:277,non-repris: flux
+H3,,conception/06-flows/00-index.yaml:280,non-repris: flux
+H4,,conception/06-flows/00-index.yaml:283,non-repris: flux
+H5,,conception/06-flows/00-index.yaml:286,non-repris: flux
+H6,,conception/06-flows/00-index.yaml:289,non-repris: flux
+A1,FLX-A1,conception/06-flows/01-decouverte.yaml:39,repris
+A2,,conception/06-flows/01-decouverte.yaml:95,non-repris: flux
+A3,FLX-A3,conception/06-flows/01-decouverte.yaml:141,repris
+A4,,conception/06-flows/01-decouverte.yaml:207,non-repris: flux
+A5,,conception/06-flows/01-decouverte.yaml:252,non-repris: flux
+A6,,conception/06-flows/01-decouverte.yaml:309,non-repris: flux
+B1,FLX-B1,conception/06-flows/02-consultation-pin.yaml:40,repris
+B2,FLX-B2,conception/06-flows/02-consultation-pin.yaml:104,repris
+B3,,conception/06-flows/02-consultation-pin.yaml:200,non-repris: flux
+B4,FLX-B4,conception/06-flows/02-consultation-pin.yaml:262,repris
+B5,FLX-B5,conception/06-flows/02-consultation-pin.yaml:324,repris
+B6,,conception/06-flows/02-consultation-pin.yaml:395,non-repris: flux
+B7,,conception/06-flows/02-consultation-pin.yaml:459,non-repris: flux
+C1,,conception/06-flows/03-parcours.yaml:39,non-repris: flux
+C2,,conception/06-flows/03-parcours.yaml:80,non-repris: flux
+C3,FLX-C3,conception/06-flows/03-parcours.yaml:110,repris
+C4,FLX-C4,conception/06-flows/03-parcours.yaml:159,repris
+C5,FLX-C5,conception/06-flows/03-parcours.yaml:204,repris
+C6,,conception/06-flows/03-parcours.yaml:265,non-repris: flux
+C7,,conception/06-flows/03-parcours.yaml:312,non-repris: flux
+C8,FLX-C8,conception/06-flows/03-parcours.yaml:361,repris
+C9,FLX-C9,conception/06-flows/03-parcours.yaml:395,repris
+C10,,conception/06-flows/03-parcours.yaml:433,non-repris: flux
+C11,,conception/06-flows/03-parcours.yaml:471,non-repris: flux
+C12,,conception/06-flows/03-parcours.yaml:514,non-repris: flux
+C13,,conception/06-flows/03-parcours.yaml:567,non-repris: flux
+D1,,conception/06-flows/04-profil-compte.yaml:45,non-repris: flux
+D2,,conception/06-flows/04-profil-compte.yaml:90,non-repris: flux
+D3,,conception/06-flows/04-profil-compte.yaml:141,non-repris: flux
+D4,,conception/06-flows/04-profil-compte.yaml:206,non-repris: flux
+D5,,conception/06-flows/04-profil-compte.yaml:266,non-repris: flux
+D6,,conception/06-flows/04-profil-compte.yaml:331,non-repris: flux
+D7,,conception/06-flows/04-profil-compte.yaml:432,non-repris: flux
+D8,,conception/06-flows/04-profil-compte.yaml:505,non-repris: flux
+D9,,conception/06-flows/04-profil-compte.yaml:580,non-repris: flux
+E1,,conception/06-flows/05-notifications.yaml:39,non-repris: flux
+E2,,conception/06-flows/05-notifications.yaml:105,non-repris: flux
+E3,FLX-E3,conception/06-flows/05-notifications.yaml:173,repris
+F1,,conception/06-flows/06-partage.yaml:41,non-repris: flux
+F2,,conception/06-flows/06-partage.yaml:89,non-repris: flux
+F3,,conception/06-flows/06-partage.yaml:139,non-repris: flux
+F4,,conception/06-flows/06-partage.yaml:210,non-repris: flux
+F5,,conception/06-flows/06-partage.yaml:273,non-repris: flux
+G1,,conception/06-flows/07-communaute.yaml:42,non-repris: flux
+G2,,conception/06-flows/07-communaute.yaml:93,non-repris: flux
+G3,,conception/06-flows/07-communaute.yaml:149,non-repris: flux
+G4,,conception/06-flows/07-communaute.yaml:227,non-repris: flux
+G5,,conception/06-flows/07-communaute.yaml:317,non-repris: flux
+G6,,conception/06-flows/07-communaute.yaml:380,non-repris: flux
+H1,,conception/06-flows/08-back-office.yaml:45,non-repris: flux
+H2,,conception/06-flows/08-back-office.yaml:100,non-repris: flux
+H3,,conception/06-flows/08-back-office.yaml:154,non-repris: flux
+H4,,conception/06-flows/08-back-office.yaml:206,non-repris: flux
+H5,,conception/06-flows/08-back-office.yaml:268,non-repris: flux
+H6,,conception/06-flows/08-back-office.yaml:317,non-repris: flux
 01,,conception/07-ecrans/00-index.yaml:62,non-repris: numéro de section
 02,,conception/07-ecrans/00-index.yaml:67,non-repris: numéro de section
 03,,conception/07-ecrans/00-index.yaml:71,non-repris: numéro de section
@@ -294,102 +294,102 @@ H6,FLX-H6,conception/06-flows/08-back-office.yaml:317,a-ecrire
 06,,conception/07-ecrans/00-index.yaml:83,non-repris: numéro de section
 07,,conception/07-ecrans/00-index.yaml:87,non-repris: numéro de section
 08,,conception/07-ecrans/00-index.yaml:91,non-repris: numéro de section
-E-CARTE-PRINCIPALE,ECR-CARTE-PRINCIPALE,conception/07-ecrans/00-index.yaml:101,a-ecrire
-E-CARTE-APERCU-PIN,ECR-CARTE-APERCU-PIN,conception/07-ecrans/00-index.yaml:106,a-ecrire
-E-CARTE-RECHERCHE,ECR-CARTE-RECHERCHE,conception/07-ecrans/00-index.yaml:111,a-ecrire
-E-CARTE-FILTRES-COUCHES,ECR-CARTE-FILTRES-COUCHES,conception/07-ecrans/00-index.yaml:116,a-ecrire
-E-CARTE-ALERTE-PROXIMITE,ECR-CARTE-ALERTE-PROXIMITE,conception/07-ecrans/00-index.yaml:121,a-ecrire
-E-PIN-CONSULTATION-APPROFONDIE,ECR-PIN-CONSULTATION-APPROFONDIE,conception/07-ecrans/00-index.yaml:128,a-ecrire
-E-PIN-MODE-PRESENTATION,ECR-PIN-MODE-PRESENTATION,conception/07-ecrans/00-index.yaml:134,a-ecrire
-E-PIN-CONSULTATION-3D,ECR-PIN-CONSULTATION-3D,conception/07-ecrans/00-index.yaml:139,a-ecrire
-E-PIN-CONSULTATION-AR,ECR-PIN-CONSULTATION-AR,conception/07-ecrans/00-index.yaml:144,a-ecrire
-E-PARCOURS-PRINCIPAL,ECR-PARCOURS-PRINCIPAL,conception/07-ecrans/00-index.yaml:151,a-ecrire
-E-PARCOURS-FILTRES,ECR-PARCOURS-FILTRES,conception/07-ecrans/00-index.yaml:157,a-ecrire
-E-PARCOURS-FICHE-DETAIL,ECR-PARCOURS-FICHE-DETAIL,conception/07-ecrans/00-index.yaml:162,a-ecrire
-E-PARCOURS-LANCEMENT,ECR-PARCOURS-LANCEMENT,conception/07-ecrans/00-index.yaml:168,a-ecrire
-E-PARCOURS-EN-COURS-TERRAIN,ECR-PARCOURS-EN-COURS-TERRAIN,conception/07-ecrans/00-index.yaml:173,a-ecrire
-E-PARCOURS-EN-COURS-CANAPE,ECR-PARCOURS-EN-COURS-CANAPE,conception/07-ecrans/00-index.yaml:178,a-ecrire
-E-PARCOURS-SAUT-ETAPE,ECR-PARCOURS-SAUT-ETAPE,conception/07-ecrans/00-index.yaml:183,a-ecrire
-E-PARCOURS-FIN-CELEBRATION,ECR-PARCOURS-FIN-CELEBRATION,conception/07-ecrans/00-index.yaml:188,a-ecrire
-E-PARCOURS-EDITEUR,ECR-PARCOURS-EDITEUR,conception/07-ecrans/00-index.yaml:193,a-ecrire
-E-PROFIL-PRINCIPAL,ECR-PROFIL-PRINCIPAL,conception/07-ecrans/00-index.yaml:201,a-ecrire
-E-PROFIL-FAVORIS,ECR-PROFIL-FAVORIS,conception/07-ecrans/00-index.yaml:206,a-ecrire
-E-PROFIL-HISTORIQUE,ECR-PROFIL-HISTORIQUE,conception/07-ecrans/00-index.yaml:211,a-ecrire
-E-PROFIL-PARAMETRES,ECR-PROFIL-PARAMETRES,conception/07-ecrans/00-index.yaml:216,a-ecrire
-E-PROFIL-CREATION-COMPTE,ECR-PROFIL-CREATION-COMPTE,conception/07-ecrans/00-index.yaml:221,a-ecrire
-E-PROFIL-CONNEXION-COMPTE,ECR-PROFIL-CONNEXION-COMPTE,conception/07-ecrans/00-index.yaml:226,a-ecrire
-E-PROFIL-PARAMETRES-COMPTE,ECR-PROFIL-PARAMETRES-COMPTE,conception/07-ecrans/00-index.yaml:231,a-ecrire
-E-COMMUNAUTE-REDACTION-COMMENTAIRE,ECR-COMMUNAUTE-REDACTION-COMMENTAIRE,conception/07-ecrans/00-index.yaml:238,a-ecrire
-E-COMMUNAUTE-REDACTION-SIGNALEMENT,ECR-COMMUNAUTE-REDACTION-SIGNALEMENT,conception/07-ecrans/00-index.yaml:243,a-ecrire
-E-COMMUNAUTE-SOUMISSION-PIN,ECR-COMMUNAUTE-SOUMISSION-PIN,conception/07-ecrans/00-index.yaml:248,a-ecrire
-E-COMMUNAUTE-SUIVI-SOUMISSIONS,ECR-COMMUNAUTE-SUIVI-SOUMISSIONS,conception/07-ecrans/00-index.yaml:254,a-ecrire
-E-COMMUNAUTE-REDACTION-RETOUR-PARCOURS,ECR-COMMUNAUTE-REDACTION-RETOUR-PARCOURS,conception/07-ecrans/00-index.yaml:260,a-ecrire
-E-PARTAGE-CODE-VISUEL,ECR-PARTAGE-CODE-VISUEL,conception/07-ecrans/00-index.yaml:267,a-ecrire
-E-PARTAGE-FIN-PARCOURS-IMAGE,ECR-PARTAGE-FIN-PARCOURS-IMAGE,conception/07-ecrans/00-index.yaml:272,a-ecrire
-E-TRANSVERSES-AUDIO-PERSISTANT,ECR-TRANSVERSES-AUDIO-PERSISTANT,conception/07-ecrans/00-index.yaml:280,a-ecrire
-E-TRANSVERSES-PARCOURS-PERSISTANT,ECR-TRANSVERSES-PARCOURS-PERSISTANT,conception/07-ecrans/00-index.yaml:285,a-ecrire
-E-TRANSVERSES-BANDEAU-OFFLINE,ECR-TRANSVERSES-BANDEAU-OFFLINE,conception/07-ecrans/00-index.yaml:290,a-ecrire
-E-TRANSVERSES-DIALOGUE-CONFIRMATION,ECR-TRANSVERSES-DIALOGUE-CONFIRMATION,conception/07-ecrans/00-index.yaml:295,a-ecrire
-E-TRANSVERSES-MESSAGE-EPHEMERE,ECR-TRANSVERSES-MESSAGE-EPHEMERE,conception/07-ecrans/00-index.yaml:301,a-ecrire
-E-TRANSVERSES-DIALOGUE-PERMISSION,ECR-TRANSVERSES-DIALOGUE-PERMISSION,conception/07-ecrans/00-index.yaml:307,a-ecrire
-E-TRANSVERSES-INDICATION-ONBOARDING,ECR-TRANSVERSES-INDICATION-ONBOARDING,conception/07-ecrans/00-index.yaml:312,a-ecrire
-E-TRANSVERSES-INVITATION-MICROPARCOURS,ECR-TRANSVERSES-INVITATION-MICROPARCOURS,conception/07-ecrans/00-index.yaml:318,a-ecrire
-E-ADMIN-ACCUEIL,ECR-ADMIN-ACCUEIL,conception/07-ecrans/00-index.yaml:326,a-ecrire
-E-ADMIN-CATALOGUE-PINS,ECR-ADMIN-CATALOGUE-PINS,conception/07-ecrans/00-index.yaml:331,a-ecrire
-E-ADMIN-SAISIE-PIN-TEMPLATE,ECR-ADMIN-SAISIE-PIN-TEMPLATE,conception/07-ecrans/00-index.yaml:336,a-ecrire
-E-ADMIN-VALIDATION-SCIENTIFIQUE,ECR-ADMIN-VALIDATION-SCIENTIFIQUE,conception/07-ecrans/00-index.yaml:341,a-ecrire
-E-ADMIN-MODERATION-COMMUNAUTAIRE,ECR-ADMIN-MODERATION-COMMUNAUTAIRE,conception/07-ecrans/00-index.yaml:346,a-ecrire
-E-ADMIN-MODERATION-SOUMISSIONS,ECR-ADMIN-MODERATION-SOUMISSIONS,conception/07-ecrans/00-index.yaml:351,a-ecrire
-E-ADMIN-PROMOTION-COMMUNAUTAIRE,ECR-ADMIN-PROMOTION-COMMUNAUTAIRE,conception/07-ecrans/00-index.yaml:356,a-ecrire
-E-ADMIN-RETRAIT-REOUVERTURE-PIN,ECR-ADMIN-RETRAIT-REOUVERTURE-PIN,conception/07-ecrans/00-index.yaml:361,a-ecrire
-E-ADMIN-ACCUEIL,ECR-ADMIN-ACCUEIL,conception/07-ecrans/admin/01-accueil.yaml:15,a-ecrire
-E-ADMIN-CATALOGUE-PINS,ECR-ADMIN-CATALOGUE-PINS,conception/07-ecrans/admin/02-catalogue-pins.yaml:19,a-ecrire
-E-ADMIN-SAISIE-PIN-TEMPLATE,ECR-ADMIN-SAISIE-PIN-TEMPLATE,conception/07-ecrans/admin/03-saisie-pin-template.yaml:16,a-ecrire
-E-ADMIN-VALIDATION-SCIENTIFIQUE,ECR-ADMIN-VALIDATION-SCIENTIFIQUE,conception/07-ecrans/admin/04-validation-scientifique.yaml:16,a-ecrire
-E-ADMIN-MODERATION-COMMUNAUTAIRE,ECR-ADMIN-MODERATION-COMMUNAUTAIRE,conception/07-ecrans/admin/05-moderation-communautaire.yaml:15,a-ecrire
-E-ADMIN-MODERATION-SOUMISSIONS,ECR-ADMIN-MODERATION-SOUMISSIONS,conception/07-ecrans/admin/06-moderation-soumissions.yaml:15,a-ecrire
-E-ADMIN-PROMOTION-COMMUNAUTAIRE,ECR-ADMIN-PROMOTION-COMMUNAUTAIRE,conception/07-ecrans/admin/07-promotion-communautaire.yaml:16,a-ecrire
-E-ADMIN-RETRAIT-REOUVERTURE-PIN,ECR-ADMIN-RETRAIT-REOUVERTURE-PIN,conception/07-ecrans/admin/08-retrait-reouverture-pin.yaml:15,a-ecrire
-E-CARTE-PRINCIPALE,ECR-CARTE-PRINCIPALE,conception/07-ecrans/carte/01-principale.yaml:15,a-ecrire
-E-CARTE-APERCU-PIN,ECR-CARTE-APERCU-PIN,conception/07-ecrans/carte/02-apercu-pin.yaml:15,a-ecrire
-E-CARTE-RECHERCHE,ECR-CARTE-RECHERCHE,conception/07-ecrans/carte/03-recherche.yaml:14,a-ecrire
-E-CARTE-FILTRES-COUCHES,ECR-CARTE-FILTRES-COUCHES,conception/07-ecrans/carte/04-filtres-couches.yaml:14,a-ecrire
-E-CARTE-ALERTE-PROXIMITE,ECR-CARTE-ALERTE-PROXIMITE,conception/07-ecrans/carte/05-alerte-proximite.yaml:15,a-ecrire
-E-COMMUNAUTE-REDACTION-COMMENTAIRE,ECR-COMMUNAUTE-REDACTION-COMMENTAIRE,conception/07-ecrans/communaute/01-redaction-commentaire.yaml:15,a-ecrire
-E-COMMUNAUTE-REDACTION-SIGNALEMENT,ECR-COMMUNAUTE-REDACTION-SIGNALEMENT,conception/07-ecrans/communaute/02-redaction-signalement.yaml:16,a-ecrire
-E-COMMUNAUTE-SOUMISSION-PIN,ECR-COMMUNAUTE-SOUMISSION-PIN,conception/07-ecrans/communaute/03-soumission-pin.yaml:16,a-ecrire
-E-COMMUNAUTE-SUIVI-SOUMISSIONS,ECR-COMMUNAUTE-SUIVI-SOUMISSIONS,conception/07-ecrans/communaute/04-suivi-soumissions.yaml:16,a-ecrire
-E-COMMUNAUTE-REDACTION-RETOUR-PARCOURS,ECR-COMMUNAUTE-REDACTION-RETOUR-PARCOURS,conception/07-ecrans/communaute/05-redaction-retour-parcours.yaml:17,a-ecrire
-E-PARCOURS-PRINCIPAL,ECR-PARCOURS-PRINCIPAL,conception/07-ecrans/parcours/01-principal.yaml:15,a-ecrire
-E-PARCOURS-FILTRES,ECR-PARCOURS-FILTRES,conception/07-ecrans/parcours/02-filtres.yaml:14,a-ecrire
-E-PARCOURS-FICHE-DETAIL,ECR-PARCOURS-FICHE-DETAIL,conception/07-ecrans/parcours/03-fiche-detail.yaml:15,a-ecrire
-E-PARCOURS-LANCEMENT,ECR-PARCOURS-LANCEMENT,conception/07-ecrans/parcours/04-lancement.yaml:15,a-ecrire
-E-PARCOURS-EN-COURS-TERRAIN,ECR-PARCOURS-EN-COURS-TERRAIN,conception/07-ecrans/parcours/05-en-cours-terrain.yaml:16,a-ecrire
-E-PARCOURS-EN-COURS-CANAPE,ECR-PARCOURS-EN-COURS-CANAPE,conception/07-ecrans/parcours/06-en-cours-canape.yaml:15,a-ecrire
-E-PARCOURS-SAUT-ETAPE,ECR-PARCOURS-SAUT-ETAPE,conception/07-ecrans/parcours/07-saut-etape.yaml:16,a-ecrire
-E-PARCOURS-FIN-CELEBRATION,ECR-PARCOURS-FIN-CELEBRATION,conception/07-ecrans/parcours/08-fin-celebration.yaml:16,a-ecrire
-E-PARCOURS-EDITEUR,ECR-PARCOURS-EDITEUR,conception/07-ecrans/parcours/09-editeur.yaml:16,a-ecrire
-E-PARTAGE-CODE-VISUEL,ECR-PARTAGE-CODE-VISUEL,conception/07-ecrans/partage/01-code-visuel.yaml:15,a-ecrire
-E-PARTAGE-FIN-PARCOURS-IMAGE,ECR-PARTAGE-FIN-PARCOURS-IMAGE,conception/07-ecrans/partage/02-fin-parcours-image.yaml:15,a-ecrire
-E-PIN-CONSULTATION-APPROFONDIE,ECR-PIN-CONSULTATION-APPROFONDIE,conception/07-ecrans/pin/01-consultation-approfondie.yaml:15,a-ecrire
-E-PIN-MODE-PRESENTATION,ECR-PIN-MODE-PRESENTATION,conception/07-ecrans/pin/02-mode-presentation.yaml:16,a-ecrire
-E-PIN-CONSULTATION-3D,ECR-PIN-CONSULTATION-3D,conception/07-ecrans/pin/03-consultation-3d.yaml:16,a-ecrire
-E-PIN-CONSULTATION-AR,ECR-PIN-CONSULTATION-AR,conception/07-ecrans/pin/04-consultation-ar.yaml:15,a-ecrire
-E-PROFIL-PRINCIPAL,ECR-PROFIL-PRINCIPAL,conception/07-ecrans/profil/01-principal.yaml:16,a-ecrire
-E-PROFIL-FAVORIS,ECR-PROFIL-FAVORIS,conception/07-ecrans/profil/02-favoris.yaml:15,a-ecrire
-E-PROFIL-HISTORIQUE,ECR-PROFIL-HISTORIQUE,conception/07-ecrans/profil/03-historique.yaml:17,a-ecrire
-E-PROFIL-PARAMETRES,ECR-PROFIL-PARAMETRES,conception/07-ecrans/profil/04-parametres.yaml:16,a-ecrire
-E-PROFIL-CREATION-COMPTE,ECR-PROFIL-CREATION-COMPTE,conception/07-ecrans/profil/05-creation-compte.yaml:18,a-ecrire
-E-PROFIL-CONNEXION-COMPTE,ECR-PROFIL-CONNEXION-COMPTE,conception/07-ecrans/profil/06-connexion-compte.yaml:15,a-ecrire
-E-PROFIL-PARAMETRES-COMPTE,ECR-PROFIL-PARAMETRES-COMPTE,conception/07-ecrans/profil/07-parametres-compte.yaml:17,a-ecrire
-E-TRANSVERSES-AUDIO-PERSISTANT,ECR-TRANSVERSES-AUDIO-PERSISTANT,conception/07-ecrans/transverses/01-audio-persistant.yaml:16,a-ecrire
-E-TRANSVERSES-PARCOURS-PERSISTANT,ECR-TRANSVERSES-PARCOURS-PERSISTANT,conception/07-ecrans/transverses/02-parcours-persistant.yaml:15,a-ecrire
-E-TRANSVERSES-BANDEAU-OFFLINE,ECR-TRANSVERSES-BANDEAU-OFFLINE,conception/07-ecrans/transverses/03-bandeau-offline.yaml:15,a-ecrire
-E-TRANSVERSES-DIALOGUE-CONFIRMATION,ECR-TRANSVERSES-DIALOGUE-CONFIRMATION,conception/07-ecrans/transverses/04-dialogue-confirmation.yaml:17,a-ecrire
-E-TRANSVERSES-MESSAGE-EPHEMERE,ECR-TRANSVERSES-MESSAGE-EPHEMERE,conception/07-ecrans/transverses/05-message-ephemere.yaml:17,a-ecrire
-E-TRANSVERSES-DIALOGUE-PERMISSION,ECR-TRANSVERSES-DIALOGUE-PERMISSION,conception/07-ecrans/transverses/06-dialogue-permission.yaml:16,a-ecrire
-E-TRANSVERSES-INDICATION-ONBOARDING,ECR-TRANSVERSES-INDICATION-ONBOARDING,conception/07-ecrans/transverses/07-indication-onboarding.yaml:21,a-ecrire
-E-TRANSVERSES-INVITATION-MICROPARCOURS,ECR-TRANSVERSES-INVITATION-MICROPARCOURS,conception/07-ecrans/transverses/08-invitation-microparcours.yaml:20,a-ecrire
+E-CARTE-PRINCIPALE,ECR-CARTE-PRINCIPALE,conception/07-ecrans/00-index.yaml:101,repris
+E-CARTE-APERCU-PIN,ECR-CARTE-APERCU-PIN,conception/07-ecrans/00-index.yaml:106,repris
+E-CARTE-RECHERCHE,,conception/07-ecrans/00-index.yaml:111,non-repris: écran
+E-CARTE-FILTRES-COUCHES,,conception/07-ecrans/00-index.yaml:116,non-repris: écran
+E-CARTE-ALERTE-PROXIMITE,,conception/07-ecrans/00-index.yaml:121,non-repris: écran
+E-PIN-CONSULTATION-APPROFONDIE,ECR-PIN-CONSULTATION-APPROFONDIE,conception/07-ecrans/00-index.yaml:128,repris
+E-PIN-MODE-PRESENTATION,,conception/07-ecrans/00-index.yaml:134,non-repris: écran
+E-PIN-CONSULTATION-3D,ECR-PIN-CONSULTATION-3D,conception/07-ecrans/00-index.yaml:139,repris
+E-PIN-CONSULTATION-AR,,conception/07-ecrans/00-index.yaml:144,non-repris: écran
+E-PARCOURS-PRINCIPAL,,conception/07-ecrans/00-index.yaml:151,non-repris: écran
+E-PARCOURS-FILTRES,,conception/07-ecrans/00-index.yaml:157,non-repris: écran
+E-PARCOURS-FICHE-DETAIL,ECR-PARCOURS-FICHE-DETAIL,conception/07-ecrans/00-index.yaml:162,repris
+E-PARCOURS-LANCEMENT,,conception/07-ecrans/00-index.yaml:168,non-repris: écran
+E-PARCOURS-EN-COURS-TERRAIN,ECR-PARCOURS-EN-COURS-TERRAIN,conception/07-ecrans/00-index.yaml:173,repris
+E-PARCOURS-EN-COURS-CANAPE,,conception/07-ecrans/00-index.yaml:178,non-repris: écran
+E-PARCOURS-SAUT-ETAPE,,conception/07-ecrans/00-index.yaml:183,non-repris: écran
+E-PARCOURS-FIN-CELEBRATION,ECR-PARCOURS-FIN-CELEBRATION,conception/07-ecrans/00-index.yaml:188,repris
+E-PARCOURS-EDITEUR,,conception/07-ecrans/00-index.yaml:193,non-repris: écran
+E-PROFIL-PRINCIPAL,,conception/07-ecrans/00-index.yaml:201,non-repris: écran
+E-PROFIL-FAVORIS,,conception/07-ecrans/00-index.yaml:206,non-repris: écran
+E-PROFIL-HISTORIQUE,,conception/07-ecrans/00-index.yaml:211,non-repris: écran
+E-PROFIL-PARAMETRES,,conception/07-ecrans/00-index.yaml:216,non-repris: écran
+E-PROFIL-CREATION-COMPTE,,conception/07-ecrans/00-index.yaml:221,non-repris: écran
+E-PROFIL-CONNEXION-COMPTE,,conception/07-ecrans/00-index.yaml:226,non-repris: écran
+E-PROFIL-PARAMETRES-COMPTE,,conception/07-ecrans/00-index.yaml:231,non-repris: écran
+E-COMMUNAUTE-REDACTION-COMMENTAIRE,,conception/07-ecrans/00-index.yaml:238,non-repris: écran
+E-COMMUNAUTE-REDACTION-SIGNALEMENT,,conception/07-ecrans/00-index.yaml:243,non-repris: écran
+E-COMMUNAUTE-SOUMISSION-PIN,,conception/07-ecrans/00-index.yaml:248,non-repris: écran
+E-COMMUNAUTE-SUIVI-SOUMISSIONS,,conception/07-ecrans/00-index.yaml:254,non-repris: écran
+E-COMMUNAUTE-REDACTION-RETOUR-PARCOURS,,conception/07-ecrans/00-index.yaml:260,non-repris: écran
+E-PARTAGE-CODE-VISUEL,,conception/07-ecrans/00-index.yaml:267,non-repris: écran
+E-PARTAGE-FIN-PARCOURS-IMAGE,,conception/07-ecrans/00-index.yaml:272,non-repris: écran
+E-TRANSVERSES-AUDIO-PERSISTANT,,conception/07-ecrans/00-index.yaml:280,non-repris: écran
+E-TRANSVERSES-PARCOURS-PERSISTANT,ECR-TRANSVERSES-PARCOURS-PERSISTANT,conception/07-ecrans/00-index.yaml:285,repris
+E-TRANSVERSES-BANDEAU-OFFLINE,ECR-TRANSVERSES-BANDEAU-OFFLINE,conception/07-ecrans/00-index.yaml:290,repris
+E-TRANSVERSES-DIALOGUE-CONFIRMATION,ECR-TRANSVERSES-DIALOGUE-CONFIRMATION,conception/07-ecrans/00-index.yaml:295,repris
+E-TRANSVERSES-MESSAGE-EPHEMERE,ECR-TRANSVERSES-MESSAGE-EPHEMERE,conception/07-ecrans/00-index.yaml:301,repris
+E-TRANSVERSES-DIALOGUE-PERMISSION,,conception/07-ecrans/00-index.yaml:307,non-repris: écran
+E-TRANSVERSES-INDICATION-ONBOARDING,,conception/07-ecrans/00-index.yaml:312,non-repris: écran
+E-TRANSVERSES-INVITATION-MICROPARCOURS,,conception/07-ecrans/00-index.yaml:318,non-repris: écran
+E-ADMIN-ACCUEIL,,conception/07-ecrans/00-index.yaml:326,non-repris: écran
+E-ADMIN-CATALOGUE-PINS,,conception/07-ecrans/00-index.yaml:331,non-repris: écran
+E-ADMIN-SAISIE-PIN-TEMPLATE,,conception/07-ecrans/00-index.yaml:336,non-repris: écran
+E-ADMIN-VALIDATION-SCIENTIFIQUE,,conception/07-ecrans/00-index.yaml:341,non-repris: écran
+E-ADMIN-MODERATION-COMMUNAUTAIRE,,conception/07-ecrans/00-index.yaml:346,non-repris: écran
+E-ADMIN-MODERATION-SOUMISSIONS,,conception/07-ecrans/00-index.yaml:351,non-repris: écran
+E-ADMIN-PROMOTION-COMMUNAUTAIRE,,conception/07-ecrans/00-index.yaml:356,non-repris: écran
+E-ADMIN-RETRAIT-REOUVERTURE-PIN,,conception/07-ecrans/00-index.yaml:361,non-repris: écran
+E-ADMIN-ACCUEIL,,conception/07-ecrans/admin/01-accueil.yaml:15,non-repris: écran
+E-ADMIN-CATALOGUE-PINS,,conception/07-ecrans/admin/02-catalogue-pins.yaml:19,non-repris: écran
+E-ADMIN-SAISIE-PIN-TEMPLATE,,conception/07-ecrans/admin/03-saisie-pin-template.yaml:16,non-repris: écran
+E-ADMIN-VALIDATION-SCIENTIFIQUE,,conception/07-ecrans/admin/04-validation-scientifique.yaml:16,non-repris: écran
+E-ADMIN-MODERATION-COMMUNAUTAIRE,,conception/07-ecrans/admin/05-moderation-communautaire.yaml:15,non-repris: écran
+E-ADMIN-MODERATION-SOUMISSIONS,,conception/07-ecrans/admin/06-moderation-soumissions.yaml:15,non-repris: écran
+E-ADMIN-PROMOTION-COMMUNAUTAIRE,,conception/07-ecrans/admin/07-promotion-communautaire.yaml:16,non-repris: écran
+E-ADMIN-RETRAIT-REOUVERTURE-PIN,,conception/07-ecrans/admin/08-retrait-reouverture-pin.yaml:15,non-repris: écran
+E-CARTE-PRINCIPALE,ECR-CARTE-PRINCIPALE,conception/07-ecrans/carte/01-principale.yaml:15,repris
+E-CARTE-APERCU-PIN,ECR-CARTE-APERCU-PIN,conception/07-ecrans/carte/02-apercu-pin.yaml:15,repris
+E-CARTE-RECHERCHE,,conception/07-ecrans/carte/03-recherche.yaml:14,non-repris: écran
+E-CARTE-FILTRES-COUCHES,,conception/07-ecrans/carte/04-filtres-couches.yaml:14,non-repris: écran
+E-CARTE-ALERTE-PROXIMITE,,conception/07-ecrans/carte/05-alerte-proximite.yaml:15,non-repris: écran
+E-COMMUNAUTE-REDACTION-COMMENTAIRE,,conception/07-ecrans/communaute/01-redaction-commentaire.yaml:15,non-repris: écran
+E-COMMUNAUTE-REDACTION-SIGNALEMENT,,conception/07-ecrans/communaute/02-redaction-signalement.yaml:16,non-repris: écran
+E-COMMUNAUTE-SOUMISSION-PIN,,conception/07-ecrans/communaute/03-soumission-pin.yaml:16,non-repris: écran
+E-COMMUNAUTE-SUIVI-SOUMISSIONS,,conception/07-ecrans/communaute/04-suivi-soumissions.yaml:16,non-repris: écran
+E-COMMUNAUTE-REDACTION-RETOUR-PARCOURS,,conception/07-ecrans/communaute/05-redaction-retour-parcours.yaml:17,non-repris: écran
+E-PARCOURS-PRINCIPAL,,conception/07-ecrans/parcours/01-principal.yaml:15,non-repris: écran
+E-PARCOURS-FILTRES,,conception/07-ecrans/parcours/02-filtres.yaml:14,non-repris: écran
+E-PARCOURS-FICHE-DETAIL,ECR-PARCOURS-FICHE-DETAIL,conception/07-ecrans/parcours/03-fiche-detail.yaml:15,repris
+E-PARCOURS-LANCEMENT,,conception/07-ecrans/parcours/04-lancement.yaml:15,non-repris: écran
+E-PARCOURS-EN-COURS-TERRAIN,ECR-PARCOURS-EN-COURS-TERRAIN,conception/07-ecrans/parcours/05-en-cours-terrain.yaml:16,repris
+E-PARCOURS-EN-COURS-CANAPE,,conception/07-ecrans/parcours/06-en-cours-canape.yaml:15,non-repris: écran
+E-PARCOURS-SAUT-ETAPE,,conception/07-ecrans/parcours/07-saut-etape.yaml:16,non-repris: écran
+E-PARCOURS-FIN-CELEBRATION,ECR-PARCOURS-FIN-CELEBRATION,conception/07-ecrans/parcours/08-fin-celebration.yaml:16,repris
+E-PARCOURS-EDITEUR,,conception/07-ecrans/parcours/09-editeur.yaml:16,non-repris: écran
+E-PARTAGE-CODE-VISUEL,,conception/07-ecrans/partage/01-code-visuel.yaml:15,non-repris: écran
+E-PARTAGE-FIN-PARCOURS-IMAGE,,conception/07-ecrans/partage/02-fin-parcours-image.yaml:15,non-repris: écran
+E-PIN-CONSULTATION-APPROFONDIE,ECR-PIN-CONSULTATION-APPROFONDIE,conception/07-ecrans/pin/01-consultation-approfondie.yaml:15,repris
+E-PIN-MODE-PRESENTATION,,conception/07-ecrans/pin/02-mode-presentation.yaml:16,non-repris: écran
+E-PIN-CONSULTATION-3D,ECR-PIN-CONSULTATION-3D,conception/07-ecrans/pin/03-consultation-3d.yaml:16,repris
+E-PIN-CONSULTATION-AR,,conception/07-ecrans/pin/04-consultation-ar.yaml:15,non-repris: écran
+E-PROFIL-PRINCIPAL,,conception/07-ecrans/profil/01-principal.yaml:16,non-repris: écran
+E-PROFIL-FAVORIS,,conception/07-ecrans/profil/02-favoris.yaml:15,non-repris: écran
+E-PROFIL-HISTORIQUE,,conception/07-ecrans/profil/03-historique.yaml:17,non-repris: écran
+E-PROFIL-PARAMETRES,,conception/07-ecrans/profil/04-parametres.yaml:16,non-repris: écran
+E-PROFIL-CREATION-COMPTE,,conception/07-ecrans/profil/05-creation-compte.yaml:18,non-repris: écran
+E-PROFIL-CONNEXION-COMPTE,,conception/07-ecrans/profil/06-connexion-compte.yaml:15,non-repris: écran
+E-PROFIL-PARAMETRES-COMPTE,,conception/07-ecrans/profil/07-parametres-compte.yaml:17,non-repris: écran
+E-TRANSVERSES-AUDIO-PERSISTANT,,conception/07-ecrans/transverses/01-audio-persistant.yaml:16,non-repris: écran
+E-TRANSVERSES-PARCOURS-PERSISTANT,ECR-TRANSVERSES-PARCOURS-PERSISTANT,conception/07-ecrans/transverses/02-parcours-persistant.yaml:15,repris
+E-TRANSVERSES-BANDEAU-OFFLINE,ECR-TRANSVERSES-BANDEAU-OFFLINE,conception/07-ecrans/transverses/03-bandeau-offline.yaml:15,repris
+E-TRANSVERSES-DIALOGUE-CONFIRMATION,ECR-TRANSVERSES-DIALOGUE-CONFIRMATION,conception/07-ecrans/transverses/04-dialogue-confirmation.yaml:17,repris
+E-TRANSVERSES-MESSAGE-EPHEMERE,ECR-TRANSVERSES-MESSAGE-EPHEMERE,conception/07-ecrans/transverses/05-message-ephemere.yaml:17,repris
+E-TRANSVERSES-DIALOGUE-PERMISSION,,conception/07-ecrans/transverses/06-dialogue-permission.yaml:16,non-repris: écran
+E-TRANSVERSES-INDICATION-ONBOARDING,,conception/07-ecrans/transverses/07-indication-onboarding.yaml:21,non-repris: écran
+E-TRANSVERSES-INVITATION-MICROPARCOURS,,conception/07-ecrans/transverses/08-invitation-microparcours.yaml:20,non-repris: écran
 P1,,conception/08-contenu/01-strategie-narrative.yaml:160,non-repris: principe ou bloc de contenu
 P2,,conception/08-contenu/01-strategie-narrative.yaml:167,non-repris: principe ou bloc de contenu
 P3,,conception/08-contenu/01-strategie-narrative.yaml:175,non-repris: principe ou bloc de contenu
@@ -423,14 +423,14 @@ le_saviez_vous,,conception/08-contenu/02-template-pin.yaml:351,non-repris: princ
 citation_inline_dans_le_recit,,conception/08-contenu/02-template-pin.yaml:386,non-repris: principe ou bloc de contenu
 pied_de_page_recapitulatif,,conception/08-contenu/02-template-pin.yaml:391,non-repris: principe ou bloc de contenu
 lien_externe_consultable,,conception/08-contenu/02-template-pin.yaml:402,non-repris: principe ou bloc de contenu
-E-ADMIN-ACCUEIL,ECR-ADMIN-ACCUEIL,conception/08-contenu/05-microcopy-admin.yaml:142,a-ecrire
-E-ADMIN-CATALOGUE-PINS,ECR-ADMIN-CATALOGUE-PINS,conception/08-contenu/05-microcopy-admin.yaml:155,a-ecrire
-E-ADMIN-SAISIE-PIN-TEMPLATE,ECR-ADMIN-SAISIE-PIN-TEMPLATE,conception/08-contenu/05-microcopy-admin.yaml:168,a-ecrire
-E-ADMIN-VALIDATION-SCIENTIFIQUE,ECR-ADMIN-VALIDATION-SCIENTIFIQUE,conception/08-contenu/05-microcopy-admin.yaml:202,a-ecrire
-E-ADMIN-MODERATION-COMMUNAUTAIRE,ECR-ADMIN-MODERATION-COMMUNAUTAIRE,conception/08-contenu/05-microcopy-admin.yaml:221,a-ecrire
-E-ADMIN-MODERATION-SOUMISSIONS,ECR-ADMIN-MODERATION-SOUMISSIONS,conception/08-contenu/05-microcopy-admin.yaml:239,a-ecrire
-E-ADMIN-PROMOTION-COMMUNAUTAIRE,ECR-ADMIN-PROMOTION-COMMUNAUTAIRE,conception/08-contenu/05-microcopy-admin.yaml:263,a-ecrire
-E-ADMIN-RETRAIT-REOUVERTURE-PIN,ECR-ADMIN-RETRAIT-REOUVERTURE-PIN,conception/08-contenu/05-microcopy-admin.yaml:280,a-ecrire
+E-ADMIN-ACCUEIL,,conception/08-contenu/05-microcopy-admin.yaml:142,non-repris: principe ou bloc de contenu
+E-ADMIN-CATALOGUE-PINS,,conception/08-contenu/05-microcopy-admin.yaml:155,non-repris: principe ou bloc de contenu
+E-ADMIN-SAISIE-PIN-TEMPLATE,,conception/08-contenu/05-microcopy-admin.yaml:168,non-repris: principe ou bloc de contenu
+E-ADMIN-VALIDATION-SCIENTIFIQUE,,conception/08-contenu/05-microcopy-admin.yaml:202,non-repris: principe ou bloc de contenu
+E-ADMIN-MODERATION-COMMUNAUTAIRE,,conception/08-contenu/05-microcopy-admin.yaml:221,non-repris: principe ou bloc de contenu
+E-ADMIN-MODERATION-SOUMISSIONS,,conception/08-contenu/05-microcopy-admin.yaml:239,non-repris: principe ou bloc de contenu
+E-ADMIN-PROMOTION-COMMUNAUTAIRE,,conception/08-contenu/05-microcopy-admin.yaml:263,non-repris: principe ou bloc de contenu
+E-ADMIN-RETRAIT-REOUVERTURE-PIN,,conception/08-contenu/05-microcopy-admin.yaml:280,non-repris: principe ou bloc de contenu
 confirmation_retrait_pin_publie,,conception/08-contenu/05-microcopy-admin.yaml:361,non-repris: principe ou bloc de contenu
 confirmation_suppression_brouillon,,conception/08-contenu/05-microcopy-admin.yaml:372,non-repris: principe ou bloc de contenu
 confirmation_promotion,,conception/08-contenu/05-microcopy-admin.yaml:380,non-repris: principe ou bloc de contenu
@@ -491,19 +491,19 @@ PI-FOCUS-TRAP-DIALOGUE,,conception/10-composants/00-index.yaml:329,"non-repris: 
 03,,conception/10-composants/00-index.yaml:362,non-repris: numéro de section
 04,,conception/10-composants/00-index.yaml:377,non-repris: numéro de section
 05,,conception/10-composants/00-index.yaml:388,non-repris: numéro de section
-comp-button-back,COMP-BUTTON-BACK,conception/10-composants/00-index.yaml:449,a-ecrire
-comp-icone,COMP-ICONE,conception/10-composants/00-index.yaml:459,a-ecrire
-comp-button-primary,COMP-BUTTON-PRIMARY,conception/10-composants/00-index.yaml:493,a-ecrire
-comp-libelle-bouton,COMP-LIBELLE-BOUTON,conception/10-composants/00-index.yaml:503,a-ecrire
-comp-icone,COMP-ICONE,conception/10-composants/00-index.yaml:506,a-ecrire
-comp-libelle-texte,COMP-LIBELLE-TEXTE,conception/10-composants/00-index.yaml:587,a-ecrire
-comp-button-primary,COMP-BUTTON-PRIMARY,conception/10-composants/00-index.yaml:591,a-ecrire
-comp-button-secondary,COMP-BUTTON-SECONDARY,conception/10-composants/00-index.yaml:594,a-ecrire
-comp-button-primary,COMP-BUTTON-PRIMARY,conception/10-composants/00-index.yaml:633,a-ecrire
-comp-libelle-texte,COMP-LIBELLE-TEXTE,conception/10-composants/00-index.yaml:635,a-ecrire
-comp-icone,COMP-ICONE,conception/10-composants/00-index.yaml:637,a-ecrire
-comp-libelle-bouton,COMP-LIBELLE-BOUTON,conception/10-composants/00-index.yaml:639,a-ecrire
-comp-chip-categorie,COMP-CHIP-CATEGORIE,conception/10-composants/00-index.yaml:641,a-ecrire
+comp-button-back,COMP-BUTTON-BACK,conception/10-composants/00-index.yaml:449,repris
+comp-icone,COMP-ICONE,conception/10-composants/00-index.yaml:459,repris
+comp-button-primary,COMP-BUTTON-PRIMARY,conception/10-composants/00-index.yaml:493,repris
+comp-libelle-bouton,COMP-LIBELLE-BOUTON,conception/10-composants/00-index.yaml:503,repris
+comp-icone,COMP-ICONE,conception/10-composants/00-index.yaml:506,repris
+comp-libelle-texte,COMP-LIBELLE-TEXTE,conception/10-composants/00-index.yaml:587,repris
+comp-button-primary,COMP-BUTTON-PRIMARY,conception/10-composants/00-index.yaml:591,repris
+comp-button-secondary,COMP-BUTTON-SECONDARY,conception/10-composants/00-index.yaml:594,repris
+comp-button-primary,COMP-BUTTON-PRIMARY,conception/10-composants/00-index.yaml:633,repris
+comp-libelle-texte,COMP-LIBELLE-TEXTE,conception/10-composants/00-index.yaml:635,repris
+comp-icone,COMP-ICONE,conception/10-composants/00-index.yaml:637,repris
+comp-libelle-bouton,COMP-LIBELLE-BOUTON,conception/10-composants/00-index.yaml:639,repris
+comp-chip-categorie,COMP-CHIP-CATEGORIE,conception/10-composants/00-index.yaml:641,repris
 D1,,conception/10-composants/00-index.yaml:649,"non-repris: état, interaction ou décision"
 D2,,conception/10-composants/00-index.yaml:653,"non-repris: état, interaction ou décision"
 D3,,conception/10-composants/00-index.yaml:657,"non-repris: état, interaction ou décision"
@@ -514,141 +514,141 @@ D7,,conception/10-composants/00-index.yaml:673,"non-repris: état, interaction o
 D8,,conception/10-composants/00-index.yaml:680,"non-repris: état, interaction ou décision"
 D9,,conception/10-composants/00-index.yaml:687,"non-repris: état, interaction ou décision"
 D10,,conception/10-composants/00-index.yaml:695,"non-repris: état, interaction ou décision"
-comp-button-primary,COMP-BUTTON-PRIMARY,conception/10-composants/01-atomes.yaml:76,a-ecrire
-comp-button-secondary,COMP-BUTTON-SECONDARY,conception/10-composants/01-atomes.yaml:106,a-ecrire
-comp-button-tertiary,COMP-BUTTON-TERTIARY,conception/10-composants/01-atomes.yaml:131,a-ecrire
-comp-button-back,COMP-BUTTON-BACK,conception/10-composants/01-atomes.yaml:154,a-ecrire
-comp-button-fermeture-overlay,COMP-BUTTON-FERMETURE-OVERLAY,conception/10-composants/01-atomes.yaml:190,a-ecrire
-comp-button-fab-creation,COMP-BUTTON-FAB-CREATION,conception/10-composants/01-atomes.yaml:220,a-ecrire
-comp-button-play-audio,COMP-BUTTON-PLAY-AUDIO,conception/10-composants/01-atomes.yaml:258,a-ecrire
-comp-chip-epoque,COMP-CHIP-EPOQUE,conception/10-composants/01-atomes.yaml:295,a-ecrire
-comp-chip-couche-carte,COMP-CHIP-COUCHE-CARTE,conception/10-composants/01-atomes.yaml:324,a-ecrire
-comp-chip-categorie,COMP-CHIP-CATEGORIE,conception/10-composants/01-atomes.yaml:347,a-ecrire
-comp-chip-filtre,COMP-CHIP-FILTRE,conception/10-composants/01-atomes.yaml:368,a-ecrire
-comp-badge-statut,COMP-BADGE-STATUT,conception/10-composants/01-atomes.yaml:396,a-ecrire
-comp-badge-nombre,COMP-BADGE-NOMBRE,conception/10-composants/01-atomes.yaml:413,a-ecrire
-comp-avatar,COMP-AVATAR,conception/10-composants/01-atomes.yaml:433,a-ecrire
-comp-image-hero,COMP-IMAGE-HERO,conception/10-composants/01-atomes.yaml:450,a-ecrire
-comp-toggle-switch,COMP-TOGGLE-SWITCH,conception/10-composants/01-atomes.yaml:474,a-ecrire
-comp-champ-saisie-texte,COMP-CHAMP-SAISIE-TEXTE,conception/10-composants/01-atomes.yaml:510,a-ecrire
-comp-champ-saisie-textarea,COMP-CHAMP-SAISIE-TEXTAREA,conception/10-composants/01-atomes.yaml:539,a-ecrire
-comp-champ-saisie-nombre,COMP-CHAMP-SAISIE-NOMBRE,conception/10-composants/01-atomes.yaml:565,a-ecrire
-comp-champ-saisie-date,COMP-CHAMP-SAISIE-DATE,conception/10-composants/01-atomes.yaml:591,a-ecrire
-comp-champ-saisie-lieu,COMP-CHAMP-SAISIE-LIEU,conception/10-composants/01-atomes.yaml:617,a-ecrire
-comp-icone,COMP-ICONE,conception/10-composants/01-atomes.yaml:650,a-ecrire
-comp-libelle-texte,COMP-LIBELLE-TEXTE,conception/10-composants/01-atomes.yaml:675,a-ecrire
-comp-libelle-bouton,COMP-LIBELLE-BOUTON,conception/10-composants/01-atomes.yaml:697,a-ecrire
-comp-libelle-chip,COMP-LIBELLE-CHIP,conception/10-composants/01-atomes.yaml:713,a-ecrire
-comp-separateur,COMP-SEPARATEUR,conception/10-composants/01-atomes.yaml:731,a-ecrire
-comp-espaceur,COMP-ESPACEUR,conception/10-composants/01-atomes.yaml:746,a-ecrire
-comp-indicateur-chargement,COMP-INDICATEUR-CHARGEMENT,conception/10-composants/01-atomes.yaml:766,a-ecrire
-comp-message-erreur-inline,COMP-MESSAGE-ERREUR-INLINE,conception/10-composants/01-atomes.yaml:782,a-ecrire
-comp-message-success-inline,COMP-MESSAGE-SUCCESS-INLINE,conception/10-composants/01-atomes.yaml:799,a-ecrire
-comp-indicateur-progression,COMP-INDICATEUR-PROGRESSION,conception/10-composants/01-atomes.yaml:813,a-ecrire
-comp-page-indicator,COMP-PAGE-INDICATOR,conception/10-composants/01-atomes.yaml:829,a-ecrire
-comp-lien-texte,COMP-LIEN-TEXTE,conception/10-composants/01-atomes.yaml:848,a-ecrire
-comp-lien-universel-qr,COMP-LIEN-UNIVERSEL-QR,conception/10-composants/01-atomes.yaml:872,a-ecrire
-comp-image-avatar-small,COMP-IMAGE-AVATAR-SMALL,conception/10-composants/01-atomes.yaml:896,a-ecrire
-comp-tag,COMP-TAG,conception/10-composants/01-atomes.yaml:912,a-ecrire
-comp-mention-anonymat,COMP-MENTION-ANONYMAT,conception/10-composants/01-atomes.yaml:928,a-ecrire
-comp-tag-categorie,COMP-TAG-CATEGORIE,conception/10-composants/01-atomes.yaml:947,a-ecrire
-comp-tag-provenance,COMP-TAG-PROVENANCE,conception/10-composants/01-atomes.yaml:962,a-ecrire
-comp-status-pin-verification,COMP-STATUS-PIN-VERIFICATION,conception/10-composants/01-atomes.yaml:982,a-ecrire
-comp-header-titre-action,COMP-HEADER-TITRE-ACTION,conception/10-composants/02-molecules.yaml:56,a-ecrire
-comp-header-retour-titre,COMP-HEADER-RETOUR-TITRE,conception/10-composants/02-molecules.yaml:75,a-ecrire
-comp-header-retour-titre-action,COMP-HEADER-RETOUR-TITRE-ACTION,conception/10-composants/02-molecules.yaml:94,a-ecrire
-comp-item-liste-simple,COMP-ITEM-LISTE-SIMPLE,conception/10-composants/02-molecules.yaml:117,a-ecrire
-comp-item-liste-pin-apercu,COMP-ITEM-LISTE-PIN-APERCU,conception/10-composants/02-molecules.yaml:139,a-ecrire
-comp-item-liste-parcours-simple,COMP-ITEM-LISTE-PARCOURS-SIMPLE,conception/10-composants/02-molecules.yaml:167,a-ecrire
-comp-item-historique-visite,COMP-ITEM-HISTORIQUE-VISITE,conception/10-composants/02-molecules.yaml:193,a-ecrire
-comp-item-liste-etape,COMP-ITEM-LISTE-ETAPE,conception/10-composants/02-molecules.yaml:217,a-ecrire
-comp-card-parcours-large,COMP-CARD-PARCOURS-LARGE,conception/10-composants/02-molecules.yaml:245,a-ecrire
-comp-card-parcours-compact,COMP-CARD-PARCOURS-COMPACT,conception/10-composants/02-molecules.yaml:271,a-ecrire
-comp-vignette-pin,COMP-VIGNETTE-PIN,conception/10-composants/02-molecules.yaml:294,a-ecrire
-comp-controle-favori,COMP-CONTROLE-FAVORI,conception/10-composants/02-molecules.yaml:323,a-ecrire
-comp-controle-partage,COMP-CONTROLE-PARTAGE,conception/10-composants/02-molecules.yaml:358,a-ecrire
-comp-controle-signalement,COMP-CONTROLE-SIGNALEMENT,conception/10-composants/02-molecules.yaml:381,a-ecrire
-comp-zone-narration,COMP-ZONE-NARRATION,conception/10-composants/02-molecules.yaml:416,a-ecrire
-comp-zone-sources,COMP-ZONE-SOURCES,conception/10-composants/02-molecules.yaml:437,a-ecrire
-comp-zone-commentaires,COMP-ZONE-COMMENTAIRES,conception/10-composants/02-molecules.yaml:460,a-ecrire
-comp-zone-post-narrative,COMP-ZONE-POST-NARRATIVE,conception/10-composants/02-molecules.yaml:490,a-ecrire
-comp-zone-vide,COMP-ZONE-VIDE,conception/10-composants/02-molecules.yaml:507,a-ecrire
-comp-item-commentaire,COMP-ITEM-COMMENTAIRE,conception/10-composants/02-molecules.yaml:534,a-ecrire
-comp-rangee-favori,COMP-RANGEE-FAVORI,conception/10-composants/02-molecules.yaml:557,a-ecrire
-comp-rangee-historique,COMP-RANGEE-HISTORIQUE,conception/10-composants/02-molecules.yaml:579,a-ecrire
-comp-rangee-profil-action,COMP-RANGEE-PROFIL-ACTION,conception/10-composants/02-molecules.yaml:598,a-ecrire
-comp-encart-information,COMP-ENCART-INFORMATION,conception/10-composants/02-molecules.yaml:635,a-ecrire
-comp-bloc-sources,COMP-BLOC-SOURCES,conception/10-composants/02-molecules.yaml:652,a-ecrire
-comp-compteur-statistique,COMP-COMPTEUR-STATISTIQUE,conception/10-composants/02-molecules.yaml:666,a-ecrire
-comp-indicateur-permission,COMP-INDICATEUR-PERMISSION,conception/10-composants/02-molecules.yaml:681,a-ecrire
-comp-info-progress-etape,COMP-INFO-PROGRESS-ETAPE,conception/10-composants/02-molecules.yaml:708,a-ecrire
-comp-carousel,COMP-CAROUSEL,conception/10-composants/02-molecules.yaml:726,a-ecrire
-comp-barre-filtres,COMP-BARRE-FILTRES,conception/10-composants/02-molecules.yaml:755,a-ecrire
-comp-pin,COMP-PIN,conception/10-composants/03-fonctionnels.yaml:50,a-ecrire
-comp-icone,COMP-ICONE,conception/10-composants/03-fonctionnels.yaml:65,a-ecrire
-comp-badge-nombre,COMP-BADGE-NOMBRE,conception/10-composants/03-fonctionnels.yaml:69,a-ecrire
-comp-carte,COMP-CARTE,conception/10-composants/03-fonctionnels.yaml:139,a-ecrire
-comp-slider-epoque,COMP-SLIDER-EPOQUE,conception/10-composants/03-fonctionnels.yaml:172,a-ecrire
-comp-cluster-densite,COMP-CLUSTER-DENSITE,conception/10-composants/03-fonctionnels.yaml:201,a-ecrire
-comp-trace-parcours,COMP-TRACE-PARCOURS,conception/10-composants/03-fonctionnels.yaml:226,a-ecrire
-comp-recherche-surface,COMP-RECHERCHE-SURFACE,conception/10-composants/03-fonctionnels.yaml:250,a-ecrire
-comp-grid-recherche,COMP-GRID-RECHERCHE,conception/10-composants/03-fonctionnels.yaml:277,a-ecrire
-comp-filtres-couches,COMP-FILTRES-COUCHES,conception/10-composants/03-fonctionnels.yaml:299,a-ecrire
-comp-alerte-proximite,COMP-ALERTE-PROXIMITE,conception/10-composants/03-fonctionnels.yaml:313,a-ecrire
-comp-lecteur-audio,COMP-LECTEUR-AUDIO,conception/10-composants/03-fonctionnels.yaml:340,a-ecrire
-comp-lecteur-video,COMP-LECTEUR-VIDEO,conception/10-composants/03-fonctionnels.yaml:369,a-ecrire
-comp-viewer-3d,COMP-VIEWER-3D,conception/10-composants/03-fonctionnels.yaml:386,a-ecrire
-comp-camera-ar,COMP-CAMERA-AR,conception/10-composants/03-fonctionnels.yaml:403,a-ecrire
-comp-quiz,COMP-QUIZ,conception/10-composants/03-fonctionnels.yaml:421,a-ecrire
-comp-avant-apres,COMP-AVANT-APRES,conception/10-composants/03-fonctionnels.yaml:440,a-ecrire
-comp-frise-chronologique,COMP-FRISE-CHRONOLOGIQUE,conception/10-composants/03-fonctionnels.yaml:460,a-ecrire
-comp-enigme,COMP-ENIGME,conception/10-composants/03-fonctionnels.yaml:483,a-ecrire
-comp-citation,COMP-CITATION,conception/10-composants/03-fonctionnels.yaml:511,a-ecrire
-comp-saviez-vous,COMP-SAVIEZ-VOUS,conception/10-composants/03-fonctionnels.yaml:530,a-ecrire
-comp-puzzle,COMP-PUZZLE,conception/10-composants/03-fonctionnels.yaml:549,a-ecrire
-comp-formulaire-creation-compte,COMP-FORMULAIRE-CREATION-COMPTE,conception/10-composants/03-fonctionnels.yaml:584,a-ecrire
-comp-formulaire-connexion-compte,COMP-FORMULAIRE-CONNEXION-COMPTE,conception/10-composants/03-fonctionnels.yaml:604,a-ecrire
-comp-formulaire-saisie-pin,COMP-FORMULAIRE-SAISIE-PIN,conception/10-composants/03-fonctionnels.yaml:621,a-ecrire
-comp-formulaire-creation-parcours,COMP-FORMULAIRE-CREATION-PARCOURS,conception/10-composants/03-fonctionnels.yaml:647,a-ecrire
-comp-selecteur-section-principale,COMP-SELECTEUR-SECTION-PRINCIPALE,conception/10-composants/04-shell.yaml:82,a-ecrire
-comp-apercu-rapide-pin,COMP-APERCU-RAPIDE-PIN,conception/10-composants/04-shell.yaml:132,a-ecrire
-comp-surface-ponctuelle-recherche,COMP-SURFACE-PONCTUELLE-RECHERCHE,conception/10-composants/04-shell.yaml:182,a-ecrire
-comp-surface-ponctuelle-filtres-couches,COMP-SURFACE-PONCTUELLE-FILTRES-COUCHES,conception/10-composants/04-shell.yaml:223,a-ecrire
-comp-surface-ponctuelle-lancement-parcours,COMP-SURFACE-PONCTUELLE-LANCEMENT-PARCOURS,conception/10-composants/04-shell.yaml:253,a-ecrire
-comp-surface-ponctuelle-filtres-parcours,COMP-SURFACE-PONCTUELLE-FILTRES-PARCOURS,conception/10-composants/04-shell.yaml:298,a-ecrire
-comp-surface-ponctuelle-saut-etape,COMP-SURFACE-PONCTUELLE-SAUT-ETAPE,conception/10-composants/04-shell.yaml:330,a-ecrire
-comp-dialogue-confirmation,COMP-DIALOGUE-CONFIRMATION,conception/10-composants/04-shell.yaml:366,a-ecrire
-comp-dialogue-permission,COMP-DIALOGUE-PERMISSION,conception/10-composants/04-shell.yaml:421,a-ecrire
-comp-message-ephemere,COMP-MESSAGE-EPHEMERE,conception/10-composants/04-shell.yaml:467,a-ecrire
-comp-indication-onboarding,COMP-INDICATION-ONBOARDING,conception/10-composants/04-shell.yaml:512,a-ecrire
-comp-invitation-microparcours,COMP-INVITATION-MICROPARCOURS,conception/10-composants/04-shell.yaml:555,a-ecrire
-comp-backdrop,COMP-BACKDROP,conception/10-composants/04-shell.yaml:597,a-ecrire
-comp-surface-persistante-audio,COMP-SURFACE-PERSISTANTE-AUDIO,conception/10-composants/04-shell.yaml:629,a-ecrire
-comp-surface-persistante-parcours,COMP-SURFACE-PERSISTANTE-PARCOURS,conception/10-composants/04-shell.yaml:677,a-ecrire
-comp-bandeau-information-offline,COMP-BANDEAU-INFORMATION-OFFLINE,conception/10-composants/04-shell.yaml:727,a-ecrire
-comp-layout-carte-principale,COMP-LAYOUT-CARTE-PRINCIPALE,conception/10-composants/04-shell.yaml:752,a-ecrire
-comp-layout-parcours,COMP-LAYOUT-PARCOURS,conception/10-composants/04-shell.yaml:798,a-ecrire
-comp-layout-profil,COMP-LAYOUT-PROFIL,conception/10-composants/04-shell.yaml:843,a-ecrire
-comp-layout-consultation-pin-approfondie,COMP-LAYOUT-CONSULTATION-PIN-APPROFONDIE,conception/10-composants/04-shell.yaml:887,a-ecrire
-comp-tableau-bord-admin,COMP-TABLEAU-BORD-ADMIN,conception/10-composants/05-back-office.yaml:61,a-ecrire
-comp-catalogue-pins-admin,COMP-CATALOGUE-PINS-ADMIN,conception/10-composants/05-back-office.yaml:91,a-ecrire
-comp-formulaire-saisie-pin-admin,COMP-FORMULAIRE-SAISIE-PIN-ADMIN,conception/10-composants/05-back-office.yaml:127,a-ecrire
-comp-validation-scientifique,COMP-VALIDATION-SCIENTIFIQUE,conception/10-composants/05-back-office.yaml:182,a-ecrire
-comp-moderation-communautaire,COMP-MODERATION-COMMUNAUTAIRE,conception/10-composants/05-back-office.yaml:219,a-ecrire
-comp-moderation-soumissions,COMP-MODERATION-SOUMISSIONS,conception/10-composants/05-back-office.yaml:254,a-ecrire
-comp-promotion-communautaire,COMP-PROMOTION-COMMUNAUTAIRE,conception/10-composants/05-back-office.yaml:289,a-ecrire
-comp-retrait-reouverture-pin,COMP-RETRAIT-REOUVERTURE-PIN,conception/10-composants/05-back-office.yaml:322,a-ecrire
+comp-button-primary,COMP-BUTTON-PRIMARY,conception/10-composants/01-atomes.yaml:76,repris
+comp-button-secondary,COMP-BUTTON-SECONDARY,conception/10-composants/01-atomes.yaml:106,repris
+comp-button-tertiary,COMP-BUTTON-TERTIARY,conception/10-composants/01-atomes.yaml:131,repris
+comp-button-back,COMP-BUTTON-BACK,conception/10-composants/01-atomes.yaml:154,repris
+comp-button-fermeture-overlay,COMP-BUTTON-FERMETURE-OVERLAY,conception/10-composants/01-atomes.yaml:190,repris
+comp-button-fab-creation,,conception/10-composants/01-atomes.yaml:220,non-repris: composant (définition ou usage)
+comp-button-play-audio,,conception/10-composants/01-atomes.yaml:258,non-repris: composant (définition ou usage)
+comp-chip-epoque,COMP-CHIP-EPOQUE,conception/10-composants/01-atomes.yaml:295,repris
+comp-chip-couche-carte,,conception/10-composants/01-atomes.yaml:324,non-repris: composant (définition ou usage)
+comp-chip-categorie,COMP-CHIP-CATEGORIE,conception/10-composants/01-atomes.yaml:347,repris
+comp-chip-filtre,,conception/10-composants/01-atomes.yaml:368,non-repris: composant (définition ou usage)
+comp-badge-statut,COMP-BADGE-STATUT,conception/10-composants/01-atomes.yaml:396,repris
+comp-badge-nombre,COMP-BADGE-NOMBRE,conception/10-composants/01-atomes.yaml:413,repris
+comp-avatar,,conception/10-composants/01-atomes.yaml:433,non-repris: composant (définition ou usage)
+comp-image-hero,COMP-IMAGE-HERO,conception/10-composants/01-atomes.yaml:450,repris
+comp-toggle-switch,,conception/10-composants/01-atomes.yaml:474,non-repris: composant (définition ou usage)
+comp-champ-saisie-texte,,conception/10-composants/01-atomes.yaml:510,non-repris: composant (définition ou usage)
+comp-champ-saisie-textarea,,conception/10-composants/01-atomes.yaml:539,non-repris: composant (définition ou usage)
+comp-champ-saisie-nombre,,conception/10-composants/01-atomes.yaml:565,non-repris: composant (définition ou usage)
+comp-champ-saisie-date,,conception/10-composants/01-atomes.yaml:591,non-repris: composant (définition ou usage)
+comp-champ-saisie-lieu,,conception/10-composants/01-atomes.yaml:617,non-repris: composant (définition ou usage)
+comp-icone,COMP-ICONE,conception/10-composants/01-atomes.yaml:650,repris
+comp-libelle-texte,COMP-LIBELLE-TEXTE,conception/10-composants/01-atomes.yaml:675,repris
+comp-libelle-bouton,COMP-LIBELLE-BOUTON,conception/10-composants/01-atomes.yaml:697,repris
+comp-libelle-chip,COMP-LIBELLE-CHIP,conception/10-composants/01-atomes.yaml:713,repris
+comp-separateur,,conception/10-composants/01-atomes.yaml:731,non-repris: composant (définition ou usage)
+comp-espaceur,,conception/10-composants/01-atomes.yaml:746,non-repris: composant (définition ou usage)
+comp-indicateur-chargement,,conception/10-composants/01-atomes.yaml:766,non-repris: composant (définition ou usage)
+comp-message-erreur-inline,,conception/10-composants/01-atomes.yaml:782,non-repris: composant (définition ou usage)
+comp-message-success-inline,,conception/10-composants/01-atomes.yaml:799,non-repris: composant (définition ou usage)
+comp-indicateur-progression,COMP-INDICATEUR-PROGRESSION,conception/10-composants/01-atomes.yaml:813,repris
+comp-page-indicator,,conception/10-composants/01-atomes.yaml:829,non-repris: composant (définition ou usage)
+comp-lien-texte,COMP-LIEN-TEXTE,conception/10-composants/01-atomes.yaml:848,repris
+comp-lien-universel-qr,,conception/10-composants/01-atomes.yaml:872,non-repris: composant (définition ou usage)
+comp-image-avatar-small,COMP-IMAGE-AVATAR-SMALL,conception/10-composants/01-atomes.yaml:896,repris
+comp-tag,COMP-TAG,conception/10-composants/01-atomes.yaml:912,repris
+comp-mention-anonymat,,conception/10-composants/01-atomes.yaml:928,non-repris: composant (définition ou usage)
+comp-tag-categorie,COMP-TAG-CATEGORIE,conception/10-composants/01-atomes.yaml:947,repris
+comp-tag-provenance,COMP-TAG-PROVENANCE,conception/10-composants/01-atomes.yaml:962,repris
+comp-status-pin-verification,COMP-STATUS-PIN-VERIFICATION,conception/10-composants/01-atomes.yaml:982,repris
+comp-header-titre-action,,conception/10-composants/02-molecules.yaml:56,non-repris: composant (définition ou usage)
+comp-header-retour-titre,COMP-HEADER-RETOUR-TITRE,conception/10-composants/02-molecules.yaml:75,repris
+comp-header-retour-titre-action,COMP-HEADER-RETOUR-TITRE-ACTION,conception/10-composants/02-molecules.yaml:94,repris
+comp-item-liste-simple,,conception/10-composants/02-molecules.yaml:117,non-repris: composant (définition ou usage)
+comp-item-liste-pin-apercu,,conception/10-composants/02-molecules.yaml:139,non-repris: composant (définition ou usage)
+comp-item-liste-parcours-simple,,conception/10-composants/02-molecules.yaml:167,non-repris: composant (définition ou usage)
+comp-item-historique-visite,,conception/10-composants/02-molecules.yaml:193,non-repris: composant (définition ou usage)
+comp-item-liste-etape,COMP-ITEM-LISTE-ETAPE,conception/10-composants/02-molecules.yaml:217,repris
+comp-card-parcours-large,COMP-CARD-PARCOURS-LARGE,conception/10-composants/02-molecules.yaml:245,repris
+comp-card-parcours-compact,,conception/10-composants/02-molecules.yaml:271,non-repris: composant (définition ou usage)
+comp-vignette-pin,COMP-VIGNETTE-PIN,conception/10-composants/02-molecules.yaml:294,repris
+comp-controle-favori,,conception/10-composants/02-molecules.yaml:323,non-repris: composant (définition ou usage)
+comp-controle-partage,,conception/10-composants/02-molecules.yaml:358,non-repris: composant (définition ou usage)
+comp-controle-signalement,,conception/10-composants/02-molecules.yaml:381,non-repris: composant (définition ou usage)
+comp-zone-narration,COMP-ZONE-NARRATION,conception/10-composants/02-molecules.yaml:416,repris
+comp-zone-sources,COMP-ZONE-SOURCES,conception/10-composants/02-molecules.yaml:437,repris
+comp-zone-commentaires,,conception/10-composants/02-molecules.yaml:460,non-repris: composant (définition ou usage)
+comp-zone-post-narrative,,conception/10-composants/02-molecules.yaml:490,non-repris: composant (définition ou usage)
+comp-zone-vide,,conception/10-composants/02-molecules.yaml:507,non-repris: composant (définition ou usage)
+comp-item-commentaire,,conception/10-composants/02-molecules.yaml:534,non-repris: composant (définition ou usage)
+comp-rangee-favori,,conception/10-composants/02-molecules.yaml:557,non-repris: composant (définition ou usage)
+comp-rangee-historique,,conception/10-composants/02-molecules.yaml:579,non-repris: composant (définition ou usage)
+comp-rangee-profil-action,,conception/10-composants/02-molecules.yaml:598,non-repris: composant (définition ou usage)
+comp-encart-information,COMP-ENCART-INFORMATION,conception/10-composants/02-molecules.yaml:635,repris
+comp-bloc-sources,COMP-BLOC-SOURCES,conception/10-composants/02-molecules.yaml:652,repris
+comp-compteur-statistique,,conception/10-composants/02-molecules.yaml:666,non-repris: composant (définition ou usage)
+comp-indicateur-permission,,conception/10-composants/02-molecules.yaml:681,non-repris: composant (définition ou usage)
+comp-info-progress-etape,COMP-INFO-PROGRESS-ETAPE,conception/10-composants/02-molecules.yaml:708,repris
+comp-carousel,,conception/10-composants/02-molecules.yaml:726,non-repris: composant (définition ou usage)
+comp-barre-filtres,,conception/10-composants/02-molecules.yaml:755,non-repris: composant (définition ou usage)
+comp-pin,COMP-PIN,conception/10-composants/03-fonctionnels.yaml:50,repris
+comp-icone,COMP-ICONE,conception/10-composants/03-fonctionnels.yaml:65,repris
+comp-badge-nombre,COMP-BADGE-NOMBRE,conception/10-composants/03-fonctionnels.yaml:69,repris
+comp-carte,COMP-CARTE,conception/10-composants/03-fonctionnels.yaml:139,repris
+comp-slider-epoque,COMP-SLIDER-EPOQUE,conception/10-composants/03-fonctionnels.yaml:172,repris
+comp-cluster-densite,COMP-CLUSTER-DENSITE,conception/10-composants/03-fonctionnels.yaml:201,repris
+comp-trace-parcours,COMP-TRACE-PARCOURS,conception/10-composants/03-fonctionnels.yaml:226,repris
+comp-recherche-surface,,conception/10-composants/03-fonctionnels.yaml:250,non-repris: composant (définition ou usage)
+comp-grid-recherche,,conception/10-composants/03-fonctionnels.yaml:277,non-repris: composant (définition ou usage)
+comp-filtres-couches,,conception/10-composants/03-fonctionnels.yaml:299,non-repris: composant (définition ou usage)
+comp-alerte-proximite,,conception/10-composants/03-fonctionnels.yaml:313,non-repris: composant (définition ou usage)
+comp-lecteur-audio,,conception/10-composants/03-fonctionnels.yaml:340,non-repris: composant (définition ou usage)
+comp-lecteur-video,,conception/10-composants/03-fonctionnels.yaml:369,non-repris: composant (définition ou usage)
+comp-viewer-3d,COMP-VIEWER-3D,conception/10-composants/03-fonctionnels.yaml:386,repris
+comp-camera-ar,,conception/10-composants/03-fonctionnels.yaml:403,non-repris: composant (définition ou usage)
+comp-quiz,,conception/10-composants/03-fonctionnels.yaml:421,non-repris: composant (définition ou usage)
+comp-avant-apres,,conception/10-composants/03-fonctionnels.yaml:440,non-repris: composant (définition ou usage)
+comp-frise-chronologique,,conception/10-composants/03-fonctionnels.yaml:460,non-repris: composant (définition ou usage)
+comp-enigme,,conception/10-composants/03-fonctionnels.yaml:483,non-repris: composant (définition ou usage)
+comp-citation,COMP-CITATION,conception/10-composants/03-fonctionnels.yaml:511,repris
+comp-saviez-vous,COMP-SAVIEZ-VOUS,conception/10-composants/03-fonctionnels.yaml:530,repris
+comp-puzzle,,conception/10-composants/03-fonctionnels.yaml:549,non-repris: composant (définition ou usage)
+comp-formulaire-creation-compte,,conception/10-composants/03-fonctionnels.yaml:584,non-repris: composant (définition ou usage)
+comp-formulaire-connexion-compte,,conception/10-composants/03-fonctionnels.yaml:604,non-repris: composant (définition ou usage)
+comp-formulaire-saisie-pin,,conception/10-composants/03-fonctionnels.yaml:621,non-repris: composant (définition ou usage)
+comp-formulaire-creation-parcours,,conception/10-composants/03-fonctionnels.yaml:647,non-repris: composant (définition ou usage)
+comp-selecteur-section-principale,COMP-SELECTEUR-SECTION-PRINCIPALE,conception/10-composants/04-shell.yaml:82,repris
+comp-apercu-rapide-pin,COMP-APERCU-RAPIDE-PIN,conception/10-composants/04-shell.yaml:132,repris
+comp-surface-ponctuelle-recherche,,conception/10-composants/04-shell.yaml:182,non-repris: composant (définition ou usage)
+comp-surface-ponctuelle-filtres-couches,,conception/10-composants/04-shell.yaml:223,non-repris: composant (définition ou usage)
+comp-surface-ponctuelle-lancement-parcours,,conception/10-composants/04-shell.yaml:253,non-repris: composant (définition ou usage)
+comp-surface-ponctuelle-filtres-parcours,,conception/10-composants/04-shell.yaml:298,non-repris: composant (définition ou usage)
+comp-surface-ponctuelle-saut-etape,,conception/10-composants/04-shell.yaml:330,non-repris: composant (définition ou usage)
+comp-dialogue-confirmation,COMP-DIALOGUE-CONFIRMATION,conception/10-composants/04-shell.yaml:366,repris
+comp-dialogue-permission,,conception/10-composants/04-shell.yaml:421,non-repris: composant (définition ou usage)
+comp-message-ephemere,COMP-MESSAGE-EPHEMERE,conception/10-composants/04-shell.yaml:467,repris
+comp-indication-onboarding,,conception/10-composants/04-shell.yaml:512,non-repris: composant (définition ou usage)
+comp-invitation-microparcours,,conception/10-composants/04-shell.yaml:555,non-repris: composant (définition ou usage)
+comp-backdrop,COMP-BACKDROP,conception/10-composants/04-shell.yaml:597,repris
+comp-surface-persistante-audio,,conception/10-composants/04-shell.yaml:629,non-repris: composant (définition ou usage)
+comp-surface-persistante-parcours,COMP-SURFACE-PERSISTANTE-PARCOURS,conception/10-composants/04-shell.yaml:677,repris
+comp-bandeau-information-offline,COMP-BANDEAU-INFORMATION-OFFLINE,conception/10-composants/04-shell.yaml:727,repris
+comp-layout-carte-principale,COMP-LAYOUT-CARTE-PRINCIPALE,conception/10-composants/04-shell.yaml:752,repris
+comp-layout-parcours,,conception/10-composants/04-shell.yaml:798,non-repris: composant (définition ou usage)
+comp-layout-profil,,conception/10-composants/04-shell.yaml:843,non-repris: composant (définition ou usage)
+comp-layout-consultation-pin-approfondie,COMP-LAYOUT-CONSULTATION-PIN-APPROFONDIE,conception/10-composants/04-shell.yaml:887,repris
+comp-tableau-bord-admin,,conception/10-composants/05-back-office.yaml:61,non-repris: composant (définition ou usage)
+comp-catalogue-pins-admin,,conception/10-composants/05-back-office.yaml:91,non-repris: composant (définition ou usage)
+comp-formulaire-saisie-pin-admin,,conception/10-composants/05-back-office.yaml:127,non-repris: composant (définition ou usage)
+comp-validation-scientifique,,conception/10-composants/05-back-office.yaml:182,non-repris: composant (définition ou usage)
+comp-moderation-communautaire,,conception/10-composants/05-back-office.yaml:219,non-repris: composant (définition ou usage)
+comp-moderation-soumissions,,conception/10-composants/05-back-office.yaml:254,non-repris: composant (définition ou usage)
+comp-promotion-communautaire,,conception/10-composants/05-back-office.yaml:289,non-repris: composant (définition ou usage)
+comp-retrait-reouverture-pin,,conception/10-composants/05-back-office.yaml:322,non-repris: composant (définition ou usage)
 01,,conception/11-reponse-parametrique/00-index.yaml:338,non-repris: numéro de section
 02,,conception/11-reponse-parametrique/00-index.yaml:354,non-repris: numéro de section
 03,,conception/11-reponse-parametrique/00-index.yaml:370,non-repris: numéro de section
 04,,conception/11-reponse-parametrique/00-index.yaml:386,non-repris: numéro de section
 05,,conception/11-reponse-parametrique/00-index.yaml:404,non-repris: numéro de section
-DUR-COURT,TOK-DUR-COURT,conception/11-reponse-parametrique/00-index.yaml:434,a-ecrire
-CRV-EASE-OUT,TOK-CRV-EASE-OUT,conception/11-reponse-parametrique/00-index.yaml:444,a-ecrire
-HAP-LEGER,TOK-HAP-LEGER,conception/11-reponse-parametrique/00-index.yaml:455,a-ecrire
-CHO-OUVERTURE-M2,TOK-CHO-OUVERTURE-M2,conception/11-reponse-parametrique/00-index.yaml:471,a-ecrire
-MAP-CONTEXTE-PARCOURS-VERS-PIN,TOK-MAP-CONTEXTE-PARCOURS-VERS-PIN,conception/11-reponse-parametrique/00-index.yaml:507,a-ecrire
-TMP-AUTO-DISMISS-M9,TOK-TMP-AUTO-DISMISS-M9,conception/11-reponse-parametrique/00-index.yaml:533,a-ecrire
+DUR-COURT,TOK-DUR-COURT,conception/11-reponse-parametrique/00-index.yaml:434,repris
+CRV-EASE-OUT,TOK-CRV-EASE-OUT,conception/11-reponse-parametrique/00-index.yaml:444,repris
+HAP-LEGER,TOK-HAP-LEGER,conception/11-reponse-parametrique/00-index.yaml:455,repris
+CHO-OUVERTURE-M2,TOK-CHO-OUVERTURE-M2,conception/11-reponse-parametrique/00-index.yaml:471,repris
+MAP-CONTEXTE-PARCOURS-VERS-PIN,TOK-MAP-CONTEXTE-PARCOURS-VERS-PIN,conception/11-reponse-parametrique/00-index.yaml:507,repris
+TMP-AUTO-DISMISS-M9,TOK-TMP-AUTO-DISMISS-M9,conception/11-reponse-parametrique/00-index.yaml:533,repris
 D1,,conception/11-reponse-parametrique/00-index.yaml:700,"non-repris: durée, courbe, chorégraphie, mapping ou décision"
 D2,,conception/11-reponse-parametrique/00-index.yaml:704,"non-repris: durée, courbe, chorégraphie, mapping ou décision"
 D3,,conception/11-reponse-parametrique/00-index.yaml:708,"non-repris: durée, courbe, chorégraphie, mapping ou décision"
@@ -656,77 +656,77 @@ D4,,conception/11-reponse-parametrique/00-index.yaml:718,"non-repris: durée, co
 D5,,conception/11-reponse-parametrique/00-index.yaml:722,"non-repris: durée, courbe, chorégraphie, mapping ou décision"
 D6,,conception/11-reponse-parametrique/00-index.yaml:733,"non-repris: durée, courbe, chorégraphie, mapping ou décision"
 D7,,conception/11-reponse-parametrique/00-index.yaml:741,"non-repris: durée, courbe, chorégraphie, mapping ou décision"
-DUR-INSTANT,TOK-DUR-INSTANT,conception/11-reponse-parametrique/01-durees-et-courbes.yaml:43,a-ecrire
-DUR-COURT,TOK-DUR-COURT,conception/11-reponse-parametrique/01-durees-et-courbes.yaml:59,a-ecrire
-DUR-STANDARD,TOK-DUR-STANDARD,conception/11-reponse-parametrique/01-durees-et-courbes.yaml:74,a-ecrire
-DUR-LONG,TOK-DUR-LONG,conception/11-reponse-parametrique/01-durees-et-courbes.yaml:92,a-ecrire
-DUR-AMPLE,TOK-DUR-AMPLE,conception/11-reponse-parametrique/01-durees-et-courbes.yaml:113,a-ecrire
-DUR-CONTINU,TOK-DUR-CONTINU,conception/11-reponse-parametrique/01-durees-et-courbes.yaml:130,a-ecrire
-CRV-LINEAIRE,TOK-CRV-LINEAIRE,conception/11-reponse-parametrique/01-durees-et-courbes.yaml:156,a-ecrire
-CRV-EASE-OUT,TOK-CRV-EASE-OUT,conception/11-reponse-parametrique/01-durees-et-courbes.yaml:170,a-ecrire
-CRV-EASE-IN,TOK-CRV-EASE-IN,conception/11-reponse-parametrique/01-durees-et-courbes.yaml:185,a-ecrire
-CRV-EASE-IN-OUT,TOK-CRV-EASE-IN-OUT,conception/11-reponse-parametrique/01-durees-et-courbes.yaml:198,a-ecrire
-CRV-SPRING-DOUX,TOK-CRV-SPRING-DOUX,conception/11-reponse-parametrique/01-durees-et-courbes.yaml:213,a-ecrire
-CRV-SPRING-NET,TOK-CRV-SPRING-NET,conception/11-reponse-parametrique/01-durees-et-courbes.yaml:235,a-ecrire
-HAP-LEGER,TOK-HAP-LEGER,conception/11-reponse-parametrique/02-haptique-et-feedback-non-visuel.yaml:38,a-ecrire
-HAP-FRANC,TOK-HAP-FRANC,conception/11-reponse-parametrique/02-haptique-et-feedback-non-visuel.yaml:56,a-ecrire
-HAP-NET,TOK-HAP-NET,conception/11-reponse-parametrique/02-haptique-et-feedback-non-visuel.yaml:76,a-ecrire
-CHO-OUVERTURE-M2,TOK-CHO-OUVERTURE-M2,conception/11-reponse-parametrique/03-chorégraphies.yaml:74,a-ecrire
-CHO-FERMETURE-M2,TOK-CHO-FERMETURE-M2,conception/11-reponse-parametrique/03-chorégraphies.yaml:88,a-ecrire
-CHO-OUVERTURE-M3,TOK-CHO-OUVERTURE-M3,conception/11-reponse-parametrique/03-chorégraphies.yaml:100,a-ecrire
-CHO-FERMETURE-M3,TOK-CHO-FERMETURE-M3,conception/11-reponse-parametrique/03-chorégraphies.yaml:115,a-ecrire
-CHO-ENTREE-M4,TOK-CHO-ENTREE-M4,conception/11-reponse-parametrique/03-chorégraphies.yaml:127,a-ecrire
-CHO-SORTIE-M4,TOK-CHO-SORTIE-M4,conception/11-reponse-parametrique/03-chorégraphies.yaml:143,a-ecrire
-CHO-OUVERTURE-M6,TOK-CHO-OUVERTURE-M6,conception/11-reponse-parametrique/03-chorégraphies.yaml:160,a-ecrire
-CHO-FERMETURE-M6,TOK-CHO-FERMETURE-M6,conception/11-reponse-parametrique/03-chorégraphies.yaml:172,a-ecrire
-CHO-OUVERTURE-M7,TOK-CHO-OUVERTURE-M7,conception/11-reponse-parametrique/03-chorégraphies.yaml:181,a-ecrire
-CHO-DISMISS-M7,TOK-CHO-DISMISS-M7,conception/11-reponse-parametrique/03-chorégraphies.yaml:191,a-ecrire
-CHO-OUVERTURE-M8,TOK-CHO-OUVERTURE-M8,conception/11-reponse-parametrique/03-chorégraphies.yaml:206,a-ecrire
-CHO-FERMETURE-M8,TOK-CHO-FERMETURE-M8,conception/11-reponse-parametrique/03-chorégraphies.yaml:217,a-ecrire
-CHO-OUVERTURE-M9,TOK-CHO-OUVERTURE-M9,conception/11-reponse-parametrique/03-chorégraphies.yaml:228,a-ecrire
-CHO-DISMISS-M9,TOK-CHO-DISMISS-M9,conception/11-reponse-parametrique/03-chorégraphies.yaml:237,a-ecrire
-CHO-APPARITION-P1,TOK-CHO-APPARITION-P1,conception/11-reponse-parametrique/03-chorégraphies.yaml:252,a-ecrire
-CHO-DISPARITION-P1,TOK-CHO-DISPARITION-P1,conception/11-reponse-parametrique/03-chorégraphies.yaml:262,a-ecrire
-CHO-APPARITION-P2,TOK-CHO-APPARITION-P2,conception/11-reponse-parametrique/03-chorégraphies.yaml:273,a-ecrire
-CHO-DISPARITION-P2,TOK-CHO-DISPARITION-P2,conception/11-reponse-parametrique/03-chorégraphies.yaml:282,a-ecrire
-CHO-APPARITION-P3,TOK-CHO-APPARITION-P3,conception/11-reponse-parametrique/03-chorégraphies.yaml:292,a-ecrire
-CHO-DISPARITION-P3,TOK-CHO-DISPARITION-P3,conception/11-reponse-parametrique/03-chorégraphies.yaml:308,a-ecrire
-CHO-SOMMEIL-PERSISTANTES-EN-M4,TOK-CHO-SOMMEIL-PERSISTANTES-EN-M4,conception/11-reponse-parametrique/03-chorégraphies.yaml:317,a-ecrire
-CHO-REVEIL-PERSISTANTES-APRES-M4,TOK-CHO-REVEIL-PERSISTANTES-APRES-M4,conception/11-reponse-parametrique/03-chorégraphies.yaml:327,a-ecrire
-CHO-CALAGE-EPOQUE,TOK-CHO-CALAGE-EPOQUE,conception/11-reponse-parametrique/03-chorégraphies.yaml:340,a-ecrire
-CHO-PILOTAGE-AUTOMATIQUE-EPOQUE,TOK-CHO-PILOTAGE-AUTOMATIQUE-EPOQUE,conception/11-reponse-parametrique/03-chorégraphies.yaml:369,a-ecrire
-CHO-LANCEMENT-PARCOURS,TOK-CHO-LANCEMENT-PARCOURS,conception/11-reponse-parametrique/03-chorégraphies.yaml:395,a-ecrire
-CHO-ABANDON-PARCOURS,TOK-CHO-ABANDON-PARCOURS,conception/11-reponse-parametrique/03-chorégraphies.yaml:418,a-ecrire
-CHO-FIN-PARCOURS,TOK-CHO-FIN-PARCOURS,conception/11-reponse-parametrique/03-chorégraphies.yaml:435,a-ecrire
-CHO-SAUT-LATERAL-S1-S2-S3,TOK-CHO-SAUT-LATERAL-S1-S2-S3,conception/11-reponse-parametrique/03-chorégraphies.yaml:460,a-ecrire
-CHO-RETOUR-GRACIEUX,TOK-CHO-RETOUR-GRACIEUX,conception/11-reponse-parametrique/03-chorégraphies.yaml:478,a-ecrire
-MAP-SLIDER-VERS-AXES-CARTE,TOK-MAP-SLIDER-VERS-AXES-CARTE,conception/11-reponse-parametrique/04-mappings-parametriques.yaml:60,a-ecrire
-MAP-CONTEXTE-PARCOURS-VERS-PIN,TOK-MAP-CONTEXTE-PARCOURS-VERS-PIN,conception/11-reponse-parametrique/04-mappings-parametriques.yaml:301,a-ecrire
+DUR-INSTANT,TOK-DUR-INSTANT,conception/11-reponse-parametrique/01-durees-et-courbes.yaml:43,repris
+DUR-COURT,TOK-DUR-COURT,conception/11-reponse-parametrique/01-durees-et-courbes.yaml:59,repris
+DUR-STANDARD,TOK-DUR-STANDARD,conception/11-reponse-parametrique/01-durees-et-courbes.yaml:74,repris
+DUR-LONG,TOK-DUR-LONG,conception/11-reponse-parametrique/01-durees-et-courbes.yaml:92,repris
+DUR-AMPLE,TOK-DUR-AMPLE,conception/11-reponse-parametrique/01-durees-et-courbes.yaml:113,repris
+DUR-CONTINU,TOK-DUR-CONTINU,conception/11-reponse-parametrique/01-durees-et-courbes.yaml:130,repris
+CRV-LINEAIRE,TOK-CRV-LINEAIRE,conception/11-reponse-parametrique/01-durees-et-courbes.yaml:156,repris
+CRV-EASE-OUT,TOK-CRV-EASE-OUT,conception/11-reponse-parametrique/01-durees-et-courbes.yaml:170,repris
+CRV-EASE-IN,TOK-CRV-EASE-IN,conception/11-reponse-parametrique/01-durees-et-courbes.yaml:185,repris
+CRV-EASE-IN-OUT,TOK-CRV-EASE-IN-OUT,conception/11-reponse-parametrique/01-durees-et-courbes.yaml:198,repris
+CRV-SPRING-DOUX,TOK-CRV-SPRING-DOUX,conception/11-reponse-parametrique/01-durees-et-courbes.yaml:213,repris
+CRV-SPRING-NET,TOK-CRV-SPRING-NET,conception/11-reponse-parametrique/01-durees-et-courbes.yaml:235,repris
+HAP-LEGER,TOK-HAP-LEGER,conception/11-reponse-parametrique/02-haptique-et-feedback-non-visuel.yaml:38,repris
+HAP-FRANC,TOK-HAP-FRANC,conception/11-reponse-parametrique/02-haptique-et-feedback-non-visuel.yaml:56,repris
+HAP-NET,TOK-HAP-NET,conception/11-reponse-parametrique/02-haptique-et-feedback-non-visuel.yaml:76,repris
+CHO-OUVERTURE-M2,TOK-CHO-OUVERTURE-M2,conception/11-reponse-parametrique/03-chorégraphies.yaml:74,repris
+CHO-FERMETURE-M2,TOK-CHO-FERMETURE-M2,conception/11-reponse-parametrique/03-chorégraphies.yaml:88,repris
+CHO-OUVERTURE-M3,TOK-CHO-OUVERTURE-M3,conception/11-reponse-parametrique/03-chorégraphies.yaml:100,repris
+CHO-FERMETURE-M3,TOK-CHO-FERMETURE-M3,conception/11-reponse-parametrique/03-chorégraphies.yaml:115,repris
+CHO-ENTREE-M4,,conception/11-reponse-parametrique/03-chorégraphies.yaml:127,"non-repris: durée, courbe, chorégraphie, mapping ou décision"
+CHO-SORTIE-M4,,conception/11-reponse-parametrique/03-chorégraphies.yaml:143,"non-repris: durée, courbe, chorégraphie, mapping ou décision"
+CHO-OUVERTURE-M6,TOK-CHO-OUVERTURE-M6,conception/11-reponse-parametrique/03-chorégraphies.yaml:160,repris
+CHO-FERMETURE-M6,TOK-CHO-FERMETURE-M6,conception/11-reponse-parametrique/03-chorégraphies.yaml:172,repris
+CHO-OUVERTURE-M7,,conception/11-reponse-parametrique/03-chorégraphies.yaml:181,"non-repris: durée, courbe, chorégraphie, mapping ou décision"
+CHO-DISMISS-M7,,conception/11-reponse-parametrique/03-chorégraphies.yaml:191,"non-repris: durée, courbe, chorégraphie, mapping ou décision"
+CHO-OUVERTURE-M8,TOK-CHO-OUVERTURE-M8,conception/11-reponse-parametrique/03-chorégraphies.yaml:206,repris
+CHO-FERMETURE-M8,TOK-CHO-FERMETURE-M8,conception/11-reponse-parametrique/03-chorégraphies.yaml:217,repris
+CHO-OUVERTURE-M9,TOK-CHO-OUVERTURE-M9,conception/11-reponse-parametrique/03-chorégraphies.yaml:228,repris
+CHO-DISMISS-M9,TOK-CHO-DISMISS-M9,conception/11-reponse-parametrique/03-chorégraphies.yaml:237,repris
+CHO-APPARITION-P1,,conception/11-reponse-parametrique/03-chorégraphies.yaml:252,"non-repris: durée, courbe, chorégraphie, mapping ou décision"
+CHO-DISPARITION-P1,,conception/11-reponse-parametrique/03-chorégraphies.yaml:262,"non-repris: durée, courbe, chorégraphie, mapping ou décision"
+CHO-APPARITION-P2,TOK-CHO-APPARITION-P2,conception/11-reponse-parametrique/03-chorégraphies.yaml:273,repris
+CHO-DISPARITION-P2,TOK-CHO-DISPARITION-P2,conception/11-reponse-parametrique/03-chorégraphies.yaml:282,repris
+CHO-APPARITION-P3,TOK-CHO-APPARITION-P3,conception/11-reponse-parametrique/03-chorégraphies.yaml:292,repris
+CHO-DISPARITION-P3,TOK-CHO-DISPARITION-P3,conception/11-reponse-parametrique/03-chorégraphies.yaml:308,repris
+CHO-SOMMEIL-PERSISTANTES-EN-M4,,conception/11-reponse-parametrique/03-chorégraphies.yaml:317,"non-repris: durée, courbe, chorégraphie, mapping ou décision"
+CHO-REVEIL-PERSISTANTES-APRES-M4,,conception/11-reponse-parametrique/03-chorégraphies.yaml:327,"non-repris: durée, courbe, chorégraphie, mapping ou décision"
+CHO-CALAGE-EPOQUE,TOK-CHO-CALAGE-EPOQUE,conception/11-reponse-parametrique/03-chorégraphies.yaml:340,repris
+CHO-PILOTAGE-AUTOMATIQUE-EPOQUE,TOK-CHO-PILOTAGE-AUTOMATIQUE-EPOQUE,conception/11-reponse-parametrique/03-chorégraphies.yaml:369,repris
+CHO-LANCEMENT-PARCOURS,TOK-CHO-LANCEMENT-PARCOURS,conception/11-reponse-parametrique/03-chorégraphies.yaml:395,repris
+CHO-ABANDON-PARCOURS,TOK-CHO-ABANDON-PARCOURS,conception/11-reponse-parametrique/03-chorégraphies.yaml:418,repris
+CHO-FIN-PARCOURS,TOK-CHO-FIN-PARCOURS,conception/11-reponse-parametrique/03-chorégraphies.yaml:435,repris
+CHO-SAUT-LATERAL-S1-S2-S3,TOK-CHO-SAUT-LATERAL-S1-S2-S3,conception/11-reponse-parametrique/03-chorégraphies.yaml:460,repris
+CHO-RETOUR-GRACIEUX,TOK-CHO-RETOUR-GRACIEUX,conception/11-reponse-parametrique/03-chorégraphies.yaml:478,repris
+MAP-SLIDER-VERS-AXES-CARTE,TOK-MAP-SLIDER-VERS-AXES-CARTE,conception/11-reponse-parametrique/04-mappings-parametriques.yaml:60,repris
+MAP-CONTEXTE-PARCOURS-VERS-PIN,TOK-MAP-CONTEXTE-PARCOURS-VERS-PIN,conception/11-reponse-parametrique/04-mappings-parametriques.yaml:301,repris
 PR1,,conception/11-reponse-parametrique/04-mappings-parametriques.yaml:352,"non-repris: durée, courbe, chorégraphie, mapping ou décision"
 PR2,,conception/11-reponse-parametrique/04-mappings-parametriques.yaml:355,"non-repris: durée, courbe, chorégraphie, mapping ou décision"
-MAP-DEJA-VISITE-VERS-PIN,TOK-MAP-DEJA-VISITE-VERS-PIN,conception/11-reponse-parametrique/04-mappings-parametriques.yaml:373,a-ecrire
-MAP-MODE-OFFLINE-VERS-CARTE,TOK-MAP-MODE-OFFLINE-VERS-CARTE,conception/11-reponse-parametrique/04-mappings-parametriques.yaml:414,a-ecrire
-MAP-MODE-M4-VERS-PERSISTANTES,TOK-MAP-MODE-M4-VERS-PERSISTANTES,conception/11-reponse-parametrique/04-mappings-parametriques.yaml:468,a-ecrire
-TMP-AUTO-DISMISS-M9,TOK-TMP-AUTO-DISMISS-M9,conception/11-reponse-parametrique/05-comportements-temporels-purs.yaml:37,a-ecrire
-TMP-AUTO-DISMISS-M7,TOK-TMP-AUTO-DISMISS-M7,conception/11-reponse-parametrique/05-comportements-temporels-purs.yaml:57,a-ecrire
-TMP-AUTO-DISMISS-INDICATION-ONBOARDING,TOK-TMP-AUTO-DISMISS-INDICATION-ONBOARDING,conception/11-reponse-parametrique/05-comportements-temporels-purs.yaml:78,a-ecrire
-TMP-DEBOUNCE-RECHERCHE,TOK-TMP-DEBOUNCE-RECHERCHE,conception/11-reponse-parametrique/05-comportements-temporels-purs.yaml:99,a-ecrire
-TMP-DEBOUNCE-VALIDATION-FORMULAIRE,TOK-TMP-DEBOUNCE-VALIDATION-FORMULAIRE,conception/11-reponse-parametrique/05-comportements-temporels-purs.yaml:115,a-ecrire
-TMP-THROTTLE-DRAG-SLIDER,TOK-TMP-THROTTLE-DRAG-SLIDER,conception/11-reponse-parametrique/05-comportements-temporels-purs.yaml:139,a-ecrire
-TMP-THROTTLE-PAN-ZOOM-CARTE,TOK-TMP-THROTTLE-PAN-ZOOM-CARTE,conception/11-reponse-parametrique/05-comportements-temporels-purs.yaml:163,a-ecrire
-TMP-THROTTLE-SCROLL,TOK-TMP-THROTTLE-SCROLL,conception/11-reponse-parametrique/05-comportements-temporels-purs.yaml:174,a-ecrire
-TMP-LONG-PRESS,TOK-TMP-LONG-PRESS,conception/11-reponse-parametrique/05-comportements-temporels-purs.yaml:195,a-ecrire
-TMP-DOUBLE-TAP,TOK-TMP-DOUBLE-TAP,conception/11-reponse-parametrique/05-comportements-temporels-purs.yaml:215,a-ecrire
-TMP-TIMEOUT-RESEAU-STANDARD,TOK-TMP-TIMEOUT-RESEAU-STANDARD,conception/11-reponse-parametrique/05-comportements-temporels-purs.yaml:233,a-ecrire
-TMP-TIMEOUT-RESEAU-SOUMISSION,TOK-TMP-TIMEOUT-RESEAU-SOUMISSION,conception/11-reponse-parametrique/05-comportements-temporels-purs.yaml:248,a-ecrire
+MAP-DEJA-VISITE-VERS-PIN,TOK-MAP-DEJA-VISITE-VERS-PIN,conception/11-reponse-parametrique/04-mappings-parametriques.yaml:373,repris
+MAP-MODE-OFFLINE-VERS-CARTE,TOK-MAP-MODE-OFFLINE-VERS-CARTE,conception/11-reponse-parametrique/04-mappings-parametriques.yaml:414,repris
+MAP-MODE-M4-VERS-PERSISTANTES,,conception/11-reponse-parametrique/04-mappings-parametriques.yaml:468,"non-repris: durée, courbe, chorégraphie, mapping ou décision"
+TMP-AUTO-DISMISS-M9,TOK-TMP-AUTO-DISMISS-M9,conception/11-reponse-parametrique/05-comportements-temporels-purs.yaml:37,repris
+TMP-AUTO-DISMISS-M7,,conception/11-reponse-parametrique/05-comportements-temporels-purs.yaml:57,"non-repris: durée, courbe, chorégraphie, mapping ou décision"
+TMP-AUTO-DISMISS-INDICATION-ONBOARDING,,conception/11-reponse-parametrique/05-comportements-temporels-purs.yaml:78,"non-repris: durée, courbe, chorégraphie, mapping ou décision"
+TMP-DEBOUNCE-RECHERCHE,,conception/11-reponse-parametrique/05-comportements-temporels-purs.yaml:99,"non-repris: durée, courbe, chorégraphie, mapping ou décision"
+TMP-DEBOUNCE-VALIDATION-FORMULAIRE,,conception/11-reponse-parametrique/05-comportements-temporels-purs.yaml:115,"non-repris: durée, courbe, chorégraphie, mapping ou décision"
+TMP-THROTTLE-DRAG-SLIDER,TOK-TMP-THROTTLE-DRAG-SLIDER,conception/11-reponse-parametrique/05-comportements-temporels-purs.yaml:139,repris
+TMP-THROTTLE-PAN-ZOOM-CARTE,TOK-TMP-THROTTLE-PAN-ZOOM-CARTE,conception/11-reponse-parametrique/05-comportements-temporels-purs.yaml:163,repris
+TMP-THROTTLE-SCROLL,,conception/11-reponse-parametrique/05-comportements-temporels-purs.yaml:174,"non-repris: durée, courbe, chorégraphie, mapping ou décision"
+TMP-LONG-PRESS,,conception/11-reponse-parametrique/05-comportements-temporels-purs.yaml:195,"non-repris: durée, courbe, chorégraphie, mapping ou décision"
+TMP-DOUBLE-TAP,,conception/11-reponse-parametrique/05-comportements-temporels-purs.yaml:215,"non-repris: durée, courbe, chorégraphie, mapping ou décision"
+TMP-TIMEOUT-RESEAU-STANDARD,,conception/11-reponse-parametrique/05-comportements-temporels-purs.yaml:233,"non-repris: durée, courbe, chorégraphie, mapping ou décision"
+TMP-TIMEOUT-RESEAU-SOUMISSION,,conception/11-reponse-parametrique/05-comportements-temporels-purs.yaml:248,"non-repris: durée, courbe, chorégraphie, mapping ou décision"
 01,,conception/12-tokens/00-index.yaml:269,non-repris: numéro de section
 02,,conception/12-tokens/00-index.yaml:282,non-repris: numéro de section
 03,,conception/12-tokens/00-index.yaml:291,non-repris: numéro de section
 04,,conception/12-tokens/00-index.yaml:297,non-repris: numéro de section
-TOK-COLOR-PIN-EDITORIAL,TOK-COLOR-PIN-EDITORIAL,conception/12-tokens/00-index.yaml:322,a-ecrire
-TOK-TYPO-DISPLAY-LG,TOK-TYPO-DISPLAY-LG,conception/12-tokens/00-index.yaml:341,a-ecrire
-TOK-SPACE-MD,TOK-SPACE-MD,conception/12-tokens/00-index.yaml:355,a-ecrire
-TOK-OPACITY-BACKDROP-M6,TOK-OPACITY-BACKDROP-M6,conception/12-tokens/00-index.yaml:365,a-ecrire
+TOK-COLOR-PIN-EDITORIAL,TOK-COLOR-PIN-EDITORIAL,conception/12-tokens/00-index.yaml:322,repris
+TOK-TYPO-DISPLAY-LG,TOK-TYPO-DISPLAY-LG,conception/12-tokens/00-index.yaml:341,repris
+TOK-SPACE-MD,TOK-SPACE-MD,conception/12-tokens/00-index.yaml:355,repris
+TOK-OPACITY-BACKDROP-M6,TOK-OPACITY-BACKDROP-M6,conception/12-tokens/00-index.yaml:365,repris
 D1,,conception/12-tokens/00-index.yaml:502,non-repris: décision de tokens
 D2,,conception/12-tokens/00-index.yaml:506,non-repris: décision de tokens
 D3,,conception/12-tokens/00-index.yaml:510,non-repris: décision de tokens
@@ -738,65 +738,65 @@ D8,,conception/12-tokens/00-index.yaml:550,non-repris: décision de tokens
 D9,,conception/12-tokens/00-index.yaml:562,non-repris: décision de tokens
 D10,,conception/12-tokens/00-index.yaml:569,non-repris: décision de tokens
 D11,,conception/12-tokens/00-index.yaml:577,non-repris: décision de tokens
-TOK-COLOR-PRIMARY,TOK-COLOR-PRIMARY,conception/12-tokens/01-couleurs.yaml:49,a-ecrire
-TOK-COLOR-PRIMARY-FONCE,TOK-COLOR-PRIMARY-FONCE,conception/12-tokens/01-couleurs.yaml:72,a-ecrire
-TOK-COLOR-PRIMARY-CLAIR,TOK-COLOR-PRIMARY-CLAIR,conception/12-tokens/01-couleurs.yaml:84,a-ecrire
-TOK-COLOR-FOND-PRINCIPAL,TOK-COLOR-FOND-PRINCIPAL,conception/12-tokens/01-couleurs.yaml:94,a-ecrire
-TOK-COLOR-FOND-SECONDAIRE,TOK-COLOR-FOND-SECONDAIRE,conception/12-tokens/01-couleurs.yaml:103,a-ecrire
-TOK-COLOR-FOND-TERTIAIRE,TOK-COLOR-FOND-TERTIAIRE,conception/12-tokens/01-couleurs.yaml:115,a-ecrire
-TOK-COLOR-TEXTE-PRINCIPAL,TOK-COLOR-TEXTE-PRINCIPAL,conception/12-tokens/01-couleurs.yaml:124,a-ecrire
-TOK-COLOR-TEXTE-SECONDAIRE,TOK-COLOR-TEXTE-SECONDAIRE,conception/12-tokens/01-couleurs.yaml:139,a-ecrire
-TOK-COLOR-TEXTE-TERTIAIRE,TOK-COLOR-TEXTE-TERTIAIRE,conception/12-tokens/01-couleurs.yaml:152,a-ecrire
-TOK-COLOR-OR-ACCENT,TOK-COLOR-OR-ACCENT,conception/12-tokens/01-couleurs.yaml:169,a-ecrire
-TOK-COLOR-BLANC-NARRATIF,TOK-COLOR-BLANC-NARRATIF,conception/12-tokens/01-couleurs.yaml:191,a-ecrire
-TOK-COLOR-FONCTIONNEL-SUCCES,TOK-COLOR-FONCTIONNEL-SUCCES,conception/12-tokens/01-couleurs.yaml:209,a-ecrire
-TOK-COLOR-FONCTIONNEL-ERREUR,TOK-COLOR-FONCTIONNEL-ERREUR,conception/12-tokens/01-couleurs.yaml:224,a-ecrire
-TOK-COLOR-FONCTIONNEL-INFO,TOK-COLOR-FONCTIONNEL-INFO,conception/12-tokens/01-couleurs.yaml:239,a-ecrire
-TOK-COLOR-PIN-EDITORIAL,TOK-COLOR-PIN-EDITORIAL,conception/12-tokens/01-couleurs.yaml:257,a-ecrire
-TOK-COLOR-PIN-COMMUNAUTAIRE,TOK-COLOR-PIN-COMMUNAUTAIRE,conception/12-tokens/01-couleurs.yaml:283,a-ecrire
-TOK-COLOR-CONTOUR-VERIFICATION,TOK-COLOR-CONTOUR-VERIFICATION,conception/12-tokens/01-couleurs.yaml:303,a-ecrire
-TOK-COLOR-OVERLAY-SOMBRE,TOK-COLOR-OVERLAY-SOMBRE,conception/12-tokens/01-couleurs.yaml:339,a-ecrire
-TOK-FONT-TITRE-EDITORIAL,TOK-FONT-TITRE-EDITORIAL,conception/12-tokens/02-typographies.yaml:38,a-ecrire
-TOK-FONT-CORPS-NARRATIF,TOK-FONT-CORPS-NARRATIF,conception/12-tokens/02-typographies.yaml:54,a-ecrire
-TOK-FONT-INTERFACE,TOK-FONT-INTERFACE,conception/12-tokens/02-typographies.yaml:68,a-ecrire
-TOK-TYPO-DISPLAY-XL,TOK-TYPO-DISPLAY-XL,conception/12-tokens/02-typographies.yaml:93,a-ecrire
-TOK-TYPO-DISPLAY-LG,TOK-TYPO-DISPLAY-LG,conception/12-tokens/02-typographies.yaml:103,a-ecrire
-TOK-TYPO-DISPLAY-MD,TOK-TYPO-DISPLAY-MD,conception/12-tokens/02-typographies.yaml:113,a-ecrire
-TOK-TYPO-DISPLAY-SM,TOK-TYPO-DISPLAY-SM,conception/12-tokens/02-typographies.yaml:123,a-ecrire
-TOK-TYPO-BODY-LG,TOK-TYPO-BODY-LG,conception/12-tokens/02-typographies.yaml:134,a-ecrire
-TOK-TYPO-BODY-MD,TOK-TYPO-BODY-MD,conception/12-tokens/02-typographies.yaml:144,a-ecrire
-TOK-TYPO-BODY-SM,TOK-TYPO-BODY-SM,conception/12-tokens/02-typographies.yaml:154,a-ecrire
-TOK-TYPO-BODY-EMPHASIS,TOK-TYPO-BODY-EMPHASIS,conception/12-tokens/02-typographies.yaml:164,a-ecrire
-TOK-TYPO-UI-LG,TOK-TYPO-UI-LG,conception/12-tokens/02-typographies.yaml:176,a-ecrire
-TOK-TYPO-UI-MD,TOK-TYPO-UI-MD,conception/12-tokens/02-typographies.yaml:185,a-ecrire
-TOK-TYPO-UI-SM,TOK-TYPO-UI-SM,conception/12-tokens/02-typographies.yaml:195,a-ecrire
-TOK-TYPO-UI-XS,TOK-TYPO-UI-XS,conception/12-tokens/02-typographies.yaml:205,a-ecrire
-TOK-SPACE-XS,TOK-SPACE-XS,conception/12-tokens/03-espace-et-forme.yaml:34,a-ecrire
-TOK-SPACE-SM,TOK-SPACE-SM,conception/12-tokens/03-espace-et-forme.yaml:41,a-ecrire
-TOK-SPACE-MD,TOK-SPACE-MD,conception/12-tokens/03-espace-et-forme.yaml:49,a-ecrire
-TOK-SPACE-LG,TOK-SPACE-LG,conception/12-tokens/03-espace-et-forme.yaml:56,a-ecrire
-TOK-SPACE-XL,TOK-SPACE-XL,conception/12-tokens/03-espace-et-forme.yaml:64,a-ecrire
-TOK-SPACE-XXL,TOK-SPACE-XXL,conception/12-tokens/03-espace-et-forme.yaml:71,a-ecrire
-TOK-SPACE-XXXL,TOK-SPACE-XXXL,conception/12-tokens/03-espace-et-forme.yaml:78,a-ecrire
-TOK-RADIUS-NONE,TOK-RADIUS-NONE,conception/12-tokens/03-espace-et-forme.yaml:98,a-ecrire
-TOK-RADIUS-SM,TOK-RADIUS-SM,conception/12-tokens/03-espace-et-forme.yaml:105,a-ecrire
-TOK-RADIUS-MD,TOK-RADIUS-MD,conception/12-tokens/03-espace-et-forme.yaml:113,a-ecrire
-TOK-RADIUS-LG,TOK-RADIUS-LG,conception/12-tokens/03-espace-et-forme.yaml:121,a-ecrire
-TOK-RADIUS-PILL,TOK-RADIUS-PILL,conception/12-tokens/03-espace-et-forme.yaml:131,a-ecrire
-TOK-SHADOW-SM,TOK-SHADOW-SM,conception/12-tokens/03-espace-et-forme.yaml:147,a-ecrire
-TOK-SHADOW-MD,TOK-SHADOW-MD,conception/12-tokens/03-espace-et-forme.yaml:155,a-ecrire
-TOK-SHADOW-LG,TOK-SHADOW-LG,conception/12-tokens/03-espace-et-forme.yaml:164,a-ecrire
-TOK-OPACITY-BACKDROP-M6,TOK-OPACITY-BACKDROP-M6,conception/12-tokens/04-opacites-constantes.yaml:38,a-ecrire
-TOK-OPACITY-BACKDROP-M8,TOK-OPACITY-BACKDROP-M8,conception/12-tokens/04-opacites-constantes.yaml:54,a-ecrire
-TOK-OPACITY-DESACTIVE,TOK-OPACITY-DESACTIVE,conception/12-tokens/04-opacites-constantes.yaml:71,a-ecrire
-TOK-OPACITY-SEPARATEUR,TOK-OPACITY-SEPARATEUR,conception/12-tokens/04-opacites-constantes.yaml:106,a-ecrire
+TOK-COLOR-PRIMARY,TOK-COLOR-PRIMARY,conception/12-tokens/01-couleurs.yaml:49,repris
+TOK-COLOR-PRIMARY-FONCE,TOK-COLOR-PRIMARY-FONCE,conception/12-tokens/01-couleurs.yaml:72,repris
+TOK-COLOR-PRIMARY-CLAIR,TOK-COLOR-PRIMARY-CLAIR,conception/12-tokens/01-couleurs.yaml:84,repris
+TOK-COLOR-FOND-PRINCIPAL,TOK-COLOR-FOND-PRINCIPAL,conception/12-tokens/01-couleurs.yaml:94,repris
+TOK-COLOR-FOND-SECONDAIRE,TOK-COLOR-FOND-SECONDAIRE,conception/12-tokens/01-couleurs.yaml:103,repris
+TOK-COLOR-FOND-TERTIAIRE,TOK-COLOR-FOND-TERTIAIRE,conception/12-tokens/01-couleurs.yaml:115,repris
+TOK-COLOR-TEXTE-PRINCIPAL,TOK-COLOR-TEXTE-PRINCIPAL,conception/12-tokens/01-couleurs.yaml:124,repris
+TOK-COLOR-TEXTE-SECONDAIRE,TOK-COLOR-TEXTE-SECONDAIRE,conception/12-tokens/01-couleurs.yaml:139,repris
+TOK-COLOR-TEXTE-TERTIAIRE,TOK-COLOR-TEXTE-TERTIAIRE,conception/12-tokens/01-couleurs.yaml:152,repris
+TOK-COLOR-OR-ACCENT,TOK-COLOR-OR-ACCENT,conception/12-tokens/01-couleurs.yaml:169,repris
+TOK-COLOR-BLANC-NARRATIF,TOK-COLOR-BLANC-NARRATIF,conception/12-tokens/01-couleurs.yaml:191,repris
+TOK-COLOR-FONCTIONNEL-SUCCES,TOK-COLOR-FONCTIONNEL-SUCCES,conception/12-tokens/01-couleurs.yaml:209,repris
+TOK-COLOR-FONCTIONNEL-ERREUR,TOK-COLOR-FONCTIONNEL-ERREUR,conception/12-tokens/01-couleurs.yaml:224,repris
+TOK-COLOR-FONCTIONNEL-INFO,TOK-COLOR-FONCTIONNEL-INFO,conception/12-tokens/01-couleurs.yaml:239,repris
+TOK-COLOR-PIN-EDITORIAL,TOK-COLOR-PIN-EDITORIAL,conception/12-tokens/01-couleurs.yaml:257,repris
+TOK-COLOR-PIN-COMMUNAUTAIRE,TOK-COLOR-PIN-COMMUNAUTAIRE,conception/12-tokens/01-couleurs.yaml:283,repris
+TOK-COLOR-CONTOUR-VERIFICATION,TOK-COLOR-CONTOUR-VERIFICATION,conception/12-tokens/01-couleurs.yaml:303,repris
+TOK-COLOR-OVERLAY-SOMBRE,TOK-COLOR-OVERLAY-SOMBRE,conception/12-tokens/01-couleurs.yaml:339,repris
+TOK-FONT-TITRE-EDITORIAL,TOK-FONT-TITRE-EDITORIAL,conception/12-tokens/02-typographies.yaml:38,repris
+TOK-FONT-CORPS-NARRATIF,TOK-FONT-CORPS-NARRATIF,conception/12-tokens/02-typographies.yaml:54,repris
+TOK-FONT-INTERFACE,TOK-FONT-INTERFACE,conception/12-tokens/02-typographies.yaml:68,repris
+TOK-TYPO-DISPLAY-XL,TOK-TYPO-DISPLAY-XL,conception/12-tokens/02-typographies.yaml:93,repris
+TOK-TYPO-DISPLAY-LG,TOK-TYPO-DISPLAY-LG,conception/12-tokens/02-typographies.yaml:103,repris
+TOK-TYPO-DISPLAY-MD,TOK-TYPO-DISPLAY-MD,conception/12-tokens/02-typographies.yaml:113,repris
+TOK-TYPO-DISPLAY-SM,TOK-TYPO-DISPLAY-SM,conception/12-tokens/02-typographies.yaml:123,repris
+TOK-TYPO-BODY-LG,TOK-TYPO-BODY-LG,conception/12-tokens/02-typographies.yaml:134,repris
+TOK-TYPO-BODY-MD,TOK-TYPO-BODY-MD,conception/12-tokens/02-typographies.yaml:144,repris
+TOK-TYPO-BODY-SM,TOK-TYPO-BODY-SM,conception/12-tokens/02-typographies.yaml:154,repris
+TOK-TYPO-BODY-EMPHASIS,TOK-TYPO-BODY-EMPHASIS,conception/12-tokens/02-typographies.yaml:164,repris
+TOK-TYPO-UI-LG,TOK-TYPO-UI-LG,conception/12-tokens/02-typographies.yaml:176,repris
+TOK-TYPO-UI-MD,TOK-TYPO-UI-MD,conception/12-tokens/02-typographies.yaml:185,repris
+TOK-TYPO-UI-SM,TOK-TYPO-UI-SM,conception/12-tokens/02-typographies.yaml:195,repris
+TOK-TYPO-UI-XS,TOK-TYPO-UI-XS,conception/12-tokens/02-typographies.yaml:205,repris
+TOK-SPACE-XS,TOK-SPACE-XS,conception/12-tokens/03-espace-et-forme.yaml:34,repris
+TOK-SPACE-SM,TOK-SPACE-SM,conception/12-tokens/03-espace-et-forme.yaml:41,repris
+TOK-SPACE-MD,TOK-SPACE-MD,conception/12-tokens/03-espace-et-forme.yaml:49,repris
+TOK-SPACE-LG,TOK-SPACE-LG,conception/12-tokens/03-espace-et-forme.yaml:56,repris
+TOK-SPACE-XL,TOK-SPACE-XL,conception/12-tokens/03-espace-et-forme.yaml:64,repris
+TOK-SPACE-XXL,TOK-SPACE-XXL,conception/12-tokens/03-espace-et-forme.yaml:71,repris
+TOK-SPACE-XXXL,TOK-SPACE-XXXL,conception/12-tokens/03-espace-et-forme.yaml:78,repris
+TOK-RADIUS-NONE,TOK-RADIUS-NONE,conception/12-tokens/03-espace-et-forme.yaml:98,repris
+TOK-RADIUS-SM,TOK-RADIUS-SM,conception/12-tokens/03-espace-et-forme.yaml:105,repris
+TOK-RADIUS-MD,TOK-RADIUS-MD,conception/12-tokens/03-espace-et-forme.yaml:113,repris
+TOK-RADIUS-LG,TOK-RADIUS-LG,conception/12-tokens/03-espace-et-forme.yaml:121,repris
+TOK-RADIUS-PILL,TOK-RADIUS-PILL,conception/12-tokens/03-espace-et-forme.yaml:131,repris
+TOK-SHADOW-SM,TOK-SHADOW-SM,conception/12-tokens/03-espace-et-forme.yaml:147,repris
+TOK-SHADOW-MD,TOK-SHADOW-MD,conception/12-tokens/03-espace-et-forme.yaml:155,repris
+TOK-SHADOW-LG,TOK-SHADOW-LG,conception/12-tokens/03-espace-et-forme.yaml:164,repris
+TOK-OPACITY-BACKDROP-M6,TOK-OPACITY-BACKDROP-M6,conception/12-tokens/04-opacites-constantes.yaml:38,repris
+TOK-OPACITY-BACKDROP-M8,TOK-OPACITY-BACKDROP-M8,conception/12-tokens/04-opacites-constantes.yaml:54,repris
+TOK-OPACITY-DESACTIVE,TOK-OPACITY-DESACTIVE,conception/12-tokens/04-opacites-constantes.yaml:71,repris
+TOK-OPACITY-SEPARATEUR,TOK-OPACITY-SEPARATEUR,conception/12-tokens/04-opacites-constantes.yaml:106,repris
 01,,conception/13-icones/00-index.yaml:246,non-repris: numéro de section
 02,,conception/13-icones/00-index.yaml:262,non-repris: numéro de section
 03,,conception/13-icones/00-index.yaml:272,non-repris: numéro de section
 04,,conception/13-icones/00-index.yaml:281,non-repris: numéro de section
-ICON-CAT-LIEU-DISPARU,ICN-CAT-LIEU-DISPARU,conception/13-icones/00-index.yaml:309,a-ecrire
-ICON-UI-RETOUR,ICN-UI-RETOUR,conception/13-icones/00-index.yaml:330,a-ecrire
-ICON-ADMIN-VALIDER-PIN,ICN-ADMIN-VALIDER-PIN,conception/13-icones/00-index.yaml:346,a-ecrire
+ICON-CAT-LIEU-DISPARU,ICN-CAT-LIEU-DISPARU,conception/13-icones/00-index.yaml:309,repris
+ICON-UI-RETOUR,ICN-UI-RETOUR,conception/13-icones/00-index.yaml:330,repris
+ICON-ADMIN-VALIDER-PIN,,conception/13-icones/00-index.yaml:346,non-repris: icône
 D1,,conception/13-icones/00-index.yaml:465,non-repris: décision d’icônes
 D2,,conception/13-icones/00-index.yaml:469,non-repris: décision d’icônes
 D3,,conception/13-icones/00-index.yaml:473,non-repris: décision d’icônes
@@ -814,64 +814,64 @@ disabled,,conception/13-icones/01-charte-graphique.yaml:238,non-repris: décisio
 hover_pressed,,conception/13-icones/01-charte-graphique.yaml:244,non-repris: décision d’icônes
 erreur,,conception/13-icones/01-charte-graphique.yaml:250,non-repris: décision d’icônes
 succes,,conception/13-icones/01-charte-graphique.yaml:255,non-repris: décision d’icônes
-ICON-CAT-CLASSIQUE,ICN-CAT-CLASSIQUE,conception/13-icones/02-icones-categories.yaml:46,a-ecrire
-ICON-CAT-ANECDOTE,ICN-CAT-ANECDOTE,conception/13-icones/02-icones-categories.yaml:67,a-ecrire
-ICON-CAT-MUSEE-INSTITUTION,ICN-CAT-MUSEE-INSTITUTION,conception/13-icones/02-icones-categories.yaml:92,a-ecrire
-ICON-CAT-PERSONNE,ICN-CAT-PERSONNE,conception/13-icones/02-icones-categories.yaml:112,a-ecrire
-ICON-CAT-EVENEMENT,ICN-CAT-EVENEMENT,conception/13-icones/02-icones-categories.yaml:133,a-ecrire
-ICON-CAT-LIEU-DISPARU,ICN-CAT-LIEU-DISPARU,conception/13-icones/02-icones-categories.yaml:153,a-ecrire
-ICON-CAT-VIE-QUOTIDIENNE,ICN-CAT-VIE-QUOTIDIENNE,conception/13-icones/02-icones-categories.yaml:188,a-ecrire
-ICON-CAT-ARCHITECTURE,ICN-CAT-ARCHITECTURE,conception/13-icones/02-icones-categories.yaml:207,a-ecrire
-ICON-CAT-NATURE-GEOGRAPHIE,ICN-CAT-NATURE-GEOGRAPHIE,conception/13-icones/02-icones-categories.yaml:233,a-ecrire
-ICON-CAT-PATRIMOINE-VIVANT,ICN-CAT-PATRIMOINE-VIVANT,conception/13-icones/02-icones-categories.yaml:252,a-ecrire
-ICON-CAT-GASTRONOMIE,ICN-CAT-GASTRONOMIE,conception/13-icones/02-icones-categories.yaml:277,a-ecrire
-ICON-UI-RETOUR,ICN-UI-RETOUR,conception/13-icones/03-icones-ui-fonctionnelles.yaml:30,a-ecrire
-ICON-UI-FERMETURE,ICN-UI-FERMETURE,conception/13-icones/03-icones-ui-fonctionnelles.yaml:41,a-ecrire
-ICON-UI-CREATION-FAB,ICN-UI-CREATION-FAB,conception/13-icones/03-icones-ui-fonctionnelles.yaml:52,a-ecrire
-ICON-UI-PLAY,ICN-UI-PLAY,conception/13-icones/03-icones-ui-fonctionnelles.yaml:66,a-ecrire
-ICON-UI-PAUSE,ICN-UI-PAUSE,conception/13-icones/03-icones-ui-fonctionnelles.yaml:78,a-ecrire
-ICON-UI-CALENDRIER,ICN-UI-CALENDRIER,conception/13-icones/03-icones-ui-fonctionnelles.yaml:92,a-ecrire
-ICON-UI-LIEU,ICN-UI-LIEU,conception/13-icones/03-icones-ui-fonctionnelles.yaml:104,a-ecrire
-ICON-UI-VISIBILITE,ICN-UI-VISIBILITE,conception/13-icones/03-icones-ui-fonctionnelles.yaml:122,a-ecrire
-ICON-UI-VISIBILITE-OFF,ICN-UI-VISIBILITE-OFF,conception/13-icones/03-icones-ui-fonctionnelles.yaml:137,a-ecrire
-ICON-UI-ERREUR,ICN-UI-ERREUR,conception/13-icones/03-icones-ui-fonctionnelles.yaml:158,a-ecrire
-ICON-UI-SUCCES,ICN-UI-SUCCES,conception/13-icones/03-icones-ui-fonctionnelles.yaml:168,a-ecrire
-ICON-UI-INFO,ICN-UI-INFO,conception/13-icones/03-icones-ui-fonctionnelles.yaml:179,a-ecrire
-ICON-UI-FAVORI,ICN-UI-FAVORI,conception/13-icones/03-icones-ui-fonctionnelles.yaml:195,a-ecrire
-ICON-UI-PARTAGE,ICN-UI-PARTAGE,conception/13-icones/03-icones-ui-fonctionnelles.yaml:209,a-ecrire
-ICON-UI-SIGNALEMENT,ICN-UI-SIGNALEMENT,conception/13-icones/03-icones-ui-fonctionnelles.yaml:218,a-ecrire
-ICON-UI-RECHERCHE,ICN-UI-RECHERCHE,conception/13-icones/03-icones-ui-fonctionnelles.yaml:227,a-ecrire
-ICON-UI-FILTRE,ICN-UI-FILTRE,conception/13-icones/03-icones-ui-fonctionnelles.yaml:238,a-ecrire
-ICON-UI-CHECK,ICN-UI-CHECK,conception/13-icones/03-icones-ui-fonctionnelles.yaml:249,a-ecrire
-ICON-UI-SECTION-CARTE,ICN-UI-SECTION-CARTE,conception/13-icones/03-icones-ui-fonctionnelles.yaml:268,a-ecrire
-ICON-UI-SECTION-PARCOURS,ICN-UI-SECTION-PARCOURS,conception/13-icones/03-icones-ui-fonctionnelles.yaml:279,a-ecrire
-ICON-UI-SECTION-PROFIL,ICN-UI-SECTION-PROFIL,conception/13-icones/03-icones-ui-fonctionnelles.yaml:290,a-ecrire
-ICON-UI-OFFLINE,ICN-UI-OFFLINE,conception/13-icones/03-icones-ui-fonctionnelles.yaml:307,a-ecrire
-ICON-UI-CHARGEMENT,ICN-UI-CHARGEMENT,conception/13-icones/03-icones-ui-fonctionnelles.yaml:316,a-ecrire
-ICON-UI-CAMERA,ICN-UI-CAMERA,conception/13-icones/03-icones-ui-fonctionnelles.yaml:334,a-ecrire
-ICON-UI-NOTIFICATION,ICN-UI-NOTIFICATION,conception/13-icones/03-icones-ui-fonctionnelles.yaml:348,a-ecrire
-ICON-UI-LIEN-EXTERNE,ICN-UI-LIEN-EXTERNE,conception/13-icones/03-icones-ui-fonctionnelles.yaml:366,a-ecrire
-ICON-UI-ANONYMAT,ICN-UI-ANONYMAT,conception/13-icones/03-icones-ui-fonctionnelles.yaml:375,a-ecrire
-ICON-UI-PROVENANCE-EDITORIAL,ICN-UI-PROVENANCE-EDITORIAL,conception/13-icones/03-icones-ui-fonctionnelles.yaml:384,a-ecrire
-ICON-UI-PROVENANCE-COMMUNAUTAIRE,ICN-UI-PROVENANCE-COMMUNAUTAIRE,conception/13-icones/03-icones-ui-fonctionnelles.yaml:396,a-ecrire
-ICON-UI-VERIFICATION-EN-COURS,ICN-UI-VERIFICATION-EN-COURS,conception/13-icones/03-icones-ui-fonctionnelles.yaml:405,a-ecrire
-ICON-UI-COUCHE,ICN-UI-COUCHE,conception/13-icones/03-icones-ui-fonctionnelles.yaml:425,a-ecrire
-ICON-UI-MODE-SURPRENEZ-MOI,ICN-UI-MODE-SURPRENEZ-MOI,conception/13-icones/03-icones-ui-fonctionnelles.yaml:441,a-ecrire
-ICON-UI-MODE-PRESENTATION,ICN-UI-MODE-PRESENTATION,conception/13-icones/03-icones-ui-fonctionnelles.yaml:457,a-ecrire
-ICON-UI-DUREE,ICN-UI-DUREE,conception/13-icones/03-icones-ui-fonctionnelles.yaml:478,a-ecrire
-ICON-UI-DISTANCE,ICN-UI-DISTANCE,conception/13-icones/03-icones-ui-fonctionnelles.yaml:498,a-ecrire
-ICON-UI-ETAPES,ICN-UI-ETAPES,conception/13-icones/03-icones-ui-fonctionnelles.yaml:513,a-ecrire
-ICON-UI-LANGUE,ICN-UI-LANGUE,conception/13-icones/03-icones-ui-fonctionnelles.yaml:533,a-ecrire
-ICON-ADMIN-VALIDER,ICN-ADMIN-VALIDER,conception/13-icones/04-icones-back-office.yaml:35,a-ecrire
-ICON-ADMIN-REJETER,ICN-ADMIN-REJETER,conception/13-icones/04-icones-back-office.yaml:52,a-ecrire
-ICON-ADMIN-MODERER,ICN-ADMIN-MODERER,conception/13-icones/04-icones-back-office.yaml:62,a-ecrire
-ICON-ADMIN-VALIDATION-SCIENTIFIQUE,ICN-ADMIN-VALIDATION-SCIENTIFIQUE,conception/13-icones/04-icones-back-office.yaml:75,a-ecrire
-ICON-ADMIN-PROMOUVOIR,ICN-ADMIN-PROMOUVOIR,conception/13-icones/04-icones-back-office.yaml:86,a-ecrire
-ICON-ADMIN-RETIRER,ICN-ADMIN-RETIRER,conception/13-icones/04-icones-back-office.yaml:98,a-ecrire
-ICON-ADMIN-REOUVRIR,ICN-ADMIN-REOUVRIR,conception/13-icones/04-icones-back-office.yaml:114,a-ecrire
-ICON-ADMIN-TABLEAU-BORD,ICN-ADMIN-TABLEAU-BORD,conception/13-icones/04-icones-back-office.yaml:125,a-ecrire
-ICON-ADMIN-CATALOGUE,ICN-ADMIN-CATALOGUE,conception/13-icones/04-icones-back-office.yaml:136,a-ecrire
-ICON-ADMIN-PREVISUALISATION,ICN-ADMIN-PREVISUALISATION,conception/13-icones/04-icones-back-office.yaml:147,a-ecrire
+ICON-CAT-CLASSIQUE,ICN-CAT-CLASSIQUE,conception/13-icones/02-icones-categories.yaml:46,repris
+ICON-CAT-ANECDOTE,ICN-CAT-ANECDOTE,conception/13-icones/02-icones-categories.yaml:67,repris
+ICON-CAT-MUSEE-INSTITUTION,ICN-CAT-MUSEE-INSTITUTION,conception/13-icones/02-icones-categories.yaml:92,repris
+ICON-CAT-PERSONNE,ICN-CAT-PERSONNE,conception/13-icones/02-icones-categories.yaml:112,repris
+ICON-CAT-EVENEMENT,ICN-CAT-EVENEMENT,conception/13-icones/02-icones-categories.yaml:133,repris
+ICON-CAT-LIEU-DISPARU,ICN-CAT-LIEU-DISPARU,conception/13-icones/02-icones-categories.yaml:153,repris
+ICON-CAT-VIE-QUOTIDIENNE,ICN-CAT-VIE-QUOTIDIENNE,conception/13-icones/02-icones-categories.yaml:188,repris
+ICON-CAT-ARCHITECTURE,ICN-CAT-ARCHITECTURE,conception/13-icones/02-icones-categories.yaml:207,repris
+ICON-CAT-NATURE-GEOGRAPHIE,ICN-CAT-NATURE-GEOGRAPHIE,conception/13-icones/02-icones-categories.yaml:233,repris
+ICON-CAT-PATRIMOINE-VIVANT,ICN-CAT-PATRIMOINE-VIVANT,conception/13-icones/02-icones-categories.yaml:252,repris
+ICON-CAT-GASTRONOMIE,ICN-CAT-GASTRONOMIE,conception/13-icones/02-icones-categories.yaml:277,repris
+ICON-UI-RETOUR,ICN-UI-RETOUR,conception/13-icones/03-icones-ui-fonctionnelles.yaml:30,repris
+ICON-UI-FERMETURE,ICN-UI-FERMETURE,conception/13-icones/03-icones-ui-fonctionnelles.yaml:41,repris
+ICON-UI-CREATION-FAB,,conception/13-icones/03-icones-ui-fonctionnelles.yaml:52,non-repris: icône
+ICON-UI-PLAY,,conception/13-icones/03-icones-ui-fonctionnelles.yaml:66,non-repris: icône
+ICON-UI-PAUSE,,conception/13-icones/03-icones-ui-fonctionnelles.yaml:78,non-repris: icône
+ICON-UI-CALENDRIER,ICN-UI-CALENDRIER,conception/13-icones/03-icones-ui-fonctionnelles.yaml:92,repris
+ICON-UI-LIEU,ICN-UI-LIEU,conception/13-icones/03-icones-ui-fonctionnelles.yaml:104,repris
+ICON-UI-VISIBILITE,,conception/13-icones/03-icones-ui-fonctionnelles.yaml:122,non-repris: icône
+ICON-UI-VISIBILITE-OFF,,conception/13-icones/03-icones-ui-fonctionnelles.yaml:137,non-repris: icône
+ICON-UI-ERREUR,ICN-UI-ERREUR,conception/13-icones/03-icones-ui-fonctionnelles.yaml:158,repris
+ICON-UI-SUCCES,ICN-UI-SUCCES,conception/13-icones/03-icones-ui-fonctionnelles.yaml:168,repris
+ICON-UI-INFO,ICN-UI-INFO,conception/13-icones/03-icones-ui-fonctionnelles.yaml:179,repris
+ICON-UI-FAVORI,,conception/13-icones/03-icones-ui-fonctionnelles.yaml:195,non-repris: icône
+ICON-UI-PARTAGE,,conception/13-icones/03-icones-ui-fonctionnelles.yaml:209,non-repris: icône
+ICON-UI-SIGNALEMENT,,conception/13-icones/03-icones-ui-fonctionnelles.yaml:218,non-repris: icône
+ICON-UI-RECHERCHE,,conception/13-icones/03-icones-ui-fonctionnelles.yaml:227,non-repris: icône
+ICON-UI-FILTRE,,conception/13-icones/03-icones-ui-fonctionnelles.yaml:238,non-repris: icône
+ICON-UI-CHECK,ICN-UI-CHECK,conception/13-icones/03-icones-ui-fonctionnelles.yaml:249,repris
+ICON-UI-SECTION-CARTE,ICN-UI-SECTION-CARTE,conception/13-icones/03-icones-ui-fonctionnelles.yaml:268,repris
+ICON-UI-SECTION-PARCOURS,ICN-UI-SECTION-PARCOURS,conception/13-icones/03-icones-ui-fonctionnelles.yaml:279,repris
+ICON-UI-SECTION-PROFIL,ICN-UI-SECTION-PROFIL,conception/13-icones/03-icones-ui-fonctionnelles.yaml:290,repris
+ICON-UI-OFFLINE,ICN-UI-OFFLINE,conception/13-icones/03-icones-ui-fonctionnelles.yaml:307,repris
+ICON-UI-CHARGEMENT,ICN-UI-CHARGEMENT,conception/13-icones/03-icones-ui-fonctionnelles.yaml:316,repris
+ICON-UI-CAMERA,,conception/13-icones/03-icones-ui-fonctionnelles.yaml:334,non-repris: icône
+ICON-UI-NOTIFICATION,,conception/13-icones/03-icones-ui-fonctionnelles.yaml:348,non-repris: icône
+ICON-UI-LIEN-EXTERNE,ICN-UI-LIEN-EXTERNE,conception/13-icones/03-icones-ui-fonctionnelles.yaml:366,repris
+ICON-UI-ANONYMAT,,conception/13-icones/03-icones-ui-fonctionnelles.yaml:375,non-repris: icône
+ICON-UI-PROVENANCE-EDITORIAL,,conception/13-icones/03-icones-ui-fonctionnelles.yaml:384,non-repris: icône
+ICON-UI-PROVENANCE-COMMUNAUTAIRE,,conception/13-icones/03-icones-ui-fonctionnelles.yaml:396,non-repris: icône
+ICON-UI-VERIFICATION-EN-COURS,,conception/13-icones/03-icones-ui-fonctionnelles.yaml:405,non-repris: icône
+ICON-UI-COUCHE,,conception/13-icones/03-icones-ui-fonctionnelles.yaml:425,non-repris: icône
+ICON-UI-MODE-SURPRENEZ-MOI,,conception/13-icones/03-icones-ui-fonctionnelles.yaml:441,non-repris: icône
+ICON-UI-MODE-PRESENTATION,,conception/13-icones/03-icones-ui-fonctionnelles.yaml:457,non-repris: icône
+ICON-UI-DUREE,ICN-UI-DUREE,conception/13-icones/03-icones-ui-fonctionnelles.yaml:478,repris
+ICON-UI-DISTANCE,ICN-UI-DISTANCE,conception/13-icones/03-icones-ui-fonctionnelles.yaml:498,repris
+ICON-UI-ETAPES,ICN-UI-ETAPES,conception/13-icones/03-icones-ui-fonctionnelles.yaml:513,repris
+ICON-UI-LANGUE,,conception/13-icones/03-icones-ui-fonctionnelles.yaml:533,non-repris: icône
+ICON-ADMIN-VALIDER,,conception/13-icones/04-icones-back-office.yaml:35,non-repris: icône
+ICON-ADMIN-REJETER,,conception/13-icones/04-icones-back-office.yaml:52,non-repris: icône
+ICON-ADMIN-MODERER,,conception/13-icones/04-icones-back-office.yaml:62,non-repris: icône
+ICON-ADMIN-VALIDATION-SCIENTIFIQUE,,conception/13-icones/04-icones-back-office.yaml:75,non-repris: icône
+ICON-ADMIN-PROMOUVOIR,,conception/13-icones/04-icones-back-office.yaml:86,non-repris: icône
+ICON-ADMIN-RETIRER,,conception/13-icones/04-icones-back-office.yaml:98,non-repris: icône
+ICON-ADMIN-REOUVRIR,,conception/13-icones/04-icones-back-office.yaml:114,non-repris: icône
+ICON-ADMIN-TABLEAU-BORD,,conception/13-icones/04-icones-back-office.yaml:125,non-repris: icône
+ICON-ADMIN-CATALOGUE,,conception/13-icones/04-icones-back-office.yaml:136,non-repris: icône
+ICON-ADMIN-PREVISUALISATION,,conception/13-icones/04-icones-back-office.yaml:147,non-repris: icône
 01,,conception/14-surfaces-hors-app/00-index.yaml:168,non-repris: numéro de section
 02,,conception/14-surfaces-hors-app/00-index.yaml:186,non-repris: numéro de section
 03,,conception/14-surfaces-hors-app/00-index.yaml:199,non-repris: numéro de section

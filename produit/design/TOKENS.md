@@ -29,7 +29,7 @@ R3. Toute couleur visible existe dans l’inventaire ci-dessous. Un besoin nouve
 R4. Une couleur n’exprime pas la catégorie d’un pin (c’est l’icône, voir ICONES.md) et il n’y a pas de couleur d’accent par époque. La provenance se lit par la couleur du pin.
 R5. Pas de thème sombre : un seul mode, clair.
 R6. Trois fontes, jamais plus : titres en Playfair Display, récit en Lora, interface en Inter. Fonts embarquées localement.
-R7. Les espacements sont des multiples de 4 et prennent leur valeur dans les 7 tokens `TOK-SPACE-*`.
+R7. Les espacements sont des multiples de 4 et prennent leur valeur dans les 7 tokens d’espacement ci-dessous.
 R8. Les bordures n’ont pas de token propre : 1 px en `TOK-COLOR-TEXTE-TERTIAIRE` pour un champ au repos, 1,5 px en `TOK-COLOR-PRIMARY` pour un champ actif, 1,5 px en `TOK-COLOR-FONCTIONNEL-ERREUR` pour un champ en erreur.
 R9. Un composant désactivé prend `TOK-OPACITY-DESACTIVE` et bascule sa couleur vers `TOK-COLOR-TEXTE-TERTIAIRE` au lieu de garder une teinte primaire atténuée.
 R10. Les modulations qui dépendent d’un état dynamique (pin hors parcours, déjà visité, hors ligne) ne sont pas des tokens statiques : voir MOUVEMENT.md.
@@ -208,7 +208,7 @@ Filets de séparation entre éléments de liste, base encre brune.
 
 ## Écarts constatés
 - Aucun écart de valeur entre les fichiers de conception et le package pour les couleurs, espacements, rayons, ombres, opacités et la typographie ; le package suit la maquette (conception/15-maquette.md:49).
-- Les 3 fontes (`TOK-FONT-*`) n’ont pas de constante dans le package : le nom de fonte est écrit dans chaque style typographique. Voir QO-801.
+- Les 3 fontes n’ont pas de constante dans le package : le nom de fonte est écrit dans chaque style typographique. Voir QO-801.
 - `TOK-OPACITY-DESACTIVE` : la conception dit 0,5 puis 0,4 en d’autres endroits ; le package et la maquette valent 0,5. Voir DEC-81.
 
 ## Hors MVP

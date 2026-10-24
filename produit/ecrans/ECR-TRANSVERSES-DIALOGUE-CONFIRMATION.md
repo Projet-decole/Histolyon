@@ -7,7 +7,7 @@ priorite: important
 jalon: JAL-GEL
 liens:
   capacites: [CAP-D8.2]
-  flux: [FLX-C7]
+  flux: []
   composants: [COMP-DIALOGUE-CONFIRMATION, COMP-BACKDROP]
   entites: []
   decisions: [DEC-05, DEC-14]
@@ -26,7 +26,7 @@ derniere_verif: 2026-10-24
 Patron unique pour toute décision sensible. L’utilisateur répond avant toute autre action. À réserver aux vraies décisions : pas de confirmation inutile.
 
 ## Instance au MVP
-Une seule : abandonner un parcours en cours (FLX-C7). Titre « Abandonner ce parcours ? », description « Vous quittez le parcours en cours. Vous pourrez toujours le relancer plus tard depuis Mes parcours. », boutons « Abandonner » et « Annuler ». Après confirmation, un message éphémère « Parcours abandonné » apparaît (ECR-TRANSVERSES-MESSAGE-EPHEMERE).
+Une seule : abandonner un parcours en cours (flux d’origine C7, non repris). Titre « Abandonner ce parcours ? », description « Vous quittez le parcours en cours. Vous pourrez toujours le relancer plus tard depuis Mes parcours. », boutons « Abandonner » et « Annuler ». Après confirmation, un message éphémère « Parcours abandonné » apparaît (ECR-TRANSVERSES-MESSAGE-EPHEMERE).
 
 ## Composition
 - **Fond bloquant** (COMP-BACKDROP) derrière le dialogue.

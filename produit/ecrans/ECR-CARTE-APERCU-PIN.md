@@ -6,7 +6,7 @@ statut: mvp
 priorite: coeur
 jalon: JAL-FU2
 liens:
-  capacites: [CAP-D1.1]
+  capacites: [CAP-D2.4]
   flux: [FLX-A3]
   composants: [COMP-APERCU-RAPIDE-PIN, COMP-CHIP-CATEGORIE, COMP-LIBELLE-TEXTE, COMP-BUTTON-PRIMARY]
   entites: [ENT-PIN, ENT-EPOQUE, ENT-CATEGORIE]
@@ -31,7 +31,7 @@ Panneau (COMP-APERCU-RAPIDE-PIN) au-dessus de la carte :
 - **Titre et époque** (COMP-LIBELLE-TEXTE) : une seule époque par pin (DEC-02).
 - **Teaser** (COMP-LIBELLE-TEXTE) : court extrait du récit, au tutoiement narratif (DEC-14).
 - **Vignette** : optionnelle, voir QO-104.
-- **Bouton « Voir le récit »** (COMP-BUTTON-PRIMARY) : ouvre la consultation approfondie (CAP-D2.4).
+- **Bouton « Voir le récit »** (COMP-BUTTON-PRIMARY) : ouvre la consultation approfondie (CAP-D2.5).
 
 ## États
 - **nominal** — quand : tap sur un pin ; on voit : catégorie, titre, époque, teaser, bouton, carte visible derrière.
@@ -39,7 +39,7 @@ Panneau (COMP-APERCU-RAPIDE-PIN) au-dessus de la carte :
 - **fermé** — quand : geste neutre de fermeture ; on voit : la carte seule.
 
 ## Interactions
-- Tap sur « Voir le récit » → consultation approfondie du pin (CAP-D2.4).
+- Tap sur « Voir le récit » → consultation approfondie du pin (CAP-D2.5).
 - Geste neutre de fermeture (tap hors du panneau) → l’aperçu se ferme, la carte reprend (FLX-A3).
 - Tap sur un autre pin → l’aperçu passe à ce pin.
 

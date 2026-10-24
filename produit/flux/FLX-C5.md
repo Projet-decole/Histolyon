@@ -7,7 +7,7 @@ priorite: important
 jalon: JAL-FU3
 liens:
   ecrans: [ECR-PARCOURS-EN-COURS-TERRAIN, ECR-TRANSVERSES-PARCOURS-PERSISTANT]
-  invariants: [INV-08]
+  invariants: [INV-09]
   decisions: [DEC-05, DEC-07, DEC-09]
 anciens_ids: [C5]
 sources:
@@ -38,4 +38,4 @@ Fin (FLX-C9) ou abandon.
 - Géolocalisation, alerte de proximité, déviation, pause, hors-ligne, audio : hors MVP (DEC-05).
 
 ## Invariants
-INV-08
+INV-09

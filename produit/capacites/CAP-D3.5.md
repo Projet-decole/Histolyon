@@ -9,7 +9,7 @@ liens:
   ecrans: [ECR-PARCOURS-EN-COURS-TERRAIN, ECR-TRANSVERSES-PARCOURS-PERSISTANT]
   flux: [FLX-C5, FLX-E3]
   entites: [ENT-PARCOURS, ENT-ETAPE, ENT-HISTORIQUE-DE-VISITE]
-  invariants: [INV-08]
+  invariants: [INV-09]
   composants: [COMP-SLIDER-EPOQUE, COMP-DIALOGUE-CONFIRMATION]
   decisions: [DEC-05, DEC-07, DEC-09, DEC-40]
   questions: [QO-301, QO-303]

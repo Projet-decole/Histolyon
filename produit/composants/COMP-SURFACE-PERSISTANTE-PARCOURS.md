@@ -29,7 +29,7 @@ Mini-barre du parcours en cours, qui survit à la navigation entre sections. Ell
 - `close` (1) : COMP-BUTTON-SECONDARY.
 
 ## Tokens
-Apparition et disparition TOK-CHO-APPARITION-P2 et TOK-CHO-DISPARITION-P2, mise en sommeil TOK-CHO-SOMMEIL-PERSISTANTES-EN-M4, TOK-MAP-MODE-M4-VERS-PERSISTANTES.
+Apparition et disparition TOK-CHO-APPARITION-P2 et TOK-CHO-DISPARITION-P2. Mise en sommeil en mode présentation : hors MVP.
 
 ## Interactions natives
 Tap sur la zone principale : retour à l’écran du parcours en cours. Tap sur fermer : ouvre COMP-DIALOGUE-CONFIRMATION de sévérité destructive ; à confirmation, le parcours est terminé (abandon : aucune étape ne devient complétée par ce geste, DEC-09). Visible tant qu’un parcours est en cours. Coexiste avec le bandeau hors-ligne.
