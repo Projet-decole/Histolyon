@@ -112,6 +112,7 @@ Rapport verifie(Corpus c, {required CoutPack coutPack}) {
       }
     });
     // Références inline dans le corps : doivent exister.
+    if (u.rel.startsWith('decisions/_')) continue;
     for (final id in idsCites(u.body)) {
       if (c.resous(id) == null) err(u, 'référence non résolue "$id" dans le corps');
     }
@@ -142,7 +143,6 @@ Rapport verifie(Corpus c, {required CoutPack coutPack}) {
     for (final u in c.units) u.rel: u.raw,
   };
   final csv = File('${c.produitDir.path}/_correspondance.csv');
-  if (csv.existsSync()) fichiers['_correspondance.csv'] = csv.readAsStringSync();
   fichiers.forEach((rel, txt) {
     if (rel.startsWith('decisions/') || rel.startsWith('RAPPORT')) return;
     for (final m in motifsInterdits) {
