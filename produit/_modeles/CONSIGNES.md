@@ -47,8 +47,8 @@ Identifiants (nom de fichier = id + `.md`) :
 - `statut` : `mvp`, `s2` ou `hors-perimetre`. `derniere_verif: 2026-10-24`.
 - Typographie : guillemets « », apostrophe ’ dans le corps français, points de
   suspension …, pas d’emoji. Interface au vouvoiement, récit au tutoiement (DEC-14).
-- Motifs interdits partout dans `produit/` (hors `decisions/`) : `design/conception`,
-  `palier 16`, `persona_check`. Pas de références mortes (« palier 7 », « cluster 03 »…) :
+- Motifs interdits partout dans `produit/` (hors `decisions/`) : la liste est dans
+  `tools/ctx_check.dart` (`motifsInterdits`). Pas de références mortes (« palier 7 », « cluster 03 »…) :
   remplace par l’unité neuve ou supprime.
 
 ## Budgets (tokens ≈ caractères ÷ 3,5, frontmatter compris)
@@ -61,7 +61,7 @@ Reste sous les plafonds en gardant l’essentiel (règles, états, critères de 
 ## Tri bloc par bloc (source → unité)
 - Garder : comportement, `regles_fonctionnelles`, états, `definition_of_done`,
   dépendances utiles. « Raison d’être » en ≤ 3 lignes.
-- Retirer : `persona_check`, `perimetre`, `test_de_purete`, `heritage_*`,
+- Retirer : les blocs de contrôle de persona, `perimetre`, `test_de_purete`, `heritage_*`,
   `articulation_paliers_*`, `prerequis_de_lecture`, blocs `document:`.
 - Déplacer les `questions_ouvertes` encore bloquantes vers le registre QO.
 - Un seul foyer pour un fait dupliqué (renvoie par identifiant).
