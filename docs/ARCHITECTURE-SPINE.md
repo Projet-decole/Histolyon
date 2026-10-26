@@ -7,7 +7,7 @@ paradigm: 'Monorepo Dart schema-first : Flutter feature-first à couches stricte
 scope: 'Socle de développement HistoLyon — app mobile, back-office web, backend/contenu, structure du repo, architecture documentaire, process d''équipe, tests/CI'
 status: final
 created: '2026-09-17'
-updated: '2026-09-22'
+updated: '2026-10-26'
 binds: [D1, D2, D3, D4, D5, D6, D7, D8, D9, D10, D11, C1, C2, C3, C4, C5, C6, I1, I2, I3, I4, I5, I6, I7, I8, I9, I10]
 sources:
   - conception/01-essence.yaml
@@ -17,10 +17,39 @@ sources:
   - conception/08-contenu/06-i18n.yaml
   - conception/15-maquette.md
   - contexte du porteur (contraintes 3.1–3.3, attentes 2.1–2.4) — docs/DECISIONS.md
-companions: [ORGANISATION.md, DECISIONS.md, archive/BOOTSTRAP.md]
+companions: [PROCESS.md, DECISIONS.md, archive/ORGANISATION.md, archive/BOOTSTRAP.md]
 ---
 
 # Architecture Spine — HistoLyon
+
+## Statut des règles au 26/10/2026
+
+Le recadrage autour du MVP (voir `DECISIONS.md`, phase 6) change le statut de plusieurs règles. Le texte de chaque règle n'est pas réécrit ci-dessous ; **ce tableau prime**. Statuts proposés, à confirmer au prochain point de périmètre.
+
+| Règle | Statut | Remarque |
+| --- | --- | --- |
+| AD-1 Un seul langage (Dart/Flutter) | En vigueur | |
+| AD-2 Schéma SQL = vérité du backend | En vigueur | Second semestre pour l'app ; la zone `supabase/` reste testée |
+| AD-3 Types clients générés | En vigueur | `api_types` n'est pas utilisé par le MVP (contenu embarqué) |
+| AD-4 Ownership des données | En vigueur | |
+| AD-5 Direction des dépendances | En vigueur | Vérifiée par `tools/check_import_direction.dart` |
+| AD-6 Transitions par RPC | En vigueur | Les RPC manquantes sont du second semestre |
+| AD-7 Contenu en fichiers, binaires hors git | En vigueur | Les images de référence du design sont versionnées (DEC-10 de `produit/`) |
+| AD-8 Cartographie MapLibre | En vigueur, réduite | Un seul style de fond au MVP (DEC-06), pas un style par époque |
+| AD-9 Hors-ligne par paquet de parcours | Second semestre | Le MVP embarque tout son contenu (DEC-04) |
+| AD-10 Tokens et composants 1:1 avec Figma | En vigueur | Tokens confirmés par un export réel (DEC-100) |
+| AD-11 Viewer 3D isolé derrière une interface | En vigueur | |
+| AD-12 Issue courte, une branche, une PR | Remplacée | Tickets par apport avec charge : `PROCESS.md` |
+| AD-13 Trunk-based, itération de deux semaines | En vigueur, adaptée | Trunk-based conservé ; le rythme suit les jalons, pas les itérations de deux semaines |
+| AD-14 Tests d'abord, par couche | En vigueur | Pour la logique ; les critères de fin d'une capacité servent de tests d'acceptation |
+| AD-15 Documentation en quatre niveaux | Remplacée | `produit/` pour le produit, `AGENTS.md` unique (importé par `CLAUDE.md`) |
+| AD-16 Trois environnements, migrations sérialisées | Second semestre | Le MVP est un APK de démo |
+| AD-17 Avancement calculé depuis GitHub | En vigueur, redéfinie | Indicateurs et seuils dans `PROCESS.md` |
+| AD-18 Rôles en casquettes tournantes | Abandonnée | Équipe réduite ; voir `PROCESS.md` |
+| AD-19 Enveloppe Supabase gratuite | Second semestre | |
+| AD-20 État de session = liste fermée | En vigueur | |
+
+La section « Structural Seed » plus bas décrit la structure visée au moment du bootstrap. Plusieurs éléments qu'elle cite n'existent pas ou plus : `packages/ui_kit`, `tools/tiles`, `riverpod_lint`, `nightly-e2e`, `tools/sync_agents`, les copies Cursor et Copilot, `conception/INDEX.md`, `docs/ORGANISATION.md` (archivé). La structure réelle est décrite dans le `README.md` racine.
 
 ## Design Paradigm
 

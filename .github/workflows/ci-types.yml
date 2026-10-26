@@ -1,0 +1,57 @@
+name: ci-types
+
+# Régénère les types Dart (packages/api_types) et les schémas JSON
+# (content/schema/) depuis le schéma SQL, puis refuse tout écart avec ce qui
+# est commité. Exige une pile Supabase locale : ne se déclenche donc que
+# lorsque le schéma ou le générateur change.
+
+on:
+  pull_request:
+    paths:
+      - "supabase/migrations/**"
+      - "tools/gen_types.dart"
+      - "tools/src/**"
+      - "packages/api_types/**"
+      - "content/schema/**"
+      - ".github/workflows/ci-types.yml"
+
+jobs:
+  regenerer-et-verifier-diff:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.47.4"
+          channel: "stable"
+
+      - run: flutter pub get
+
+      - uses: supabase/setup-cli@v1
+        with:
+          version: 2.117.0
+
+      - name: Supabase local (pour gen-types)
+        run: |
+          supabase start
+          supabase db reset
+
+      - name: Récupérer les clés locales
+        run: |
+          STATUS=$(supabase status -o json)
+          # jq -e : échoue si la clé manque, au lieu d'exporter "null".
+          URL=$(echo "$STATUS" | jq -re .API_URL)
+          CLE=$(echo "$STATUS" | jq -re .SERVICE_ROLE_KEY)
+          echo "SUPABASE_URL=$URL" >> "$GITHUB_ENV"
+          echo "SUPABASE_SERVICE_ROLE_KEY=$CLE" >> "$GITHUB_ENV"
+
+      - name: Régénérer packages/api_types et content/schema/
+        run: dart run tools/gen_types.dart
+
+      - name: Refuser tout diff après régénération
+        run: |
+          git diff --exit-code -- packages/api_types content/schema || (
+            echo "::error::Les types générés ne sont pas à jour — relancer dart run tools/gen_types.dart et committer le résultat." &&
+            exit 1
+          )

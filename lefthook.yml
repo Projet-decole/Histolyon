@@ -1,28 +1,19 @@
-# Hooks Git (AD-14) : une erreur doit être visible avant qu'un autre membre
-# la voie. lefthook est installé dans le devcontainer ; ailleurs,
-# https://lefthook.dev puis `lefthook install`.
+# Hooks Git : une erreur doit être visible avant qu'un autre membre la voie.
+# Optionnels : lefthook n'est pas obligatoire pour contribuer (la CI refait
+# les mêmes contrôles). Pour les activer : https://lefthook.dev puis
+# `lefthook install`.
 #
-# Simplifications assumées faute d'outillage existant à ce stade du
-# bootstrap (à réviser quand les stories citées existent) :
-# - `analyze` tourne sur tout le workspace (`melos run analyze`), pas
-#   seulement sur les fichiers stagés : `dart analyze` n'a pas de mode
-#   "uniquement ces fichiers" utile sur un workspace multi-packages.
-# - `test` (pre-push) tourne sur tout le workspace (`melos run test`), pas
-#   seulement le package touché : aucun outil de détection de package
-#   modifié n'existe encore dans `tools/`.
+# Volontairement légers : les tests complets tournent en CI seulement, pas à
+# chaque commit ni à chaque push, pour ne pas alourdir une machine ordinaire.
 
 pre-commit:
-  # Séquentiel : `format` réécrit les fichiers stagés, `analyze` doit lire
-  # leur version finale.
+  # Séquentiel : `format` réécrit les fichiers stagés avant les contrôles.
   parallel: false
   commands:
     format:
       glob: "*.dart"
       run: dart format {staged_files}
       stage_fixed: true
-    analyze:
-      glob: "*.dart"
-      run: dart run melos run analyze
     content:
       glob:
         - "content/**/*.yaml"
@@ -30,8 +21,11 @@ pre-commit:
         - "tools/seed.dart"
         - "supabase/migrations/**"
       run: dart run tools/validate_content.dart
+    produit:
+      glob: "produit/**"
+      run: dart run tools/ctx.dart check
 
-pre-push:
-  commands:
-    test:
-      run: dart run melos run test
+# Pas de hook au push : l'analyse et les tests complets sont lourds pour une
+# machine ordinaire. La CI les lance sur chaque PR ; en local, lance-les à la
+# main (`dart run melos run analyze`) ou seulement sur le package touché
+# (`cd apps/mobile && flutter analyze && flutter test`).

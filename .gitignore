@@ -2,6 +2,11 @@
 _bmad/
 .claude/
 
+# Dépôt brut des exports Figma (le tri se fait vers produit/ecrans, produit/composants
+# et produit/design) et ancien index généré de conception/ (n'est plus versionné).
+produit/_import-figma/
+conception/INDEX.md
+
 # OS
 .DS_Store
 Thumbs.db

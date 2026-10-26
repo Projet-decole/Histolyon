@@ -27,9 +27,13 @@ Les features en squelette sont `carte`, `parcours` et `profil` (les onglets), pl
 
 Le thème (`app/theme.dart`, construit depuis `design_tokens`) et la locale `fr` sont posés à la composition root : une feature utilise `Theme.of(context)` ou les tokens, jamais une valeur en dur.
 
+## Source des données du MVP
+
+Le MVP lit un **instantané du contenu embarqué dans l'app** (généré depuis `content/`, décision DEC-04 de `produit/decisions/`), pas Supabase : la démo doit marcher hors ligne, sur téléphone, sans Docker. Supabase redevient la source au second semestre. Cela ne change pas la règle de couches : seule `data/` lit les données, via un repository qui renvoie un `Result<T>`.
+
 ## Recette : une tranche de feature
 
-1. **data/** : `<slug>_repository.dart` lit `ref.watch(supabaseClientProvider)` ou `appDatabaseProvider`. Chaque méthode publique renvoie `Future<Result<T>>` et attrape les exceptions pour les convertir en `Failure`. Pour les types serveur, utilise `package:api_types`, sans jamais redéfinir une classe `Pin` à la main.
+1. **data/** : `<slug>_repository.dart` lit la source de données (contenu embarqué, `appDatabaseProvider`, plus tard `supabaseClientProvider`). Chaque méthode publique renvoie `Future<Result<T>>` et attrape les exceptions pour les convertir en `Failure`. Pour les types serveur, utilise `package:api_types`, sans jamais redéfinir une classe `Pin` à la main.
 2. **domain/** : des providers `@riverpod` qui appellent le repository et exposent à l'écran ce dont il a besoin.
 3. **presentation/** : widgets `ConsumerWidget` qui font `ref.watch` sur les providers de `domain/`. Ils gèrent les états chargement, erreur et vide.
 4. **Nouvelle sous-route** : ajoute le nom et le chemin dans `core/router/route_names.dart`, puis la `GoRoute` dans `presentation/<slug>_routes.dart`. Ne touche pas à `app/router.dart`.
@@ -40,7 +44,8 @@ Guide détaillé : `docs/guides/ajouter-une-feature.md`. Tests de widget : `docs
 
 ## Commandes
 
-- `melos run app` (depuis la racine) : app dans le navigateur, sur http://localhost:8080 (lancer `melos run local` avant). Sur un téléphone Android en ADB : `flutter run --dart-define-from-file=../../env/local.json`.
+- Sur un téléphone Android branché en USB (débogage activé) : `flutter run --dart-define-from-file=../../env/local.json`. Dans Chrome : ajouter `-d chrome`. Tant qu'aucune feature ne lit Supabase, `melos run local` (Docker) n'est pas nécessaire.
+- `melos run app` (depuis la racine) : app dans le navigateur sur http://localhost:8080, pensé pour le devcontainer.
 - `flutter test` et `flutter analyze` pour ce seul package.
 
 ## Jamais

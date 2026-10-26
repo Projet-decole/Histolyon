@@ -2,6 +2,8 @@
 
 Backend : schéma Postgres, RLS, RPC de transition et tests pgTAP. Les règles globales sont dans le `AGENTS.md` racine.
 
+**Statut :** cette zone est solide et testée, mais l'app du MVP ne l'utilise pas (le contenu est embarqué, décision DEC-04 de `produit/decisions/`). Elle redevient centrale au second semestre : ne la modifie que sur un ticket qui le demande.
+
 ## État réel
 
 Le **schéma est complet** pour toutes les données serveur (`migrations/`) :

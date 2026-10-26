@@ -6,10 +6,13 @@ Closes #<numéro>
 
 ## Vérifié
 
-- [ ] Le premier commit contient les tests (rouges), le code vient après
-- [ ] `melos run analyze`, `melos run test` et `melos run format` verts (+ `supabase db reset && supabase test db` si `supabase/` touché)
-- [ ] Rien hors de la zone de l'issue (sinon signalé ci-dessus) ; fichiers générés régénérés, jamais édités à la main
-- [ ] Testé dans l'app (émulateur / Chrome) si c'est visible
+- [ ] Les critères de fin (CF…) du ticket sont atteints, et chacun a un test ou une capture
+- [ ] Pour la logique : le premier commit contient les tests (rouges), le code vient après
+- [ ] `dart run melos run analyze`, `... run test` et `... run format` verts (+ `supabase db reset && supabase test db` si `supabase/` touché, + `dart run tools/ctx.dart check` si `produit/` touché)
+- [ ] Rien hors de la zone du ticket (sinon signalé ci-dessus) ; fichiers générés régénérés, jamais édités à la main
+- [ ] La fiche de `produit/` est à jour si une règle du produit a changé (elle se modifie avant le code)
+- [ ] Image de référence ré-exportée dans `produit/ecrans/img/` si un écran a changé dans Figma
+- [ ] Testé dans l'app (téléphone / Chrome) si c'est visible
 
 ## Assistance IA
 
