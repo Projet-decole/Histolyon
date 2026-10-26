@@ -47,21 +47,40 @@ const budgetParType = <String, int>{
   'entite': 1500,
 };
 
-final idPattern = RegExp(r'^(' + idPrefixes.join('|') + r')-[A-Z0-9][A-Z0-9._-]*$');
+final idPattern = RegExp(
+  r'^(' + idPrefixes.join('|') + r')-[A-Z0-9][A-Z0-9._-]*$',
+);
 final _idInText = RegExp(
   r'\b(' + idPrefixes.join('|') + r')-[A-Z0-9][A-Z0-9._-]*[A-Z0-9]\b',
 );
 final _headingId = RegExp(
-  r'^(#{2,4})\s+((?:' + idPrefixes.join('|') + r')-[A-Z0-9][A-Z0-9._-]*)\b\s*[—:-]*\s*(.*)$',
+  r'^(#{2,4})\s+((?:' +
+      idPrefixes.join('|') +
+      r')-[A-Z0-9][A-Z0-9._-]*)\b\s*[—:-]*\s*(.*)$',
 );
 
 /// Estimation du coût en tokens : caractères ÷ 3,5.
 int estimeTokens(String text) => (text.runes.length / 3.5).ceil();
 
 const _accents = {
-  'à': 'a', 'â': 'a', 'ä': 'a', 'é': 'e', 'è': 'e', 'ê': 'e', 'ë': 'e',
-  'î': 'i', 'ï': 'i', 'ô': 'o', 'ö': 'o', 'ù': 'u', 'û': 'u', 'ü': 'u',
-  'ç': 'c', 'œ': 'oe', 'æ': 'ae', '’': "'",
+  'à': 'a',
+  'â': 'a',
+  'ä': 'a',
+  'é': 'e',
+  'è': 'e',
+  'ê': 'e',
+  'ë': 'e',
+  'î': 'i',
+  'ï': 'i',
+  'ô': 'o',
+  'ö': 'o',
+  'ù': 'u',
+  'û': 'u',
+  'ü': 'u',
+  'ç': 'c',
+  'œ': 'oe',
+  'æ': 'ae',
+  '’': "'",
 };
 
 /// Minuscules, sans accents.
@@ -189,7 +208,8 @@ class Entree {
   final String id;
   final Unit unit;
   final Section? section;
-  String get titre => section?.titre.isNotEmpty == true ? section!.titre : unit.titre;
+  String get titre =>
+      section?.titre.isNotEmpty == true ? section!.titre : unit.titre;
   String get typeAffiche =>
       section == null ? unit.type : id.split('-').first.toLowerCase();
   String get statut => unit.statut;
@@ -210,7 +230,8 @@ class Corpus {
   Map<String, List<Entree>> _construireRegistre() {
     final m = <String, List<Entree>>{};
     for (final u in units) {
-      if (u.id.isNotEmpty) m.putIfAbsent(u.id, () => []).add(Entree(u.id, u, null));
+      if (u.id.isNotEmpty)
+        m.putIfAbsent(u.id, () => []).add(Entree(u.id, u, null));
       for (final s in u.sections) {
         if (s.id == u.id) continue;
         m.putIfAbsent(s.id, () => []).add(Entree(s.id, u, s));
@@ -244,17 +265,19 @@ class Corpus {
 
   static Corpus charge(Directory produitDir) {
     final units = <Unit>[];
-    final files = produitDir
-        .listSync(recursive: true)
-        .whereType<File>()
-        .where((f) => f.path.endsWith('.md'))
-        .toList()
-      ..sort((a, b) => a.path.compareTo(b.path));
+    final files =
+        produitDir
+            .listSync(recursive: true)
+            .whereType<File>()
+            .where((f) => f.path.endsWith('.md'))
+            .toList()
+          ..sort((a, b) => a.path.compareTo(b.path));
     final base = produitDir.path.replaceAll('\\', '/');
     for (final f in files) {
       var rel = f.path.replaceAll('\\', '/').substring(base.length);
       if (rel.startsWith('/')) rel = rel.substring(1);
-      if (rel.startsWith('_modeles/') || rel.startsWith('_import-figma/')) continue;
+      if (rel.startsWith('_modeles/') || rel.startsWith('_import-figma/'))
+        continue;
       final raw = f.readAsStringSync();
       final sp = splitFrontmatter(raw);
       var front = <String, dynamic>{};

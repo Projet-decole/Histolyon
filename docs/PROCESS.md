@@ -64,5 +64,6 @@ Seuils qui déclenchent une action : date prévue après la date du jalon, plate
 ## Revue et qualité
 
 - `main` est protégé : tout passe par une PR liée à un ticket, vérifiée par la CI et relue par une autre personne.
+- Les hooks git (`lefthook.yml`) sont le premier filet : analyse des fichiers du commit, tests du package touché avant le push. La CI refait tout sur chaque PR.
 - Les tests protègent la logique ; les critères de fin (`CF…`) d'une capacité sont ses tests d'acceptation.
 - Les agents IA font le gros du travail de rédaction et de code, **l'humain cadre, relit et fusionne** : on reste responsable de ce qu'on fusionne.

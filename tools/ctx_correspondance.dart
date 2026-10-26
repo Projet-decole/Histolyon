@@ -17,7 +17,9 @@ import 'dart:io';
 
 import 'ctx_corpus.dart';
 
-final _idLine = RegExp(r'''^(\s*)(?:-\s*)?id:\s*["']?([^\s"'#]+)["']?\s*(?:#.*)?$''');
+final _idLine = RegExp(
+  r'''^(\s*)(?:-\s*)?id:\s*["']?([^\s"'#]+)["']?\s*(?:#.*)?$''',
+);
 
 /// Cible proposée pour `id` défini dans `rel` (chemin sous `conception/`).
 String? propose(String rel, String id) {
@@ -84,7 +86,9 @@ String role(String rel, String id) {
     case '09-cartographie':
       return 'ancre ou décision de cartographie';
     case '10-composants':
-      return id.startsWith('comp-') ? 'composant (définition ou usage)' : 'état, interaction ou décision';
+      return id.startsWith('comp-')
+          ? 'composant (définition ou usage)'
+          : 'état, interaction ou décision';
     case '11-reponse-parametrique':
       return 'durée, courbe, chorégraphie, mapping ou décision';
     case '12-tokens':
@@ -104,14 +108,17 @@ class Occ {
   final int ligne;
 }
 
-String _csv(String s) => s.contains(',') || s.contains('"') ? '"${s.replaceAll('"', '""')}"' : s;
+String _csv(String s) =>
+    s.contains(',') || s.contains('"') ? '"${s.replaceAll('"', '""')}"' : s;
 
 void main(List<String> args) {
   final finale = args.contains('--final');
   final conception = Directory('conception');
   final produit = Directory('produit');
   if (!conception.existsSync() || !produit.existsSync()) {
-    stderr.writeln('tools/ctx_correspondance: lancer depuis la racine du dépôt.');
+    stderr.writeln(
+      'tools/ctx_correspondance: lancer depuis la racine du dépôt.',
+    );
     exitCode = 1;
     return;
   }
@@ -124,12 +131,13 @@ void main(List<String> args) {
   }
 
   final occs = <Occ>[];
-  final fichiers = conception
-      .listSync(recursive: true)
-      .whereType<File>()
-      .where((f) => f.path.endsWith('.yaml'))
-      .toList()
-    ..sort((a, b) => a.path.compareTo(b.path));
+  final fichiers =
+      conception
+          .listSync(recursive: true)
+          .whereType<File>()
+          .where((f) => f.path.endsWith('.yaml'))
+          .toList()
+        ..sort((a, b) => a.path.compareTo(b.path));
   for (final f in fichiers) {
     final rel = f.path.substring('conception/'.length);
     final lignes = f.readAsLinesSync();
@@ -158,7 +166,8 @@ void main(List<String> args) {
     }
     if (cible == null) {
       final alt = parAncien[o.id];
-      if (alt != null && alt.length == 1 && roles[o.id]!.length == 1) cible = alt.first;
+      if (alt != null && alt.length == 1 && roles[o.id]!.length == 1)
+        cible = alt.first;
     }
     final prop = propose(o.rel, o.id);
     if (cible != null) {
@@ -190,7 +199,9 @@ void main(List<String> args) {
     ..writeln('titre: "Collisions d’identifiants de conception/"')
     ..writeln('statut: mvp')
     ..writeln('sources: [brief:lot1]')
-    ..writeln('derniere_verif: ${DateTime.now().toIso8601String().substring(0, 10)}')
+    ..writeln(
+      'derniere_verif: ${DateTime.now().toIso8601String().substring(0, 10)}',
+    )
     ..writeln('---')
     ..writeln()
     ..writeln('# Collisions d’identifiants de `conception/`')
@@ -208,16 +219,20 @@ void main(List<String> args) {
   final reelles = collisions.where((e) => roles[e.key]!.length > 1).toList();
   final doublons = collisions.where((e) => roles[e.key]!.length == 1).toList();
   b
-    ..writeln('Total : ${occs.length} définitions, ${parId.length} identifiants distincts, '
-        '${collisions.length} répétés (${reelles.length} avec plusieurs rôles, '
-        '${doublons.length} définis plusieurs fois pour un même rôle).')
+    ..writeln(
+      'Total : ${occs.length} définitions, ${parId.length} identifiants distincts, '
+      '${collisions.length} répétés (${reelles.length} avec plusieurs rôles, '
+      '${doublons.length} définis plusieurs fois pour un même rôle).',
+    )
     ..writeln()
     ..writeln('## Collisions de rôle')
     ..writeln()
     ..writeln('| ancien id | occurrences | rôles |')
     ..writeln('|---|---|---|');
   for (final e in reelles) {
-    b.writeln('| ${e.key} | ${e.value.length} | ${roles[e.key]!.join(' ; ')} |');
+    b.writeln(
+      '| ${e.key} | ${e.value.length} | ${roles[e.key]!.join(' ; ')} |',
+    );
   }
   b
     ..writeln()

@@ -50,7 +50,8 @@ Rapport verifie(Corpus c, {required CoutPack coutPack}) {
     }
     final f = u.front;
     for (final k in ['id', 'type', 'titre', 'statut', 'derniere_verif']) {
-      if (f[k] == null || '${f[k]}'.trim().isEmpty) err(u, 'clé "$k" manquante');
+      if (f[k] == null || '${f[k]}'.trim().isEmpty)
+        err(u, 'clé "$k" manquante');
     }
     if (u.id.isNotEmpty && !idPattern.hasMatch(u.id)) {
       err(u, 'identifiant "${u.id}" invalide (PREFIXE-MAJUSCULES)');
@@ -70,8 +71,10 @@ Rapport verifie(Corpus c, {required CoutPack coutPack}) {
     for (final k in ['liens', 'anciens_ids', 'sources']) {
       if (attendu != null && !f.containsKey(k)) err(u, 'clé "$k" manquante');
     }
-    if (f['liens'] != null && f['liens'] is! Map) err(u, '"liens" doit être une table');
-    if (f['sources'] != null && f['sources'] is! List) err(u, '"sources" doit être une liste');
+    if (f['liens'] != null && f['liens'] is! Map)
+      err(u, '"liens" doit être une table');
+    if (f['sources'] != null && f['sources'] is! List)
+      err(u, '"sources" doit être une liste');
     if (f['anciens_ids'] != null && f['anciens_ids'] is! List) {
       err(u, '"anciens_ids" doit être une liste');
     }
@@ -91,7 +94,10 @@ Rapport verifie(Corpus c, {required CoutPack coutPack}) {
   // Identifiants uniques ----------------------------------------------------
   c.registre.forEach((id, l) {
     if (l.length > 1) {
-      err(null, 'identifiant en double $id : ${l.map((e) => e.unit.rel).join(', ')}');
+      err(
+        null,
+        'identifiant en double $id : ${l.map((e) => e.unit.rel).join(', ')}',
+      );
     }
   });
 
@@ -114,7 +120,8 @@ Rapport verifie(Corpus c, {required CoutPack coutPack}) {
     // Références inline dans le corps : doivent exister.
     if (u.rel.startsWith('decisions/_')) continue;
     for (final id in idsCites(u.body)) {
-      if (c.resous(id) == null) err(u, 'référence non résolue "$id" dans le corps');
+      if (c.resous(id) == null)
+        err(u, 'référence non résolue "$id" dans le corps');
     }
   }
 
@@ -133,15 +140,15 @@ Rapport verifie(Corpus c, {required CoutPack coutPack}) {
       err(u, 'budget_tokens déclaré $decl < mesure ${u.tokens}');
     }
   }
-  for (final u in c.units.where((u) => u.type == 'capacite' && u.statut == 'mvp')) {
+  for (final u in c.units.where(
+    (u) => u.type == 'capacite' && u.statut == 'mvp',
+  )) {
     final cout = coutPack(c, u);
     if (cout > plafondPack) err(u, 'ctx pack ≈ $cout tokens > $plafondPack');
   }
 
   // Motifs interdits --------------------------------------------------------
-  final fichiers = <String, String>{
-    for (final u in c.units) u.rel: u.raw,
-  };
+  final fichiers = <String, String>{for (final u in c.units) u.rel: u.raw};
   final csv = File('${c.produitDir.path}/_correspondance.csv');
   fichiers.forEach((rel, txt) {
     if (rel.startsWith('decisions/') || rel.startsWith('RAPPORT')) return;
@@ -164,7 +171,10 @@ Rapport verifie(Corpus c, {required CoutPack coutPack}) {
         // Les cibles non encore écrites sont tolérées seulement si la note le dit.
         final note = cols.length > 3 ? cols[3] : '';
         if (!note.startsWith('non-repris') && !note.startsWith('a-ecrire')) {
-          err(null, '_correspondance.csv:${i + 1} : cible "$nouveau" introuvable');
+          err(
+            null,
+            '_correspondance.csv:${i + 1} : cible "$nouveau" introuvable',
+          );
         }
       }
     }
@@ -200,10 +210,17 @@ Rapport verifie(Corpus c, {required CoutPack coutPack}) {
   return r;
 }
 
-void _verifieSource(Corpus c, Unit u, String s, void Function(Unit?, String) err) {
+void _verifieSource(
+  Corpus c,
+  Unit u,
+  String s,
+  void Function(Unit?, String) err,
+) {
   final t = s.trim();
   if (t.startsWith('brief:') || t.startsWith('DEC-')) return;
-  final m = RegExp(r'^((?:(?:conception|content|packages|produit|supabase|apps|docs)/[^:\s]+|AGENTS\.md))(?::(\d+)(?:-(\d+))?)?(?:\s.*)?$').firstMatch(t);
+  final m = RegExp(
+    r'^((?:(?:conception|content|packages|produit|supabase|apps|docs)/[^:\s]+|AGENTS\.md))(?::(\d+)(?:-(\d+))?)?(?:\s.*)?$',
+  ).firstMatch(t);
   if (m == null) {
     err(u, 'source illisible "$t" (attendu chemin:ligne)');
     return;

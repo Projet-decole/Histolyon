@@ -18,14 +18,69 @@ import 'dart:math';
 import 'ctx_check.dart';
 import 'ctx_corpus.dart';
 
-const sousCommandes = {'lire', 'pack', 'chercher', 'refs', 'liste', 'chemin', 'check'};
+const sousCommandes = {
+  'lire',
+  'pack',
+  'chercher',
+  'refs',
+  'liste',
+  'chemin',
+  'check',
+};
 
 const _stop = {
-  'le', 'la', 'les', 'de', 'du', 'des', 'un', 'une', 'et', 'ou', 'que', 'qui',
-  'quoi', 'ce', 'se', 'sur', 'si', 'on', 'est', 'a', 'en', 'pour', 'par',
-  'dans', 'd', 'l', 'quel', 'quelle', 'quels', 'quelles', 'quand', 'comment',
-  'au', 'aux', 'il', 'elle', 'qu', 'y', 'ne', 'pas', 'son', 'sa', 'ses',
-  'tape', 'passe', 'combien', 'faut', 'peut', 'fait', 'sont', 'ont', 'etre',
+  'le',
+  'la',
+  'les',
+  'de',
+  'du',
+  'des',
+  'un',
+  'une',
+  'et',
+  'ou',
+  'que',
+  'qui',
+  'quoi',
+  'ce',
+  'se',
+  'sur',
+  'si',
+  'on',
+  'est',
+  'a',
+  'en',
+  'pour',
+  'par',
+  'dans',
+  'd',
+  'l',
+  'quel',
+  'quelle',
+  'quels',
+  'quelles',
+  'quand',
+  'comment',
+  'au',
+  'aux',
+  'il',
+  'elle',
+  'qu',
+  'y',
+  'ne',
+  'pas',
+  'son',
+  'sa',
+  'ses',
+  'tape',
+  'passe',
+  'combien',
+  'faut',
+  'peut',
+  'fait',
+  'sont',
+  'ont',
+  'etre',
 };
 
 int runV2(List<String> argsBrut) {
@@ -40,7 +95,9 @@ int runV2(List<String> argsBrut) {
   final reste = args.sublist(1);
   final dir = Directory(dossier);
   if (!dir.existsSync()) {
-    stderr.writeln("tools/ctx: dossier '$dossier/' introuvable depuis ${Directory.current.path}.");
+    stderr.writeln(
+      "tools/ctx: dossier '$dossier/' introuvable depuis ${Directory.current.path}.",
+    );
     return 1;
   }
   final corpus = Corpus.charge(dir);
@@ -107,7 +164,10 @@ int _liste(Corpus c, List<String> a) {
   var total = 0;
   for (final u in c.units) {
     if (u.id.isEmpty) continue;
-    if (type != null && u.type != type && !u.id.startsWith('${type.toUpperCase()}-')) continue;
+    if (type != null &&
+        u.type != type &&
+        !u.id.startsWith('${type.toUpperCase()}-'))
+      continue;
     if (statut != null && u.statut != statut) continue;
     lignes.add('${u.id}\t${u.statut}\t${u.tokens}\t${u.titre}');
     total += u.tokens;
@@ -135,7 +195,9 @@ int _refs(Corpus c, List<String> a) {
     final viaLien = u.tousLiens.contains(id);
     final viaTexte = idsCites(u.body).contains(id);
     if (viaLien || viaTexte) {
-      stdout.writeln('${u.id}\t${u.type}\t${viaLien ? 'lien' : 'texte'}\t${u.titre}');
+      stdout.writeln(
+        '${u.id}\t${u.type}\t${viaLien ? 'lien' : 'texte'}\t${u.titre}',
+      );
       n++;
     }
   }
@@ -171,7 +233,8 @@ String construitPack(Corpus c, Unit cap, {bool complet = false}) {
   b.writeln(cap.raw.trimRight());
   final liens = cap.liens;
   final ecrans = liens['ecrans'] ?? [];
-  if (ecrans.isNotEmpty) section('Écrans (images citées par chemin, non inlinées)');
+  if (ecrans.isNotEmpty)
+    section('Écrans (images citées par chemin, non inlinées)');
   for (final id in ecrans) {
     unite(id);
   }
@@ -192,7 +255,8 @@ String construitPack(Corpus c, Unit cap, {bool complet = false}) {
     final u = c.resous(id)?.unit;
     if (u != null) comps.addAll(u.liens['composants'] ?? []);
   }
-  if (comps.isNotEmpty) section(complet ? 'Composants (complet)' : 'Composants (résumés)');
+  if (comps.isNotEmpty)
+    section(complet ? 'Composants (complet)' : 'Composants (résumés)');
   for (final id in comps) {
     final u = c.resous(id)?.unit;
     if (u == null) continue;
@@ -224,7 +288,9 @@ int _pack(Corpus c, List<String> a) {
   final txt = construitPack(c, e.unit, complet: complet);
   stdout.write(txt);
   final cout = estimeTokens(txt);
-  stdout.writeln('\n-- coût du pack : ≈ $cout tokens${complet ? ' (complet)' : ''}');
+  stdout.writeln(
+    '\n-- coût du pack : ≈ $cout tokens${complet ? ' (complet)' : ''}',
+  );
   if (cout > plafondPack) {
     stdout.writeln('-- AVERTISSEMENT : au-delà de $plafondPack tokens');
   }
@@ -237,7 +303,8 @@ int _pack(Corpus c, List<String> a) {
 
 String _racine(String t) {
   var s = t;
-  if (s.length > 3 && (s.endsWith('s') || s.endsWith('x'))) s = s.substring(0, s.length - 1);
+  if (s.length > 3 && (s.endsWith('s') || s.endsWith('x')))
+    s = s.substring(0, s.length - 1);
   if (s.length >= 7) s = s.substring(0, s.length - 2);
   return s;
 }
@@ -245,7 +312,12 @@ String _racine(String t) {
 List<String> termesRequete(String q) {
   final mots = normalise(q)
       .split(RegExp(r"[^a-z0-9]+"))
-      .where((m) => m.isNotEmpty && !_stop.contains(m) && (m.length > 1 || RegExp(r'\d').hasMatch(m)))
+      .where(
+        (m) =>
+            m.isNotEmpty &&
+            !_stop.contains(m) &&
+            (m.length > 1 || RegExp(r'\d').hasMatch(m)),
+      )
       .toList();
   return mots.map(_racine).toList();
 }
@@ -284,12 +356,16 @@ List<Resultat> cherche(Corpus c, String requete, {int max = 10}) {
   final textes = <Entree, String>{
     for (final e in vus)
       e: normalise(
-        e.section != null ? e.section!.texte : '${e.unit.titre}\n${e.unit.body}',
+        e.section != null
+            ? e.section!.texte
+            : '${e.unit.titre}\n${e.unit.body}',
       ),
   };
   final poids = <String, double>{
     for (final t in termes)
-      t: log(1 + vus.length / (1 + textes.values.where((x) => x.contains(t)).length)),
+      t: log(
+        1 + vus.length / (1 + textes.values.where((x) => x.contains(t)).length),
+      ),
   };
   for (final e in vus) {
     final titre = normalise(e.titre);
@@ -315,7 +391,8 @@ List<Resultat> cherche(Corpus c, String requete, {int max = 10}) {
     if (phrase.length > 4 && corps.contains(phrase)) score += 4;
     // Les annexes de tri, de questions ouvertes et de collisions complètent
     // les unités : elles passent après à pertinence égale.
-    if (e.unit.rel.startsWith('decisions/_') || e.unit.rel.startsWith('decisions/QO-')) {
+    if (e.unit.rel.startsWith('decisions/_') ||
+        e.unit.rel.startsWith('decisions/QO-')) {
       score *= 0.6;
     }
     // Une section précise l'emporte sur son fichier entier à score égal.

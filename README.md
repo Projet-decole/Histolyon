@@ -58,6 +58,8 @@ Une **capacité** (`CAP-…`) est une fonctionnalité du produit avec ses règle
 3. **Teste, code, vérifie** : les tests d'abord pour la logique, puis le code. Regarde l'app tourner sur le téléphone.
 4. **Ouvre une PR** (`Closes #N`) : une autre personne la relit, puis on fusionne.
 
+**Active les hooks git** (recommandé, car on développe avec des agents IA) : installe [lefthook](https://lefthook.dev) puis `lefthook install`. Au commit, tes fichiers sont formatés et analysés ; au push, seuls les tests du package que tu as touché tournent. Un bug est ainsi repéré avant qu'une autre personne le voie.
+
 Le détail (étiquettes, charge, relecture, rendez-vous, suivi) est dans [`docs/PROCESS.md`](docs/PROCESS.md). Les règles de code sont dans [`AGENTS.md`](AGENTS.md). Les recettes pas à pas sont dans [`docs/guides/`](docs/guides/).
 
 ## Sur une machine modeste
