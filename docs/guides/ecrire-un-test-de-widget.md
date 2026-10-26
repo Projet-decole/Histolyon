@@ -59,7 +59,7 @@ Points spécifiques à ce projet :
 
 ## 4. Premier commit rouge
 
-Avant d'écrire l'implémentation : écris le test avec le comportement final attendu, lance-le (`flutter test apps/mobile/test/features/<slug>/presentation/mon_widget_test.dart`), vérifie qu'il **échoue** pour la bonne raison (widget/texte introuvable, pas une erreur de compilation), puis committe ce test seul comme premier commit de la branche. Le relecteur vérifiera cet ordre avant le squash merge (AD-14).
+Avant d'écrire l'implémentation : écris le test avec le comportement final attendu, lance-le (`cd apps/mobile && flutter test test/features/<slug>/presentation/mon_widget_test.dart`), vérifie qu'il **échoue** pour la bonne raison (widget/texte introuvable, pas une erreur de compilation), puis committe ce test seul comme premier commit de la branche. Le relecteur vérifiera cet ordre avant le squash merge (AD-14).
 
 ## 5. Vérifier avant de pousser
 

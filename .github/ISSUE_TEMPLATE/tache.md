@@ -1,40 +1,42 @@
 ---
-name: Tâche
-about: Une tâche d'une demi-journée, prête à confier à une IA (format dans prompts/ecrire-une-issue.md)
+name: Ticket (par apport)
+about: Une tranche démontrable rattachée à une capacité du produit, avec sa charge (voir docs/PROCESS.md et prompts/ecrire-un-ticket.md)
 title: ''
 labels: ''
 ---
 
-## Objectif
+## Apport
 
-<!-- Ce que l'utilisateur (ou l'équipe) voit / peut faire à la fin. 1 à 3 phrases. -->
+<!-- Une phrase : ce qu'on peut voir ou faire à la fin, et qu'on peut montrer. -->
 
-## À lire avant de coder
+## Capacité
 
-- `dart run tools/ctx.dart <ID>` — <pourquoi>
-- `<chemin/du/fichier>` — <pourquoi>
+`CAP-…` — fiche : `produit/capacites/CAP-….md`
 
-## Zone
+## Contexte à charger
 
-`<un seul dossier : apps/mobile/lib/features/<slug>/ | supabase/ | content/ | apps/admin/… | packages/<nom>/>`
-Rien d'autre n'est modifié, sauf : <exception explicite, ou « aucune »>.
+- `dart run tools/ctx.dart pack CAP-…`
+- <autre fichier ou commande précise, et pourquoi — ou « rien d'autre »>
 
-## À faire
+## Critères de fin
 
-- [ ] …
+<!-- Reprendre les CF… de la capacité que ce ticket couvre. -->
+- [ ] CF… : …
+- [ ] `dart run melos run analyze`, `... run test` et `... run format` verts (+ `dart run tools/ctx.dart check` si `produit/` est touché, + `supabase db reset && supabase test db` si `supabase/` est touché)
 
-## Tests attendus (premier commit, rouges)
+## Zone et fichiers autorisés
+
+`<un seul dossier : apps/mobile/lib/features/<slug>/ | content/ | produit/ | tools/ | packages/<nom>/ | supabase/>`
+Rien d'autre n'est modifié, sauf : <exception explicite, ou « aucune » — ex. `core/router/route_names.dart` pour une route>.
+
+## Tests attendus (premiers commits, rouges)
 
 - …
-
-## Terminé quand
-
-- [ ] …
-- [ ] `melos run analyze` et `melos run test` verts
 
 ## Hors périmètre
 
 - …
 
 ---
-Dépend de : <#n ou « rien »> · Taille : ½ journée avec une IA
+Charge : <1 | 2 | 3 | 5> · Dépend de : <#n ou « rien »> · Jalon : <J1 | J2 | J3 | J4 | S2>
+<!-- Étiquettes à poser : `charge:N`, `cap:D…`, la zone, et le jalon (milestone). -->

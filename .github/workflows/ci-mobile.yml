@@ -6,7 +6,9 @@ on:
       - "apps/mobile/**"
       - "pubspec.yaml"
       - "pubspec.lock"
-      - "tools/coverage_ratchet.dart"
+      - "tools/check_import_direction.dart"
+      - "tools/check_tokens.dart"
+      - "packages/**"
       - ".github/workflows/ci-mobile.yml"
 
 jobs:
@@ -14,10 +16,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          # fetch-depth: 0 nécessaire pour lire coverage_baseline.txt sur
-          # origin/main (cliquet de couverture) plus bas.
-          fetch-depth: 0
 
       - uses: subosito/flutter-action@v2
         with:
@@ -26,19 +24,18 @@ jobs:
 
       - run: flutter pub get
 
-      - name: Analyse statique (workspace, cf. Story 1.5/AD-5)
+      - name: Analyse statique (workspace, cf. AD-5)
         run: dart run melos run analyze
+
+      - name: Formatage (dart format)
+        run: dart format --output=none --set-exit-if-changed apps/mobile packages
 
       - name: Tests + couverture
         working-directory: apps/mobile
         run: flutter test --coverage
 
-      - name: Cliquet de couverture (ne doit pas baisser vs main)
-        working-directory: apps/mobile
-        run: |
-          git show origin/main:apps/mobile/coverage_baseline.txt > coverage_baseline.txt 2>/dev/null || echo "0.0" > coverage_baseline.txt
-          dart run ../../tools/coverage_ratchet.dart coverage/lcov.info coverage_baseline.txt
-
+      # La couverture sert à suivre l'avancement (indicateur du suivi), pas à
+      # bloquer une PR.
       - uses: actions/upload-artifact@v4
         with:
           name: mobile-coverage

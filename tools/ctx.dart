@@ -14,6 +14,8 @@
 //                                          fichier tronqué à son préfixe
 //                                          numérique).
 //   dart run tools/ctx.dart --index    -- régénère conception/INDEX.md.
+//   dart run tools/ctx.dart lire|pack|chercher|refs|liste|chemin|check ...
+//                                       -- v2, corpus produit/ (ctx_v2.dart).
 //
 // Écrit sans dépendance pub tierce (dart:io seul), même convention que
 // tools/check_import_direction.dart -- voir
@@ -25,10 +27,20 @@
 
 import 'dart:io';
 
+import 'ctx_v2.dart';
+
 const _conceptionDirName = 'conception';
 const _indexFileName = 'INDEX.md';
 
 void main(List<String> args) {
+  // v2 : sous-commandes sur `produit/` (voir tools/ctx_v2.dart). Les autres
+  // usages restent ceux de `conception/` ci-dessous.
+  if (args.isNotEmpty &&
+      (sousCommandes.contains(args[0]) || args[0] == '--produit')) {
+    exitCode = runV2(args);
+    return;
+  }
+
   final conceptionDir = Directory(_conceptionDirName);
   if (!conceptionDir.existsSync()) {
     stderr.writeln(

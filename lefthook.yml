@@ -1,19 +1,16 @@
-# Hooks Git (Story 9.1, AD-14) : une erreur doit être visible avant qu'un
-# autre membre la voie. Nécessite le binaire lefthook (https://lefthook.dev)
-# puis `lefthook install` — non vérifié en exécution réelle dans cet
-# environnement (binaire absent).
+# Hooks Git : une erreur doit être visible avant qu'un autre membre la voie.
+# C'est le filet de sécurité d'un projet développé avec des agents IA : repérer
+# un bug au commit ou au push plutôt qu'en relecture. Pour les activer :
+# https://lefthook.dev puis `lefthook install`.
 #
-# Simplifications assumées faute d'outillage existant à ce stade du
-# bootstrap (à réviser quand les stories citées existent) :
-# - `analyze` tourne sur tout le workspace (`melos run analyze`), pas
-#   seulement sur les fichiers stagés : `dart analyze` n'a pas de mode
-#   "uniquement ces fichiers" utile sur un workspace multi-packages.
-# - `test` (pre-push) tourne sur tout le workspace (`melos run test`), pas
-#   seulement le package touché : aucun outil de détection de package
-#   modifié n'existe encore dans `tools/`.
+# Les contrôles ne portent que sur ce qui a changé (fichiers du commit, package
+# touché par le push), pour rester supportables sur une machine ordinaire. La
+# CI refait ensuite l'analyse et les tests complets sur chaque PR.
+# Sauter un hook ponctuellement : `LEFTHOOK=0 git push` (à éviter).
 
 pre-commit:
-  parallel: true
+  # Séquentiel : `format` réécrit les fichiers stagés avant les contrôles.
+  parallel: false
   commands:
     format:
       glob: "*.dart"
@@ -21,7 +18,7 @@ pre-commit:
       stage_fixed: true
     analyze:
       glob: "*.dart"
-      run: dart run melos run analyze
+      run: dart analyze {staged_files}
     content:
       glob:
         - "content/**/*.yaml"
@@ -29,8 +26,23 @@ pre-commit:
         - "tools/seed.dart"
         - "supabase/migrations/**"
       run: dart run tools/validate_content.dart
+    produit:
+      glob: "produit/**"
+      run: dart run tools/ctx.dart check
 
 pre-push:
+  # Un package à la fois, et seulement s'il a été touché par le push.
+  parallel: false
   commands:
-    test:
-      run: dart run melos run test
+    tests-mobile:
+      glob: "apps/mobile/**"
+      run: cd apps/mobile && flutter test
+    tests-admin:
+      glob: "apps/admin/**"
+      run: cd apps/admin && flutter test
+    tests-outils:
+      glob: "{tools,test/tools}/**"
+      run: dart test --concurrency=1 test/tools
+    tokens:
+      glob: "packages/design_tokens/**"
+      run: dart run tools/check_tokens.dart

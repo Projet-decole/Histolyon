@@ -1,49 +1,88 @@
 # HistoLyon
 
-Application mobile qui fait explorer Lyon à travers les époques : une carte avec un slider d'époques, des pins historiques sourcés, des parcours et des reconstitutions 3D/AR. Le code est en Flutter (Android, avec du code partagé prêt pour iOS), le backend est sur Supabase et le contenu éditorial est en YAML.
+Application mobile qui fait explorer Lyon à travers les époques : une carte avec un slider d'époques, des pins historiques sourcés, des parcours et une vue 3D. Projet de fin d'études (Epitech), en Flutter. Le contenu éditorial est en YAML.
 
-## Démarrer (une fois)
+**Où on en est.** Le MVP attendu le 07/02/2027 se construit : une carte avec slider d'époques, un parcours de 7 à 10 pins, dont un en 3D. Aujourd'hui l'app affiche cinq écrans provisoires ; la carte, les pins et le parcours arrivent jalon par jalon (follow-up 2 le 13/11, follow-up 3 le 18/12, gel le 21/01). Détail dans [`produit/FEUILLE-DE-ROUTE.md`](produit/FEUILLE-DE-ROUTE.md).
 
-**Le plus simple : le devcontainer.** Ouvre le dépôt dans VS Code avec l'extension *Dev Containers*, ou dans GitHub Codespaces : tout est préinstallé.
+## Voir l'app
 
-**En natif**, il faut Flutter 3.47.4 (via [fvm](https://fvm.app/), voir `.fvmrc`), Docker, [Supabase CLI](https://supabase.com/docs/guides/cli) 2.117, Android SDK et JDK 21, et [lefthook](https://lefthook.dev). Ensuite :
+Il faut [Flutter 3.47.4](https://docs.flutter.dev/get-started/install) (la version exacte est dans `.fvmrc` ; avec [fvm](https://fvm.app/), `fvm install`). Pas besoin de Docker pour cela. Vérifie ton installation avec `flutter doctor`.
 
 ```bash
-git clone <url-du-depot> && cd Histolyon
-flutter pub get && lefthook install
-supabase start && supabase db reset          # base locale avec le schéma complet
-eval "$(supabase status -o env | sed -n 's/^API_URL=/export SUPABASE_URL=/p; s/^SERVICE_ROLE_KEY=/export SUPABASE_SERVICE_ROLE_KEY=/p')"
-dart run tools/seed.dart                     # charge époques, catégories, pins
-dart run tools/publier_local.dart            # publie tout en local pour que l'app le voie
-melos run test                               # tout doit être vert
-cd apps/mobile && flutter run --dart-define-from-file=../../env/local.json
+flutter pub get                       # une fois, à la racine
+cd apps/mobile
+flutter run --dart-define-from-file=../../env/local.json
 ```
 
-Si quelque chose casse, ouvre une issue avec le message d'erreur. C'est déjà une contribution utile.
+- **Sur un téléphone Android** : branche-le en USB, active les *Options pour les développeurs* puis le *Débogage USB*. `flutter run` détecte le téléphone. Dans le terminal, `r` recharge l'app après une modification (rechargement à chaud).
+- **Dans Chrome**, sans téléphone : ajoute `-d chrome`.
+- Le fichier `env/local.json` contient seulement l'adresse de la base locale et une clé de démonstration. Tant qu'aucun écran ne lit la base, rien n'a besoin d'être démarré.
 
-## Travailler (à chaque session)
+*D'après le code, l'app démarre sans base de données. Si ce n'est pas le cas chez toi, dis-le dans un ticket avec le message d'erreur : c'est une contribution utile.*
 
-1. **Choisis une issue** [avec le label `prête`](../../issues?q=is%3Aopen+label%3Apr%C3%AAte+no%3Aassignee) qui n'est assignée à personne, puis **assigne-la-toi**. Chaque issue est faite pour tenir en une demi-journée.
-2. **Ouvre ton agent IA dans le dépôt** (Claude Code, Cursor, Copilot…) et dis-lui : **« Implémente l'issue #N »**. Il charge `AGENTS.md` tout seul, et ce fichier lui explique quoi lire, où coder et comment vérifier. Si ton outil n'a pas accès au dépôt, colle-lui le contenu de [`prompts/implementer-une-issue.md`](prompts/implementer-une-issue.md).
-3. **Relis ce qu'il a fait et lance l'app** pour vérifier le résultat. Tu restes responsable du code.
-4. **Ouvre la PR.** Un autre membre la relit (il peut s'aider de [`prompts/relire-une-pr.md`](prompts/relire-une-pr.md)), puis on fait un squash merge.
+## Comprendre le dépôt
 
-Tu bloques ou l'issue n'est pas claire ? Écris un commentaire sur l'issue. Ne devine pas.
-
-**Pour créer une nouvelle issue**, utilise le template « Tâche » de GitHub ou le prompt [`prompts/ecrire-une-issue.md`](prompts/ecrire-une-issue.md).
-
-## Où est quoi
-
-| Besoin | Où |
+| Dossier | Ce que c'est |
 | --- | --- |
-| Règles du code, structure du dépôt, commandes | [`AGENTS.md`](AGENTS.md), plus le `AGENTS.md` de chaque zone (`apps/mobile`, `apps/admin`, `supabase`) |
-| Recettes pas à pas | [`docs/guides/`](docs/guides/) |
-| Ce que fait le produit (fonctionnalités, données, écrans) | `conception/`, lu par ID : `dart run tools/ctx.dart D1.2` |
-| La maquette Figma | [`conception/15-maquette.md`](conception/15-maquette.md) |
-| Pourquoi on a fait ces choix | [`docs/DECISIONS.md`](docs/DECISIONS.md) (journal), [`docs/ARCHITECTURE-SPINE.md`](docs/ARCHITECTURE-SPINE.md) (les règles AD-n) |
-| Pourquoi on travaille comme ça (pour le jury) | [`docs/ORGANISATION.md`](docs/ORGANISATION.md) |
-| État d'avancement pour un compte rendu | `dart run tools/report.dart` → `docs/sprint/reports/<date>.md` |
+| [`produit/`](produit/README.md) | **Le produit, en lecture courante** : ce qu'on construit (capacités, écrans, composants, flux, données), le design, les règles d'écriture, les décisions |
+| `apps/mobile/` | L'app Flutter. `lib/app/` démarre l'app, `lib/core/` est partagé, `lib/features/<nom>/` contient une fonctionnalité (`presentation → domain → data`) |
+| `apps/admin/` | Le futur back-office web : gabarit vide, second semestre |
+| `packages/design_tokens/` | Couleurs, polices, espacements du design, en Dart |
+| `packages/api_types/` | Types Dart générés depuis le schéma SQL (ne pas éditer) |
+| `supabase/` | La base de données : schéma, règles d'accès, tests. Solide, mais l'app du MVP ne s'en sert pas (second semestre) |
+| `content/` | Le contenu éditorial en YAML : époques, catégories, sources, pins, parcours |
+| `tools/` | Les scripts maison, expliqués dans [`tools/README.md`](tools/README.md) |
+| [`docs/`](docs/README.md) | Comment on travaille ([`PROCESS.md`](docs/PROCESS.md)), journal des décisions, règles d'architecture, recettes |
+| `prompts/` | Textes à donner à un agent IA : écrire un ticket, réaliser un ticket, relire une PR |
+| `conception/` | **Archive gelée** de l'ancienne spécification : ne pas la lire, tout est repris dans `produit/` |
+
+À la racine, `AGENTS.md` donne les règles à tout agent IA (`CLAUDE.md` l'importe), et `pubspec.yaml` déclare les packages du dépôt et les raccourcis `melos`.
+
+## Comprendre le produit
+
+Tout ce qu'on construit est décrit dans `produit/`, en petites fiches à identifiant unique, lues avec un outil :
+
+```bash
+dart run tools/ctx.dart liste --statut mvp          # ce qui est dans le MVP
+dart run tools/ctx.dart pack CAP-D1.2               # tout le contexte du slider d'époques
+dart run tools/ctx.dart chercher "couleur d'un pin" # recherche dans les fiches
+dart run tools/ctx.dart lire ECR-CARTE-PRINCIPALE   # une fiche
+```
+
+Une **capacité** (`CAP-…`) est une fonctionnalité du produit avec ses règles et ses critères de fin ; elle renvoie à ses écrans (`ECR-…`), ses composants (`COMP-…`), ses flux (`FLX-…`) et ses données (`ENT-…`). Les captures de la maquette sont dans `produit/ecrans/img/`.
+
+## Développer une fonctionnalité
+
+1. **Prends un ticket** du jalon en cours (issues GitHub, avec un jalon, une capacité et une charge). Chaque ticket décrit un apport qu'on peut montrer.
+2. **Charge son contexte** : `dart run tools/ctx.dart pack CAP-…`, puis ouvre un agent IA dans le dépôt (Claude Code, Cursor, Copilot…) et dis-lui : « Réalise le ticket #N ». Il lit `AGENTS.md` tout seul.
+3. **Teste, code, vérifie** : les tests d'abord pour la logique, puis le code. Regarde l'app tourner sur le téléphone.
+4. **Ouvre une PR** (`Closes #N`) : une autre personne la relit, puis on fusionne.
+
+**Active les hooks git** (recommandé, car on développe avec des agents IA) : installe [lefthook](https://lefthook.dev) puis `lefthook install`. Au commit, tes fichiers sont formatés et analysés ; au push, seuls les tests du package que tu as touché tournent. Un bug est ainsi repéré avant qu'une autre personne le voie.
+
+Le détail (étiquettes, charge, relecture, rendez-vous, suivi) est dans [`docs/PROCESS.md`](docs/PROCESS.md). Les règles de code sont dans [`AGENTS.md`](AGENTS.md). Les recettes pas à pas sont dans [`docs/guides/`](docs/guides/).
+
+## Sur une machine modeste
+
+Certaines commandes sont lourdes (tests complets, génération de code, Docker). Évite d'en lancer plusieurs à la fois, ferme ce dont tu n'as pas besoin, et teste seulement ce que tu touches :
+
+```bash
+cd apps/mobile && flutter analyze && flutter test   # seulement l'app
+dart run tools/ctx.dart check                       # seulement produit/
+```
+
+L'analyse et les tests complets (`dart run melos run analyze`, `... run test`) tournent aussi en CI sur chaque PR. La liste des commandes et leur poids est dans [`tools/README.md`](tools/README.md).
+
+## Avancé : base de données locale et devcontainer
+
+Seulement si tu touches `supabase/` ou `content/` (Docker requis, au moins 8 Go de mémoire alloués) :
+
+```bash
+dart run melos run local   # Supabase local : schéma, contenu chargé et publié
+```
+
+Un **devcontainer** (`.devcontainer/`, VS Code + Docker) fournit tous les outils aux bonnes versions : option pour une machine qui n'a pas Flutter, mais plus lourde que l'installation directe.
 
 ## Licences et données
 
-Chaque source a sa licence, documentée dans `content/sources/` et dans la colonne `licence` des médias. Le fond de carte OpenStreetMap (ODbL) et Protomaps impose une attribution visible en permanence. Aucun secret, aucune clé et aucun média n'est versionné dans ce dépôt.
+Chaque média a sa licence et son crédit (`content/medias.yaml`) ; chaque source cite son auteur et, pour un texte réutilisé, sa licence (`content/sources/`). Le fond de carte OpenStreetMap (ODbL) et Protomaps impose une attribution visible en permanence. Les icônes viennent de Lucide (licence ISC), sauf deux dessinées pour le projet. Aucun secret, aucune clé et aucun média de contenu n'est versionné dans ce dépôt.

@@ -3,27 +3,25 @@ import 'dart:io';
 
 import 'package:yaml/yaml.dart';
 
+import 'src/connexion_supabase.dart';
+
 // Story 5.4 (AD-7) : charge content/{categories,epoques,sources,pins}/*.yaml
 // en base Supabase locale — upsert idempotent par slug, ne touche jamais
 // `statut` (AD-6 : transitions de cycle de vie par RPC uniquement), force
 // toujours `provenance: editorial` (seul contenu géré par ce script).
 //
 // Usage : dart run tools/seed.dart (après `supabase db reset`)
-// Lit SUPABASE_URL et SUPABASE_SERVICE_ROLE_KEY dans l'environnement
-// (jamais commitées — voir `supabase status` en local).
+// Base visée : SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY si présentes, sinon
+// la base locale de `supabase start` (tools/src/connexion_supabase.dart).
 
 Future<void> main() async {
-  final url = Platform.environment['SUPABASE_URL'];
-  final key = Platform.environment['SUPABASE_SERVICE_ROLE_KEY'];
-  if (url == null || key == null) {
-    stderr.writeln(
-      'tools/seed : SUPABASE_URL et SUPABASE_SERVICE_ROLE_KEY doivent être '
-      "renseignées dans l'environnement (jamais commitées) — voir "
-      '`supabase status` en local.',
-    );
+  final connexion = await connexionSupabase('seed');
+  if (connexion == null) {
     exitCode = 1;
     return;
   }
+  final url = connexion.url;
+  final key = connexion.cle;
 
   final validation = await Process.run('dart', [
     'run',

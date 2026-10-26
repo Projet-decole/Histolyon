@@ -1,13 +1,15 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'src/connexion_supabase.dart';
+
 // Story 4.2 (AD-3) : régénère packages/api_types (Dart, via supadart) et
 // content/schema/ (JSON Schema) depuis le schéma Supabase local — jamais
 // de modèle écrit à la main.
 //
 // Usage : dart run tools/gen_types.dart
-// Lit SUPABASE_URL et SUPABASE_SERVICE_ROLE_KEY dans l'environnement
-// (jamais commitées — voir `supabase status` en local).
+// Base visée : SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY si présentes, sinon
+// la base locale de `supabase start` (tools/src/connexion_supabase.dart).
 //
 // Deux limites de supadart 1.9.3 contournées ici plutôt que dans le
 // fichier généré (cf. spike Story 4.1, .memlog.md de la spine) :
@@ -40,17 +42,13 @@ const _dossierSchema = 'content/schema';
 const _dossierMigrations = 'supabase/migrations';
 
 Future<void> main() async {
-  final url = Platform.environment['SUPABASE_URL'];
-  final key = Platform.environment['SUPABASE_SERVICE_ROLE_KEY'];
-  if (url == null || key == null) {
-    stderr.writeln(
-      'tools/gen-types : SUPABASE_URL et SUPABASE_SERVICE_ROLE_KEY doivent '
-      "être renseignées dans l'environnement (jamais commitées) — "
-      'voir `supabase status` en local pour les récupérer.',
-    );
+  final connexion = await connexionSupabase('gen-types');
+  if (connexion == null) {
     exitCode = 1;
     return;
   }
+  final url = connexion.url;
+  final key = connexion.cle;
 
   final Map<String, dynamic> swaggerComplet;
   try {
@@ -194,7 +192,9 @@ Future<void> _genererApiTypes({
   }
   final blocEnums = StringBuffer('enums:\n');
   enums.forEach((nom, valeurs) {
-    blocEnums.writeln('  $nom: [${valeurs.join(', ')}]');
+    // Valeurs citées (JSON est du YAML valide) : `on`, `null`, `:`… restent
+    // des chaînes.
+    blocEnums.writeln('  $nom: [${valeurs.map(jsonEncode).join(', ')}]');
   });
   // Remplace la ligne `enums:` (seule, sans valeurs) du fichier statique par
   // le bloc introspecté — le fichier commité documente juste que ce bloc
@@ -237,8 +237,8 @@ Future<void> _genererApiTypes({
 /// Sert `{"definitions": <definitionsFiltrees>}` sur `/rest/v1/` — supadart
 /// n'utilise que ce champ de la réponse (cf. commentaire d'en-tête). Sert
 /// aussi une liste de buckets vide sur `/storage/v1/bucket/` : supadart
-/// traite un échec de cet appel comme fatal (`exit(1)`), et ce dépôt ne
-/// déclare aucun bucket pour l'instant (Story 3.1).
+/// traite un échec de cet appel comme fatal (`exit(1)`), et les buckets
+/// (déclarés dans supabase/config.toml) ne produisent aucun type utile.
 Future<HttpServer> _demarrerProxySwaggerFiltre(
   Map<String, dynamic> definitionsFiltrees,
 ) async {
@@ -261,8 +261,8 @@ Future<HttpServer> _demarrerProxySwaggerFiltre(
 
 /// Convertit chaque définition swagger (déjà quasi un JSON Schema) en
 /// `content/schema/<table>.schema.json`, pour les tables de contenu
-/// éditorial (AD-7). Une table listée mais absente du schéma (ex.
-/// `parcours`, pas encore migré) est signalée et ignorée plutôt que de
+/// éditorial (AD-7). Une table listée mais absente du schéma (ex. table
+/// renommée par une migration) est signalée et ignorée plutôt que de
 /// produire un schéma inventé.
 Future<void> _genererJsonSchema(Map<String, dynamic> definitions) async {
   final dossier = Directory(_dossierSchema)..createSync(recursive: true);

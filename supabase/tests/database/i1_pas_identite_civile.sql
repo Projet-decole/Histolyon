@@ -1,13 +1,19 @@
 -- I1 — Identité civile jamais collectée.
--- Vérifie structurellement qu'aucune table du socle ne porte de colonne
--- d'identité civile (nom, prénom, date de naissance, adresse, téléphone).
+-- Vérifie structurellement qu'aucune table du schéma public (présente ou
+-- future) ne porte de colonne d'identité civile. L'email reste dans auth.users.
 begin;
-select plan(4);
+select plan(1);
 
-select hasnt_column('public', 'membre_equipe', 'nom', 'membre_equipe ne stocke pas de nom civil');
-select hasnt_column('public', 'membre_equipe', 'prenom', 'membre_equipe ne stocke pas de prénom');
-select hasnt_column('public', 'trace_validation', 'nom', 'trace_validation ne stocke pas de nom civil (I1, pseudonyme via auth.users uniquement)');
-select hasnt_column('public', 'pin', 'auteur_nom', 'pin ne stocke pas de nom civil d''auteur');
+select is(
+    (
+        select coalesce(string_agg(table_name || '.' || column_name, ', '), '')
+        from information_schema.columns
+        where table_schema = 'public'
+          and column_name ~ '^(auteur_)?(nom|prenom|nom_civil|email|telephone|adresse|date_naissance|date_de_naissance)$'
+    ),
+    '',
+    'aucune colonne d''identité civile dans le schéma public (I1)'
+);
 
 select * from finish();
 rollback;

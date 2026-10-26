@@ -1,6 +1,6 @@
 {
-  "_source": "conception/15-maquette.md §4, vérifié par appel direct Figma MCP (get_metadata/get_screenshot) le 2026-09-15 sur la collection « HistoLyon — Tokens » (VariableCollectionId:345:2, page 01 · Fondations, node 347:2).",
-  "_regenerer": "Quand le quota Figma MCP (Starter : 20 appels/mois) le permet, revérifier avec get_variable_defs sur le node 347:2 et mettre à jour ce fichier avant de le faire à nouveau confiance.",
+  "_source": "conception/15-maquette.md §4, vérifié par appel direct Figma MCP (get_metadata/get_screenshot) le 2026-09-15 sur la collection « HistoLyon — Tokens » (VariableCollectionId:345:2, page 01 · Fondations, node 347:2). Les 34 variables (couleurs, espacements, rayons, opacités) ont été confirmées le 2026-10-26 par l'export réel des variables Figma (produit/design/figma-tokens.light.json) ; les styles de texte et les ombres sont des styles Figma, non exportables comme variables, et restent saisis depuis la maquette.",
+  "_regenerer": "Pour revérifier sans le MCP Figma : réexporter les variables Figma dans produit/design/figma-tokens.light.json, puis lancer `dart run tools/check_tokens.dart` (il compare le package à cet export et à ce fichier).",
   "colors": {
     "TOK_COLOR_PRIMARY": "FFB85220",
     "TOK_COLOR_PRIMARY_FONCE": "FF8B3A14",

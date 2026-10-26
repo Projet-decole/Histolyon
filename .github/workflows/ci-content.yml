@@ -37,8 +37,11 @@ jobs:
       - name: Récupérer les clés locales
         run: |
           STATUS=$(supabase status -o json)
-          echo "SUPABASE_URL=$(echo "$STATUS" | jq -r .API_URL)" >> "$GITHUB_ENV"
-          echo "SUPABASE_SERVICE_ROLE_KEY=$(echo "$STATUS" | jq -r .SERVICE_ROLE_KEY)" >> "$GITHUB_ENV"
+          # jq -e : échoue si la clé manque, au lieu d'exporter "null".
+          URL=$(echo "$STATUS" | jq -re .API_URL)
+          CLE=$(echo "$STATUS" | jq -re .SERVICE_ROLE_KEY)
+          echo "SUPABASE_URL=$URL" >> "$GITHUB_ENV"
+          echo "SUPABASE_SERVICE_ROLE_KEY=$CLE" >> "$GITHUB_ENV"
 
       - name: Seed à blanc (idempotence exercée deux fois)
         run: |

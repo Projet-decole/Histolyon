@@ -1,10 +1,11 @@
 # Même réserve que wikipedia-cour-des-voraces.yaml : source publique
-# générale, pas primaire.
+# générale, pas primaire. Texte sous licence CC BY-SA 4.0.
 id: 0548569b-45ae-45a5-8fef-93549ea74b20
 slug: wikipedia-canuts
 type: page_web
 reference: "Canuts — article Wikipédia (français)"
 credit: "Wikipédia, contributeurs de l'article « Canuts »"
+lien: "https://fr.wikipedia.org/wiki/Canut"
 description: >-
   Référence générale sur les canuts (ouvriers tisseurs de soie lyonnais),
   le travail à domicile dans les ateliers de la Croix-Rousse, et les

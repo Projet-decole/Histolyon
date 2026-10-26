@@ -53,8 +53,10 @@ file_size_limit = "200MiB"
 
 [auth]
 enabled = true
-site_url = "http://localhost:3000"
-additional_redirect_urls = []
+# App mobile servie en web pour le dev (`melos run app`) ; l'admin Flutter Web
+# tourne sur un port choisi par `flutter run`.
+site_url = "http://localhost:8080"
+additional_redirect_urls = ["http://localhost:*"]
 jwt_expiry = 3600
 enable_signup = true
 

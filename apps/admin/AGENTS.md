@@ -4,9 +4,9 @@ Back-office Flutter Web, utilisé par l'équipe éditoriale pour saisir, valider
 
 ## État réel
 
-Pour l'instant, c'est le squelette `flutter create` (`lib/main.dart`). La première issue admin pose la structure, calquée sur `apps/mobile` : `lib/app/` (bootstrap, routeur, coquille), `lib/core/`, `lib/features/<slug>/{presentation,domain,data}`.
+C'est le squelette `flutter create` (`lib/main.dart`), **gelé jusqu'au second semestre** : le MVP n'a pas de back-office (le contenu passe par `content/`). Le premier ticket admin posera la structure, calquée sur `apps/mobile` : `lib/app/` (bootstrap, routeur, coquille), `lib/core/`, `lib/features/<slug>/{presentation,domain,data}`.
 
-Slugs de feature admin : `catalogue`, `saisie`, `validation`, `moderation`. Les écrans de référence sont dans `conception/07-ecrans/admin/`, par exemple `dart run tools/ctx.dart` avec l'ID que donne l'issue.
+Slugs de feature admin : `catalogue`, `saisie`, `validation`, `moderation`. Les écrans de référence sont dans l'archive `conception/07-ecrans/admin/` ; ils seront repris dans `produit/` avant de démarrer ce chantier.
 
 ## Règles propres à l'admin
 

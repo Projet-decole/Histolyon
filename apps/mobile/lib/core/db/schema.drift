@@ -1,6 +1,9 @@
 -- Base Drift unique du terminal (AD-4) : le serveur possède l'éditorial et le
 -- communautaire, le terminal possède le Profil et les Parcours personnels
--- dans cette seule base locale. `id` en TEXT (uuid v4 généré côté client).
+-- dans cette seule base locale (tables des Parcours personnels : à ajouter
+-- avec leur feature). `id` en TEXT (uuid v4 généré côté client).
+-- Les clés étrangères sont appliquées (PRAGMA foreign_keys dans
+-- app_database.dart) : supprimer le Profil supprime ses données.
 
 CREATE TABLE profil (
   id TEXT NOT NULL PRIMARY KEY,
@@ -8,7 +11,7 @@ CREATE TABLE profil (
 );
 
 CREATE TABLE preference (
-  profil_id TEXT NOT NULL REFERENCES profil(id),
+  profil_id TEXT NOT NULL REFERENCES profil(id) ON DELETE CASCADE,
   cle TEXT NOT NULL,
   valeur TEXT NOT NULL,
   PRIMARY KEY (profil_id, cle)
@@ -18,7 +21,7 @@ CREATE TABLE preference (
 -- type_de_cible : 'pin' | 'parcours' ; cible_id = uuid serveur.
 CREATE TABLE favori (
   id TEXT NOT NULL PRIMARY KEY,
-  profil_id TEXT NOT NULL REFERENCES profil(id),
+  profil_id TEXT NOT NULL REFERENCES profil(id) ON DELETE CASCADE,
   type_de_cible TEXT NOT NULL CHECK (type_de_cible IN ('pin', 'parcours')),
   cible_id TEXT NOT NULL,
   ajoute_le DATETIME NOT NULL,
@@ -29,11 +32,13 @@ CREATE TABLE favori (
 -- consultation_pin | etape_visitee | parcours_engage | parcours_termine | resultat_quiz
 CREATE TABLE historique_visite (
   id TEXT NOT NULL PRIMARY KEY,
-  profil_id TEXT NOT NULL REFERENCES profil(id),
-  type_evenement TEXT NOT NULL,
+  profil_id TEXT NOT NULL REFERENCES profil(id) ON DELETE CASCADE,
+  type_evenement TEXT NOT NULL CHECK (type_evenement IN ('consultation_pin', 'etape_visitee', 'parcours_engage', 'parcours_termine', 'resultat_quiz')),
   type_de_cible TEXT NOT NULL CHECK (type_de_cible IN ('pin', 'parcours')),
   cible_id TEXT NOT NULL,
   horodatage DATETIME NOT NULL,
   duree_secondes INTEGER,
   score_quiz INTEGER
 );
+
+CREATE INDEX historique_visite_profil_horodatage ON historique_visite (profil_id, horodatage);
