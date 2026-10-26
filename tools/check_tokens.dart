@@ -5,6 +5,12 @@
 // manquant côté package est déjà détecté comme divergence, qu'il ait été
 // oublié ou fusionné dans une autre constante).
 //
+// Si `produit/design/figma-tokens.light.json` existe (export réel des
+// variables Figma, 18 couleurs et 16 nombres), le package est aussi comparé à
+// cet export : c'est le contrôle indépendant de `figma_export.json`. Les styles
+// de texte et les ombres sont des styles Figma, pas des variables : ils n'y
+// figurent pas et restent vérifiés contre `figma_export.json` seulement.
+//
 // Usage : dart run tools/check_tokens.dart
 // Sortie non vide + exit 1 si une divergence est trouvée.
 
@@ -136,6 +142,49 @@ Map<String, Map<String, Object>> parseOmbres(String source) {
   };
 }
 
+/// Chemin de l'export Figma des variables, relatif à la racine du workspace.
+const cheminVariablesFigma = 'produit/design/figma-tokens.light.json';
+
+/// Convertit l'export Figma des variables (format « design tokens » W3C) vers
+/// le format du package : clés `TOK_…`, couleurs en ARGB hexadécimal, nombres
+/// en double arrondis à 4 décimales (Figma stocke des flottants 32 bits :
+/// 0,4 devient 0,4000000059604645). Une catégorie par préfixe de token.
+Map<String, Map<String, Object?>> convertirVariablesFigma(
+  Map<String, dynamic> export,
+) {
+  final categories = <String, Map<String, Object?>>{
+    'colors': {},
+    'spacing': {},
+    'radius': {},
+    'opacity': {},
+  };
+  for (final entree in export.entries) {
+    if (entree.key.startsWith(r'$')) continue; // métadonnées de l'export
+    final id = entree.key.replaceAll('-', '_');
+    final valeur = (entree.value as Map<String, dynamic>)[r'$value'];
+    if (id.startsWith('TOK_COLOR_')) {
+      final couleur = valeur as Map<String, dynamic>;
+      final alpha = ((couleur['alpha'] as num) * 255).round();
+      final rvb = (couleur['hex'] as String).substring(1, 7).toUpperCase();
+      categories['colors']![id] =
+          '${alpha.toRadixString(16).toUpperCase().padLeft(2, '0')}$rvb';
+      continue;
+    }
+    final categorie = id.startsWith('TOK_SPACE_')
+        ? 'spacing'
+        : id.startsWith('TOK_RADIUS_')
+        ? 'radius'
+        : id.startsWith('TOK_OPACITY_')
+        ? 'opacity'
+        : null;
+    if (categorie == null) continue;
+    categories[categorie]![id] = double.parse(
+      (valeur as num).toStringAsFixed(4),
+    );
+  }
+  return categories;
+}
+
 void main() {
   final racinePackage = Directory('packages/design_tokens');
   if (!racinePackage.existsSync()) {
@@ -204,9 +253,43 @@ void main() {
     ),
   ];
 
+  var confirmesParFigma = 0;
+  final fichierVariables = File(cheminVariablesFigma);
+  if (fichierVariables.existsSync()) {
+    final variables = convertirVariablesFigma(
+      jsonDecode(fichierVariables.readAsStringSync()) as Map<String, dynamic>,
+    );
+    final reelParCategorie = <String, Map<String, Object?>>{
+      'colors': couleurs,
+      'spacing': espacement,
+      'radius': rayons,
+      'opacity': opacites,
+    };
+    for (final entree in variables.entries) {
+      confirmesParFigma += entree.value.length;
+      divergences.addAll(
+        comparerCategorie(
+          categorie: 'variables-figma:${entree.key}',
+          attendu: entree.value,
+          reel: reelParCategorie[entree.key]!,
+        ),
+      );
+    }
+  }
+
   if (divergences.isEmpty) {
+    final total =
+        couleurs.length +
+        espacement.length +
+        rayons.length +
+        opacites.length +
+        typographie.length +
+        ombres.length;
+    final figma = confirmesParFigma > 0
+        ? ", dont $confirmesParFigma confirmés par l'export Figma des variables"
+        : '';
     stdout.writeln(
-      'tools/check_tokens: aucune divergence (${couleurs.length + espacement.length + rayons.length + opacites.length + typographie.length + ombres.length} tokens vérifiés).',
+      'tools/check_tokens: aucune divergence ($total tokens vérifiés$figma).',
     );
     return;
   }

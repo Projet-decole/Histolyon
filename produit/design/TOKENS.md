@@ -206,6 +206,11 @@ Opacité d’un composant entier désactivé, associée à la bascule de couleur
 ## TOK-OPACITY-SEPARATEUR — Séparateur léger
 Filets de séparation entre éléments de liste, base encre brune.
 
+## Vérification contre Figma (26/10/2026)
+L’export réel des variables Figma (`produit/design/figma-tokens.light.json`, format « design tokens » avec les identifiants de variables Figma) a été comparé aux constantes de `packages/design_tokens` : 34 tokens identiques (18 couleurs dont l’opacité de l’overlay, 7 espacements, 5 rayons, 4 opacités), aucun écart, aucun token présent d’un seul côté (DEC-100).
+Ne sont pas couverts : les 12 styles de texte et les 3 ombres, qui sont des styles Figma et non des variables. Leur valeur reste celle de la maquette (conception/15-maquette.md:49).
+Le contrôle se rejoue avec `dart run tools/check_tokens.dart` (il compare aussi le package à cet export). Pour le mettre à jour : réexporter les variables depuis Figma dans le même fichier, puis relancer la commande.
+
 ## Écarts constatés
 - Aucun écart de valeur entre les fichiers de conception et le package pour les couleurs, espacements, rayons, ombres, opacités et la typographie ; le package suit la maquette (conception/15-maquette.md:49).
 - Les 3 fontes n’ont pas de constante dans le package : le nom de fonte est écrit dans chaque style typographique. Voir QO-801.

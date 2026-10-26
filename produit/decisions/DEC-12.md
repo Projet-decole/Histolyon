@@ -18,3 +18,6 @@ Une seule source de valeurs, déjà utilisée par le code et vérifiée par `too
 
 ## Conséquences
 Ne pas modifier le package depuis `produit/`. Un écart constaté s’écrit comme question ouverte.
+
+## Mise à jour du 26/10/2026
+La vérification dans Figma est faite pour les variables (34 tokens, aucun écart) : voir DEC-100. Les styles de texte et les ombres restent à vérifier à l’occasion d’un export des styles.

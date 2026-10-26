@@ -35,5 +35,8 @@ R7. Dette connue : le premier plan Android a été retiré de la maquette. S’i
 ## Dans la maquette
 Page « 04 · Marque » (`375:2`) : logo couleur `378:2` (source de vérité), monochrome encre `384:2`, monochrome parchemin `384:26`, icône iOS `385:2`, arrière-plan Android `385:26`, règles d’usage `387:31`. Styles de texte dédiés : mot-symbole en Playfair Display Bold 52, signature en Inter Medium 15 avec espacement de lettres de 18 %, texte « LYON IMMERSIVE ».
 
+## Fichiers exportés
+Versionnés dans `produit/design/marque/` (export Figma du 24/10/2026) : `logo-a-couleur.png`, `logo-b-mono-encre.png`, `logo-c-mono-parchemin.png`, `app-icon-ios-1024.png`, `app-icon-android-fond.png`, `favicon-16.png`, `-32`, `-64`, `-180`, `-512`, `regles-d-usage.png`. Le premier plan Android adaptatif n’existe pas dans l’export (QO-807).
+
 ## Hors MVP
 Favicons et page web, signature de l’image partageable, signature du code visuel (déclinaisons du logo pour des surfaces de partage hors de l’app, reportées avec le partage).

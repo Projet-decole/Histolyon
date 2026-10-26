@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+  <g transform="translate(-75 -7)">
+    <path d="M79 29V18C79 15.8783 79.8429 13.8434 81.3431 12.3431C82.8434 10.8429 84.8783 10 87 10C89.1217 10 91.1566 10.8429 92.6569 12.3431C94.1571 13.8434 95 15.8783 95 18V29"/>
+    <path d="M83 29V22C83 20.9391 83.4214 19.9217 84.1716 19.1716C84.9217 18.4214 85.9391 18 87 18C88.0609 18 89.0783 18.4214 89.8284 19.1716C90.5786 19.9217 91 20.9391 91 22V29"/>
+    <path d="M78 29H96"/>
+  </g>
+</svg>

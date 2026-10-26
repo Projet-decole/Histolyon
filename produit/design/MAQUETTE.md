@@ -69,17 +69,32 @@ R8. Les quatre gabarits de mise en page d’écran ont été supprimés ; la str
 R9. **Nommage des états d’écran.** Cible : `ECR-<NOM>--<etat>` (double tiret, jamais de barre oblique). Dans les faits, la maquette utilise souvent un nom suivi d’un descriptif après un point médian (par exemple « nominal_charge »). Vérifier au cas par cas.
 
 ## Images de référence
-Captures versionnées dans `produit/ecrans/img/`, nommées `ECR-<NOM>--<etat>@2x.png` (DEC-10). Chaque fiche d’écran les liste dans son champ `images` avec l’état, le fichier et le nœud Figma.
+Captures versionnées dans `produit/ecrans/img/`, nommées `ECR-<NOM>--<etat>@2x.png` (DEC-10, DEC-100). Chaque fiche d’écran du MVP les liste dans son champ `images` avec l’état, le fichier et le nœud Figma. Les écrans du second semestre n’ont pas encore de fiche : leurs captures sont déjà là, prêtes pour la passe 2.
+
+## Exports versionnés (état du 26/10/2026)
+Export Figma fait par le porteur le 24/10/2026, intégré le 26/10/2026 (DEC-100).
+
+| Quoi | Où | Contenu | Poids |
+|---|---|---|---|
+| Écrans | `ecrans/img/` | 41 frames en PNG 2× (780 × 1688) : 37 écrans de la page 06 et 4 surfaces transverses (progression persistante, dialogue de confirmation, message éphémère, audio persistant) | 8,4 Mo |
+| Planches de composants | `composants/img/` | 13 planches utiles au MVP : pin, slider, carte, médias et 3D, coquille, zones de narration, cards, headers, boutons, chips, tags, messages, items de liste | 7,4 Mo |
+| Marque | `design/marque/` | 3 logos, icône iOS 1024, fond Android, 5 favicons, règles d’usage | 1,6 Mo |
+| Variables | `design/figma-tokens.light.json` | Export réel des variables Figma : 18 couleurs et 16 nombres (voir TOKENS.md) | 12 Ko |
+| Icônes personnalisées | `design/icones/` | ICN-CAT-ARCHITECTURE et ICN-CAT-LIEU-DISPARU, nettoyées à partir des planches (voir ICONES.md) | 8 Ko |
+
+Restent dans l’export local du porteur (`produit/_import-figma/`, ignoré par git) : l’inventaire complet des composants (4,9 Mo), les planches du back-office, les bandes de titre, les planches de composants non retenues (atomes détaillés, items consultés, représentations, structure, liens, libellés, indicateurs, frise, contrôles, encarts), les 61 autres planches d’icônes et les planches de marque redondantes.
+
+Les nœuds Figma ne sont pas dans les noms de fichiers : le champ `node_figma` des fiches reste à renseigner.
 
 ## Frames manquantes
-Images importées le 24/10/2026 depuis l’export Figma (PNG 780 × 1688, soit 2× 390 × 844) : 13 frames dans `ecrans/img/`, liées dans le champ `images` de chaque fiche d’écran. Les node ids ne sont pas dans l’export : champ `node_figma` à renseigner.
+Jamais exportés : la page 07 (calibrage des 10 époques ; le seul visuel proche est `E-DEMO-CARTE`, resté dans l’export local), la page 08 (8 écrans d’administration, second semestre) et la page 12 (présentation du jury).
 
 Frames absentes de l’export pour les écrans du MVP :
 - ECR-TRANSVERSES-BANDEAU-OFFLINE : pas de frame propre ; le bandeau se voit dans la frame `offline_avec_cache` de ECR-CARTE-PRINCIPALE.
 - ECR-PARCOURS-EN-COURS-TERRAIN : une seule frame (état nominal) ; l’état « étape sautée » et la fin partielle n’ont pas de frame.
 - ECR-PIN-CONSULTATION-APPROFONDIE, ECR-PIN-CONSULTATION-3D, ECR-PARCOURS-FICHE-DETAIL, ECR-PARCOURS-FIN-CELEBRATION, ECR-CARTE-APERCU-PIN : état nominal seulement (pas de frame chargement ni erreur).
 - ECR-TRANSVERSES-DIALOGUE-CONFIRMATION : instance « abandon de parcours » ; ECR-TRANSVERSES-MESSAGE-EPHEMERE : seule frame « lien copié » (instance de partage, hors MVP ; le message « Parcours abandonné » du MVP n’a pas de frame) ; ECR-TRANSVERSES-PARCOURS-PERSISTANT : frame audio + parcours (l’audio est hors MVP).
-- Écrans hors MVP exportés mais non copiés : recherche, filtres, alerte de proximité, communauté, profil, partage, éditeur, canapé, lancement, saut d’étape, AR, mode présentation.
+- Écrans hors MVP : leurs captures sont dans `ecrans/img/` sans fiche d’écran (recherche, filtres, alerte de proximité, communauté, profil, partage, éditeur de parcours, canapé, lancement, saut d’étape, AR, mode présentation, audio persistant).
 
 ## Ce qui n’est pas confirmé
 Les interactions câblées dans le prototype n’ont pas d’inventaire exhaustif : à tester dans Figma avant de supposer un enchaînement. La liste nominative des dix ancres de la page 07 n’est confirmée que pour la première.

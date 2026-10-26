@@ -20,6 +20,10 @@ derniere_verif: 2026-10-24
 
 Source des icônes : bibliothèque Lucide (licence ISC), version épinglée `lucide-static@1.21.0`, plus deux icônes personnalisées (DEC-11, DEC-80). `MANIFEST.yaml` ne donne pas de correspondance Lucide : les noms viennent des fiches d’icône (champ `source`) et de la maquette.
 
+## Export Figma des icônes (26/10/2026)
+L’export contient 63 fichiers SVG qui sont des planches et non des icônes prêtes à l’emploi : chaque fichier fait 150 × 62, contient l’icône en 14 px et en 24 px, plus l’étiquette de son nom dessinée en contours, avec un trait de couleur écrit en dur (noir ou `#1C1108`). Ils ne servent qu’à la lecture. Ils ne sont pas versionnés, sauf les deux icônes personnalisées, nettoyées dans `produit/design/icones/` (tracé 24 px seul, grille 24 × 24, couleur héritée `currentColor`) : `ICN-CAT-ARCHITECTURE.svg` et `ICN-CAT-LIEU-DISPARU.svg`. Les 61 autres sont réputées venir de Lucide (DEC-11, d’après la maquette) ; ce n’est pas confirmé pour les 7 plus récentes ci-dessous.
+L’export compte 7 icônes d’interface que ni la conception ni ce document ne décrivent : compte, image, impression, paramètres, case vide (bouton radio), visibilité et visibilité masquée. Elles sont hors MVP et restent à documenter si une fonction les demande.
+
 ## Règles
 R1. Style monoline contour seul (pas de remplissage), grille 24×24, trait de 1,5, bouts arrondis, couleur héritée (`currentColor`). Pas d’autre bibliothèque mélangée.
 R2. Tailles : 14 px (XS) pour l’icône à l’intérieur d’un pin sur la carte, 20 px (MD) dans les chips, 24 px (LG) pour l’interface. Seule la taille XS a un dessin dédié (trait de 2) pour les 11 icônes de catégorie.
