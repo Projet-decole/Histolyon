@@ -59,7 +59,7 @@ Les indicateurs sont **calculés** depuis GitHub (tickets, PR, CI) et le contenu
 
 Seuils qui déclenchent une action : date prévue après la date du jalon, plateau de deux semaines, ajouts de périmètre au-delà de 10 % de la charge du jalon, PR sans relecture depuis plus de 5 jours, ticket sans commit depuis plus de 14 jours. Deux vues : une **vue client** (agrégée, pour les follow-ups) et une **vue interne** (détail par personne, générée en local, jamais publiée).
 
-*État : le tableau de bord n'est pas encore en place ; il fait partie des prochaines étapes. Le script `tools/report.dart` est l'ancien rapport : ses chiffres ne sont pas fiables.*
+*État : `dart run tools/suivi.dart` calcule l'instantané du jour et l'écrit dans `build/suivi/` (vue publique `instantane-AAAA-MM-JJ.json`, vue interne `interne-AAAA-MM-JJ.json`, jamais commitée). L'historique, les graphiques et la publication de la vue client sur la branche `suivi` sont le ticket suivant (#126). Le script `tools/report.dart` est l'ancien rapport : ses chiffres ne sont pas fiables.*
 
 ## Revue et qualité
 
