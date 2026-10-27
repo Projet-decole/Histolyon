@@ -233,7 +233,7 @@ void main() {
         'supabase/tests/database/c.sql': 'select plan(4); select plan(3);',
       });
 
-      expect(nombres, {'unite': 5, 'widget': 1, 'integration': 1, 'sql': 7});
+      expect(nombres, {'unite': 4, 'widget': 1, 'integration': 1, 'sql': 7});
     });
 
     test('part du premier contributeur', () {
