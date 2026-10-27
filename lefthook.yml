@@ -32,17 +32,28 @@ pre-commit:
 
 pre-push:
   # Un package à la fois, et seulement s'il a été touché par le push.
+  #
+  # `unset $(git rev-parse --local-env-vars)` : git exporte GIT_DIR et d'autres
+  # variables dans un hook ; Flutter les hérite, ne retrouve plus la version de
+  # son propre SDK (« 0.0.0-unknown ») et refuse alors de résoudre les
+  # dépendances du workspace. On les retire avant d'appeler Flutter ou Dart.
   parallel: false
   commands:
     tests-mobile:
       glob: "apps/mobile/**"
-      run: cd apps/mobile && flutter test
+      run: |
+        unset $(git rev-parse --local-env-vars)
+        cd apps/mobile && flutter test
     tests-admin:
       glob: "apps/admin/**"
-      run: cd apps/admin && flutter test
+      run: |
+        unset $(git rev-parse --local-env-vars)
+        cd apps/admin && flutter test
     tests-outils:
       glob: "{tools,test/tools}/**"
-      run: dart test --concurrency=1 test/tools
+      run: |
+        unset $(git rev-parse --local-env-vars)
+        flutter pub get > /dev/null && dart test --concurrency=1 test/tools
     tokens:
       glob: "packages/design_tokens/**"
       run: dart run tools/check_tokens.dart
