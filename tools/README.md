@@ -28,6 +28,7 @@ Petits programmes Dart du projet, lancés depuis la racine avec `dart run tools/
 | --- | --- |
 | `media_push.dart` | Gelé : envoie des médias vers Supabase Storage ; aucun média n'existe encore et le MVP n'utilise pas Supabase. |
 | `report.dart` | À remplacer : c'est l'ancien rapport d'avancement, dont les indicateurs ne sont pas fiables (voir `docs/PROCESS.md`). |
+| `projet_sync.dart` | Signale ce qui est incohérent dans le tableau de projet GitHub (charge, priorité, nature, assigné, statut, semaine). `--appliquer` corrige la charge d'après l'étiquette `charge:N`. Voir `docs/PROCESS.md`, « Le tableau de projet ». |
 | `ctx.dart --index` | Obsolète : génère `conception/INDEX.md`, qui n'est plus versionné. |
 | `ctx_correspondance.dart` | Sert à reconstruire `produit/_correspondance.csv` (ancien identifiant, nouvel identifiant, source). Rarement utile. |
 

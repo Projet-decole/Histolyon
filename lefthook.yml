@@ -44,7 +44,9 @@ pre-push:
       run: cd apps/admin && env -u GIT_DIR -u GIT_WORK_TREE -u GIT_INDEX_FILE flutter test
     tests-outils:
       glob: "{tools,test/tools}/**"
-      run: dart test --concurrency=1 test/tools
+      run: |
+        unset $(git rev-parse --local-env-vars)
+        flutter pub get > /dev/null && dart test --concurrency=1 test/tools
     tokens:
       glob: "packages/design_tokens/**"
       run: dart run tools/check_tokens.dart
