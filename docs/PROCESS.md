@@ -61,6 +61,35 @@ Seuils qui déclenchent une action : date prévue après la date du jalon, plate
 
 *État : le tableau de bord n'est pas encore en place ; il fait partie des prochaines étapes. Le script `tools/report.dart` est l'ancien rapport : ses chiffres ne sont pas fiables.*
 
+## Le tableau de projet
+
+Le tableau GitHub (Projet-decole, privé) est l'endroit où chacun voit **ce qu'il a à faire, ce que font les autres et ce qui est prévu quand**. Il se lit ; il ne se tient pas à la main.
+
+**Champs.** `Status` (Backlog, Ready, In progress, In review, Done), `Priorité` (1 · Chemin critique, 2 · Important, 3 · Si le temps : la ligne de coupe de la feuille de route), `Charge` (nombre, copie de l'étiquette `charge:N`), `Nature` (Fonctionnalité, Contenu, Tâche, Décision, Technique), `Semaine` (la semaine où le ticket est prévu), plus `Assignees` et `Milestone` (le jalon).
+
+**Vues.**
+
+| Vue | Pour qui, pour quoi |
+| --- | --- |
+| Maintenant | Ce qui est prêt, en cours ou en relecture, une ligne par personne |
+| Mes tâches | Mes tickets non terminés, par statut, triés par priorité |
+| Par personne | Choisir une personne dans le panneau de gauche : ses tickets |
+| Jalons | Chaque jalon avec sa charge totale : où en est l'objectif |
+| Feuille de route | Les tickets sur les semaines, avec les jalons en repères |
+| À assigner | Les tickets sans assigné, par jalon : l'ordre du jour du point d'équipe |
+| Contenu | Le circuit éditorial (pins, parcours, époques) |
+| Backlog | Le tableau complet par statut |
+
+**Règles.**
+- Tout travail, même une petite tâche (« valider les époques »), est un ticket avec une `Nature` ; une petite tâche a une charge de 0 ou 1.
+- Un ticket qui démarre a un assigné ; il passe de Ready à In progress quand son auteur commence.
+- Les dépendances se déclarent avec le lien natif « bloqué par » du ticket, en plus de la ligne « Dépend de : #N ».
+- Le point d'équipe se prépare dans la vue À assigner : on attribue, puis on place chaque ticket dans une `Semaine`.
+
+**Ce qui se met à jour tout seul.** Un ticket ajouté arrive en Backlog ; une PR liée le passe en In review ; une relecture qui demande des changements le remet en In progress ; une PR fusionnée ou un ticket fermé le passe en Done.
+
+**Remise d'équerre.** `dart run tools/projet_sync.dart` signale ce qui est incohérent (charge, priorité, nature, assigné, statut, semaine, ticket en cours sans mouvement depuis 14 jours). Avec `--appliquer`, il corrige la charge d'après l'étiquette. À lancer pendant le créneau hebdomadaire.
+
 ## Revue et qualité
 
 - `main` est protégé : tout passe par une PR liée à un ticket, vérifiée par la CI et relue par une autre personne.
