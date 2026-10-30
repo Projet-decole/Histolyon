@@ -11,6 +11,7 @@ Petits programmes Dart du projet, lancés depuis la racine avec `dart run tools/
 | `check_import_direction.dart` | Vérifie la règle d'architecture AD-5 (une feature n'importe pas une autre feature, etc.). Lancé par `melos run analyze`. | `dart run tools/check_import_direction.dart` |
 | `validate_content.dart` | Valide les fichiers YAML de `content/` contre leurs schémas. | `dart run tools/validate_content.dart` |
 | `suivi.dart` | **Le suivi hebdomadaire** : calcule les indicateurs de `docs/PROCESS.md` depuis GitHub (tickets, PR, CI) et le dépôt (tests, couverture). Écrit une vue publique et une vue interne dans `build/suivi/`. Les calculs sont dans `suivi_calculs.dart`, la lecture des données dans `suivi_donnees.dart`. Exige `gh` connecté. | `dart run tools/suivi.dart` |
+| `gen_contenu_embarque.dart` | Génère `apps/mobile/assets/contenu/contenu.json` (contenu embarqué, DEC-04) depuis `content/`. `--verifier` échoue s'il est périmé (CI). | `dart run tools/gen_contenu_embarque.dart` |
 
 ## Ceux qui servent quand on touche la base ou le contenu (Docker requis)
 
@@ -28,6 +29,7 @@ Petits programmes Dart du projet, lancés depuis la racine avec `dart run tools/
 | --- | --- |
 | `media_push.dart` | Gelé : envoie des médias vers Supabase Storage ; aucun média n'existe encore et le MVP n'utilise pas Supabase. |
 | `report.dart` | Remplacé par `suivi.dart` : c'est l'ancien rapport d'avancement, dont les indicateurs ne sont pas fiables (voir `docs/PROCESS.md`). À supprimer une fois le suivi publié (#126). |
+| `projet_sync.dart` | Signale ce qui est incohérent dans le tableau de projet GitHub (charge, priorité, nature, assigné, statut, semaine). `--appliquer` corrige la charge d'après l'étiquette `charge:N`. Voir `docs/PROCESS.md`, « Le tableau de projet ». |
 | `ctx.dart --index` | Obsolète : génère `conception/INDEX.md`, qui n'est plus versionné. |
 | `ctx_correspondance.dart` | Sert à reconstruire `produit/_correspondance.csv` (ancien identifiant, nouvel identifiant, source). Rarement utile. |
 

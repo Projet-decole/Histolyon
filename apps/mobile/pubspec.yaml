@@ -52,6 +52,7 @@ dependencies:
   drift_flutter: 0.3.1
   path_provider: ^2.1.5
   uuid: ^4.6.0
+  maplibre: 0.3.7+1
 
 dev_dependencies:
   flutter_test:
@@ -80,6 +81,12 @@ flutter:
   # included with your application, so that you can use the icons in
   # the material Icons class.
   uses-material-design: true
+
+  # Instantané du contenu (DEC-04), généré par tools/gen_contenu_embarque.dart.
+  assets:
+    - assets/contenu/contenu.json
+    # Spike #129 (DEC-110), code jetable.
+    - assets/spike/
 
   # To add assets to your application, add an assets section, like this:
   # assets:
