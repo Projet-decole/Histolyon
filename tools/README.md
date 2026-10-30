@@ -10,6 +10,7 @@ Petits programmes Dart du projet, lancés depuis la racine avec `dart run tools/
 | `check_tokens.dart` | Vérifie que `packages/design_tokens` est identique à l'export Figma (34 variables) et à `figma_export.json`. | `dart run tools/check_tokens.dart` |
 | `check_import_direction.dart` | Vérifie la règle d'architecture AD-5 (une feature n'importe pas une autre feature, etc.). Lancé par `melos run analyze`. | `dart run tools/check_import_direction.dart` |
 | `validate_content.dart` | Valide les fichiers YAML de `content/` contre leurs schémas. | `dart run tools/validate_content.dart` |
+| `gen_contenu_embarque.dart` | Génère `apps/mobile/assets/contenu/contenu.json` (contenu embarqué, DEC-04) depuis `content/`. `--verifier` échoue s'il est périmé (CI). | `dart run tools/gen_contenu_embarque.dart` |
 
 ## Ceux qui servent quand on touche la base ou le contenu (Docker requis)
 

@@ -1,0 +1,28 @@
+name: ci-contenu-embarque
+
+# Refuse une PR où l'instantané embarqué dans l'app (DEC-04) n'est plus celui
+# que produit `content/`. Pas de Supabase ni de Docker : un simple diff.
+
+on:
+  pull_request:
+    paths:
+      - "content/**"
+      - "apps/mobile/assets/contenu/**"
+      - "tools/gen_contenu_embarque.dart"
+      - ".github/workflows/ci-contenu-embarque.yml"
+
+jobs:
+  verifier-instantane:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.47.4"
+          channel: "stable"
+
+      - run: flutter pub get
+
+      - name: Vérifier que le contenu embarqué est à jour
+        run: dart run tools/gen_contenu_embarque.dart --verifier
