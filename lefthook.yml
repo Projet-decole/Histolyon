@@ -31,17 +31,24 @@ pre-commit:
       run: dart run tools/ctx.dart check
 
 pre-push:
-  # Git exporte GIT_DIR aux hooks ; Flutter lit sa version via git et lirait alors
-  # le dépôt du projet (0.0.0-unknown). On le retire pour les commandes flutter.
   # Un package à la fois, et seulement s'il a été touché par le push.
+  #
+  # `unset $(git rev-parse --local-env-vars)` : git exporte GIT_DIR et d'autres
+  # variables dans un hook ; Flutter les hérite, ne retrouve plus la version de
+  # son propre SDK (« 0.0.0-unknown ») et refuse alors de résoudre les
+  # dépendances du workspace. On les retire avant d'appeler Flutter ou Dart.
   parallel: false
   commands:
     tests-mobile:
       glob: "apps/mobile/**"
-      run: cd apps/mobile && env -u GIT_DIR -u GIT_WORK_TREE -u GIT_INDEX_FILE flutter test
+      run: |
+        unset $(git rev-parse --local-env-vars)
+        cd apps/mobile && flutter test
     tests-admin:
       glob: "apps/admin/**"
-      run: cd apps/admin && env -u GIT_DIR -u GIT_WORK_TREE -u GIT_INDEX_FILE flutter test
+      run: |
+        unset $(git rev-parse --local-env-vars)
+        cd apps/admin && flutter test
     tests-outils:
       glob: "{tools,test/tools}/**"
       run: |
