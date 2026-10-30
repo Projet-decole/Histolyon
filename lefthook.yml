@@ -31,15 +31,17 @@ pre-commit:
       run: dart run tools/ctx.dart check
 
 pre-push:
+  # Git exporte GIT_DIR aux hooks ; Flutter lit sa version via git et lirait alors
+  # le dépôt du projet (0.0.0-unknown). On le retire pour les commandes flutter.
   # Un package à la fois, et seulement s'il a été touché par le push.
   parallel: false
   commands:
     tests-mobile:
       glob: "apps/mobile/**"
-      run: cd apps/mobile && flutter test
+      run: cd apps/mobile && env -u GIT_DIR -u GIT_WORK_TREE -u GIT_INDEX_FILE flutter test
     tests-admin:
       glob: "apps/admin/**"
-      run: cd apps/admin && flutter test
+      run: cd apps/admin && env -u GIT_DIR -u GIT_WORK_TREE -u GIT_INDEX_FILE flutter test
     tests-outils:
       glob: "{tools,test/tools}/**"
       run: dart test --concurrency=1 test/tools
