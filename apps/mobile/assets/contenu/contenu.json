@@ -1,0 +1,211 @@
+{
+  "_genere": "dart run tools/gen_contenu_embarque.dart — ne pas éditer",
+  "epoques": [
+    {
+      "id": "d67a8516-9938-470f-bf0c-e3d682b88d25",
+      "slug": "antiquite_romaine",
+      "libelle": "Antiquité",
+      "borne_debut": -43,
+      "borne_fin": 476,
+      "ordre": 1
+    },
+    {
+      "id": "895b0621-a799-4f12-b90e-9d1985ae8c73",
+      "slug": "haut_moyen_age",
+      "libelle": "Haut Moyen Âge",
+      "borne_debut": 476,
+      "borne_fin": 987,
+      "ordre": 2
+    },
+    {
+      "id": "112e5aae-b1ff-4951-b2a2-71560a541126",
+      "slug": "moyen_age",
+      "libelle": "Moyen Âge",
+      "borne_debut": 987,
+      "borne_fin": 1492,
+      "ordre": 3
+    },
+    {
+      "id": "969b55a2-a27b-4577-a8c2-9d33df1aff2a",
+      "slug": "renaissance",
+      "libelle": "Renaissance",
+      "borne_debut": 1492,
+      "borne_fin": 1610,
+      "ordre": 4
+    },
+    {
+      "id": "5851f015-6ac5-4e49-8aec-cd5741ce077d",
+      "slug": "epoque_classique",
+      "libelle": "Époque classique",
+      "borne_debut": 1610,
+      "borne_fin": 1789,
+      "ordre": 5
+    },
+    {
+      "id": "2389c86f-7215-41cb-8f7a-cb4d953239c1",
+      "slug": "revolution_empire",
+      "libelle": "Révolution et Empire",
+      "borne_debut": 1789,
+      "borne_fin": 1815,
+      "ordre": 6
+    },
+    {
+      "id": "c0715e21-4bec-4a63-b0c5-dba4f17138d4",
+      "slug": "xixe_siecle",
+      "libelle": "XIXe siècle",
+      "borne_debut": 1815,
+      "borne_fin": 1939,
+      "ordre": 7
+    },
+    {
+      "id": "913c33d0-d7c8-4880-a9dd-84c5302af43d",
+      "slug": "seconde_guerre_mondiale",
+      "libelle": "Seconde Guerre mondiale",
+      "borne_debut": 1939,
+      "borne_fin": 1945,
+      "ordre": 8
+    },
+    {
+      "id": "79316513-326e-4c6b-8f6a-9c35bca3d5cd",
+      "slug": "xxe_siecle",
+      "libelle": "XXe siècle",
+      "borne_debut": 1945,
+      "borne_fin": 2000,
+      "ordre": 9
+    },
+    {
+      "id": "d428b876-df1e-4876-94de-e6190d65223d",
+      "slug": "aujourd_hui",
+      "libelle": "Aujourd'hui",
+      "borne_debut": 2000,
+      "borne_fin": 2026,
+      "ordre": 10
+    }
+  ],
+  "categories": [
+    {
+      "id": "9df72f8d-a04a-4dc6-a2e4-b32fbb935d5e",
+      "slug": "classique",
+      "libelle": "Classique",
+      "ordre": 1
+    },
+    {
+      "id": "027b444b-ff3d-409b-844e-af7ab48438b9",
+      "slug": "anecdote",
+      "libelle": "Anecdote",
+      "ordre": 2
+    },
+    {
+      "id": "18f9c80d-e7c8-4f53-81a2-8fba8a312f9a",
+      "slug": "musee_institution",
+      "libelle": "Musée et institution",
+      "ordre": 3
+    },
+    {
+      "id": "769c3391-86e4-4c2c-83e2-7005a6ecd8a0",
+      "slug": "personne",
+      "libelle": "Personne",
+      "ordre": 4
+    },
+    {
+      "id": "eba34f71-454f-4c33-88f2-3f297fec45fa",
+      "slug": "evenement",
+      "libelle": "Événement",
+      "ordre": 5
+    },
+    {
+      "id": "ddec4c0e-a54d-4a99-8802-fd42b637a373",
+      "slug": "lieu_disparu",
+      "libelle": "Lieu disparu",
+      "ordre": 6
+    },
+    {
+      "id": "d552421e-563e-4f53-88bf-989c21f6f72d",
+      "slug": "vie_quotidienne",
+      "libelle": "Vie quotidienne",
+      "ordre": 7
+    },
+    {
+      "id": "9ff1da20-d6f1-49d7-9684-7b06bba2a209",
+      "slug": "architecture",
+      "libelle": "Architecture",
+      "ordre": 8
+    },
+    {
+      "id": "4d1dec79-9e76-42e9-b04b-51e2df0c2dbe",
+      "slug": "nature_geographie",
+      "libelle": "Nature et géographie",
+      "ordre": 9
+    },
+    {
+      "id": "083532ad-5fbb-4a6f-820c-2265fb028072",
+      "slug": "patrimoine_vivant_traditions",
+      "libelle": "Patrimoine vivant et traditions",
+      "ordre": 10
+    },
+    {
+      "id": "4804146d-4d11-44d1-aa7b-479e0112cc4b",
+      "slug": "gastronomie",
+      "libelle": "Gastronomie",
+      "ordre": 11
+    }
+  ],
+  "sources": [
+    {
+      "id": "36b51f59-ca53-4c49-85dc-8fb8869b2f41",
+      "slug": "musee-gadagne-canuts",
+      "type": "autre",
+      "reference": "Musée Gadagne (musée d'histoire de Lyon) — parcours canuts et Croix-Rousse",
+      "credit": "Musées Gadagne, Lyon",
+      "description": "Institution de référence pour l'histoire lyonnaise, dont les collections permanentes documentent le travail de la soie et les révoltes canutes. Cité comme point d'ancrage institutionnel, à compléter par une référence de catalogue précise si besoin."
+    },
+    {
+      "id": "0548569b-45ae-45a5-8fef-93549ea74b20",
+      "slug": "wikipedia-canuts",
+      "type": "page_web",
+      "reference": "Canuts — article Wikipédia (français)",
+      "credit": "Wikipédia, contributeurs de l'article « Canuts »",
+      "lien": "https://fr.wikipedia.org/wiki/Canut",
+      "description": "Référence générale sur les canuts (ouvriers tisseurs de soie lyonnais), le travail à domicile dans les ateliers de la Croix-Rousse, et les révoltes de 1831 et 1834."
+    },
+    {
+      "id": "af49fba5-897d-434a-ae74-658534bcbc2b",
+      "slug": "wikipedia-cour-des-voraces",
+      "type": "page_web",
+      "reference": "Cour des Voraces — article Wikipédia (français)",
+      "credit": "Wikipédia, contributeurs de l'article « Cour des Voraces »",
+      "lien": "https://fr.wikipedia.org/wiki/Cour_des_Voraces",
+      "description": "Référence générale et publique sur la Cour des Voraces (Croix-Rousse, Lyon 4e/1er) — localisation, historique de la construction, usage comme lieu de rassemblement des sociétés ouvrières lyonnaises au XIXe siècle."
+    }
+  ],
+  "pins": [
+    {
+      "id": "c4d158e5-f125-4f3d-ad5e-57a9456379e1",
+      "slug": "cour-des-voraces",
+      "titre": "La Cour des Voraces",
+      "categorie": "architecture",
+      "epoques": [
+        "xixe_siecle"
+      ],
+      "sources": [
+        "wikipedia-cour-des-voraces",
+        "wikipedia-canuts",
+        "musee-gadagne-canuts"
+      ],
+      "localisation": {
+        "lat": 45.7706,
+        "lon": 4.8298
+      },
+      "contenu_narratif": {
+        "teaser": "Une porte cochère, une cour, et soudain un escalier de pierre qui grimpe sur six étages à ciel ouvert. Ici, la soie passait — et, parfois, une révolte.",
+        "narration": "Tu pousses la porte, place Colbert, et tu te retrouves dans une cour\nintérieure vertigineuse : un escalier à vis en pierre grimpe le long\ndes façades, desservant les logements sur plusieurs étages, à ciel\nouvert. C'est la Cour des Voraces, l'une des traboules les plus\nspectaculaires de la Croix-Rousse.\n\nAu XIXe siècle, ce quartier vivait de la soie. Les canuts — les\nouvriers tisseurs — travaillaient chez eux, sur des métiers à tisser\nqui occupaient tout un étage, et devaient porter leurs pièces de soie\naux marchands du centre-ville sans les exposer à la pluie. Les\ntraboules, ces passages qui traversent les immeubles et relient une\nrue à l'autre par leurs cours intérieures, servaient exactement à\nça : un raccourci à l'abri, d'un pâté de maisons au suivant.\n\nMais la colline de la Croix-Rousse a aussi été un terrain\nd'affrontement. En 1831 puis en 1834, les canuts se sont soulevés\npour de meilleurs salaires et de meilleures conditions — les\nrévoltes canutes, parmi les premiers grands mouvements ouvriers du\nXIXe siècle en France. Le réseau de cours et de passages qui\nquadrille le quartier leur permettait de circuler d'un point à\nl'autre sans emprunter les rues, hors de vue des troupes envoyées\npour rétablir l'ordre.\n\nLa Cour des Voraces tiendrait son nom d'une société ouvrière\nlyonnaise du milieu du siècle qui en aurait fait un de ses lieux de\nrassemblement — l'histoire précise de ce nom reste discutée, mais le\ndécor, lui, n'a pas bougé : le même escalier de pierre, la même cour\nouverte sur le ciel.\n",
+        "post_narratif": [
+          {
+            "type": "le_saviez_vous",
+            "texte": "Le saviez-vous. Lyon compte plusieurs centaines de traboules, surtout concentrées dans le Vieux Lyon et sur la colline de la Croix-Rousse. Beaucoup sont encore aujourd'hui des passages privés, ouverts au public à certaines heures ou lors d'occasions particulières."
+          }
+        ]
+      }
+    }
+  ]
+}

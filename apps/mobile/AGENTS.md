@@ -6,11 +6,12 @@ App Flutter (Android, avec du code partagé prêt pour iOS). Les règles globale
 
 ```
 lib/
-  main.dart                 → app/bootstrap.dart (Supabase.initialize + ProviderScope)
+  main.dart                 → app/bootstrap.dart (Supabase.initialize seulement si configuré + ProviderScope)
   app/router.dart           assemble les routes exportées par chaque feature (seul endroit qui importe des features)
   app/coquille.dart         NavigationBar : Carte / Parcours / Profil
   core/router/route_names.dart   noms et chemins de toutes les routes
   core/session/             état transverse, liste FERMÉE : epoqueSelectionnee, parcoursActif, etapeCourante, pinCourant, modePresentation, lectureAudio
+  core/contenu/             ChargeurContenu : lit assets/contenu/contenu.json (généré, ne pas éditer), modèles *Contenu
   core/supabase/            supabaseClientProvider (lu uniquement par les couches data/)
   core/db/                  base Drift locale (schema.drift : profil, preference, favori, historique_visite) + appDatabaseProvider
   core/profile/             Profil local sans Compte (I6) : profilLocalIdProvider
@@ -29,7 +30,7 @@ Le thème (`app/theme.dart`, construit depuis `design_tokens`) et la locale `fr`
 
 ## Source des données du MVP
 
-Le MVP lit un **instantané du contenu embarqué dans l'app** (généré depuis `content/`, décision DEC-04 de `produit/decisions/`), pas Supabase : la démo doit marcher hors ligne, sur téléphone, sans Docker. Supabase redevient la source au second semestre. Cela ne change pas la règle de couches : seule `data/` lit les données, via un repository qui renvoie un `Result<T>`.
+Le MVP lit un **instantané du contenu embarqué dans l'app** (généré depuis `content/`, décision DEC-04 de `produit/decisions/`), pas Supabase : la démo doit marcher hors ligne, sur téléphone, sans Docker. Supabase redevient la source au second semestre. Le fichier est régénéré par `dart run tools/gen_contenu_embarque.dart` après toute modif de `content/` (la CI le vérifie). Cela ne change pas la règle de couches : seule `data/` lit les données, via un repository qui renvoie un `Result<T>`.
 
 ## Recette : une tranche de feature
 

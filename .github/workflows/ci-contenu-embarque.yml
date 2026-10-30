@@ -1,0 +1,50 @@
+name: ci-contenu-embarque
+
+# L'instantané embarqué dans l'app (DEC-04) doit être celui que produit
+# `content/`. Sur une PR du même dépôt, le workflow le régénère et le
+# committe lui-même : une contribution de contenu (époque, pin) n'a pas besoin
+# de lancer le script. Sur une PR venant d'un fork, il se contente de vérifier.
+# Pas de Supabase ni de Docker.
+
+on:
+  pull_request:
+    paths:
+      - "content/**"
+      - "apps/mobile/assets/contenu/**"
+      - "tools/gen_contenu_embarque.dart"
+      - ".github/workflows/ci-contenu-embarque.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  verifier-instantane:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.47.4"
+          channel: "stable"
+
+      - run: flutter pub get
+
+      - name: Régénérer l'instantané (PR du dépôt)
+        if: github.event.pull_request.head.repo.full_name == github.repository
+        run: |
+          dart run tools/gen_contenu_embarque.dart
+          if ! git diff --quiet -- apps/mobile/assets/contenu/contenu.json; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add apps/mobile/assets/contenu/contenu.json
+            git commit -m "chore(content): régénérer le contenu embarqué"
+            git push
+            echo "::notice::Contenu embarqué régénéré et poussé sur la branche."
+          fi
+
+      - name: Vérifier que le contenu embarqué est à jour
+        run: dart run tools/gen_contenu_embarque.dart --verifier
