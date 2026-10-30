@@ -31,24 +31,41 @@ void main() {
     );
   });
 
-  test('une configuration Supabase absente échoue tôt et clairement', () {
-    expect(
-      () => verifierConfigSupabase(url: '', cle: 'x'),
-      throwsA(
-        isA<StateError>().having(
-          (e) => e.message,
-          'message',
-          contains('dart-define-from-file'),
+  group('Supabase optionnel (DEC-04)', () {
+    test('sans configuration, Supabase n\'est pas initialisé', () async {
+      var appels = 0;
+      final actif = await initialiserSupabaseSiConfigure(
+        url: '',
+        cle: '',
+        initialiser: (url, cle) async => appels++,
+      );
+      expect(actif, isFalse);
+      expect(appels, 0);
+    });
+
+    test('une configuration partielle est ignorée', () async {
+      var appels = 0;
+      Future<void> init(String u, String c) async => appels++;
+      expect(
+        await initialiserSupabaseSiConfigure(
+          url: 'http://x',
+          cle: '',
+          initialiser: init,
         ),
-      ),
-    );
-    expect(
-      () => verifierConfigSupabase(url: 'http://x', cle: ''),
-      throwsStateError,
-    );
-    expect(
-      () => verifierConfigSupabase(url: 'http://x', cle: 'y'),
-      returnsNormally,
-    );
+        isFalse,
+      );
+      expect(appels, 0);
+    });
+
+    test('avec configuration complète, Supabase est initialisé', () async {
+      String? recu;
+      final actif = await initialiserSupabaseSiConfigure(
+        url: 'http://x',
+        cle: 'y',
+        initialiser: (url, cle) async => recu = '$url|$cle',
+      );
+      expect(actif, isTrue);
+      expect(recu, 'http://x|y');
+    });
   });
 }
