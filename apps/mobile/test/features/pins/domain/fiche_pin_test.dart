@@ -14,6 +14,10 @@ ProviderContainer _conteneur(Result<Pin> resultat) {
     ],
   );
   addTearDown(c.dispose);
+  // Garde les fiches en vie : un provider auto-dispose lu sans écouteur est
+  // libéré avant d'avoir répondu.
+  c.listen(fichePinProvider('pin-a'), (_, _) {});
+  c.listen(fichePinProvider('nope'), (_, _) {});
   return c;
 }
 
