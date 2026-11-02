@@ -11,8 +11,13 @@ import 'package:mobile/features/pins/presentation/pins_ecran.dart';
 import '../pins_factices.dart';
 
 /// Monte la fiche au-dessus d'une carte factice, comme dans l'app (pushNamed).
-Future<void> _monter(WidgetTester tester, RepositoryFactice repo) async {
+Future<GoRouter> _monter(
+  WidgetTester tester,
+  RepositoryFactice repo, {
+  bool lienDirect = false,
+}) async {
   final routeur = GoRouter(
+    initialLocation: lienDirect ? '/pin/pin-a' : RouteNames.cartePath,
     routes: [
       GoRoute(
         path: RouteNames.cartePath,
@@ -32,8 +37,11 @@ Future<void> _monter(WidgetTester tester, RepositoryFactice repo) async {
       child: MaterialApp.router(routerConfig: routeur),
     ),
   );
-  routeur.pushNamed(RouteNames.pin, pathParameters: {'slug': 'pin-a'});
+  if (!lienDirect) {
+    routeur.pushNamed(RouteNames.pin, pathParameters: {'slug': 'pin-a'});
+  }
   await tester.pumpAndSettle();
+  return routeur;
 }
 
 void main() {
@@ -117,4 +125,21 @@ void main() {
     expect(find.text('carte factice'), findsOneWidget);
     expect(find.byType(PinEcran), findsNothing);
   });
+
+  testWidgets(
+    'lien vers un pin retiré depuis une fiche ouverte : retour à la carte',
+    (tester) async {
+      final repo = RepositoryFactice(Ok(pinFactice()));
+      final routeur = await _monter(tester, repo, lienDirect: true);
+      expect(find.text('La Cour des Voraces'), findsOneWidget);
+
+      // Même route, autre slug : l'écran peut être réutilisé (lien web).
+      repo.resultat = const Err(ValidationFailure('introuvable'));
+      routeur.goNamed(RouteNames.pin, pathParameters: {'slug': 'pin-retire'});
+      await tester.pumpAndSettle();
+
+      expect(find.text('carte factice'), findsOneWidget);
+      expect(find.byType(PinEcran), findsNothing);
+    },
+  );
 }

@@ -22,16 +22,14 @@ class PinEcran extends ConsumerStatefulWidget {
 }
 
 class _PinEcranState extends ConsumerState<PinEcran> {
-  @override
-  void initState() {
-    super.initState();
-    ref.listenManual(fichePinProvider(widget.slug), (_, suivant) {
-      if (suivant.value is FicheRetiree) _fermerPinRetire();
-    }, fireImmediately: true);
-  }
+  bool _fermetureDemandee = false;
 
-  /// R9 : message éphémère puis retour gracieux à la carte.
+  /// R9 : message éphémère puis retour gracieux à la carte. Déclenché depuis
+  /// `build`, qui suit toujours le slug courant : go_router peut réutiliser
+  /// l'écran quand un lien change seulement le slug.
   void _fermerPinRetire() {
+    if (_fermetureDemandee) return;
+    _fermetureDemandee = true;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -46,6 +44,7 @@ class _PinEcranState extends ConsumerState<PinEcran> {
   @override
   Widget build(BuildContext context) {
     final fiche = ref.watch(fichePinProvider(widget.slug));
+    if (fiche.value is FicheRetiree) _fermerPinRetire();
     return Scaffold(
       appBar: AppBar(),
       body: switch (fiche) {
