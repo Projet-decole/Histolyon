@@ -10,6 +10,7 @@ import 'package:go_router/go_router.dart';
 
 import 'package:mobile/app/bootstrap.dart';
 import 'package:mobile/core/router/route_names.dart';
+import 'package:mobile/features/parcours/presentation/parcours_ecran.dart';
 
 void main() {
   testWidgets("l'app démarre sur la Carte avec trois onglets", (tester) async {
@@ -30,7 +31,12 @@ void main() {
     await tester.tap(find.text('Parcours'));
     await tester.pumpAndSettle();
 
-    expect(find.text('Parcours — à venir'), findsOneWidget);
+    // Sans Supabase configuré (cas de ce test, comme du MVP sur contenu
+    // embarqué), le catalogue affiche son message d'erreur sans planter.
+    expect(find.byType(ParcoursEcran), findsOneWidget);
+    expect(find.textContaining('n’a pas pu être chargé'), findsOneWidget);
+    expect(find.text('Réessayer'), findsOneWidget);
+    expect(tester.takeException(), isNull);
   });
 
   // Écrans plein écran : ouverts par pushNamed pour garder les onglets
