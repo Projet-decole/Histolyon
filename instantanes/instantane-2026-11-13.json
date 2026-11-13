@@ -3,8 +3,8 @@
   "charge": {
     "J1 · Follow-up 2 (13/11)": {
       "total": 22,
-      "terminee": 11,
-      "restante": 11,
+      "terminee": 14,
+      "restante": 8,
       "ajoutee": 8
     },
     "J4 · Oral et rendu (05-07/02)": {
@@ -32,24 +32,24 @@
       "ajoutee": 0
     }
   },
-  "debit_3sem": 5.666666666666667,
+  "debit_3sem": 6.666666666666667,
   "date_prevue": {
-    "J1 · Follow-up 2 (13/11)": "2026-11-27",
-    "J2 · Follow-up 3 (18/12)": "2027-01-13",
-    "J3 · Gel du MVP (21/01)": "2027-02-25",
-    "J4 · Oral et rendu (05-07/02)": "2027-03-02",
-    "S2 · Après le MVP": "2027-03-06"
+    "J1 · Follow-up 2 (13/11)": "2026-11-22",
+    "J2 · Follow-up 3 (18/12)": "2027-01-01",
+    "J3 · Gel du MVP (21/01)": "2027-02-07",
+    "J4 · Oral et rendu (05-07/02)": "2027-02-11",
+    "S2 · Après le MVP": "2027-02-14"
   },
   "flux": {
-    "cycle_median_j": 0.08715277777777777,
-    "age_max_en_cours_j": 16.883333333333333,
+    "cycle_median_j": 0.08541666666666667,
+    "age_max_en_cours_j": 16.886805555555554,
     "sans_mouvement_14j": 8,
     "delai_premiere_relecture_j": null,
     "pr_relues_par_autre_pct": 0.0
   },
   "qualite": {
     "tests": {
-      "unite": 187,
+      "unite": 188,
       "widget": 9,
       "integration": 1,
       "sql": 82

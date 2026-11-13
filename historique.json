@@ -101,12 +101,12 @@
   {
     "date": "2026-11-13",
     "perimetre": 105,
-    "terminee": 17,
-    "restante": 88,
-    "debit_3sem": 5.666666666666667,
-    "date_prevue": "2027-03-02",
-    "pr_fusionnees_semaine": 3,
-    "charge_terminee_semaine": 3,
+    "terminee": 20,
+    "restante": 85,
+    "debit_3sem": 6.666666666666667,
+    "date_prevue": "2027-02-11",
+    "pr_fusionnees_semaine": 4,
+    "charge_terminee_semaine": 6,
     "ci_verte_semaine_pct": 100.0
   }
 ]

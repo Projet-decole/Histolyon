@@ -4,19 +4,19 @@ Instantané du **2026-11-13**, calculé automatiquement depuis GitHub chaque sem
 
 ## Les jalons
 
-Débit des trois dernières semaines : **5.7** de charge par semaine. La fin prévue d'un jalon cumule le reste des jalons qui le précèdent.
+Débit des trois dernières semaines : **6.7** de charge par semaine. La fin prévue d'un jalon cumule le reste des jalons qui le précèdent.
 
 | Jalon | Terminé / total | Reste | Ajouté en cours | Fin prévue |
 |---|---|---|---|---|
-| J1 · Follow-up 2 (13/11) | 11 / 22 | 11 | 8 | 2026-11-27 |
-| J4 · Oral et rendu (05-07/02) | 0 / 4 | 4 | 0 | 2027-03-02 |
-| J3 · Gel du MVP (21/01) | 0 / 35 | 35 | 0 | 2027-02-25 |
-| J2 · Follow-up 3 (18/12) | 6 / 44 | 38 | 0 | 2027-01-13 |
-| S2 · Après le MVP | 0 / 3 | 3 | 0 | 2027-03-06 |
+| J1 · Follow-up 2 (13/11) | 14 / 22 | 8 | 8 | 2026-11-22 |
+| J2 · Follow-up 3 (18/12) | 6 / 44 | 38 | 0 | 2027-01-01 |
+| J3 · Gel du MVP (21/01) | 0 / 35 | 35 | 0 | 2027-02-07 |
+| J4 · Oral et rendu (05-07/02) | 0 / 4 | 4 | 0 | 2027-02-11 |
+| S2 · Après le MVP | 0 / 3 | 3 | 0 | 2027-02-14 |
 
 ## À surveiller
 
-- La fin prévue du MVP (2027-03-02) est après son échéance (2027-02-07).
+- La fin prévue du MVP (2027-02-11) est après son échéance (2027-02-07).
 - J1 · Follow-up 2 (13/11) : 8 de charge ajoutée en cours de jalon (36 %, seuil 10 %).
 - 8 ticket(s) sans mouvement depuis 14 jours.
 
@@ -46,7 +46,7 @@ Chaque point est la fin prévue du MVP calculée cette semaine-là (reste divis�
 
 | Indicateur | Valeur |
 |---|---|
-| Tests (unité / widget / intégration / SQL) | 187 / 9 / 1 / 82 |
+| Tests (unité / widget / intégration / SQL) | 188 / 9 / 1 / 82 |
 | Couverture du code de l'app (`lib/`) | 88 % |
 | CI verte sur 4 semaines | 100 % |
 
@@ -68,7 +68,7 @@ Chaque point est la fin prévue du MVP calculée cette semaine-là (reste divis�
 | 2026-10-29 | 97 | 0 | 97 | 0.0 | — | 2 | 0 | 100 % |
 | 2026-11-05 | 103 | 14 | 89 | 4.7 | 2027-03-19 | 6 | 14 | 100 % |
 | 2026-11-12 | 103 | 14 | 89 | 4.7 | 2027-03-26 | 0 | 0 | — |
-| 2026-11-13 | 105 | 17 | 88 | 5.7 | 2027-03-02 | 3 | 3 | 100 % |
+| 2026-11-13 | 105 | 20 | 85 | 6.7 | 2027-02-11 | 4 | 6 | 100 % |
 
 ## Limites connues
 
