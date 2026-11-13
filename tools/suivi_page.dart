@@ -281,11 +281,16 @@ String pageClient({
       '| Jalon | Terminé / total | Reste | Ajouté en cours | Fin prévue |',
     )
     ..writeln('|---|---|---|---|---|');
-  for (final e in charges.entries) {
-    final c = e.value as Map;
+  // Les dates prévues sont rangées par échéance : la table suit cet ordre.
+  final ordre = [
+    ...prevues.keys.where(charges.containsKey),
+    ...charges.keys.where((k) => !prevues.containsKey(k)),
+  ];
+  for (final jalon in ordre) {
+    final c = charges[jalon] as Map;
     b.writeln(
-      '| ${e.key} | ${c['terminee']} / ${c['total']} | ${c['restante']} | '
-      '${c['ajoutee']} | ${prevues[e.key] ?? 'inconnue'} |',
+      '| $jalon | ${c['terminee']} / ${c['total']} | ${c['restante']} | '
+      '${c['ajoutee']} | ${prevues[jalon] ?? 'inconnue'} |',
     );
   }
   b

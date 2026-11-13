@@ -39,6 +39,12 @@ final points = [
 final instantane = <String, Object?>{
   'date': '2026-11-13',
   'charge': {
+    'J2 · Follow-up 3 (18/12)': {
+      'total': 44,
+      'terminee': 6,
+      'restante': 38,
+      'ajoutee': 0,
+    },
     'J1 · Follow-up 2 (13/11)': {
       'total': 22,
       'terminee': 8,
@@ -47,7 +53,10 @@ final instantane = <String, Object?>{
     },
   },
   'debit_3sem': 4.7,
-  'date_prevue': {'J1 · Follow-up 2 (13/11)': '2026-12-04'},
+  'date_prevue': {
+    'J1 · Follow-up 2 (13/11)': '2026-12-04',
+    'J2 · Follow-up 3 (18/12)': '2027-01-30',
+  },
   'flux': {
     'cycle_median_j': 0.15,
     'age_max_en_cours_j': 16.8,
@@ -127,6 +136,13 @@ void main() {
       expect(page, contains('166'));
       expect(page, contains('92 %'));
       expect(page, contains('trouve'));
+    });
+
+    test('range les jalons dans l\'ordre de leurs échéances', () {
+      expect(
+        page.indexOf('| J1 · Follow-up 2'),
+        lessThan(page.indexOf('| J2 · Follow-up 3')),
+      );
     });
 
     test('liste les alertes et un tableau semaine par semaine', () {
