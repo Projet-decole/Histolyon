@@ -39,6 +39,6 @@
 <rect class="barre" x="540.0" y="199.1" width="20.8" height="72.9" fill="#2da44e"/>
 <rect class="barre" x="580.6" y="272.0" width="20.8" height="0.0" fill="#1f6feb"/>
 <rect class="barre" x="602.4" y="272.0" width="20.8" height="0.0" fill="#2da44e"/>
-<rect class="barre" x="643.0" y="251.2" width="20.8" height="20.8" fill="#1f6feb"/>
-<rect class="barre" x="664.8" y="240.7" width="20.8" height="31.3" fill="#2da44e"/>
+<rect class="barre" x="643.0" y="240.7" width="20.8" height="31.3" fill="#1f6feb"/>
+<rect class="barre" x="664.8" y="209.5" width="20.8" height="62.5" fill="#2da44e"/>
 </svg>

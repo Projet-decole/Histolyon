@@ -8,19 +8,19 @@
 <line x1="72.0" y1="272.0" x2="696.0" y2="272.0" stroke="#d0d7de" stroke-width="1"/>
 <text x="66.0" y="272.0" dy="4" text-anchor="end" fill="#8c959f">0</text>
 <line x1="72.0" y1="216.0" x2="696.0" y2="216.0" stroke="#d0d7de" stroke-width="1"/>
-<text x="66.0" y="216.0" dy="4" text-anchor="end" fill="#8c959f">26</text>
+<text x="66.0" y="216.0" dy="4" text-anchor="end" fill="#8c959f">27</text>
 <line x1="72.0" y1="160.0" x2="696.0" y2="160.0" stroke="#d0d7de" stroke-width="1"/>
-<text x="66.0" y="160.0" dy="4" text-anchor="end" fill="#8c959f">53</text>
+<text x="66.0" y="160.0" dy="4" text-anchor="end" fill="#8c959f">54</text>
 <line x1="72.0" y1="104.0" x2="696.0" y2="104.0" stroke="#d0d7de" stroke-width="1"/>
-<text x="66.0" y="104.0" dy="4" text-anchor="end" fill="#8c959f">79</text>
+<text x="66.0" y="104.0" dy="4" text-anchor="end" fill="#8c959f">81</text>
 <line x1="72.0" y1="48.0" x2="696.0" y2="48.0" stroke="#d0d7de" stroke-width="1"/>
-<text x="66.0" y="48.0" dy="4" text-anchor="end" fill="#8c959f">105</text>
+<text x="66.0" y="48.0" dy="4" text-anchor="end" fill="#8c959f">108</text>
 <text x="72.0" y="290.0" text-anchor="middle" fill="#8c959f">09-17</text>
 <text x="210.7" y="290.0" text-anchor="middle" fill="#8c959f">10-01</text>
 <text x="349.3" y="290.0" text-anchor="middle" fill="#8c959f">10-15</text>
 <text x="488.0" y="290.0" text-anchor="middle" fill="#8c959f">10-29</text>
 <text x="626.7" y="290.0" text-anchor="middle" fill="#8c959f">11-12</text>
 <text x="696.0" y="290.0" text-anchor="middle" fill="#8c959f">11-13</text>
-<polyline fill="none" stroke="#8c959f" stroke-width="2.5" points="72.0,272.0 141.3,269.9 210.7,231.5 280.0,231.5 349.3,231.5 418.7,231.5 488.0,65.1 557.3,52.3 626.7,52.3 696.0,48.0"/>
-<polyline fill="none" stroke="#2da44e" stroke-width="2.5" points="72.0,272.0 141.3,272.0 210.7,272.0 280.0,272.0 349.3,272.0 418.7,272.0 488.0,272.0 557.3,242.1 626.7,242.1 696.0,229.3"/>
+<polyline fill="none" stroke="#8c959f" stroke-width="2.5" points="72.0,272.0 141.3,269.9 210.7,232.6 280.0,232.6 349.3,232.6 418.7,232.6 488.0,70.8 557.3,58.4 626.7,58.4 696.0,48.0"/>
+<polyline fill="none" stroke="#2da44e" stroke-width="2.5" points="72.0,272.0 141.3,272.0 210.7,272.0 280.0,272.0 349.3,272.0 418.7,272.0 488.0,272.0 557.3,243.0 626.7,243.0 696.0,218.1"/>
 </svg>

@@ -4,21 +4,20 @@ Instantané du **2026-11-13**, calculé automatiquement depuis GitHub chaque sem
 
 ## Les jalons
 
-Débit des trois dernières semaines : **6.7** de charge par semaine. La fin prévue d'un jalon cumule le reste des jalons qui le précèdent.
+Débit des trois dernières semaines : **8.7** de charge par semaine. La fin prévue d'un jalon cumule le reste des jalons qui le précèdent.
 
 | Jalon | Terminé / total | Reste | Ajouté en cours | Fin prévue |
 |---|---|---|---|---|
-| J1 · Follow-up 2 (13/11) | 14 / 22 | 8 | 8 | 2026-11-22 |
-| J2 · Follow-up 3 (18/12) | 6 / 44 | 38 | 0 | 2027-01-01 |
-| J3 · Gel du MVP (21/01) | 0 / 35 | 35 | 0 | 2027-02-07 |
-| J4 · Oral et rendu (05-07/02) | 0 / 4 | 4 | 0 | 2027-02-11 |
-| S2 · Après le MVP | 0 / 3 | 3 | 0 | 2027-02-14 |
+| J1 · Follow-up 2 (13/11) | 20 / 25 | 5 | 11 | 2026-11-18 |
+| J2 · Follow-up 3 (18/12) | 6 / 44 | 38 | 0 | 2026-12-18 |
+| J3 · Gel du MVP (21/01) | 0 / 35 | 35 | 0 | 2027-01-15 |
+| J4 · Oral et rendu (05-07/02) | 0 / 4 | 4 | 0 | 2027-01-19 |
+| S2 · Après le MVP | 0 / 3 | 3 | 0 | 2027-01-21 |
 
 ## À surveiller
 
-- La fin prévue du MVP (2027-02-11) est après son échéance (2027-02-07).
-- J1 · Follow-up 2 (13/11) : 8 de charge ajoutée en cours de jalon (36 %, seuil 10 %).
-- 8 ticket(s) sans mouvement depuis 14 jours.
+- J1 · Follow-up 2 (13/11) : 11 de charge ajoutée en cours de jalon (44 %, seuil 10 %).
+- 7 ticket(s) sans mouvement depuis 14 jours.
 
 ## Avancement
 
@@ -37,8 +36,8 @@ Chaque point est la fin prévue du MVP calculée cette semaine-là (reste divis�
 | Indicateur | Valeur |
 |---|---|
 | Temps de cycle médian (premier commit → fusion) | 0.1 j |
-| Âge du plus vieux ticket en cours | 16.9 j |
-| Tickets sans mouvement depuis 14 jours | 8 |
+| Âge du plus vieux ticket en cours | 17.1 j |
+| Tickets sans mouvement depuis 14 jours | 7 |
 | Délai médian avant la première relecture | — |
 | PR fusionnées relues par une autre personne | 0 % |
 
@@ -46,14 +45,14 @@ Chaque point est la fin prévue du MVP calculée cette semaine-là (reste divis�
 
 | Indicateur | Valeur |
 |---|---|
-| Tests (unité / widget / intégration / SQL) | 188 / 9 / 1 / 82 |
+| Tests (unité / widget / intégration / SQL) | 197 / 9 / 1 / 82 |
 | Couverture du code de l'app (`lib/`) | 88 % |
 | CI verte sur 4 semaines | 100 % |
 
 ## Contenu
 
 - Pins rédigés / relus / publiés : 0 / 0 / 0 (cible : 7 à 10)
-- Modèle 3D : trouve
+- Modèle 3D : droits
 
 ## Semaine par semaine
 
@@ -68,7 +67,7 @@ Chaque point est la fin prévue du MVP calculée cette semaine-là (reste divis�
 | 2026-10-29 | 97 | 0 | 97 | 0.0 | — | 2 | 0 | 100 % |
 | 2026-11-05 | 103 | 14 | 89 | 4.7 | 2027-03-19 | 6 | 14 | 100 % |
 | 2026-11-12 | 103 | 14 | 89 | 4.7 | 2027-03-26 | 0 | 0 | — |
-| 2026-11-13 | 105 | 20 | 85 | 6.7 | 2027-02-11 | 4 | 6 | 100 % |
+| 2026-11-13 | 108 | 26 | 82 | 8.7 | 2027-01-19 | 6 | 12 | 100 % |
 
 ## Limites connues
 
