@@ -11,4 +11,4 @@ part 'catalogue_provider.g.dart';
 /// Catalogue des parcours publiés (D3.2).
 @riverpod
 Future<Result<List<ParcoursCatalogue>>> catalogue(Ref ref) =>
-    throw UnimplementedError();
+    ref.watch(parcoursRepositoryProvider).catalogue();

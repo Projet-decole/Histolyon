@@ -52,4 +52,4 @@ final class CatalogueProvider
   }
 }
 
-String _$catalogueHash() => r'7096ee45e2c97502c040910320ad6360ad34d6c1';
+String _$catalogueHash() => r'6415e642549eb34b1317b93d76e1fe40f3ace1c4';
