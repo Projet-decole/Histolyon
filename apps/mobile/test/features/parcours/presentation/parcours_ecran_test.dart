@@ -73,10 +73,62 @@ void main() {
     expect(find.textContaining('Aucun parcours'), findsOneWidget);
   });
 
-  testWidgets('une erreur affiche un message, sans planter', (tester) async {
-    await _afficher(tester, () async => const Err(ReseauFailure()));
+  testWidgets('une erreur affiche un message et « Réessayer » relance', (
+    tester,
+  ) async {
+    var appels = 0;
+    await _afficher(tester, () async {
+      appels++;
+      return appels == 1
+          ? const Err(ReseauFailure())
+          : Ok([parcoursFactice(slug: 'canuts', titre: 'Les canuts')]);
+    });
 
     expect(find.textContaining('n’a pas pu être chargé'), findsOneWidget);
+
+    await tester.tap(find.text('Réessayer'));
+    await tester.pumpAndSettle();
+
+    expect(appels, 2);
+    expect(find.text('Les canuts'), findsOneWidget);
+    expect(find.textContaining('n’a pas pu être chargé'), findsNothing);
+  });
+
+  testWidgets('chaque carte a son bouton « Découvrir »', (tester) async {
+    await _afficher(
+      tester,
+      () async => Ok([
+        parcoursFactice(slug: 'canuts', titre: 'Les canuts'),
+        parcoursFactice(slug: 'vieux-lyon', titre: 'Le Vieux Lyon'),
+      ]),
+    );
+
+    expect(find.text('Découvrir'), findsNWidgets(2));
+    await tester.tap(find.text('Découvrir').first);
+    await tester.pumpAndSettle();
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('sans durée ni distance, la carte affiche le reste', (
+    tester,
+  ) async {
+    await _afficher(
+      tester,
+      () async => Ok([
+        parcoursFactice(
+          slug: 'court',
+          titre: 'Court',
+          dureeMinutes: null,
+          distanceMetres: null,
+          etapes: 2,
+        ),
+      ]),
+    );
+
+    expect(find.text('Court'), findsOneWidget);
+    expect(find.text('2 ét.'), findsOneWidget);
+    expect(find.textContaining('km'), findsNothing);
+    expect(find.textContaining('min'), findsNothing);
   });
 
   testWidgets('pendant le chargement, un indicateur s’affiche', (tester) async {
@@ -96,5 +148,38 @@ void main() {
 
     expect(find.byType(CircularProgressIndicator), findsOneWidget);
     await tester.pumpAndSettle();
+  });
+
+  testWidgets('petit écran et texte à 200 % : aucun débordement', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(320, 640);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          catalogueProvider.overrideWith(
+            (ref) async => Ok([
+              parcoursFactice(
+                slug: 'long',
+                titre: 'Un parcours au titre particulièrement long',
+              ),
+            ]),
+          ),
+        ],
+        child: const MediaQuery(
+          data: MediaQueryData(
+            size: Size(320, 640),
+            textScaler: TextScaler.linear(2),
+          ),
+          child: MaterialApp(home: ParcoursEcran()),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(tester.takeException(), isNull);
   });
 }

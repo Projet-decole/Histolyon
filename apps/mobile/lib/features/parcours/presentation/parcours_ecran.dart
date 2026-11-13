@@ -14,39 +14,71 @@ class ParcoursEcran extends ConsumerWidget {
     final catalogue = ref.watch(catalogueProvider);
     return Scaffold(
       backgroundColor: TOK_COLOR_FOND_PRINCIPAL,
-      appBar: AppBar(
-        title: const Text('Parcours'),
-        backgroundColor: TOK_COLOR_FOND_PRINCIPAL,
+      body: SafeArea(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(
+                TOK_SPACE_LG,
+                TOK_SPACE_XL,
+                TOK_SPACE_LG,
+                TOK_SPACE_SM,
+              ),
+              child: Semantics(
+                header: true,
+                child: Text(
+                  'Parcours',
+                  style: TOK_TYPO_DISPLAY_XL.copyWith(
+                    color: TOK_COLOR_TEXTE_PRINCIPAL,
+                  ),
+                ),
+              ),
+            ),
+            Expanded(
+              child: switch (catalogue) {
+                AsyncValue(value: Ok(:final value)) when value.isEmpty =>
+                  const _Message(
+                    'Aucun parcours publié pour l’instant. Revenez bientôt.',
+                  ),
+                AsyncValue(value: Ok(:final value)) => ListView.separated(
+                  padding: const EdgeInsets.all(TOK_SPACE_LG),
+                  itemCount: value.length,
+                  separatorBuilder: (_, _) =>
+                      const SizedBox(height: TOK_SPACE_LG),
+                  itemBuilder: (_, i) => _CarteParcours(
+                    parcours: value[i],
+                    // Préparé : la fiche parcours (D3.3) fait l'objet d'une
+                    // autre issue ; « Découvrir » ne mène nulle part pour
+                    // l'instant.
+                    onDecouvrir: () {},
+                  ),
+                ),
+                AsyncValue(isLoading: true) => const Center(
+                  child: CircularProgressIndicator(),
+                ),
+                AsyncValue(value: Err()) || AsyncError() => _Message(
+                  'Le catalogue n’a pas pu être chargé.',
+                  action: OutlinedButton(
+                    onPressed: () => ref.invalidate(catalogueProvider),
+                    child: const Text('Réessayer'),
+                  ),
+                ),
+                _ => const SizedBox.shrink(),
+              },
+            ),
+          ],
+        ),
       ),
-      body: switch (catalogue) {
-        AsyncData(value: Ok(:final value)) when value.isEmpty => const _Message(
-          'Aucun parcours publié pour l’instant. Revenez bientôt.',
-        ),
-        AsyncData(value: Ok(:final value)) => ListView.separated(
-          padding: const EdgeInsets.all(TOK_SPACE_LG),
-          itemCount: value.length,
-          separatorBuilder: (_, _) => const SizedBox(height: TOK_SPACE_LG),
-          itemBuilder: (_, i) => _CarteParcours(
-            parcours: value[i],
-            // Préparé : la fiche parcours (D3.3) fait l'objet d'une autre
-            // issue ; le tap ne mène nulle part pour l'instant.
-            onOuvrir: () {},
-          ),
-        ),
-        AsyncData(value: Err()) || AsyncError() => const _Message(
-          'Le catalogue n’a pas pu être chargé. Réessayez plus tard.',
-        ),
-        _ => const Center(child: CircularProgressIndicator()),
-      },
     );
   }
 }
 
 class _CarteParcours extends StatelessWidget {
-  const _CarteParcours({required this.parcours, required this.onOuvrir});
+  const _CarteParcours({required this.parcours, required this.onDecouvrir});
 
   final ParcoursCatalogue parcours;
-  final VoidCallback onOuvrir;
+  final VoidCallback onDecouvrir;
 
   @override
   Widget build(BuildContext context) {
@@ -54,71 +86,95 @@ class _CarteParcours extends StatelessWidget {
     final duree = p.dureeEstimeeMinutes;
     final distance = p.distanceEstimeeMetres;
     final teaser = p.teaserNarratif;
-    return Material(
-      color: TOK_COLOR_BLANC_NARRATIF,
-      borderRadius: BorderRadius.circular(TOK_RADIUS_LG),
-      clipBehavior: Clip.antiAlias,
-      child: InkWell(
-        onTap: onOuvrir,
-        child: Padding(
-          padding: const EdgeInsets.all(TOK_SPACE_LG),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
+    return Container(
+      decoration: BoxDecoration(
+        color: TOK_COLOR_BLANC_NARRATIF,
+        borderRadius: BorderRadius.circular(TOK_RADIUS_LG),
+        boxShadow: const [TOK_SHADOW_SM],
+      ),
+      padding: const EdgeInsets.all(TOK_SPACE_LG),
+      child: Semantics(
+        container: true,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              p.titre,
+              style: TOK_TYPO_DISPLAY_MD.copyWith(
+                color: TOK_COLOR_TEXTE_PRINCIPAL,
+              ),
+            ),
+            const SizedBox(height: TOK_SPACE_SM),
+            Wrap(
+              spacing: TOK_SPACE_MD,
+              runSpacing: TOK_SPACE_XS,
+              children: [
+                if (duree != null)
+                  _Metadonnee(Icons.schedule, formaterDuree(duree)),
+                if (distance != null)
+                  _Metadonnee(Icons.route_outlined, formaterDistance(distance)),
+                _Metadonnee(
+                  Icons.signpost_outlined,
+                  '${parcours.nombreEtapes} ét.',
+                  semantique: '${parcours.nombreEtapes} étapes',
+                ),
+              ],
+            ),
+            if (teaser != null && teaser.isNotEmpty) ...[
+              const SizedBox(height: TOK_SPACE_SM),
               Text(
-                p.titre,
-                style: TOK_TYPO_DISPLAY_MD.copyWith(
+                teaser,
+                style: TOK_TYPO_BODY_MD.copyWith(
                   color: TOK_COLOR_TEXTE_PRINCIPAL,
                 ),
               ),
-              const SizedBox(height: TOK_SPACE_SM),
-              Wrap(
-                spacing: TOK_SPACE_LG,
-                runSpacing: TOK_SPACE_XS,
-                children: [
-                  if (duree != null)
-                    _Metadonnee(Icons.schedule, formaterDuree(duree)),
-                  if (distance != null)
-                    _Metadonnee(
-                      Icons.route_outlined,
-                      formaterDistance(distance),
-                    ),
-                  _Metadonnee(
-                    Icons.signpost_outlined,
-                    '${parcours.nombreEtapes} ét.',
-                    semantique: '${parcours.nombreEtapes} étapes',
-                  ),
-                ],
-              ),
-              if (teaser != null && teaser.isNotEmpty) ...[
-                const SizedBox(height: TOK_SPACE_SM),
-                Text(
-                  teaser,
-                  style: TOK_TYPO_BODY_MD.copyWith(
-                    color: TOK_COLOR_TEXTE_PRINCIPAL,
+            ],
+            const SizedBox(height: TOK_SPACE_MD),
+            Wrap(
+              spacing: TOK_SPACE_SM,
+              runSpacing: TOK_SPACE_XS,
+              children: [
+                // Texte toujours lisible (contraste AA) ; seule l'icône
+                // porte la couleur de provenance.
+                parcours.estCommunautaire
+                    ? const _Tag(
+                        'Communautaire',
+                        icone: Icons.groups_outlined,
+                        couleurIcone: TOK_COLOR_PIN_COMMUNAUTAIRE,
+                        couleurTexte: TOK_COLOR_TEXTE_SECONDAIRE,
+                      )
+                    : const _Tag(
+                        'Éditorial',
+                        icone: Icons.verified_outlined,
+                        couleurIcone: TOK_COLOR_PIN_EDITORIAL,
+                        couleurTexte: TOK_COLOR_PRIMARY_FONCE,
+                      ),
+                for (final e in parcours.epoques)
+                  _Tag(e.libelle, couleurTexte: TOK_COLOR_TEXTE_SECONDAIRE),
+              ],
+            ),
+            const SizedBox(height: TOK_SPACE_LG),
+            SizedBox(
+              width: double.infinity,
+              child: FilledButton(
+                onPressed: onDecouvrir,
+                style: FilledButton.styleFrom(
+                  backgroundColor: TOK_COLOR_PRIMARY,
+                  foregroundColor: TOK_COLOR_BLANC_NARRATIF,
+                  textStyle: TOK_TYPO_UI_LG,
+                  padding: const EdgeInsets.all(TOK_SPACE_LG),
+                  alignment: Alignment.centerLeft,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(TOK_RADIUS_MD),
                   ),
                 ),
-              ],
-              const SizedBox(height: TOK_SPACE_MD),
-              Wrap(
-                spacing: TOK_SPACE_SM,
-                runSpacing: TOK_SPACE_XS,
-                children: [
-                  _Tag(
-                    parcours.estCommunautaire ? 'Communautaire' : 'Éditorial',
-                    icone: parcours.estCommunautaire
-                        ? Icons.groups_outlined
-                        : Icons.verified_outlined,
-                    couleur: parcours.estCommunautaire
-                        ? TOK_COLOR_PIN_COMMUNAUTAIRE
-                        : TOK_COLOR_PRIMARY_FONCE,
-                  ),
-                  for (final e in parcours.epoques)
-                    _Tag(e.libelle, couleur: TOK_COLOR_TEXTE_SECONDAIRE),
-                ],
+                child: Text(
+                  'Découvrir',
+                  semanticsLabel: 'Découvrir ${p.titre}',
+                ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -134,11 +190,13 @@ String formaterDuree(int minutes) {
   return '$h h ${m.toString().padLeft(2, '0')}';
 }
 
-/// « 2,4 km », « 800 m ».
+/// « 800 m », « 2,4 km », « 2 km » (arrondi au dixième, demi vers le haut).
 String formaterDistance(int metres) {
   if (metres < 1000) return '$metres m';
-  final km = (metres / 1000).toStringAsFixed(1).replaceAll('.', ',');
-  return '${km.endsWith(',0') ? km.substring(0, km.length - 2) : km} km';
+  final dixiemes = (metres + 50) ~/ 100;
+  final entiers = dixiemes ~/ 10;
+  final reste = dixiemes % 10;
+  return reste == 0 ? '$entiers km' : '$entiers,$reste km';
 }
 
 class _Metadonnee extends StatelessWidget {
@@ -155,10 +213,12 @@ class _Metadonnee extends StatelessWidget {
       children: [
         Icon(icone, size: TOK_SPACE_LG, color: TOK_COLOR_TEXTE_SECONDAIRE),
         const SizedBox(width: TOK_SPACE_XS),
-        Text(
-          texte,
-          semanticsLabel: semantique,
-          style: TOK_TYPO_UI_MD.copyWith(color: TOK_COLOR_TEXTE_SECONDAIRE),
+        Flexible(
+          child: Text(
+            texte,
+            semanticsLabel: semantique,
+            style: TOK_TYPO_UI_SM.copyWith(color: TOK_COLOR_TEXTE_SECONDAIRE),
+          ),
         ),
       ],
     );
@@ -166,11 +226,17 @@ class _Metadonnee extends StatelessWidget {
 }
 
 class _Tag extends StatelessWidget {
-  const _Tag(this.texte, {required this.couleur, this.icone});
+  const _Tag(
+    this.texte, {
+    required this.couleurTexte,
+    this.icone,
+    this.couleurIcone,
+  });
 
   final String texte;
-  final Color couleur;
+  final Color couleurTexte;
   final IconData? icone;
+  final Color? couleurIcone;
 
   @override
   Widget build(BuildContext context) {
@@ -187,10 +253,15 @@ class _Tag extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           if (icone != null) ...[
-            Icon(icone, size: TOK_SPACE_LG, color: couleur),
+            Icon(icone, size: TOK_SPACE_LG, color: couleurIcone),
             const SizedBox(width: TOK_SPACE_XS),
           ],
-          Text(texte, style: TOK_TYPO_UI_SM.copyWith(color: couleur)),
+          Flexible(
+            child: Text(
+              texte,
+              style: TOK_TYPO_UI_MD.copyWith(color: couleurTexte),
+            ),
+          ),
         ],
       ),
     );
@@ -198,19 +269,32 @@ class _Tag extends StatelessWidget {
 }
 
 class _Message extends StatelessWidget {
-  const _Message(this.texte);
+  const _Message(this.texte, {this.action});
 
   final String texte;
+  final Widget? action;
 
   @override
   Widget build(BuildContext context) {
+    final action = this.action;
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(TOK_SPACE_XL),
-        child: Text(
-          texte,
-          textAlign: TextAlign.center,
-          style: TOK_TYPO_BODY_MD.copyWith(color: TOK_COLOR_TEXTE_SECONDAIRE),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              texte,
+              textAlign: TextAlign.center,
+              style: TOK_TYPO_BODY_MD.copyWith(
+                color: TOK_COLOR_TEXTE_SECONDAIRE,
+              ),
+            ),
+            if (action != null) ...[
+              const SizedBox(height: TOK_SPACE_LG),
+              action,
+            ],
+          ],
         ),
       ),
     );

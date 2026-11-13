@@ -1,5 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 
+import 'package:mobile/core/models/failure.dart';
+
 import 'package:mobile/features/parcours/data/parcours_repository.dart';
 
 import '../fixtures.dart';
@@ -38,4 +40,15 @@ void main() {
     expect(p.epoques, isEmpty);
     expect(p.estCommunautaire, isFalse);
   });
+
+  test(
+    'sans Supabase configuré, catalogue() renvoie un Err, sans exception',
+    () async {
+      final repository = ParcoursRepository(
+        () => throw StateError('Supabase non initialisé'),
+      );
+
+      expect(await repository.catalogue(), isA<Err<List<ParcoursCatalogue>>>());
+    },
+  );
 }

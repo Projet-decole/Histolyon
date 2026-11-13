@@ -31,7 +31,12 @@ void main() {
     await tester.tap(find.text('Parcours'));
     await tester.pumpAndSettle();
 
+    // Sans Supabase configuré (cas de ce test, comme du MVP sur contenu
+    // embarqué), le catalogue affiche son message d'erreur sans planter.
     expect(find.byType(ParcoursEcran), findsOneWidget);
+    expect(find.textContaining('n’a pas pu être chargé'), findsOneWidget);
+    expect(find.text('Réessayer'), findsOneWidget);
+    expect(tester.takeException(), isNull);
   });
 
   // Écrans plein écran : ouverts par pushNamed pour garder les onglets

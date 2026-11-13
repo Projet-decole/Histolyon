@@ -55,4 +55,4 @@ final class ParcoursRepositoryProvider
 }
 
 String _$parcoursRepositoryHash() =>
-    r'e323aac83c6783e73e13e2491aade7a6e3239e78';
+    r'19297ef5e3cc72778859a4fb05695830aa2780b6';

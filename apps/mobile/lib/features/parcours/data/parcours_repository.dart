@@ -50,19 +50,23 @@ final class ParcoursCatalogue {
       parcours.provenance == PROVENANCE_PARCOURS.communautaire;
 }
 
-/// Lit le catalogue des parcours publiés dans Supabase (D3.2). La RLS ne
-/// laisse voir au public que les parcours publiés ; le filtre `statut` le
-/// garantit aussi pour un membre de l'équipe.
+/// Lit le catalogue des parcours publiés dans Supabase (D3.2). La RLS laisse
+/// aussi voir certains parcours non publiés (communautaires en revue,
+/// brouillons de l'auteur) : le filtre `statut` est donc nécessaire.
+///
+/// Le client est obtenu à l'appel, dans le `try` : sans Supabase configuré
+/// (démarrage sur le contenu embarqué, DEC-04), son accès lève une erreur
+/// qui devient un `Err`, jamais une exception qui échappe au `Result`.
 class ParcoursRepository {
   ParcoursRepository(this._client);
 
-  final SupabaseClient _client;
+  final SupabaseClient Function() _client;
 
   /// Parcours publiés : éditoriaux puis communautaires (ordre de l'enum
   /// `provenance_parcours`), puis par titre.
   Future<Result<List<ParcoursCatalogue>>> catalogue() async {
     try {
-      final lignes = await _client
+      final lignes = await _client()
           .from(Parcours.table_name)
           .select('*, parcours_epoque(epoque(*)), etape(count)')
           .eq(Parcours.c_statut, 'publie')
@@ -81,4 +85,4 @@ class ParcoursRepository {
 
 @riverpod
 ParcoursRepository parcoursRepository(Ref ref) =>
-    ParcoursRepository(ref.watch(supabaseClientProvider));
+    ParcoursRepository(() => ref.read(supabaseClientProvider));
