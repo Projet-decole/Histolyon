@@ -11,6 +11,9 @@ on:
     # Chaque vendredi à 6 h UTC, avant le créneau hebdomadaire.
     - cron: "0 6 * * 5"
   workflow_dispatch:
+  # ESSAI TEMPORAIRE (#126), retiré avant la relecture.
+  push:
+    branches: [126-suivi-historique]
 
 permissions:
   contents: write
