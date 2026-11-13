@@ -22,7 +22,10 @@ void main() {
 
     test('listes à puces', () {
       final html = markdownVersHtml('- un\n- **deux**\n\nfin');
-      expect(html, contains('<ul><li>un</li><li><strong>deux</strong></li></ul>'));
+      expect(
+        html,
+        contains('<ul><li>un</li><li><strong>deux</strong></li></ul>'),
+      );
       expect(html, contains('<p>fin</p>'));
     });
 

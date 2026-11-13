@@ -2,7 +2,7 @@ name: suivi
 
 # Suivi hebdomadaire (ticket #126) : calcule l'instantané des indicateurs
 # depuis GitHub (`tools/suivi.dart`) et publie la vue client (page Markdown,
-# graphiques SVG, série hebdomadaire, instantanés bruts) sur la branche
+# graphiques SVG, rapport PDF, série hebdomadaire, instantanés bruts) sur la branche
 # `suivi`. Ne touche jamais `main`. La vue interne (détail par personne) est
 # calculée mais jamais publiée : seul `build/suivi/publique/` est copié.
 
@@ -43,6 +43,11 @@ jobs:
         working-directory: apps/mobile
         continue-on-error: true
         run: flutter test --coverage
+
+      # Mise en PDF du rapport client (#181). Sans weasyprint, le suivi est
+      # quand même publié, sans PDF.
+      - name: Installer weasyprint
+        run: sudo apt-get update -q && sudo apt-get install -y -q weasyprint fonts-dejavu-core
 
       - name: Calculer l'instantané et l'historique
         env:
