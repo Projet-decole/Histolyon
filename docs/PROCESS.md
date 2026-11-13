@@ -59,7 +59,7 @@ Les indicateurs sont **calculés** depuis GitHub (tickets, PR, CI) et le contenu
 
 Seuils qui déclenchent une action : date prévue après la date du jalon, plateau de deux semaines, ajouts de périmètre au-delà de 10 % de la charge du jalon, PR sans relecture depuis plus de 5 jours, ticket sans commit depuis plus de 14 jours. Deux vues : une **vue client** (agrégée, pour les follow-ups) et une **vue interne** (détail par personne, générée en local, jamais publiée).
 
-*État : `dart run tools/suivi.dart` calcule l'instantané du jour et l'écrit dans `build/suivi/` (vue publique `instantane-AAAA-MM-JJ.json`, vue interne `interne-AAAA-MM-JJ.json`, jamais commitée). L'historique, les graphiques et la publication de la vue client sur la branche `suivi` sont le ticket suivant (#126). Le script `tools/report.dart` est l'ancien rapport : ses chiffres ne sont pas fiables.*
+*État : `dart run tools/suivi.dart` calcule l'instantané du jour et la série hebdomadaire depuis le 17/09, et écrit dans `build/suivi/` la vue publique `instantane-AAAA-MM-JJ.json`, la vue interne `interne-AAAA-MM-JJ.json` (jamais commitée ni publiée) et la vue client complète dans `build/suivi/publique/`. Le workflow `suivi` (chaque vendredi, ou à la demande depuis l'onglet Actions) publie cette vue client sur la branche `suivi` : sa page `README.md` montre les jalons, les alertes, le burn-up, la fin prévue du MVP semaine après semaine et le flux. Avant le 26/10/2026, la série est reconstituée avec les charges et jalons actuels (voir « Limites connues » sur la page).*
 
 ## Le tableau de projet
 
