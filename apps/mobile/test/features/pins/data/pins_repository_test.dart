@@ -97,6 +97,12 @@ void main() {
     },
   );
 
+  test('un pin porte le libellé de son époque (chip d\'époque)', () async {
+    final repo = PinsRepository(_ChargeurFactice(_contenu()));
+    final res = await repo.pinParSlug('pin-a') as Ok<Pin>;
+    expect(res.value.epoqueLibelles, ['Première']);
+  });
+
   test('pinParSlug inconnu -> Err(ValidationFailure)', () async {
     final repo = PinsRepository(_ChargeurFactice(_contenu()));
     final res = await repo.pinParSlug('nope');
