@@ -1,6 +1,7 @@
 // Suivi hebdomadaire (ticket #125) : calcule un instantané des indicateurs de
-// `docs/PROCESS.md` depuis GitHub (tickets, PR, CI) et le dépôt local (tests,
-// couverture, contributions), sans aucune saisie.
+// `docs/PROCESS.md` depuis GitHub (tickets, PR, CI, contributions par login)
+// et le dépôt local (tests, couverture), sans aucune saisie. La date prévue
+// d'un jalon cumule le reste des jalons d'échéance antérieure.
 //
 // Usage : dart run tools/suivi.dart [--depot Projet-decole/Histolyon]
 //                                   [--sortie build/suivi]
@@ -55,24 +56,27 @@ Map<String, String> _fichiersDeTests() {
   return contenus;
 }
 
-/// Contributions des quatre dernières semaines (`git shortlog`), par nom.
-Map<String, int> _contributions() {
-  final r = Process.runSync('git', [
-    'shortlog',
-    '-sn',
-    '--since=4.weeks.ago',
-    'HEAD',
-  ]);
-  if (r.exitCode != 0) return {};
-  final contributions = <String, int>{};
-  for (final ligne in (r.stdout as String).split('\n')) {
-    final m = RegExp(r'^\s*(\d+)\s+(.+)$').firstMatch(ligne);
-    if (m != null) {
-      contributions[m.group(2)!] =
-          (contributions[m.group(2)!] ?? 0) + int.parse(m.group(1)!);
-    }
+/// Contributions des quatre dernières semaines sur la branche par défaut,
+/// par login GitHub (voir `contributionsDepuisCommits`).
+Future<Map<String, int>> _contributions(
+  String depot,
+  DateTime maintenant,
+) async {
+  final depuis = maintenant
+      .subtract(const Duration(days: 28))
+      .toIso8601String();
+  // Pages lues une à une : `gh api --paginate --slurp` n'existe pas dans
+  // toutes les versions de `gh`.
+  final commits = <dynamic>[];
+  for (var page = 1; ; page++) {
+    final lot = await _gh([
+      'api',
+      'repos/$depot/commits?since=$depuis&per_page=100&page=$page',
+    ]) as List;
+    commits.addAll(lot);
+    if (lot.length < 100) break;
   }
-  return contributions;
+  return contributionsDepuisCommits(commits);
 }
 
 Future<void> main(List<String> args) async {
@@ -140,16 +144,19 @@ Future<void> main(List<String> args) async {
   final flux = fluxEnCours(tickets, prs, maintenant);
 
   final lcov = File('apps/mobile/coverage/lcov.info');
-  final contributions = _contributions();
+  final contributions = await _contributions(depot, maintenant);
+  final datesPrevues = datesPrevuesCumulees(
+    charges: charges,
+    echeances: echeancesJalons(jalons),
+    debit: debit,
+    maintenant: maintenant,
+  );
 
   final publique = instantane(
     date: maintenant,
     charges: charges,
     debit: debit,
-    datePrevueJalon: {
-      for (final e in charges.entries)
-        e.key: datePrevue(e.value.restante, debit, maintenant),
-    },
+    datePrevueJalon: datesPrevues,
     tempsCycleJours: tempsCycleMedianJours(prs, maintenant),
     ageMaxEnCoursJours: flux.ageMaxJours,
     sansMouvement: flux.sansMouvement,
@@ -179,13 +186,13 @@ Future<void> main(List<String> args) async {
   stdout.writeln(
     'Suivi du $jour (débit : ${debit.toStringAsFixed(1)} par semaine)',
   );
-  for (final e in charges.entries) {
-    final c = e.value;
+  for (final e in datesPrevues.entries) {
+    final c = charges[e.key]!;
     final pct = c.total == 0 ? 0 : (c.terminee / c.total * 100).round();
-    final prevue = datePrevue(c.restante, debit, maintenant);
+    final prevue = e.value;
     stdout.writeln(
       '  ${e.key} : ${c.terminee}/${c.total} (${pct} %), reste ${c.restante}, '
-      'ajouté ${c.ajoutee}, fin prévue '
+      'ajouté ${c.ajoutee}, fin prévue (cumulée) '
       '${prevue == null ? 'inconnue (débit nul)' : prevue.toIso8601String().substring(0, 10)}',
     );
   }

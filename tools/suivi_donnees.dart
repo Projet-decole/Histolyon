@@ -69,6 +69,29 @@ Map<String, DateTime> ouverturesJalons(
         .add(Duration(days: toleranceJours)),
 };
 
+/// Échéance de chaque jalon (clé = titre), ou `null` s'il n'en a pas.
+Map<String, DateTime?> echeancesJalons(List<dynamic> jalons) => {
+  for (final j in jalons) (j as Map)['title'] as String: _date(j['due_on']),
+};
+
+/// Nombre de commits par personne, depuis la liste des commits de l'API
+/// GitHub : regroupés par login, pour qu'une même personne ne soit pas
+/// comptée deux fois quand ses commits portent des noms git différents
+/// (commit local et squash merge fait sur GitHub). Repli sur le nom git si
+/// le commit n'est rattaché à aucun compte.
+Map<String, int> contributionsDepuisCommits(List<dynamic> commits) {
+  final contributions = <String, int>{};
+  for (final c in commits) {
+    final login = ((c as Map)['author'] as Map?)?['login'] as String?;
+    final nom =
+        login ??
+        (((c['commit'] as Map?)?['author'] as Map?)?['name'] as String?) ??
+        '?';
+    contributions[nom] = (contributions[nom] ?? 0) + 1;
+  }
+  return contributions;
+}
+
 /// Pourcentage de lignes couvertes par les tests, pour les fichiers de `lib/`
 /// hors code généré (`*.g.dart`), ou `null` s'il n'y en a aucun.
 double? couvertureLcov(String lcov) {

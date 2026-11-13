@@ -136,6 +136,32 @@ DateTime? datePrevue(int restante, double debit, DateTime maintenant) {
   return maintenant.add(Duration(days: (restante / debit * 7).ceil()));
 }
 
+/// Date prévue de chaque jalon, en cumulant le reste des jalons d'échéance
+/// antérieure : un jalon ne finit qu'après ceux qui le précèdent. Les jalons
+/// sont rendus dans l'ordre de leur échéance ; un jalon sans échéance (S2)
+/// vient après tous les autres.
+Map<String, DateTime?> datesPrevuesCumulees({
+  required Map<String, ChargesJalon> charges,
+  required Map<String, DateTime?> echeances,
+  required double debit,
+  required DateTime maintenant,
+}) {
+  final jalons = charges.keys.toList()
+    ..sort((a, b) {
+      final ea = echeances[a], eb = echeances[b];
+      if (ea == null && eb == null) return a.compareTo(b);
+      if (ea == null) return 1;
+      if (eb == null) return -1;
+      final c = ea.compareTo(eb);
+      return c != 0 ? c : a.compareTo(b);
+    });
+  var cumul = 0;
+  return {
+    for (final jalon in jalons)
+      jalon: datePrevue(cumul += charges[jalon]!.restante, debit, maintenant),
+  };
+}
+
 double? mediane(List<double> valeurs) {
   if (valeurs.isEmpty) return null;
   final triees = [...valeurs]..sort();
