@@ -6,6 +6,7 @@
 // Usage : dart run tools/suivi.dart [--depot Projet-decole/Histolyon]
 //                                   [--sortie build/suivi]
 //                                   [--depuis 2026-09-17]
+//                                   [--client suivi-client] [--sans-pdf]
 //
 // Écrit dans le dossier de sortie :
 // - `instantane-AAAA-MM-JJ.json` : vue publique (client), sans aucun détail
@@ -27,6 +28,7 @@ import 'suivi_calculs.dart';
 import 'suivi_donnees.dart';
 import 'suivi_historique.dart';
 import 'suivi_page.dart';
+import 'suivi_pdf.dart';
 
 Future<Object?> _gh(List<String> args) async {
   final r = await Process.run('gh', args);
@@ -246,6 +248,45 @@ Future<void> main(List<String> args) async {
     ),
   );
 
+  // Les PDF du dossier `suivi-client/` (#181) : le rapport du jour (vue
+  // client seulement) et la feuille de route client. Le rapport va aussi dans
+  // `publique/`, que le workflow publie sur la branche `suivi`.
+  final pdfs = <String>[];
+  if (!args.contains('--sans-pdf')) {
+    final client = Directory(_option(args, '--client', 'suivi-client'))
+      ..createSync(recursive: true);
+    final page = File('$dossierPublic/README.md').readAsStringSync();
+    final rapport = documentA4(
+      titre: 'HistoLyon — suivi du $jour',
+      corps: markdownVersHtml(
+        page,
+        images: {
+          for (final nom in ['burnup.svg', 'date-prevue.svg', 'flux.svg'])
+            nom: File('$dossierPublic/$nom').readAsStringSync(),
+        },
+      ),
+    );
+    final cible = '${client.path}/rapport-suivi-$jour.pdf';
+    if (await htmlVersPdf(rapport, cible)) {
+      File(cible).copySync('$dossierPublic/rapport-suivi-$jour.pdf');
+      pdfs.add(cible);
+      final feuille = File('${client.path}/feuille-de-route.md');
+      if (feuille.existsSync()) {
+        final cibleFeuille = '${client.path}/feuille-de-route.pdf';
+        final html = documentA4(
+          titre: 'HistoLyon — feuille de route du MVP',
+          corps: markdownVersHtml(feuille.readAsStringSync()),
+        );
+        if (await htmlVersPdf(html, cibleFeuille)) pdfs.add(cibleFeuille);
+      }
+    } else {
+      stderr.writeln(
+        'PDF non produits : weasyprint est introuvable ou a échoué '
+        '(installer : sudo apt-get install weasyprint). Le suivi est écrit.',
+      );
+    }
+  }
+
   stdout.writeln(
     'Suivi du $jour (débit : ${debit.toStringAsFixed(1)} par semaine)',
   );
@@ -261,6 +302,9 @@ Future<void> main(List<String> args) async {
   }
   for (final a in aSurveiller) {
     stdout.writeln('  ⚠ $a');
+  }
+  for (final pdf in pdfs) {
+    stdout.writeln('PDF écrit : $pdf');
   }
   stdout.writeln(
     'Fichiers écrits dans ${sortie.path}/ (vue client : $dossierPublic/)',
