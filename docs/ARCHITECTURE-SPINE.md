@@ -44,12 +44,12 @@ Le recadrage autour du MVP (voir `DECISIONS.md`, phase 6) change le statut de pl
 | AD-14 Tests d'abord, par couche | En vigueur | Pour la logique ; les critères de fin d'une capacité servent de tests d'acceptation |
 | AD-15 Documentation en quatre niveaux | Remplacée | `produit/` pour le produit, `AGENTS.md` unique (importé par `CLAUDE.md`) |
 | AD-16 Trois environnements, migrations sérialisées | Second semestre | Le MVP est un APK de démo |
-| AD-17 Avancement calculé depuis GitHub | En vigueur, redéfinie | Indicateurs et seuils dans `PROCESS.md` |
+| AD-17 Avancement calculé depuis GitHub | En vigueur, redéfinie | Indicateurs et seuils dans `PROCESS.md`. Calcul : `tools/suivi.dart` ; vue client publiée chaque vendredi sur la branche `suivi`. `tools/report` et `docs/sprint/` n'existent plus. |
 | AD-18 Rôles en casquettes tournantes | Abandonnée | Équipe réduite ; voir `PROCESS.md` |
 | AD-19 Enveloppe Supabase gratuite | Second semestre | |
 | AD-20 État de session = liste fermée | En vigueur | |
 
-La section « Structural Seed » plus bas décrit la structure visée au moment du bootstrap. Plusieurs éléments qu'elle cite n'existent pas ou plus : `packages/ui_kit`, `tools/tiles`, `riverpod_lint`, `nightly-e2e`, `tools/sync_agents`, les copies Cursor et Copilot, `conception/INDEX.md`, `docs/ORGANISATION.md` (archivé). La structure réelle est décrite dans le `README.md` racine.
+La section « Structural Seed » plus bas décrit la structure visée au moment du bootstrap. Plusieurs éléments qu'elle cite n'existent pas ou plus : `packages/ui_kit`, `tools/tiles`, `riverpod_lint`, `nightly-e2e`, `tools/sync_agents`, les copies Cursor et Copilot, `conception/INDEX.md`, `docs/ORGANISATION.md` (archivé), `tools/report` et `docs/sprint/` (remplacés par `tools/suivi.dart` et la branche `suivi`). La structure réelle est décrite dans le `README.md` racine.
 
 ## Design Paradigm
 
