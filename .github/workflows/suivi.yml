@@ -1,0 +1,81 @@
+name: suivi
+
+# Suivi hebdomadaire (ticket #126) : calcule l'instantané des indicateurs
+# depuis GitHub (`tools/suivi.dart`) et publie la vue client (page Markdown,
+# graphiques SVG, série hebdomadaire, instantanés bruts) sur la branche
+# `suivi`. Ne touche jamais `main`. La vue interne (détail par personne) est
+# calculée mais jamais publiée : seul `build/suivi/publique/` est copié.
+
+on:
+  schedule:
+    # Chaque vendredi à 6 h UTC, avant le créneau hebdomadaire.
+    - cron: "0 6 * * 5"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  issues: read
+  pull-requests: read
+  actions: read
+
+concurrency:
+  group: suivi
+  cancel-in-progress: false
+
+jobs:
+  publier:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.47.4"
+          channel: "stable"
+
+      - run: flutter pub get
+
+      # La couverture est un indicateur, pas une condition : un test rouge
+      # ne doit pas empêcher la publication du suivi.
+      - name: Couverture de l'app
+        working-directory: apps/mobile
+        continue-on-error: true
+        run: flutter test --coverage
+
+      - name: Calculer l'instantané et l'historique
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: dart run tools/suivi.dart --sortie build/suivi
+
+      - name: Vérifier que la vue interne n'est pas dans la vue client
+        run: |
+          if find build/suivi/publique -name 'interne-*' | grep -q .; then
+            echo "::error::une vue interne se trouve dans build/suivi/publique"
+            exit 1
+          fi
+          if grep -rq 'contributions' build/suivi/publique; then
+            echo "::error::des contributions par personne sont dans la vue client"
+            exit 1
+          fi
+
+      - name: Publier sur la branche suivi
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if git ls-remote --exit-code --heads origin suivi > /dev/null; then
+            git fetch origin suivi
+            git worktree add -B suivi ../suivi origin/suivi
+          else
+            git worktree add --orphan -b suivi ../suivi
+          fi
+          cp -r build/suivi/publique/. ../suivi/
+          cd ../suivi
+          git add -A
+          if git diff --cached --quiet; then
+            echo "Rien de nouveau à publier."
+            exit 0
+          fi
+          git commit -m "chore(suivi): instantané du $(date -u +%F)"
+          git push origin HEAD:refs/heads/suivi

@@ -5,13 +5,18 @@
 //
 // Usage : dart run tools/suivi.dart [--depot Projet-decole/Histolyon]
 //                                   [--sortie build/suivi]
+//                                   [--depuis 2026-09-17]
 //
-// Écrit deux fichiers dans le dossier de sortie :
+// Écrit dans le dossier de sortie :
 // - `instantane-AAAA-MM-JJ.json` : vue publique (client), sans aucun détail
 //   par personne ;
-// - `interne-AAAA-MM-JJ.json` : vue interne (contributions par personne).
+// - `interne-AAAA-MM-JJ.json` : vue interne (contributions par personne) ;
+// - `publique/` : la vue client publiée par le workflow `suivi` sur la
+//   branche `suivi` (ticket #126) : `README.md`, `burnup.svg`,
+//   `date-prevue.svg`, `flux.svg`, `historique.json` (série hebdomadaire
+//   depuis `--depuis`) et `instantanes/instantane-AAAA-MM-JJ.json`.
 // Le dossier par défaut (`build/`) est ignoré par git : la vue interne ne doit
-// jamais être publiée, le dépôt est public.
+// jamais être publiée, et elle n'est jamais écrite dans `publique/`.
 //
 // Prérequis : l'outil `gh` connecté à GitHub.
 
@@ -20,6 +25,8 @@ import 'dart:io';
 
 import 'suivi_calculs.dart';
 import 'suivi_donnees.dart';
+import 'suivi_historique.dart';
+import 'suivi_page.dart';
 
 Future<Object?> _gh(List<String> args) async {
   final r = await Process.run('gh', args);
@@ -82,6 +89,9 @@ Future<Map<String, int>> _contributions(
 Future<void> main(List<String> args) async {
   final depot = _option(args, '--depot', 'Projet-decole/Histolyon');
   final sortie = Directory(_option(args, '--sortie', 'build/suivi'));
+  final depuis = DateTime.parse(
+    '${_option(args, '--depuis', '2026-09-17')}T00:00:00Z',
+  );
   final maintenant = DateTime.now().toUtc();
 
   final tickets = [
@@ -114,6 +124,23 @@ Future<void> main(List<String> args) async {
       '40',
       '--json',
       'number,author,headRefName,state,createdAt,mergedAt,commits,reviews',
+    ]) as List)
+      prDepuisJson(j as Map<String, dynamic>),
+  ];
+  // Toutes les PR fusionnées, sans commits ni relectures (requête légère),
+  // pour le flux de l'historique.
+  final prsFusionnees = [
+    for (final j in await _gh([
+      'pr',
+      'list',
+      '--repo',
+      depot,
+      '--state',
+      'merged',
+      '--limit',
+      '1000',
+      '--json',
+      'number,headRefName,state,createdAt,mergedAt',
     ]) as List)
       prDepuisJson(j as Map<String, dynamic>),
   ];
@@ -183,6 +210,42 @@ Future<void> main(List<String> args) async {
   File('${sortie.path}/interne-$jour.json')
       .writeAsStringSync('${encodeur.convert(interne)}\n');
 
+  final echeances = echeancesJalons(jalons);
+  final points = historique(
+    tickets: tickets,
+    prs: prsFusionnees,
+    runs: runs,
+    echeances: echeances,
+    dates: datesHebdomadaires(depuis, maintenant),
+  );
+  final fin = echeanceFinMvp(echeances);
+  final aSurveiller = alertes(
+    points: points,
+    echeanceFin: fin,
+    charges: charges,
+    sansMouvement: flux.sansMouvement,
+  );
+  final publiques = Directory('${sortie.path}/publique/instantanes')
+    ..createSync(recursive: true);
+  final dossierPublic = publiques.parent.path;
+  File('${publiques.path}/instantane-$jour.json')
+      .writeAsStringSync('${encodeur.convert(publique)}\n');
+  File('$dossierPublic/historique.json').writeAsStringSync(
+    '${encodeur.convert([for (final p in points) p.versJson()])}\n',
+  );
+  File('$dossierPublic/burnup.svg').writeAsStringSync(svgBurnUp(points));
+  File('$dossierPublic/date-prevue.svg')
+      .writeAsStringSync(svgDatePrevue(points, fin));
+  File('$dossierPublic/flux.svg').writeAsStringSync(svgFlux(points));
+  File('$dossierPublic/README.md').writeAsStringSync(
+    pageClient(
+      instantane: publique,
+      points: points,
+      echeanceFin: fin,
+      alertes: aSurveiller,
+    ),
+  );
+
   stdout.writeln(
     'Suivi du $jour (débit : ${debit.toStringAsFixed(1)} par semaine)',
   );
@@ -196,5 +259,10 @@ Future<void> main(List<String> args) async {
       '${prevue == null ? 'inconnue (débit nul)' : prevue.toIso8601String().substring(0, 10)}',
     );
   }
-  stdout.writeln('Fichiers écrits dans ${sortie.path}/');
+  for (final a in aSurveiller) {
+    stdout.writeln('  ⚠ $a');
+  }
+  stdout.writeln(
+    'Fichiers écrits dans ${sortie.path}/ (vue client : $dossierPublic/)',
+  );
 }
