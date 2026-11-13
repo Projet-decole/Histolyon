@@ -36,14 +36,14 @@ class FavorisRepository {
 
   final AppDatabase _db;
 
-  /// Favoris du terminal, les plus récents en tête (à date égale, ordre
-  /// stable par id).
+  /// Favoris du terminal, les plus récents en tête. `ajoute_le` est stocké à
+  /// la seconde : à date égale, le dernier inséré (rowid) passe devant.
   Future<Result<List<FavoriProfil>>> lister() async {
     try {
       final requete = _db.select(_db.favori)
         ..orderBy([
           (f) => OrderingTerm.desc(f.ajouteLe),
-          (f) => OrderingTerm.asc(f.id),
+          (f) => OrderingTerm.desc(f.rowId),
         ]);
       final lignes = await requete.get();
       return Ok([for (final l in lignes) _adapter(l)]);
@@ -72,7 +72,7 @@ class FavorisRepository {
 
   Result<T> _echec<T>(String operation, Object e, StackTrace pile) {
     _log.erreur(operation, e, pile);
-    return Err(InconnueFailure('Favoris indisponibles : $e'));
+    return const Err(InconnueFailure('Favoris indisponibles'));
   }
 }
 

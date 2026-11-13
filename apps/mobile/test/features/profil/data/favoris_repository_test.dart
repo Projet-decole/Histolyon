@@ -80,4 +80,25 @@ void main() {
     expect(await repository.lister(), isA<Err<List<FavoriProfil>>>());
     expect(await repository.retirer('f-recent'), isA<Err<void>>());
   });
+
+  test('à date égale, le dernier ajouté passe devant', () async {
+    await db.delete(db.favori).go();
+    for (final id in ['a-premier', 'z-second']) {
+      await db
+          .into(db.favori)
+          .insert(
+            FavoriCompanion.insert(
+              id: id,
+              profilId: 'p1',
+              typeDeCible: 'pin',
+              cibleId: id,
+              ajouteLe: DateTime.utc(2026, 11, 5, 12),
+            ),
+          );
+    }
+
+    final favoris = _liste(await repository.lister());
+
+    expect(favoris.map((f) => f.id), ['z-second', 'a-premier']);
+  });
 }

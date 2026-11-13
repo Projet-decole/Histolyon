@@ -22,13 +22,18 @@ class ProfilEcran extends ConsumerWidget {
         backgroundColor: TOK_COLOR_FOND_PRINCIPAL,
       ),
       body: switch (favoris) {
-        AsyncData(value: Ok(:final value)) when value.isEmpty =>
+        // `AsyncValue(value: …)` garde la dernière liste connue pendant une
+        // relecture (après un retrait en échec) : pas de clignotement.
+        AsyncValue(value: Ok(:final value)) when value.isEmpty =>
           const _FavorisVides(),
-        AsyncData(value: Ok(:final value)) => _ListeFavoris(favoris: value),
-        AsyncData(value: Err()) || AsyncError() => const _Message(
+        AsyncValue(value: Ok(:final value)) => _ListeFavoris(favoris: value),
+        AsyncValue(isLoading: true) => const Center(
+          child: CircularProgressIndicator(),
+        ),
+        AsyncValue(value: Err()) || AsyncError() => const _Message(
           'Vos favoris n’ont pas pu être lus. Réessayez plus tard.',
         ),
-        _ => const Center(child: CircularProgressIndicator()),
+        _ => const SizedBox.shrink(),
       },
     );
   }
@@ -57,9 +62,21 @@ class _ListeFavoris extends ConsumerWidget {
           _RangeeFavori(
             key: ValueKey(f.id),
             favori: f,
-            onRetirer: () => ref.read(favorisProvider.notifier).retirer(f.id),
+            onRetirer: () => _retirer(context, ref, f.id),
           ),
       ],
+    );
+  }
+}
+
+/// Retire le favori ; en cas d'échec, il revient dans la liste et un message
+/// éphémère le signale.
+Future<void> _retirer(BuildContext context, WidgetRef ref, String id) async {
+  final messager = ScaffoldMessenger.of(context);
+  final resultat = await ref.read(favorisProvider.notifier).retirer(id);
+  if (resultat is Err) {
+    messager.showSnackBar(
+      const SnackBar(content: Text('Le favori n’a pas pu être retiré.')),
     );
   }
 }
@@ -120,7 +137,7 @@ class _RangeeFavori extends StatelessWidget {
         ),
         trailing: IconButton(
           tooltip: 'Retirer des favoris',
-          icon: const Icon(Icons.favorite, color: TOK_COLOR_PRIMARY),
+          icon: const Icon(Icons.favorite_border, color: TOK_COLOR_PRIMARY),
           onPressed: onRetirer,
         ),
       ),
@@ -162,6 +179,18 @@ class _FavorisVides extends StatelessWidget {
             const SizedBox(height: TOK_SPACE_LG),
             OutlinedButton(
               onPressed: () => context.goNamed(RouteNames.carte),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: TOK_COLOR_PRIMARY,
+                side: const BorderSide(color: TOK_COLOR_PRIMARY),
+                textStyle: TOK_TYPO_UI_LG,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: TOK_SPACE_XL,
+                  vertical: TOK_SPACE_MD,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(TOK_RADIUS_MD),
+                ),
+              ),
               child: const Text('Explorer la carte'),
             ),
           ],

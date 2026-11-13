@@ -36,7 +36,7 @@ final class FavorisProvider
   Favoris create() => Favoris();
 }
 
-String _$favorisHash() => r'dbc5a382d4173341b868858fdbc25c047f750761';
+String _$favorisHash() => r'3f94289c0e5dc5488025f411e72c189bc7ac8d62';
 
 /// Liste des Favoris du Profil local (D6.2), les plus récents en tête.
 

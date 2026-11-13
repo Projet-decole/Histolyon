@@ -22,7 +22,7 @@ class Favoris extends _$Favoris {
       state = AsyncData(Ok([...value.where((f) => f.id != id)]));
     }
     final resultat = await ref.read(favorisRepositoryProvider).retirer(id);
-    if (resultat is Err) ref.invalidateSelf();
+    if (resultat is Err && ref.mounted) ref.invalidateSelf();
     return resultat;
   }
 }

@@ -22,6 +22,15 @@ class _RepositoryFactice implements FavorisRepository {
   }
 }
 
+/// Lit normalement mais échoue au retrait.
+class _RetraitEnEchec extends _RepositoryFactice {
+  _RetraitEnEchec(super.favoris);
+
+  @override
+  Future<Result<void>> retirer(String id) async =>
+      const Err(InconnueFailure('base verrouillée'));
+}
+
 class _RepositoryEnPanne implements FavorisRepository {
   @override
   Future<Result<List<FavoriProfil>>> lister() async =>
@@ -129,4 +138,24 @@ void main() {
 
     expect(find.textContaining('n’ont pas pu être lus'), findsOneWidget);
   });
+
+  testWidgets(
+    'un retrait en échec prévient l’utilisateur et le favori revient',
+    (tester) async {
+      await _afficher(tester, _RetraitEnEchec(_deuxFavoris()));
+
+      await tester.tap(find.byTooltip('Retirer des favoris').first);
+      await tester.pump();
+
+      // Pas de clignotement : jamais d'indicateur de chargement à la place
+      // de la liste pendant la relecture.
+      expect(find.byType(CircularProgressIndicator), findsNothing);
+
+      await tester.pumpAndSettle();
+
+      expect(find.text('Le favori n’a pas pu être retiré.'), findsOneWidget);
+      expect(find.textContaining('parcours-canuts'), findsOneWidget);
+      expect(find.text('2 favoris · les plus récents en tête'), findsOneWidget);
+    },
+  );
 }
