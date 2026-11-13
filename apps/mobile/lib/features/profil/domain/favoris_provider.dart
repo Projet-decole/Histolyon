@@ -11,8 +11,18 @@ part 'favoris_provider.g.dart';
 @riverpod
 class Favoris extends _$Favoris {
   @override
-  Future<Result<List<FavoriProfil>>> build() => throw UnimplementedError();
+  Future<Result<List<FavoriProfil>>> build() =>
+      ref.watch(favorisRepositoryProvider).lister();
 
-  /// Retire le Favori `id` et met la liste à jour.
-  Future<Result<void>> retirer(String id) => throw UnimplementedError();
+  /// Retire le Favori `id`. La liste est mise à jour tout de suite (un
+  /// élément glissé doit quitter l'arbre sans attendre la base) ; si la
+  /// suppression échoue, elle est relue pour refléter l'état réel.
+  Future<Result<void>> retirer(String id) async {
+    if (state.value case Ok(:final value)) {
+      state = AsyncData(Ok([...value.where((f) => f.id != id)]));
+    }
+    final resultat = await ref.read(favorisRepositoryProvider).retirer(id);
+    if (resultat is Err) ref.invalidateSelf();
+    return resultat;
+  }
 }
