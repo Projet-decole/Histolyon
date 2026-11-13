@@ -108,6 +108,46 @@ void main() {
     });
   });
 
+  group('echeancesJalons', () {
+    test('l\'échéance de chaque jalon, ou null s\'il n\'en a pas', () {
+      final echeances = echeancesJalons([
+        {'title': 'J1', 'due_on': '2026-11-13T00:00:00Z'},
+        {'title': 'S2', 'due_on': null},
+      ]);
+
+      expect(echeances['J1'], DateTime.utc(2026, 11, 13));
+      expect(echeances.containsKey('S2'), isTrue);
+      expect(echeances['S2'], isNull);
+    });
+  });
+
+  group('contributionsDepuisCommits', () {
+    test('regroupe par login GitHub, quel que soit le nom git', () {
+      final contributions = contributionsDepuisCommits([
+        {
+          'author': {'login': 'alice'},
+          'commit': {
+            'author': {'name': 'Alice Martin'},
+          },
+        },
+        {
+          'author': {'login': 'alice'},
+          'commit': {
+            'author': {'name': 'alice'},
+          },
+        },
+        {
+          'author': null,
+          'commit': {
+            'author': {'name': 'Sans Compte'},
+          },
+        },
+      ]);
+
+      expect(contributions, {'alice': 2, 'Sans Compte': 1});
+    });
+  });
+
   group('couvertureLcov', () {
     test('compte seulement les fichiers de lib/, hors code généré', () {
       const lcov = '''

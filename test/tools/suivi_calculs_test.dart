@@ -106,6 +106,42 @@ void main() {
     });
   });
 
+  group('dates prévues cumulées', () {
+    test('chaque jalon cumule le reste des jalons d\'échéance antérieure', () {
+      final dates = datesPrevuesCumulees(
+        charges: {
+          'J2': const ChargesJalon(total: 10, terminee: 6, ajoutee: 0),
+          'S2': const ChargesJalon(total: 2, terminee: 0, ajoutee: 0),
+          'J1': const ChargesJalon(total: 4, terminee: 0, ajoutee: 0),
+        },
+        echeances: {
+          'J1': DateTime.utc(2026, 11, 13),
+          'J2': DateTime.utc(2026, 12, 18),
+          'S2': null,
+        },
+        debit: 2,
+        maintenant: maintenant,
+      );
+
+      // Ordre chronologique, le jalon sans échéance en dernier.
+      expect(dates.keys, ['J1', 'J2', 'S2']);
+      expect(dates['J1'], maintenant.add(const Duration(days: 14))); // 4
+      expect(dates['J2'], maintenant.add(const Duration(days: 28))); // 4+4
+      expect(dates['S2'], maintenant.add(const Duration(days: 35))); // +2
+    });
+
+    test('sans débit, aucune date', () {
+      final dates = datesPrevuesCumulees(
+        charges: {'J1': const ChargesJalon(total: 4, terminee: 0, ajoutee: 0)},
+        echeances: {'J1': DateTime.utc(2026, 11, 13)},
+        debit: 0,
+        maintenant: maintenant,
+      );
+
+      expect(dates['J1'], isNull);
+    });
+  });
+
   group('temps de cycle', () {
     test('premier commit jusqu\'à la fusion, dans la fenêtre', () {
       final jours = tempsCycleMedianJours([
