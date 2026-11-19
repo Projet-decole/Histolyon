@@ -107,22 +107,22 @@ Entrée : position du slider, continue de 0,0 à 1,0. Les dix époques sont des 
 | vignettage | intensité relative | 0,0 à 1,0 |
 | contraste | facteur (1,0 = neutre) | 0,85 à 1,20 |
 
-Ancres (cibles **indicatives**, à calibrer sur la maquette, sauf « Aujourd’hui » définitive ; QO-804) :
+Ancres (cibles **indicatives**, à calibrer sur la maquette, sauf « XXIe siècle » définitive ; QO-804). Les positions et les valeurs suivent l’ordre du slider ; depuis DEC-111, la ligne 4 (Bas Moyen Âge) reprend l’apparence du Moyen Âge classique, en attendant le calibrage :
 
 | époque | position | température | saturation | grain | vignettage | contraste |
 |---|---|---|---|---|---|---|
-| EPQ-ANTIQUITE-ROMAINE | 0,00 | +800 | 0,55 | 0,70 | 0,50 | 0,95 |
+| EPQ-ANTIQUITE | 0,00 | +800 | 0,55 | 0,70 | 0,50 | 0,95 |
 | EPQ-HAUT-MOYEN-AGE | 0,10 | +600 | 0,30 | 0,60 | 0,70 | 1,05 |
-| EPQ-MOYEN-AGE | 0,25 | +700 | 0,65 | 0,60 | 0,40 | 1,00 |
-| EPQ-RENAISSANCE | 0,42 | +400 | 0,85 | 0,40 | 0,25 | 1,05 |
-| EPQ-EPOQUE-CLASSIQUE | 0,55 | -100 | 0,80 | 0,30 | 0,20 | 1,15 |
+| EPQ-MOYEN-AGE-CLASSIQUE | 0,25 | +700 | 0,65 | 0,60 | 0,40 | 1,00 |
+| EPQ-BAS-MOYEN-AGE | 0,42 | +700 | 0,65 | 0,60 | 0,40 | 1,00 |
+| EPQ-EPOQUE-MODERNE | 0,55 | -100 | 0,80 | 0,30 | 0,20 | 1,15 |
 | EPQ-REVOLUTION-EMPIRE | 0,65 | +300 | 0,65 | 0,45 | 0,30 | 1,20 |
 | EPQ-XIXE-SIECLE | 0,75 | +200 | 0,40 | 0,55 | 0,30 | 1,05 |
-| EPQ-SECONDE-GUERRE-MONDIALE | 0,85 | 0 | 0,10 | 0,65 | 0,35 | 1,15 |
+| EPQ-GUERRES-MONDIALES | 0,85 | 0 | 0,10 | 0,65 | 0,35 | 1,15 |
 | EPQ-XXE-SIECLE | 0,92 | +250 | 0,95 | 0,30 | 0,15 | 1,00 |
-| EPQ-AUJOURDHUI | 1,00 | 0 | 1,00 | 0,00 | 0,00 | 1,00 |
+| EPQ-XXIE-SIECLE | 1,00 | 0 | 1,00 | 0,00 | 0,00 | 1,00 |
 
-Entre deux ancres, l’interpolation est linéaire et toujours continue (aucun saut). Exceptions possibles, à valider visuellement : courbe `TOK-CRV-EASE-IN-OUT` sur le contraste entre l’époque classique et la Révolution-Empire, et sur la désaturation et le contraste entre le XIXe siècle et la Seconde Guerre mondiale. Le type de texture bascule par zone, sans interpolation : parchemin et aquarelle de 0,0 à 0,42, grain de film de 0,65 à 0,92, aucune texture de 0,92 à 1,0. Les profils d’apparence de chaque époque sont dans CARTE.md.
+Entre deux ancres, l’interpolation est linéaire et toujours continue (aucun saut). Exceptions possibles, à valider visuellement : courbe `TOK-CRV-EASE-IN-OUT` sur le contraste entre l’époque moderne et la Révolution-Empire, et sur la désaturation et le contraste entre le XIXe siècle et les guerres mondiales. Le type de texture bascule par zone, sans interpolation : parchemin et aquarelle de 0,0 à 0,42, grain de film de 0,65 à 0,92, aucune texture de 0,92 à 1,0. Les profils d’apparence de chaque époque sont dans CARTE.md.
 
 ## TOK-MAP-CONTEXTE-PARCOURS-VERS-PIN — Contexte de parcours vers le pin
 Modulation d’un pin selon son rôle dans le parcours actif (opacité, halo, saturation relative) :

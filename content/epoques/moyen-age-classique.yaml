@@ -1,0 +1,9 @@
+# Bornes et libellé validés par l'historienne (DEC-111, 13/11/2026).
+# Fin à 1328 : le fichier reçu indiquait 1492, ce qui recouvrait tout le Bas
+# Moyen Âge ; 1328 est son début (avènement des Valois).
+id: 112e5aae-b1ff-4951-b2a2-71560a541126
+slug: moyen_age_classique
+libelle: Moyen Âge classique
+borne_debut: 987
+borne_fin: 1328
+ordre: 3

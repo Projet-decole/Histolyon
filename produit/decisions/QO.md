@@ -59,7 +59,7 @@ Une question figure ici seulement si elle bloque encore une unité. Le détail (
 | QO-805 | Quelle forme prend l’animation de fin de parcours ? | groupe DESIGN |
 | QO-806 | Décélération ou ressort pour l’aperçu d’un pin et le calage du slider ? | groupe DESIGN |
 | QO-807 | Faut-il reconstruire le premier plan de l’icône Android ? | groupe DESIGN |
-| QO-808 | Quelle est la borne de fin d’« Aujourd’hui » ? | groupe DESIGN |
+| QO-808 | Quelle est la borne de fin du XXIe siècle ? | groupe DESIGN |
 | QO-809 | Que montre la section Profil au MVP ? | groupe DESIGN |
 | QO-810 | Quelle frame Figma sert de référence au parcours en cours ? | groupe DESIGN |
 | QO-601 | Quelle cible stocker pour une étape vue ? | groupe DONNEES |

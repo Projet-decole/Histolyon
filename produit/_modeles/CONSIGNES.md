@@ -28,7 +28,7 @@ Identifiants (nom de fichier = id + `.md`) :
   (ancien `historique_de_visite`, majuscules, `_` → `-`) · `INV-01` (ancien `I1`,
   deux chiffres) · `TOK-COLOR-…` (identique à l’ancien) · `TOK-MAP-…`, `TOK-CHO-…`,
   `TOK-TMP-…`, `TOK-DUR-…`, `TOK-CRV-…` (ancien préfixé par `TOK-`) · `ICN-CAT-…`,
-  `ICN-UI-…` (ancien `ICON-…` sans `ICON-`) · `EPQ-ANTIQUITE-ROMAINE` (slug de
+  `ICN-UI-…` (ancien `ICON-…` sans `ICON-`) · `EPQ-ANTIQUITE` (slug de
   `content/epoques/*.yaml`) · `MOD-M1…M9` · `SRF-S1…S3`, `SRF-P1…P3` · `DEC-nn` ·
   `QO-nnn` · `JAL-FU2`, `JAL-FU3`, `JAL-GEL`, `JAL-ORAL`, `JAL-RENDU`, `JAL-S2` ·
   `DOC-…` (documents transversaux).

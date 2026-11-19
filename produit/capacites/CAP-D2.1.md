@@ -38,7 +38,7 @@ R2. Un pin sans coordonnées existe mais ne s’affiche pas sur la carte (INV-09
 R3. La catégorie se lit par l’icône placée dans le pin, jamais par la seule couleur.
 R4. La couleur du pin porte la provenance : `TOK-COLOR-PIN-EDITORIAL` pour un pin éditorial, `TOK-COLOR-PIN-COMMUNAUTAIRE` pour un pin communautaire. Au MVP tous les pins sont éditoriaux.
 R5. Un pin communautaire en cours de vérification (INV-03) porte en plus le contour `TOK-COLOR-CONTOUR-VERIFICATION`. Règle prévue, sans effet au MVP.
-R6. Le slider d’époques (CAP-D1.2) détermine les pins visibles : seuls les pins de l’époque sélectionnée s’affichent. La règle de la vue « Aujourd’hui » (vue cumulée) appartient à CAP-D1.2.
+R6. Le slider d’époques (CAP-D1.2) détermine les pins visibles : seuls les pins de l’époque sélectionnée s’affichent. La règle de la vue « XXIe siècle » (vue cumulée) appartient à CAP-D1.2.
 R7. Contexte de parcours actif : le pin du parcours est renforcé, l’étape courante est nettement mise en relief, un pin hors parcours est atténué mais reste visible et tapable. Sans parcours actif, tous les pins sont à l’état normal.
 R8. Seule l’étape courante peut être animée ; aucun autre pin n’a d’animation permanente.
 R9. Au-dessous d’un niveau de zoom, les pins proches se regroupent en cluster (COMP-CLUSTER-DENSITE). L’étape courante d’un parcours actif n’est jamais absorbée par un cluster.
