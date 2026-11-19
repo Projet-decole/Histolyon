@@ -20,6 +20,7 @@ final class Pin {
     required this.titre,
     required this.categorie,
     required this.epoques,
+    required this.epoqueLibelles,
     required this.sources,
     required this.localisation,
     required this.teaser,
@@ -36,6 +37,9 @@ final class Pin {
 
   /// Slugs des époques.
   final List<String> epoques;
+
+  /// Libellés des époques connues du contenu (ex. « XIXe siècle »).
+  final List<String> epoqueLibelles;
   final List<SourceContenu> sources;
 
   /// Absente : le pin n'est pas affiché sur la carte (INV-09).
@@ -83,16 +87,18 @@ class PinsRepository {
     final categorie = contenu.categories
         .where((c) => c.slug == p.categorie)
         .firstOrNull;
-    final epoqueConnue = p.epoques.any(
-      (s) => contenu.epoques.any((e) => e.slug == s),
-    );
-    if (categorie == null || !epoqueConnue) return null;
+    final epoques = [
+      for (final s in p.epoques)
+        ?contenu.epoques.where((e) => e.slug == s).firstOrNull,
+    ];
+    if (categorie == null || epoques.isEmpty) return null;
     return Pin(
       id: p.id,
       slug: p.slug,
       titre: p.titre,
       categorie: categorie.libelle,
       epoques: p.epoques,
+      epoqueLibelles: [for (final e in epoques) e.libelle],
       sources: [
         for (final s in p.sources)
           ?contenu.sources.where((x) => x.slug == s).firstOrNull,

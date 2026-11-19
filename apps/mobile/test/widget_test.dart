@@ -47,7 +47,7 @@ void main() {
       ).pushNamed(RouteNames.pin, pathParameters: {'slug': 'cour-des-voraces'});
       await tester.pumpAndSettle();
 
-      expect(find.text('cour-des-voraces'), findsOneWidget);
+      expect(find.text('La Cour des Voraces'), findsOneWidget);
       expect(find.byType(NavigationBar), findsNothing);
 
       await tester.tap(find.byType(BackButton));
