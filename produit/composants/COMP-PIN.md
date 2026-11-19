@@ -39,7 +39,7 @@ Règles de cumul : étape courante et déjà visité, la mise en relief prime su
 TOK-COLOR-PIN-EDITORIAL, TOK-COLOR-PIN-COMMUNAUTAIRE, TOK-COLOR-CONTOUR-VERIFICATION, TOK-SHADOW-MD, TOK-MAP-CONTEXTE-PARCOURS-VERS-PIN, TOK-MAP-DEJA-VISITE-VERS-PIN.
 
 ## Interactions natives
-Visibilité selon l’époque sélectionnée (sur « Aujourd’hui », les pins de toutes les époques sont cumulés). Le contexte de parcours suit le parcours en cours. Le long appui de la source n’est pas retenu.
+Visibilité selon l’époque sélectionnée (sur « XXIe siècle », les pins de toutes les époques sont cumulés). Le contexte de parcours suit le parcours en cours. Le long appui de la source n’est pas retenu.
 
 ## Remarque Figma
 Aucun nœud référencé.

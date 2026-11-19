@@ -38,7 +38,7 @@ R3. À la relâche, l’apparence se cale exactement sur celle de l’époque s�
 R4. Les pins restent visibles et touchables sous toutes les apparences : la lisibilité des pins prime sur la fidélité d’époque.
 R5. L’apparence suit l’époque : la personne ne peut pas la personnaliser.
 R6. Il n’y a qu’un seul fichier de tuiles et un seul style ; seules les valeurs paramétriques changent (DEC-06).
-R7. « Aujourd’hui » est l’apparence de base neutre, y compris en vue cumulée ; les autres s’en écartent (TOK-MAP-SLIDER-VERS-AXES-CARTE).
+R7. « XXIe siècle » (dernière époque, DEC-111) est l’apparence de base neutre, y compris en vue cumulée ; les autres s’en écartent (TOK-MAP-SLIDER-VERS-AXES-CARTE).
 R8. Le contraste entre pins et fond reste suffisant sur toutes les apparences (couleurs : DEC-12).
 
 ## États et cas limites

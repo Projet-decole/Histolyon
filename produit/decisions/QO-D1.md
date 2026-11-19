@@ -17,4 +17,4 @@ Bloque : l’accessibilité de CAP-D1.2 pour les personnes à déficience motric
 Bloque : la composition de ECR-CARTE-APERCU-PIN. La source prévoit la vignette si un média existe ; DEC-03 écarte les images d’archives. Faut-il une image de couverture au MVP ? Unité : ECR-CARTE-APERCU-PIN. Source : conception/07-ecrans/carte/02-apercu-pin.yaml:28.
 
 ## QO-105 — Époque sélectionnée par défaut au lancement
-Bloque : l’état nominal de ECR-CARTE-PRINCIPALE (« époque par défaut » non définie ; « Aujourd’hui » est la candidate naturelle, vue cumulée). Unité : CAP-D1.2, ECR-CARTE-PRINCIPALE. Source : conception/07-ecrans/carte/01-principale.yaml:48.
+Bloque : l’état nominal de ECR-CARTE-PRINCIPALE (« époque par défaut » non définie ; « XXIe siècle », dernière époque, est la candidate naturelle, vue cumulée). Unité : CAP-D1.2, ECR-CARTE-PRINCIPALE. Source : conception/07-ecrans/carte/01-principale.yaml:48.

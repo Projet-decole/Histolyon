@@ -29,8 +29,8 @@ titre: "[DÉMO FICTIVE] Le dragon mécanique du quai"
 categorie: anecdote
 
 epoques:
-  - moyen_age
-  - aujourd_hui
+  - moyen_age_classique
+  - xxie_siecle
 
 sources:
   - demo-archive-fictive

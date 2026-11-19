@@ -27,7 +27,7 @@ Navigateur temporel : un glissé continu interpole le fond de la carte, le relâ
 - Transitions : repos vers glissé au contact de la poignée ; glissé vers calage au relâchement ; calage vers repos à l’époque ancrée la plus proche. Repos vers pilotage automatique quand un parcours impose une époque. Le contact de la poignée l’emporte sur le pilotage automatique (DEC-07).
 
 ## Composition
-- `epoque_courante` (1), `dates_courantes` (1) : COMP-LIBELLE-TEXTE. Les 10 époques viennent des fichiers `content/epoques/*.yaml`, à valider par l’historienne (DEC-08).
+- `epoque_courante` (1), `dates_courantes` (1) : COMP-LIBELLE-TEXTE. Les 10 époques viennent des fichiers `content/epoques/*.yaml`, validées par l’historienne (DEC-111).
 
 ## Tokens
 TOK-MAP-SLIDER-VERS-AXES-CARTE, TOK-CHO-CALAGE-EPOQUE, TOK-CHO-PILOTAGE-AUTOMATIQUE-EPOQUE, TOK-TMP-THROTTLE-DRAG-SLIDER.

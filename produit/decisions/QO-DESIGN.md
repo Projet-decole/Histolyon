@@ -17,7 +17,7 @@ Bloque : l’état nominal de ECR-CARTE-PRINCIPALE (DEC-21 fixe seulement le cen
 Bloque : la limite de déplacement de la carte (CAP-D1.1) et la vérification que Bellecour y figure. Le document d’architecture note que l’emprise et la taille réelles (estimées à moins de 150 Mo) restent à mesurer. Unité : CARTE.md. Source : `docs/ARCHITECTURE-SPINE.md:336`.
 
 ## QO-804 — Qui calibre les ancres d’apparence de la carte, et quand ?
-Bloque : le rendu final de CAP-D1.3. Les 50 valeurs (10 ancres, 5 axes) sont des cibles indicatives ; seule « Aujourd’hui » est définitive. La plage de positions entre 0,42 et 0,65 n’a pas de type de texture défini. Unités : MOUVEMENT.md (TOK-MAP-SLIDER-VERS-AXES-CARTE), CARTE.md. Source : `conception/11-reponse-parametrique/04-mappings-parametriques.yaml:60`.
+Bloque : le rendu final de CAP-D1.3. Les 50 valeurs (10 ancres, 5 axes) sont des cibles indicatives ; seule « XXIe siècle » est définitive. La plage de positions entre 0,42 et 0,65 n’a pas de type de texture défini. Unités : MOUVEMENT.md (TOK-MAP-SLIDER-VERS-AXES-CARTE), CARTE.md. Source : `conception/11-reponse-parametrique/04-mappings-parametriques.yaml:60`.
 
 ## QO-805 — Quelle forme prend l’animation de fin de parcours ?
 Bloque : l’état d’arrivée de ECR-PARCOURS-FIN-CELEBRATION. La source hésite entre confettis, expansion radiale et simple révélation du récapitulatif. Unité : MOUVEMENT.md (TOK-CHO-FIN-PARCOURS). Source : `conception/11-reponse-parametrique/03-chorégraphies.yaml:435`.
@@ -28,8 +28,8 @@ Ne bloque pas : la valeur par défaut (décélération) est appliquée. La conce
 ## QO-807 — Faut-il reconstruire le premier plan de l’icône Android ?
 Bloque : la production de l’icône adaptative si la chaîne de construction exige deux couches. Le premier plan a été retiré de la maquette. Unité : MARQUE.md. Source : `conception/15-maquette.md:157`.
 
-## QO-808 — Quelle est la borne de fin d’« Aujourd’hui » ?
-Ne bloque pas : la valeur 2026 est l’année courante, provisoire, à rafraîchir (le schéma impose une fin). Même question pour la borne de début (2000). Unité : CARTE.md (EPQ-AUJOURDHUI). Source : `content/epoques/aujourdhui.yaml:1`.
+## QO-808 — Quelle est la borne de fin du XXIe siècle ?
+Ne bloque pas : la valeur 2027 (année du rendu, choisie par l’historienne, DEC-111) est provisoire, le schéma impose une fin. Le début (2000) est validé. Unité : CARTE.md (EPQ-XXIE-SIECLE). Source : `content/epoques/xxie-siecle.yaml:1`.
 
 ## QO-809 — Que montre la section Profil au MVP ?
 Bloque : l’écran principal du profil et ICN-UI-SECTION-PROFIL. Le sélecteur de sections prévoit trois entrées, mais la feuille de route range « profil et compte » dans le second semestre. Unité : SURFACES.md (SRF-S3). Sources : `conception/05-architecture-info.yaml:335`, `produit/FEUILLE-DE-ROUTE.md`.

@@ -1,0 +1,9 @@
+# Bornes et libellé validés par l'historienne (DEC-111, 13/11/2026).
+# Dernière position du slider : vue cumulée, apparence neutre (CAP-D1.2 R7).
+# La fin est provisoire (QO-808), le schéma impose une borne.
+id: d428b876-df1e-4876-94de-e6190d65223d
+slug: xxie_siecle
+libelle: XXIe siècle
+borne_debut: 2000
+borne_fin: 2027
+ordre: 10

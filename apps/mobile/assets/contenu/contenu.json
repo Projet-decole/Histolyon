@@ -3,9 +3,9 @@
   "epoques": [
     {
       "id": "d67a8516-9938-470f-bf0c-e3d682b88d25",
-      "slug": "antiquite_romaine",
+      "slug": "antiquite",
       "libelle": "Antiquité",
-      "borne_debut": -43,
+      "borne_debut": -680,
       "borne_fin": 476,
       "ordre": 1
     },
@@ -19,32 +19,32 @@
     },
     {
       "id": "112e5aae-b1ff-4951-b2a2-71560a541126",
-      "slug": "moyen_age",
-      "libelle": "Moyen Âge",
+      "slug": "moyen_age_classique",
+      "libelle": "Moyen Âge classique",
       "borne_debut": 987,
-      "borne_fin": 1492,
+      "borne_fin": 1328,
       "ordre": 3
     },
     {
-      "id": "969b55a2-a27b-4577-a8c2-9d33df1aff2a",
-      "slug": "renaissance",
-      "libelle": "Renaissance",
-      "borne_debut": 1492,
-      "borne_fin": 1610,
+      "id": "858f3dd0-1384-433d-aa7f-a1d0df518fc5",
+      "slug": "bas_moyen_age",
+      "libelle": "Bas Moyen Âge",
+      "borne_debut": 1328,
+      "borne_fin": 1492,
       "ordre": 4
     },
     {
-      "id": "5851f015-6ac5-4e49-8aec-cd5741ce077d",
-      "slug": "epoque_classique",
-      "libelle": "Époque classique",
-      "borne_debut": 1610,
+      "id": "969b55a2-a27b-4577-a8c2-9d33df1aff2a",
+      "slug": "epoque_moderne",
+      "libelle": "Époque moderne",
+      "borne_debut": 1492,
       "borne_fin": 1789,
       "ordre": 5
     },
     {
       "id": "2389c86f-7215-41cb-8f7a-cb4d953239c1",
       "slug": "revolution_empire",
-      "libelle": "Révolution et Empire",
+      "libelle": "Révolution et Ier Empire",
       "borne_debut": 1789,
       "borne_fin": 1815,
       "ordre": 6
@@ -54,14 +54,14 @@
       "slug": "xixe_siecle",
       "libelle": "XIXe siècle",
       "borne_debut": 1815,
-      "borne_fin": 1939,
+      "borne_fin": 1914,
       "ordre": 7
     },
     {
       "id": "913c33d0-d7c8-4880-a9dd-84c5302af43d",
-      "slug": "seconde_guerre_mondiale",
-      "libelle": "Seconde Guerre mondiale",
-      "borne_debut": 1939,
+      "slug": "guerres_mondiales",
+      "libelle": "Guerres mondiales",
+      "borne_debut": 1914,
       "borne_fin": 1945,
       "ordre": 8
     },
@@ -75,10 +75,10 @@
     },
     {
       "id": "d428b876-df1e-4876-94de-e6190d65223d",
-      "slug": "aujourd_hui",
-      "libelle": "Aujourd'hui",
+      "slug": "xxie_siecle",
+      "libelle": "XXIe siècle",
       "borne_debut": 2000,
-      "borne_fin": 2026,
+      "borne_fin": 2027,
       "ordre": 10
     }
   ],

@@ -23,7 +23,7 @@ La personne déplace ou zoome la carte, ou fait glisser le slider d’époques.
 1. Déplacement ou zoom : la carte se recadre dans l’emprise ; les pins visibles suivent l’époque sélectionnée.
 2. Glissement du slider (CAP-D1.2) : l’apparence de la carte évolue progressivement (CAP-D1.3) et l’année courante est lisible.
 3. Relâche : l’époque se cale sur la plus proche du catalogue (INV-07, TOK-CHO-CALAGE-EPOQUE) ; les pins de cette époque se chargent, pas pendant le geste.
-4. Sur « Aujourd’hui », tous les pins de toutes les époques sont visibles.
+4. Sur « XXIe siècle », tous les pins de toutes les époques sont visibles.
 
 ## Bifurcations
 - Tap sur un pin → ECR-CARTE-APERCU-PIN ; fermeture → retour à la carte.
