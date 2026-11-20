@@ -15,30 +15,32 @@
 <text x="66.0" y="104.0" dy="4" text-anchor="end" fill="#8c959f">32</text>
 <line x1="72.0" y1="48.0" x2="696.0" y2="48.0" stroke="#d0d7de" stroke-width="1"/>
 <text x="66.0" y="48.0" dy="4" text-anchor="end" fill="#8c959f">43</text>
-<text x="103.2" y="290.0" text-anchor="middle" fill="#8c959f">09-17</text>
-<text x="228.0" y="290.0" text-anchor="middle" fill="#8c959f">10-01</text>
-<text x="352.8" y="290.0" text-anchor="middle" fill="#8c959f">10-15</text>
-<text x="477.6" y="290.0" text-anchor="middle" fill="#8c959f">10-29</text>
-<text x="602.4" y="290.0" text-anchor="middle" fill="#8c959f">11-12</text>
-<text x="664.8" y="290.0" text-anchor="middle" fill="#8c959f">11-13</text>
-<rect class="barre" x="81.4" y="272.0" width="20.8" height="0.0" fill="#1f6feb"/>
-<rect class="barre" x="103.2" y="272.0" width="20.8" height="0.0" fill="#2da44e"/>
-<rect class="barre" x="143.8" y="48.0" width="20.8" height="224.0" fill="#1f6feb"/>
-<rect class="barre" x="165.6" y="272.0" width="20.8" height="0.0" fill="#2da44e"/>
-<rect class="barre" x="206.2" y="266.8" width="20.8" height="5.2" fill="#1f6feb"/>
-<rect class="barre" x="228.0" y="272.0" width="20.8" height="0.0" fill="#2da44e"/>
-<rect class="barre" x="268.6" y="272.0" width="20.8" height="0.0" fill="#1f6feb"/>
-<rect class="barre" x="290.4" y="272.0" width="20.8" height="0.0" fill="#2da44e"/>
-<rect class="barre" x="331.0" y="272.0" width="20.8" height="0.0" fill="#1f6feb"/>
-<rect class="barre" x="352.8" y="272.0" width="20.8" height="0.0" fill="#2da44e"/>
-<rect class="barre" x="393.4" y="272.0" width="20.8" height="0.0" fill="#1f6feb"/>
-<rect class="barre" x="415.2" y="272.0" width="20.8" height="0.0" fill="#2da44e"/>
-<rect class="barre" x="455.8" y="261.6" width="20.8" height="10.4" fill="#1f6feb"/>
-<rect class="barre" x="477.6" y="272.0" width="20.8" height="0.0" fill="#2da44e"/>
-<rect class="barre" x="518.2" y="240.7" width="20.8" height="31.3" fill="#1f6feb"/>
-<rect class="barre" x="540.0" y="199.1" width="20.8" height="72.9" fill="#2da44e"/>
-<rect class="barre" x="580.6" y="272.0" width="20.8" height="0.0" fill="#1f6feb"/>
-<rect class="barre" x="602.4" y="272.0" width="20.8" height="0.0" fill="#2da44e"/>
-<rect class="barre" x="643.0" y="240.7" width="20.8" height="31.3" fill="#1f6feb"/>
-<rect class="barre" x="664.8" y="209.5" width="20.8" height="62.5" fill="#2da44e"/>
+<text x="100.4" y="290.0" text-anchor="middle" fill="#8c959f">09-17</text>
+<text x="213.8" y="290.0" text-anchor="middle" fill="#8c959f">10-01</text>
+<text x="327.3" y="290.0" text-anchor="middle" fill="#8c959f">10-15</text>
+<text x="440.7" y="290.0" text-anchor="middle" fill="#8c959f">10-29</text>
+<text x="554.2" y="290.0" text-anchor="middle" fill="#8c959f">11-12</text>
+<text x="667.6" y="290.0" text-anchor="middle" fill="#8c959f">11-20</text>
+<rect class="barre" x="80.5" y="272.0" width="18.9" height="0.0" fill="#1f6feb"/>
+<rect class="barre" x="100.4" y="272.0" width="18.9" height="0.0" fill="#2da44e"/>
+<rect class="barre" x="137.2" y="48.0" width="18.9" height="224.0" fill="#1f6feb"/>
+<rect class="barre" x="157.1" y="272.0" width="18.9" height="0.0" fill="#2da44e"/>
+<rect class="barre" x="194.0" y="266.8" width="18.9" height="5.2" fill="#1f6feb"/>
+<rect class="barre" x="213.8" y="272.0" width="18.9" height="0.0" fill="#2da44e"/>
+<rect class="barre" x="250.7" y="272.0" width="18.9" height="0.0" fill="#1f6feb"/>
+<rect class="barre" x="270.5" y="272.0" width="18.9" height="0.0" fill="#2da44e"/>
+<rect class="barre" x="307.4" y="272.0" width="18.9" height="0.0" fill="#1f6feb"/>
+<rect class="barre" x="327.3" y="272.0" width="18.9" height="0.0" fill="#2da44e"/>
+<rect class="barre" x="364.1" y="272.0" width="18.9" height="0.0" fill="#1f6feb"/>
+<rect class="barre" x="384.0" y="272.0" width="18.9" height="0.0" fill="#2da44e"/>
+<rect class="barre" x="420.9" y="261.6" width="18.9" height="10.4" fill="#1f6feb"/>
+<rect class="barre" x="440.7" y="272.0" width="18.9" height="0.0" fill="#2da44e"/>
+<rect class="barre" x="477.6" y="240.7" width="18.9" height="31.3" fill="#1f6feb"/>
+<rect class="barre" x="497.5" y="199.1" width="18.9" height="72.9" fill="#2da44e"/>
+<rect class="barre" x="534.3" y="272.0" width="18.9" height="0.0" fill="#1f6feb"/>
+<rect class="barre" x="554.2" y="272.0" width="18.9" height="0.0" fill="#2da44e"/>
+<rect class="barre" x="591.1" y="240.7" width="18.9" height="31.3" fill="#1f6feb"/>
+<rect class="barre" x="610.9" y="209.5" width="18.9" height="62.5" fill="#2da44e"/>
+<rect class="barre" x="647.8" y="261.6" width="18.9" height="10.4" fill="#1f6feb"/>
+<rect class="barre" x="667.6" y="261.6" width="18.9" height="10.4" fill="#2da44e"/>
 </svg>

@@ -99,14 +99,25 @@
     "ci_verte_semaine_pct": null
   },
   {
-    "date": "2026-11-13",
+    "date": "2026-11-19",
     "perimetre": 108,
     "terminee": 26,
     "restante": 82,
     "debit_3sem": 8.666666666666666,
-    "date_prevue": "2027-01-19",
+    "date_prevue": "2027-01-25",
     "pr_fusionnees_semaine": 6,
     "charge_terminee_semaine": 12,
+    "ci_verte_semaine_pct": 100.0
+  },
+  {
+    "date": "2026-11-20",
+    "perimetre": 109,
+    "terminee": 26,
+    "restante": 83,
+    "debit_3sem": 7.0,
+    "date_prevue": "2027-02-11",
+    "pr_fusionnees_semaine": 2,
+    "charge_terminee_semaine": 2,
     "ci_verte_semaine_pct": 100.0
   }
 ]

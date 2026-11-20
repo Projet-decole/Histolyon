@@ -1,23 +1,24 @@
 # Suivi du projet — vue client
 
-Instantané du **2026-11-13**, calculé automatiquement depuis GitHub chaque semaine par `tools/suivi.dart` (workflow `suivi`). Ne pas éditer à la main. Les définitions sont celles de `docs/PROCESS.md` (§ Le suivi).
+Instantané du **2026-11-20**, calculé automatiquement depuis GitHub chaque semaine par `tools/suivi.dart` (workflow `suivi`). Ne pas éditer à la main. Les définitions sont celles de `docs/PROCESS.md` (§ Le suivi).
 
 ## Les jalons
 
-Débit des trois dernières semaines : **8.7** de charge par semaine. La fin prévue d'un jalon cumule le reste des jalons qui le précèdent.
+Débit des trois dernières semaines : **7.0** de charge par semaine. La fin prévue d'un jalon cumule le reste des jalons qui le précèdent.
 
 | Jalon | Terminé / total | Reste | Ajouté en cours | Fin prévue |
 |---|---|---|---|---|
-| J1 · Follow-up 2 (13/11) | 20 / 25 | 5 | 11 | 2026-11-18 |
-| J2 · Follow-up 3 (18/12) | 6 / 44 | 38 | 0 | 2026-12-18 |
-| J3 · Gel du MVP (21/01) | 0 / 35 | 35 | 0 | 2027-01-15 |
-| J4 · Oral et rendu (05-07/02) | 0 / 4 | 4 | 0 | 2027-01-19 |
-| S2 · Après le MVP | 0 / 3 | 3 | 0 | 2027-01-21 |
+| J1 · Follow-up 2 (13/11) | 20 / 25 | 5 | 11 | 2026-11-25 |
+| J2 · Follow-up 3 (18/12) | 6 / 45 | 39 | 1 | 2027-01-03 |
+| J3 · Gel du MVP (21/01) | 0 / 35 | 35 | 0 | 2027-02-07 |
+| J4 · Oral et rendu (05-07/02) | 0 / 4 | 4 | 0 | 2027-02-11 |
+| S2 · Après le MVP | 0 / 3 | 3 | 0 | 2027-02-14 |
 
 ## À surveiller
 
+- La fin prévue du MVP (2027-02-11) est après son échéance (2027-02-07).
 - J1 · Follow-up 2 (13/11) : 11 de charge ajoutée en cours de jalon (44 %, seuil 10 %).
-- 7 ticket(s) sans mouvement depuis 14 jours.
+- 13 ticket(s) sans mouvement depuis 14 jours.
 
 ## Avancement
 
@@ -35,18 +36,18 @@ Chaque point est la fin prévue du MVP calculée cette semaine-là (reste divis�
 
 | Indicateur | Valeur |
 |---|---|
-| Temps de cycle médian (premier commit → fusion) | 0.1 j |
-| Âge du plus vieux ticket en cours | 17.1 j |
-| Tickets sans mouvement depuis 14 jours | 7 |
-| Délai médian avant la première relecture | — |
-| PR fusionnées relues par une autre personne | 0 % |
+| Temps de cycle médian (premier commit → fusion) | 0.0 j |
+| Âge du plus vieux ticket en cours | 24.1 j |
+| Tickets sans mouvement depuis 14 jours | 13 |
+| Délai médian avant la première relecture | 6.2 j |
+| PR fusionnées relues par une autre personne | 3 % |
 
 ## Qualité
 
 | Indicateur | Valeur |
 |---|---|
-| Tests (unité / widget / intégration / SQL) | 197 / 9 / 1 / 82 |
-| Couverture du code de l'app (`lib/`) | 88 % |
+| Tests (unité / widget / intégration / SQL) | 205 / 15 / 1 / 82 |
+| Couverture du code de l'app (`lib/`) | 92 % |
 | CI verte sur 4 semaines | 100 % |
 
 ## Contenu
@@ -67,7 +68,8 @@ Chaque point est la fin prévue du MVP calculée cette semaine-là (reste divis�
 | 2026-10-29 | 97 | 0 | 97 | 0.0 | — | 2 | 0 | 100 % |
 | 2026-11-05 | 103 | 14 | 89 | 4.7 | 2027-03-19 | 6 | 14 | 100 % |
 | 2026-11-12 | 103 | 14 | 89 | 4.7 | 2027-03-26 | 0 | 0 | — |
-| 2026-11-13 | 108 | 26 | 82 | 8.7 | 2027-01-19 | 6 | 12 | 100 % |
+| 2026-11-19 | 108 | 26 | 82 | 8.7 | 2027-01-25 | 6 | 12 | 100 % |
+| 2026-11-20 | 109 | 26 | 83 | 7.0 | 2027-02-11 | 2 | 2 | 100 % |
 
 ## Limites connues
 

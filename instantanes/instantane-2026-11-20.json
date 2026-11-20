@@ -1,0 +1,68 @@
+{
+  "date": "2026-11-20",
+  "charge": {
+    "J2 · Follow-up 3 (18/12)": {
+      "total": 45,
+      "terminee": 6,
+      "restante": 39,
+      "ajoutee": 1
+    },
+    "J1 · Follow-up 2 (13/11)": {
+      "total": 25,
+      "terminee": 20,
+      "restante": 5,
+      "ajoutee": 11
+    },
+    "J4 · Oral et rendu (05-07/02)": {
+      "total": 4,
+      "terminee": 0,
+      "restante": 4,
+      "ajoutee": 0
+    },
+    "J3 · Gel du MVP (21/01)": {
+      "total": 35,
+      "terminee": 0,
+      "restante": 35,
+      "ajoutee": 0
+    },
+    "S2 · Après le MVP": {
+      "total": 3,
+      "terminee": 0,
+      "restante": 3,
+      "ajoutee": 0
+    }
+  },
+  "debit_3sem": 7.0,
+  "date_prevue": {
+    "J1 · Follow-up 2 (13/11)": "2026-11-25",
+    "J2 · Follow-up 3 (18/12)": "2027-01-03",
+    "J3 · Gel du MVP (21/01)": "2027-02-07",
+    "J4 · Oral et rendu (05-07/02)": "2027-02-11",
+    "S2 · Après le MVP": "2027-02-14"
+  },
+  "flux": {
+    "cycle_median_j": 0.014583333333333334,
+    "age_max_en_cours_j": 24.113888888888887,
+    "sans_mouvement_14j": 13,
+    "delai_premiere_relecture_j": 6.173611111111111,
+    "pr_relues_par_autre_pct": 3.125
+  },
+  "qualite": {
+    "tests": {
+      "unite": 205,
+      "widget": 15,
+      "integration": 1,
+      "sql": 82
+    },
+    "couverture_lib_pct": 91.73789173789174,
+    "ci_verte_4sem_pct": 100.0
+  },
+  "contenu": {
+    "pins": {
+      "redige": 0,
+      "relu": 0,
+      "publie": 0
+    },
+    "modele_3d": "droits"
+  }
+}
